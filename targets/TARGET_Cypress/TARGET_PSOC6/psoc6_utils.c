@@ -50,7 +50,7 @@
 #define NUM_TCPWM               32
 
 
-#if defined(TARGET_MCU_PSOC6_M0) || PSOC6_DYNSRM_DISABLE || !defined(__MBED__)
+#if defined(TARGET_PSOC6_CM0P) || PSOC6_DYNSRM_DISABLE || !defined(__MBED__)
 
 /****************************************************************************/
 /*                   Dynamic Shared Resource Manager                        */
@@ -89,7 +89,7 @@ do {                                                            \
         _res_[init[i].idx]_field_ = init[i].val;                \
 } while(0)
 
-#if defined(TARGET_MCU_PSOC6_M0)
+#if defined(TARGET_PSOC6_CM0P)
 /*
  * On M0 we start with all resources assigned to M4 and then clear reservations
  * for those assigned to it (M0).
@@ -105,7 +105,7 @@ do {                                                            \
 #define DEFAULT_SCM_RES         1
 #define DEFAULT_TCPWM_RES       1
 
-#else // defined(TARGET_MCU_PSOC6_M0)
+#else // defined(TARGET_PSOC6_CM0P)
 
 #define SRM_PORT(port, pins)               {(port), (pins)}
 #define SRM_DIVIDER(type, dividers)        {(type), (dividers)}
@@ -117,7 +117,7 @@ do {                                                            \
 #define DEFAULT_DIVIDER8_RES    0
 #define DEFAULT_SCM_RES         0
 #define DEFAULT_TCPWM_RES       0
-#endif // defined(TARGET_MCU_PSOC6_M0)
+#endif // defined(TARGET_PSOC6_CM0P)
 
 #include "psoc6_static_srm.h"
 
@@ -340,7 +340,7 @@ void cy_free_tcpwm(uint32_t tcpwm_num)
  * On M4 IRQs are statically pre-assigned to NVIC channels.
  */
 
-#if defined(TARGET_MCU_PSOC6_M0)
+#if defined(TARGET_PSOC6_CM0P)
 
 #define NUM_NVIC_CHANNELS       ((uint32_t)(NvicMux31_IRQn - NvicMux0_IRQn) + 1)
 
@@ -433,12 +433,13 @@ void cy_get_bd_mac_address(uint8_t *buffer)
     }
 }
 
-#endif // defined(TARGET_MCU_PSOC6_M0)
+#endif // defined(TARGET_PSOC6_CM0P)
 
-#endif // defined(TARGET_MCU_PSOC6_M0) || PSOC6_DSRM_DISABLE || !defined(__MBED__)
+#endif // defined(TARGET_PSOC6_CM0P) || PSOC6_DSRM_DISABLE || !defined(__MBED__)
 
 void cy_srm_initialize(void)
 {
+#if 0 // do not allocate any resources for CM0+
 #if PSOC6_DYNSRM_DISABLE
 #ifdef M0_ASSIGNED_PORTS
     SRM_INIT_RESOURCE(uint8_t, port_reservations,, M0_ASSIGNED_PORTS);
@@ -453,5 +454,6 @@ void cy_srm_initialize(void)
     SRM_INIT_RESOURCE(uint8_t, tcpwm_reservations,,  M0_ASSIGNED_TCPWMS);
 #endif
 #endif // PSOC6_DYNSRM_DISABLE
+#endif
 }
 

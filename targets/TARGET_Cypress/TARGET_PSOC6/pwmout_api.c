@@ -121,11 +121,11 @@ static void pwm_start(pwmout_t *obj, uint32_t new_period, uint32_t new_pulse_wid
  * Callback handler to restart the timer after deep sleep.
  */
 #if DEVICE_SLEEP && DEVICE_LPTICKER
-static cy_en_syspm_status_t pwm_pm_callback(cy_stc_syspm_callback_params_t *callback_params)
+static cy_en_syspm_status_t pwm_pm_callback(cy_stc_syspm_callback_params_t *callback_params, cy_en_syspm_callback_mode_t mode)
 {
     pwmout_t *obj = (pwmout_t *)callback_params->context;
 
-    switch (callback_params->mode) {
+    switch (mode) {
         case CY_SYSPM_BEFORE_TRANSITION:
             /* Disable timer before transition */
             Cy_TCPWM_PWM_Disable(obj->base, obj->counter_id);

@@ -19,8 +19,8 @@
 #include "device.h"
 #include "mbed_error.h"
 #include "lp_ticker_api.h"
-#include "device/drivers/peripheral/mcwdt/cy_mcwdt.h"
-#include "device/drivers/peripheral/sysint/cy_sysint.h"
+#include "cy_mcwdt.h"
+#include "cy_sysint.h"
 #include "psoc6_utils.h"
 
 #if DEVICE_LPTICKER
@@ -29,7 +29,7 @@
  * Low Power Timer API on PSoC6 uses MCWD0 timer0 to implement functionality.
  */
 
-#if defined(TARGET_MCU_PSOC6_M0)
+#if defined(TARGET_PSOC6_CM0P)
 #define LPT_MCWDT_UNIT          MCWDT_STRUCT0
 #define LPT_INTERRUPT_PRIORITY  3
 #define LPT_INTERRUPT_SOURCE    srss_interrupt_mcwdt_0_IRQn
@@ -62,7 +62,7 @@ static cy_stc_mcwdt_config_t config = {
 
 // Interrupt configuration.
 static cy_stc_sysint_t lpt_sysint_config = {
-#if defined(TARGET_MCU_PSOC6_M0)
+#if defined(TARGET_PSOC6_CM0P)
     .intrSrc = (IRQn_Type)(-1),
     .cm0pSrc = LPT_INTERRUPT_SOURCE,
 #else
@@ -81,7 +81,7 @@ void lp_ticker_init(void)
         return;
     }
 
-#ifdef TARGET_MCU_PSOC6_M0
+#ifdef TARGET_PSOC6_CM0P
     // Allocate NVIC channel.
     lpt_sysint_config.intrSrc = cy_m0_nvic_allocate_channel(CY_LP_TICKER_IRQN_ID);
     if (lpt_sysint_config.intrSrc == (IRQn_Type)(-1)) {
@@ -102,7 +102,7 @@ void lp_ticker_free(void)
 {
     NVIC_DisableIRQ(lpt_sysint_config.intrSrc);
     Cy_MCWDT_Disable(LPT_MCWDT_UNIT, CY_MCWDT_CTR0, LPT_MCWDT_DELAY_WAIT);
-#ifdef TARGET_MCU_PSOC6_M0
+#ifdef TARGET_PSOC6_CM0P
     cy_m0_nvic_release_channel(CY_LP_TICKER_IRQN_ID, lpt_sysint_config.intrSrc);
     lpt_sysint_config.intrSrc = (IRQn_Type)(-1);
 #endif

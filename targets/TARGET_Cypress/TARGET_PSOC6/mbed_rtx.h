@@ -19,7 +19,7 @@
 #ifndef MBED_MBED_RTX_H
 #define MBED_MBED_RTX_H
 
-#if defined(TARGET_MCU_PSOC6_M0)
+#if defined(TARGET_PSOC6_CM0P)
 
 #ifdef TARGET_PSA
 #ifndef INITIAL_SP
@@ -31,7 +31,7 @@
 #endif // INITIAL_SP
 
 #endif // TARGET_PSA
-#elif defined(TARGET_MCU_PSOC6_M4)
+#elif defined(TARGET_PSOC6_CM4)
 
 #ifdef TARGET_PSA
 #ifndef INITIAL_SP

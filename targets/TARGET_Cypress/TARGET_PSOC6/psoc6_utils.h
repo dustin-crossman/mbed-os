@@ -22,8 +22,8 @@
 
 #include <stdint.h>
 #include <device.h>
-#include "drivers/peripheral/gpio/cy_gpio.h"
-#include "drivers/peripheral/sysclk/cy_sysclk.h"
+#include "cy_gpio.h"
+#include "cy_sysclk.h"
 
 #else
 
@@ -65,7 +65,7 @@ uint32_t cy_clk_reserve_divider(cy_en_divider_types_t div_type, uint32_t div_num
  */
 void cy_clk_free_divider(cy_en_divider_types_t div_type, uint32_t div_num);
 
-#ifdef TARGET_MCU_PSOC6_M0
+#ifdef TARGET_PSOC6_CM0P
 
 #include "gpio_irq_api.h"
 

@@ -23,10 +23,10 @@
 #include "mbed_error.h"
 #include "psoc6_utils.h"
 
-#include "drivers/peripheral/sysint/cy_sysint.h"
-#include "drivers/peripheral/sysclk/cy_sysclk.h"
-#include "drivers/peripheral/tcpwm/cy_tcpwm_counter.h"
-#include "drivers/peripheral/syspm/cy_syspm.h"
+#include "cy_sysint.h"
+#include "cy_sysclk.h"
+#include "cy_tcpwm_counter.h"
+#include "cy_syspm.h"
 
 /** Each CPU core in PSoC6 needs its own usec timer.
  ** Although each of TCPWM timers have two compare registers,
@@ -35,23 +35,23 @@
  **/
 
 
-#if defined(TARGET_MCU_PSOC6_M0)
+#if defined(TARGET_PSOC6_CM0P)
 
 #define TICKER_COUNTER_UNIT                 TCPWM0
 #define TICKER_COUNTER_NUM                  0
 #define TICKER_COUNTER_INTERRUPT_SOURCE     tcpwm_0_interrupts_0_IRQn
 #define TICKER_COUNTER_NVIC_IRQN            CY_M0_CORE_IRQ_CHANNEL_US_TICKER
 #define TICKER_COUNTER_INTERRUPT_PRIORITY   3
-#define TICKER_CLOCK_DIVIDER_NUM            0
+#define TICKER_CLOCK_DIVIDER_NUM            6
 
-#elif defined(TARGET_MCU_PSOC6_M4)
+#elif defined(TARGET_PSOC6_CM4)
 
 #define TICKER_COUNTER_UNIT                 TCPWM0
 #define TICKER_COUNTER_NUM                  1
 #define TICKER_COUNTER_INTERRUPT_SOURCE     tcpwm_0_interrupts_1_IRQn
 #define TICKER_COUNTER_NVIC_IRQN            TICKER_COUNTER_INTERRUPT_SOURCE
 #define TICKER_COUNTER_INTERRUPT_PRIORITY   6
-#define TICKER_CLOCK_DIVIDER_NUM            1
+#define TICKER_CLOCK_DIVIDER_NUM            7
 
 #else
 #error "Unknown MCU type."
@@ -65,7 +65,7 @@ static const ticker_info_t us_ticker_info = {
 
 static const cy_stc_sysint_t us_ticker_sysint_cfg = {
     .intrSrc = TICKER_COUNTER_NVIC_IRQN,
-#if defined(TARGET_MCU_PSOC6_M0)
+#if defined(TARGET_PSOC6_CM0P)
     .cm0pSrc = TICKER_COUNTER_INTERRUPT_SOURCE,
 #endif
     .intrPriority = TICKER_COUNTER_INTERRUPT_PRIORITY
@@ -86,7 +86,7 @@ static const cy_stc_tcpwm_counter_config_t cy_counter_config = {
 };
 
 // PM callback to be executed when exiting deep sleep.
-static cy_en_syspm_status_t ticker_pm_callback(cy_stc_syspm_callback_params_t *callbackParams);
+static cy_en_syspm_status_t ticker_pm_callback(cy_stc_syspm_callback_params_t *callbackParams, cy_en_syspm_callback_mode_t mode);
 
 static cy_stc_syspm_callback_params_t ticker_pm_callback_params = {
     .base = TICKER_COUNTER_UNIT
@@ -103,9 +103,9 @@ static cy_stc_syspm_callback_t ticker_pm_callback_handler = {
 /*
  * Callback handler to restart the timer after deep sleep.
  */
-static cy_en_syspm_status_t ticker_pm_callback(cy_stc_syspm_callback_params_t *params)
+static cy_en_syspm_status_t ticker_pm_callback(cy_stc_syspm_callback_params_t *params, cy_en_syspm_callback_mode_t mode)
 {
-    if (params->mode == CY_SYSPM_AFTER_TRANSITION) {
+    if (mode == CY_SYSPM_AFTER_TRANSITION) {
         Cy_TCPWM_Counter_Enable(TICKER_COUNTER_UNIT, TICKER_COUNTER_NUM);
         Cy_TCPWM_TriggerStart(TICKER_COUNTER_UNIT, 1UL << TICKER_COUNTER_NUM);
     }
@@ -149,7 +149,7 @@ void us_ticker_init(void)
     }
     Cy_TCPWM_TriggerStart(TICKER_COUNTER_UNIT, 1UL << TICKER_COUNTER_NUM);
 
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
     if (cy_m0_nvic_reserve_channel(TICKER_COUNTER_NVIC_IRQN, CY_US_TICKER_IRQN_ID) == (IRQn_Type)(-1)) {
         error("Microsecond ticker NVIC channel reservation conflict.");
     }
@@ -163,7 +163,7 @@ void us_ticker_free(void)
     us_ticker_disable_interrupt();
     Cy_TCPWM_Counter_Disable(TICKER_COUNTER_UNIT, TICKER_COUNTER_NUM);
     Cy_SysPm_UnregisterCallback(&ticker_pm_callback_handler);
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
     cy_m0_nvic_release_channel(TICKER_COUNTER_NVIC_IRQN, CY_US_TICKER_IRQN_ID);
 #endif //
     us_ticker_inited = 0;

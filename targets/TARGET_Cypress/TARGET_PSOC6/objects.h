@@ -25,8 +25,8 @@
 
 #include "gpio_irq_api.h"
 #include "gpio_object.h"
-#include "drivers/peripheral/sysclk/cy_sysclk.h"
-#include "drivers/peripheral/syspm/cy_syspm.h"
+#include "cy_sysclk.h"
+#include "cy_syspm.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,7 +40,7 @@ struct gpio_irq_s {
     gpio_irq_event      mode;
     gpio_irq_handler    handler;
     uint32_t            id_arg;
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
     cy_en_intr_t        cm0p_irq_src;
 #endif
 };
@@ -113,7 +113,7 @@ struct spi_s {
     cy_stc_scb_spi_context_t            context;
 #if DEVICE_SPI_ASYNCH
     IRQn_Type                           irqn;
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
     cy_en_intr_t                        cm0p_irq_src;
 #endif
     uint16_t                            pending;
@@ -153,7 +153,7 @@ struct i2c_s {
     cy_stc_scb_i2c_master_xfer_config_t rx_config;
     cy_stc_scb_i2c_master_xfer_config_t tx_config;
     IRQn_Type                           irqn;
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
     cy_en_intr_t                        cm0p_irq_src;
 #endif
     uint16_t                            pending;

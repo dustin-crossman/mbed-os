@@ -150,7 +150,7 @@ static void (*irq_dispatcher_table[])(void) = {
 
 static IRQn_Type gpio_irq_allocate_channel(gpio_irq_t *obj)
 {
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
     obj->cm0p_irq_src = ioss_interrupts_gpio_0_IRQn + obj->port_id;
     return cy_m0_nvic_allocate_channel(CY_GPIO_IRQN_ID + obj->port_id);
 #else
@@ -160,7 +160,7 @@ static IRQn_Type gpio_irq_allocate_channel(gpio_irq_t *obj)
 
 static void gpio_irq_release_channel(IRQn_Type channel, uint32_t port_id)
 {
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
     cy_m0_nvic_release_channel(channel, CY_GPIO_IRQN_ID + port_id);
 #endif //M0
 }
@@ -178,7 +178,7 @@ static int gpio_irq_setup_channel(gpio_irq_t *obj)
         // Configure NVIC
         irq_config.intrPriority = GPIO_DEFAULT_IRQ_PRIORITY;
         irq_config.intrSrc = irqn;
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
         irq_config.cm0pSrc = obj->cm0p_irq_src;
 #endif
         if (Cy_SysInt_Init(&irq_config, irq_dispatcher_table[obj->port_id]) != CY_SYSINT_SUCCESS) {

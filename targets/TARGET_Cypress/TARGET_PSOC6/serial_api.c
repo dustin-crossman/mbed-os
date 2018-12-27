@@ -27,10 +27,10 @@
 #include "serial_api.h"
 #include "psoc6_utils.h"
 
-#include "drivers/peripheral/sysclk/cy_sysclk.h"
-#include "drivers/peripheral/gpio/cy_gpio.h"
-#include "drivers/peripheral/scb/cy_scb_uart.h"
-#include "drivers/peripheral/sysint/cy_sysint.h"
+#include "cy_sysclk.h"
+#include "cy_gpio.h"
+#include "cy_scb_uart.h"
+#include "cy_sysint.h"
 
 #define UART_OVERSAMPLE                 12
 #define UART_DEFAULT_BAUDRATE           115200
@@ -93,7 +93,7 @@ typedef struct irq_info_s {
     uart_irq_handler    handler;
     uint32_t            id_arg;
     IRQn_Type           irqn;
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
     cy_en_intr_t        cm0p_irq_src;
 #endif
 } irq_info_t;
@@ -188,7 +188,7 @@ static void (*irq_dispatcher_table[])(void) = {
 
 static IRQn_Type serial_irq_allocate_channel(serial_obj_t *obj)
 {
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
     irq_info[obj->serial_id].cm0p_irq_src = scb_0_interrupt_IRQn + obj->serial_id;
     return cy_m0_nvic_allocate_channel(CY_SERIAL_IRQN_ID + obj->serial_id);
 #else
@@ -198,7 +198,7 @@ static IRQn_Type serial_irq_allocate_channel(serial_obj_t *obj)
 
 static void serial_irq_release_channel(IRQn_Type channel, uint32_t serial_id)
 {
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
     cy_m0_nvic_release_channel(channel, CY_SERIAL_IRQN_ID + serial_id);
 #endif //M0
 }
@@ -216,7 +216,7 @@ static int serial_irq_setup_channel(serial_obj_t *obj)
         // Configure NVIC
         irq_config.intrPriority = SERIAL_DEFAULT_IRQ_PRIORITY;
         irq_config.intrSrc = irqn;
-#if defined (TARGET_MCU_PSOC6_M0)
+#if defined (TARGET_PSOC6_CM0P)
         irq_config.cm0pSrc = info->cm0p_irq_src;
 #endif
         if (Cy_SysInt_Init(&irq_config, irq_dispatcher_table[obj->serial_id]) != CY_SYSINT_SUCCESS) {
