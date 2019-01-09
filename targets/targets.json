@@ -7720,7 +7720,8 @@
             "STDIO_MESSAGES",
             "LPTICKER",
             "SLEEP",
-            "FLASH"
+            "FLASH",
+            "CAPSENSE"
         ],
         "release_versions": ["5"],
         "extra_labels": ["Cypress", "PSOC6"],
@@ -7838,6 +7839,94 @@
             "non-secure-ram-size": "0x37700",
             "shared-ram-start": "0x08047700",
             "shared-ram-size": "0x100"
+        }
+    },
+    "CY8CKIT_062_WIFI_BT": {
+        "inherits": ["MCU_PSOC6_M4"],
+        "sub_target": "sub_target thing is needed for PSoC6.py script to look for CM0+ image",
+        "supported_form_factors": ["ARDUINO"],
+        "extra_labels_add": ["PSOC6_01", "CY8C6XX7"],
+        "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
+        "detect_code": ["6000"],
+        "m0_core_img": "psoc6_01_cm0p_sleep.hex",
+        "post_binary_hook": {
+            "function": "PSOC6Code.complete"
+        },
+        "config": {
+            "system-clock": {
+                "help": "Desired frequency of main clock (Hz)",
+                "value": "100000000UL",
+                "macro_name": "CY_CLK_HFCLK0_FREQ_HZ"
+            },
+            "peri-clock": {
+                "help": "Desired frequency of peripheral clock (Hz)",
+                "value": "50000000UL",
+                "macro_name": "CY_CLK_PERICLK_FREQ_HZ"
+            },
+            "m0-clock": {
+                "help": "Desired frequency of M0+ core clock (Hz)",
+                "value": "50000000UL",
+                "macro_name": "CY_CLK_SLOWCLK_FREQ_HZ"
+            }
+        }
+    },
+    "CY8CKIT_062_BLE": {
+        "inherits": ["MCU_PSOC6_M4"],
+        "sub_target": "sub_target thing is needed for PSoC6.py script to look for CM0+ image",
+        "supported_form_factors": ["ARDUINO"],
+        "extra_labels_add": ["PSOC6_01", "CY8C6XX7"],
+        "macros_add": ["CY8C6347BZI_BLD53", "PSOC6_DYNSRM_DISABLE=1"],
+        "detect_code": ["6000"],
+        "m0_core_img": "psoc6_01_cm0p_sleep.hex",
+        "post_binary_hook": {
+            "function": "PSOC6Code.complete"
+        },
+        "config": {
+            "system-clock": {
+                "help": "Desired frequency of main clock (Hz)",
+                "value": "100000000UL",
+                "macro_name": "CY_CLK_HFCLK0_FREQ_HZ"
+            },
+            "peri-clock": {
+                "help": "Desired frequency of peripheral clock (Hz)",
+                "value": "50000000UL",
+                "macro_name": "CY_CLK_PERICLK_FREQ_HZ"
+            },
+            "m0-clock": {
+                "help": "Desired frequency of M0+ core clock (Hz)",
+                "value": "50000000UL",
+                "macro_name": "CY_CLK_SLOWCLK_FREQ_HZ"
+            }
+        }
+    },
+    "CY8CPROTO_062_4343W": {
+        "inherits": ["MCU_PSOC6_M4"],
+        "sub_target": "sub_target thing is needed for PSoC6.py script to look for CM0+ image",
+        "supported_form_factors": ["ARDUINO"],
+        "device_has_remove": ["ANALOGOUT"],
+        "extra_labels_add": ["PSOC6_02", "CY8C6XXA"],
+        "macros_add": ["CY8C624ABZI_D44", "PSOC6_DYNSRM_DISABLE=1"],
+        "detect_code": ["6000"],
+        "m0_core_img": "psoc6_02_cm0p_sleep.hex",
+        "post_binary_hook": {
+            "function": "PSOC6Code.complete"
+        },
+        "config": {
+            "system-clock": {
+                "help": "Desired frequency of main clock (Hz)",
+                "value": "100000000UL",
+                "macro_name": "CY_CLK_HFCLK0_FREQ_HZ"
+            },
+            "peri-clock": {
+                "help": "Desired frequency of peripheral clock (Hz)",
+                "value": "50000000UL",
+                "macro_name": "CY_CLK_PERICLK_FREQ_HZ"
+            },
+            "m0-clock": {
+                "help": "Desired frequency of M0+ core clock (Hz)",
+                "value": "50000000UL",
+                "macro_name": "CY_CLK_SLOWCLK_FREQ_HZ"
+            }
         }
     },
     "TMPM3HQ": {

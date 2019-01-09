@@ -24,10 +24,10 @@
 #include "spi_api.h"
 #include "psoc6_utils.h"
 
-#include "drivers/peripheral/sysclk/cy_sysclk.h"
-#include "drivers/peripheral/gpio/cy_gpio.h"
-#include "drivers/peripheral/scb/cy_scb_spi.h"
-#include "drivers/peripheral/sysint/cy_sysint.h"
+#include "cy_sysclk.h"
+#include "cy_gpio.h"
+#include "cy_scb_spi.h"
+#include "cy_sysint.h"
 
 #define SPI_DEFAULT_SPEED               100000
 #define NUM_SPI_PORTS                   8
@@ -83,7 +83,7 @@ static IRQn_Type spi_irq_allocate_channel(spi_obj_t *obj)
     obj->cm0p_irq_src = scb_0_interrupt_IRQn + obj->spi_id;
     return cy_m0_nvic_allocate_channel(CY_SERIAL_IRQN_ID + obj->spi_id);
 #else
-    return (IRQn_Type)(ioss_interrupts_gpio_0_IRQn + obj->spi_id);
+    return (IRQn_Type)(scb_0_interrupt_IRQn + obj->spi_id);
 #endif // M0
 }
 
@@ -274,6 +274,7 @@ void spi_init(spi_t *obj_in, PinName mosi, PinName miso, PinName sclk, PinName s
         obj->div_num = CY_INVALID_DIVIDER;
         obj->ms_mode = CY_SCB_SPI_MASTER;
 #if DEVICE_SPI_ASYNCH
+        obj->irqn = unconnected_IRQn;
         obj->pending = PENDING_NONE;
         obj->events = 0;
         obj->tx_buffer = NULL;

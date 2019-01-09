@@ -454,6 +454,7 @@ void cy_srm_initialize(void)
         tcpwm_reservations[i] = DEFAULT_TCPWM_RES;
     }
 
+#if 0 // do not allocate any resources for CM0+
 #if PSOC6_DYNSRM_DISABLE
 #ifdef M0_ASSIGNED_PORTS
     SRM_INIT_RESOURCE(uint8_t, port_reservations,, M0_ASSIGNED_PORTS);
@@ -469,5 +470,6 @@ void cy_srm_initialize(void)
 #endif
 #endif // PSOC6_DYNSRM_DISABLE
 #endif // defined(TARGET_MCU_PSOC6_M0) || PSOC6_DSRM_DISABLE || !defined(__MBED__)
+#endif
 }
 

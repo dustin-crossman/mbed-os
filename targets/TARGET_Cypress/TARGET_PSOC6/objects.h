@@ -25,8 +25,8 @@
 
 #include "gpio_irq_api.h"
 #include "gpio_object.h"
-#include "drivers/peripheral/sysclk/cy_sysclk.h"
-#include "drivers/peripheral/syspm/cy_syspm.h"
+#include "cy_sysclk.h"
+#include "cy_syspm.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -219,6 +219,15 @@ struct trng_s {
     void *dummy;
 };
 #endif // DEVICE_TRNG
+
+#if DEVICE_CAPSENSE
+#include "cy_capsense.h"
+
+typedef struct {
+    cy_stc_capsense_context_t * ptrContext;
+} capsense_t;
+
+#endif /* DEVICE_CAPSENSE */
 
 #ifdef __cplusplus
 }
