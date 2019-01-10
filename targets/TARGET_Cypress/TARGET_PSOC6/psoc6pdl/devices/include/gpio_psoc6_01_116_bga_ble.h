@@ -5,12 +5,11 @@
 * PSoC6_01 device GPIO header for 116-BGA-BLE package
 *
 * \note
-* Generator version: 1.4.0.1223
-* Database revision: a3800c2d
+* Generator version: 1.3.6934.1396
 *
 ********************************************************************************
 * \copyright
-* Copyright 2016-2018, Cypress Semiconductor Corporation. All rights reserved.
+* Copyright 2016-2019, Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.

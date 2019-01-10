@@ -469,7 +469,7 @@ void cy_srm_initialize(void)
     SRM_INIT_RESOURCE(uint8_t, tcpwm_reservations,,  M0_ASSIGNED_TCPWMS);
 #endif
 #endif // PSOC6_DYNSRM_DISABLE
-#endif // defined(TARGET_MCU_PSOC6_M0) || PSOC6_DSRM_DISABLE || !defined(__MBED__)
 #endif
+#endif // defined(TARGET_MCU_PSOC6_M0) || PSOC6_DSRM_DISABLE || !defined(__MBED__)
 }
 

@@ -19,6 +19,9 @@
 #define MBED_CMSIS_H
 
 #include "cy_device_headers.h"
+
+/* Cypress-provided #define BLE conflicts with class BLE
+ * defined in features/FEATURE_BLE/ble/BLE.h */
 #undef BLE
 
 #endif

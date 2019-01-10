@@ -5,12 +5,11 @@
 * Common header file to be included by the drivers.
 *
 * \note
-* Generator version: 1.4.0.1223
-* Database revision: 7f474c27
+* Generator version: 1.3.6934.1396
 *
 ********************************************************************************
 * \copyright
-* Copyright 2016-2018, Cypress Semiconductor Corporation. All rights reserved.
+* Copyright 2016-2019, Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.

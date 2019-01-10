@@ -5,12 +5,11 @@
 * PSoC6_03 device GPIO header for 68-QFN package
 *
 * \note
-* Generator version: 1.4.0.1223
-* Database revision: a3800c2d
+* Generator version: 1.3.6934.1396
 *
 ********************************************************************************
 * \copyright
-* Copyright 2016-2018, Cypress Semiconductor Corporation. All rights reserved.
+* Copyright 2016-2019, Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -55,6 +54,7 @@ enum
 /* AMUX Splitter Controls */
 typedef enum
 {
+    AMUX_SPLIT_CTL_0                = 0x0000u,  /* Left = AMUXBUS_SRSS._ADFT_VDDD; Right = AMUXBUS_SRSS__ADFT_VDDD */
     AMUX_SPLIT_CTL_4                = 0x0004u,  /* Left = AMUXBUS_CSD; Right = AMUXBUS_CSD1 */
     AMUX_SPLIT_CTL_5                = 0x0005u   /* Left = AMUXBUS_CSD1; Right = AMUXBUS_SAR */
 } cy_en_amux_split_t;
