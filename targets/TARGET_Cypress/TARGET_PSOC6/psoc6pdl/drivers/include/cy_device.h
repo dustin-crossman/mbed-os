@@ -704,8 +704,8 @@ void Cy_PDL_Init(const cy_stc_device_t * device);
 #define PERI_MS_PPU_FX_MS_ATT(base)         ((volatile uint32_t *) &(((PERI_MS_PPU_FX_V2_Type *)(base))->MS_ATT0))
 #define PERI_MS_PPU_FX_SL_ATT(base)         ((volatile uint32_t *) &(((PERI_MS_PPU_FX_V2_Type *)(base))->SL_ATT0))
 
-#define PROT_PERI_PPU_PR_STRUCT_IDX_ATT0(stcIdx)    ((CY_PERI_BASE)->PPU_PR[(stcIdx)].ADDR0)
-#define PROT_PERI_PPU_PR_STRUCT_IDX_ATT1(stcIdx)    ((CY_PERI_BASE)->PPU_PR[(stcIdx)].ADDR1)
+#define PROT_PERI_PPU_PR_STRUCT_IDX_ATT0(stcIdx)    ((CY_PERI_BASE)->PPU_PR[(stcIdx)].ATT0)
+#define PROT_PERI_PPU_PR_STRUCT_IDX_ATT1(stcIdx)    ((CY_PERI_BASE)->PPU_PR[(stcIdx)].ATT1)
 
 #define PROT_PERI_PPU_PR_STRUCT_IDX(stcIdx)         ((PERI_PPU_PR_Type*) &(CY_PERI_BASE)->PPU_PR[(stcIdx)])
 
