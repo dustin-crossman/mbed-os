@@ -5,7 +5,7 @@
 * CY8C6247BZI-AUD54 device header
 *
 * \note
-* Generator version: 1.3.6934.1396
+* Generator version: 1.4.0.1229
 *
 ********************************************************************************
 * \copyright
@@ -442,6 +442,8 @@ typedef enum {
 /* Memory Blocks */
 #define CY_ROM_BASE                     0x00000000UL
 #define CY_ROM_SIZE                     0x00020000UL
+#define CY_SRAM_BASE                    0x08000000UL
+#define CY_SRAM_SIZE                    0x00048000UL
 #define CY_FLASH_BASE                   0x10000000UL
 #define CY_FLASH_SIZE                   0x00100000UL
 #define CY_EM_EEPROM_BASE               0x14000000UL
@@ -452,8 +454,6 @@ typedef enum {
 #define CY_SFLASH_SIZE                  0x00008000UL
 #define CY_EFUSE_BASE                   0x402C0800UL
 #define CY_EFUSE_SIZE                   0x00000200UL
-#define CY_SRAM_BASE                    0x08000000UL
-#define CY_SRAM_SIZE                    0x00048000UL
 
 #include "system_psoc6.h"                       /*!< PSoC 6 System */
 
