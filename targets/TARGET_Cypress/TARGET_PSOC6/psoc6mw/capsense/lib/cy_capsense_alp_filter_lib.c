@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_alp_filter_lib.c
-* \version 1.0
+* \version 1.1
 *
 * \brief
 *  This file provides implementation for the ALP Filter.

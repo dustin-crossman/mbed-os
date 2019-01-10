@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_processing.h
-* \version 1.0
+* \version 1.1
 *
 * \brief
 * This file provides the function prototypes for the Data Processing module.

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense.h
-* \version 1.0
+* \version 1.1
 *
 * \brief
 * This file includes all the header files of the CapSense middleware.
@@ -175,6 +175,11 @@
 *   <tr>
 *     <td>1.0</td>
 *     <td>The initial version.</td>
+*     <td></td>
+*   </tr>
+*   <tr>
+*     <td>1.1</td>
+*     <td>TBD</td>
 *     <td></td>
 *   </tr>
 * </table>

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_ballistic_multiplier_lib.c
-* \version 1.0
+* \version 1.1
 *
 * \brief
 *  This file provides the API specific for Ballistic Multiplier implementation.

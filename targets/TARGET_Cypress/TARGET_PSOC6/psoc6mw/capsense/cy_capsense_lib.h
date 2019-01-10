@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_lib.h
-* \version 1.0
+* \version 1.1
 *
 * \brief
 * The file contains application public interface to the CapSense library.

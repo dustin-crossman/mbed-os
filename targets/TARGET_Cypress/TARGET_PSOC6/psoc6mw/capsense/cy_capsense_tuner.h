@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_capsense_tuner.h
-* \version 1.0
+* \version 1.1
 *
 * \brief
 * This file provides Tuner FW module function prototypes.
