@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_usbfs_dev_drv.h
-* \version 1.0
+* \version 1.10
 *
 * Provides API declarations of the USBFS driver.
 *
@@ -624,6 +624,18 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
+*     <td rowspan="2"> 1.10</td>
+*     <td>Fixed \ref Cy_USBFS_Dev_Drv_Disable function to not disable DMA 
+*         in the CPU mode.</td>
+*     <td>Calling this function triggers assert because DMA for endpoints is not 
+*         initialized/used in the CPU mode.</td>
+*   </tr>
+*   <tr>
+*     <td>Updated condition statement in the \ref CY_USBFS_DEV_DRV_ALLOC_ENDPOINT_BUFFER 
+*         macro to explicitly check against non-zero.</td>
+*     <td>Fixed MISRA 13.2 violation in the macro.</td>
+*   </tr>
+*   <tr>
 *     <td>1.0</td>
 *     <td>The initial version.</td>
 *     <td></td>
@@ -680,7 +692,7 @@ extern "C" {
 #define CY_USBFS_VERSION_MAJOR      (1)
 
 /** USBFS Driver minor version */
-#define CY_USBFS_VERSION_MINOR      (0)
+#define CY_USBFS_VERSION_MINOR      (10)
 
 /** USBFS Driver identifier */
 #define CY_USBFS_ID                 CY_PDL_DRV_ID(0x3BU)
@@ -1268,7 +1280,7 @@ __STATIC_INLINE cy_en_usbfs_dev_drv_lpm_req_t Cy_USBFS_Dev_Drv_Lpm_GetResponse(U
 * hardware buffer access types in the driver (See section 
 * \ref group_usbfs_dev_drv_ep_management_buf_access for more information). 
 */
-#define CY_USBFS_DEV_DRV_ALLOC_ENDPOINT_BUFFER(buf, size)  uint8_t buf[((size) & 0x1U) ? ((size) + 1U) : (size)] CY_ALIGN(2)
+#define CY_USBFS_DEV_DRV_ALLOC_ENDPOINT_BUFFER(buf, size)  uint8_t buf[(0U != ((size) & 0x1U)) ? ((size) + 1U) : (size)] CY_ALIGN(2)
 /** \} group_usbfs_dev_drv_macros */
 
 /**

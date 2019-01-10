@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_usbfs_dev_drv.c
-* \version 1.0
+* \version 1.10
 *
 * Provides general API implementation of the USBFS driver.
 *
@@ -336,7 +336,10 @@ void Cy_USBFS_Dev_Drv_Disable(USBFS_Type *base, cy_stc_usbfs_dev_drv_context_t *
     USBFS_DEV_CR0(base) &= ~USBFS_USBDEV_CR0_USB_ENABLE_Msk;
 
     /* Disable DMA channels */
-    DmaDisable(context);
+    if (CY_USBFS_DEV_DRV_EP_MANAGEMENT_CPU != context->mode)
+    {
+        DmaDisable(context);
+    }
 }
 
 

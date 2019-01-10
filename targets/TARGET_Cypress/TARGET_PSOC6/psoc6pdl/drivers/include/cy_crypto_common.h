@@ -1,17 +1,25 @@
 /***************************************************************************//**
 * \file cy_crypto_common.h
-* \version 2.10
+* \version 2.20
 *
 * \brief
 *  This file provides common constants and parameters
 *  for the Crypto driver.
 *
 ********************************************************************************
-* \copyright
-* Copyright 2016-2018, Cypress Semiconductor Corporation.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions,
-* disclaimers, and limitations in the end user license agreement accompanying
-* the software package with which this file was provided.
+* Copyright 2016-2018 Cypress Semiconductor Corporation
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
 *******************************************************************************/
 
 
@@ -48,7 +56,7 @@
 #define CY_CRYPTO_DRV_VERSION_MAJOR         2
 
 /** Driver minor version */
-#define CY_CRYPTO_DRV_VERSION_MINOR         10
+#define CY_CRYPTO_DRV_VERSION_MINOR         20
 
 /**
 * \addtogroup group_crypto_macros
@@ -61,8 +69,11 @@
 /** Defines Crypto_Sync non-blocking execution type parameter */
 #define CY_CRYPTO_SYNC_NON_BLOCKING       (false)
 
+/** Defines the Crypto DES block size (in bytes) */
+#define CY_CRYPTO_DES_BLOCK_SIZE          (8u)
+
 /** Defines the Crypto DES key size (in bytes) */
-#define CY_CRYPTO_DES_KEY_SIZE            (8u)
+#define CY_CRYPTO_DES_KEY_SIZE            (CY_CRYPTO_DES_BLOCK_SIZE)
 
 /** Defines the Crypto TDES key size (in bytes) */
 #define CY_CRYPTO_TDES_KEY_SIZE           (24u)
@@ -102,6 +113,8 @@
 #define CY_CRYPTO_SHA512_224_DIGEST_SIZE    (28u)
 /** Hash size for the SHA512_256 mode (in bytes) */
 #define CY_CRYPTO_SHA512_256_DIGEST_SIZE    (32u)
+/** Maximal hash size for the SHA modes (in bytes) */
+#define CY_CRYPTO_SHA_MAX_DIGEST_SIZE       (CY_CRYPTO_SHA512_DIGEST_SIZE)
 
 /** Block size for the SHA1 mode (in bytes)   */
 #define CY_CRYPTO_SHA1_BLOCK_SIZE           (64u)
@@ -393,7 +406,10 @@ typedef enum
     CY_CRYPTO_HW_NOT_ENABLED      = CY_CRYPTO_ID | CY_PDL_STATUS_ERROR   | 0x09u,
 
     /** The Crypto operation is not supported. */
-    CY_CRYPTO_NOT_SUPPORTED       = CY_CRYPTO_ID | CY_PDL_STATUS_ERROR   | 0x0Au
+    CY_CRYPTO_NOT_SUPPORTED       = CY_CRYPTO_ID | CY_PDL_STATUS_ERROR   | 0x0Au,
+
+    /** The Crypto operation parameters are incorrect. */
+    CY_CRYPTO_BAD_PARAMS          = CY_CRYPTO_ID | CY_PDL_STATUS_ERROR   | 0x0Bu
 
 } cy_en_crypto_status_t;
 
