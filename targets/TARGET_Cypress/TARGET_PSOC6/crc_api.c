@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2017 ARM Limited
+ * Copyright (c) 2019 Cypress Semiconductor Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ static uint32_t crcWidth = 0;
 static uint32_t crcShift = 0;
 static uint32_t crcXorMask;
 
-/* Cypress crypto supports ANY CRC algorithms */
+/* Cypress CRYPTO HW supports ANY CRC algorithms from CRC-3 to CRC-32 */
 bool hal_crc_is_supported(const crc_mbed_config_t *config)
 {
     return (config != NULL);
