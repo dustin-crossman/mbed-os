@@ -763,6 +763,9 @@ void Cy_CapSense_DpFindLocalMaxDd(
 }
 
 
+#if defined(__ICCARM__)
+    #pragma optimize=none
+#endif /* (__ICCARM__) */
 /*******************************************************************************
 * Function Name: Cy_CapSense_DpCalcTouchPadCentroid
 ****************************************************************************//**
