@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_syspm.h
-* \version 4.0
+* \version 4.10
 *
 * Provides the function definitions for the power management API.
 *
@@ -678,9 +678,37 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
+*     <td rowspan="3">4.10</td>
+*     <td>Updated Cy_SysPm_CpuEnterDeepSleep() function.</td>
+*     <td> 
+*         Corrected mechanism for saving/restoring not retained UDB 
+*         registers in the Cy_SysPm_CpuEnterDeepSleep() function.
+*
+*         Now Cy_SysPm_CpuEnterDeepSleep() function does not put the CM0+ CPU 
+*         into Deep Sleep and returns \ref CY_SYSPM_SYSCALL_PENDING status, if a 
+*         syscall operation is pending. This behavior is applicable on multi-CPU
+*         devices except CY8C6xx6 and CY8C6xx7.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>Updated Cy_SysPm_CpuEnterSleep() function.</td>
+*     <td>Removed redundant second call of WFE() instruction on CM4 CPU.
+*         This change is applicable for all devices except CY8C6xx6, 
+*         CY8C6xx7.
+*    </td>
+*   </tr>
+*   <tr>
+*     <td>Added new \ref CY_SYSPM_SYSCALL_PENDING return status. </td>
+*     <td>Expanded driver return statuses for indicating new possible events in 
+*         the driver.
+*     </td>
+*   </tr>
+*   </tr>
+*   <tr>
 *     <td rowspan="6">4.0</td>
 *     <td>
-*          Flattened the organization of the driver source code into the single source directory and the single include directory.
+*          Flattened the organization of the driver source code into the single 
+*          source directory and the single include directory.
 *     </td>
 *     <td>Driver library directory-structure simplification.</td>
 *   </tr>
@@ -1089,7 +1117,7 @@ extern "C" {
 #define CY_SYSPM_DRV_VERSION_MAJOR       4
 
 /** Driver minor version */
-#define CY_SYSPM_DRV_VERSION_MINOR       0
+#define CY_SYSPM_DRV_VERSION_MINOR       10
 
 /** SysPm driver identifier */
 #define CY_SYSPM_ID                      (CY_PDL_DRV_ID(0x10U))
@@ -1298,13 +1326,14 @@ extern "C" {
 /** The SysPm function return value status definitions. */
 typedef enum
 {
-    CY_SYSPM_SUCCESS        = 0x0U,                                         /**< Successful. */
-    CY_SYSPM_BAD_PARAM      = CY_SYSPM_ID | CY_PDL_STATUS_ERROR | 0x01U,    /**< One or more invalid parameters. */
-    CY_SYSPM_TIMEOUT        = CY_SYSPM_ID | CY_PDL_STATUS_ERROR | 0x02U,    /**< A time-out occurred. */
-    CY_SYSPM_INVALID_STATE  = CY_SYSPM_ID | CY_PDL_STATUS_ERROR | 0x03U,    /**< The operation is not setup or is in an
-                                                                                 improper state. */
-    CY_SYSPM_CANCELED       = CY_SYSPM_ID | CY_PDL_STATUS_ERROR | 0x04U,    /**< Operation canceled .*/
-    CY_SYSPM_FAIL           = CY_SYSPM_ID | CY_PDL_STATUS_ERROR | 0xFFU     /**< Unknown failure. */
+    CY_SYSPM_SUCCESS         = 0x0U,                                         /**< Successful. */
+    CY_SYSPM_BAD_PARAM       = CY_SYSPM_ID | CY_PDL_STATUS_ERROR | 0x01U,    /**< One or more invalid parameters. */
+    CY_SYSPM_TIMEOUT         = CY_SYSPM_ID | CY_PDL_STATUS_ERROR | 0x02U,    /**< A time-out occurred. */
+    CY_SYSPM_INVALID_STATE   = CY_SYSPM_ID | CY_PDL_STATUS_ERROR | 0x03U,    /**< The operation is not setup or is in an
+                                                                                  improper state. */
+    CY_SYSPM_CANCELED        = CY_SYSPM_ID | CY_PDL_STATUS_ERROR | 0x04U,    /**< Operation canceled. */
+    CY_SYSPM_SYSCALL_PENDING = CY_SYSPM_ID | CY_PDL_STATUS_ERROR | 0x05U,    /**< Canceled due syscall operation pending. */
+    CY_SYSPM_FAIL            = CY_SYSPM_ID | CY_PDL_STATUS_ERROR | 0xFFU     /**< Unknown failure. */
 } cy_en_syspm_status_t;
 
 /**

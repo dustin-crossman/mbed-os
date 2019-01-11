@@ -1,12 +1,12 @@
 /***************************************************************************//**
 * \file cy_mcwdt.c
-* \version 1.20
+* \version 1.30
 *
 *  Description:
 *   Provides a system API for the MCWDT driver.
 *
 ********************************************************************************
-* Copyright 2016-2018, Cypress Semiconductor Corporation. All rights reserved.
+* Copyright 2016-2019, Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -139,20 +139,20 @@ uint32_t Cy_MCWDT_GetCountCascaded(MCWDT_STRUCT_Type const *base)
      * The software increments counter1 to eliminate the case 
      * when the both counter0 and counter1 counters have zeros.
     */
-    if (0u == counter0)
+    if (0UL == counter0)
     {
         counter1++;
     }
 
     /* Check if the counter0 is Free running */
-    if (0u == _FLD2VAL(MCWDT_STRUCT_MCWDT_CONFIG_WDT_CLEAR0, MCWDT_STRUCT_MCWDT_CONFIG(base)))
+    if (0UL == _FLD2VAL(MCWDT_STRUCT_MCWDT_CONFIG_WDT_CLEAR0, MCWDT_STRUCT_MCWDT_CONFIG(base)))
     {
         /* Save match0 value with the correction when counter0
          *  goes to zero when it reaches the match0 value. 
         */
-        countVal = match0 + 1u;
+        countVal = match0 + 1UL;
         
-        if (0u < counter1) 
+        if (0UL < counter1) 
         {
             /* Set match to the maximum value */
             match0 = MCWDT_STRUCT_MCWDT_CNTLOW_WDT_CTR0_Msk; 
@@ -169,7 +169,7 @@ uint32_t Cy_MCWDT_GetCountCascaded(MCWDT_STRUCT_Type const *base)
     counter0 += counter1;
     
     /* Set counter1 match value to 65535 when the counter1 is free running */
-    if (0u == _FLD2VAL(MCWDT_STRUCT_MCWDT_CONFIG_WDT_CLEAR1, MCWDT_STRUCT_MCWDT_CONFIG(base)))
+    if (0UL == _FLD2VAL(MCWDT_STRUCT_MCWDT_CONFIG_WDT_CLEAR1, MCWDT_STRUCT_MCWDT_CONFIG(base)))
     {
         match1 = MCWDT_STRUCT_MCWDT_CNTLOW_WDT_CTR1_Msk >> MCWDT_STRUCT_MCWDT_CNTLOW_WDT_CTR1_Pos;
     }
@@ -177,7 +177,8 @@ uint32_t Cy_MCWDT_GetCountCascaded(MCWDT_STRUCT_Type const *base)
     /* Check for overflow */
     if (match1 < counter1)
     {
-        counter1 = 0u;
+        counter0 = 0UL;
+        counter1 = 0UL;
     }
 
     /* Calculate the combined value for C1-C0 cascaded counters */

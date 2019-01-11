@@ -1,12 +1,12 @@
 /***************************************************************************//**
 * \file cy_mcwdt.h
-* \version 1.20
+* \version 1.30
 *
 * Provides an API declaration of the Cypress PDL 3.0 MCWDT driver
 *
 ********************************************************************************
 * \copyright
-* Copyright 2016-2018, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2016-2019, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -95,7 +95,15 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
-*     <td rowspan="2">1.20</td>
+*     <td>1.30</td>
+*     <td>The Cy_MCWDT_GetCountCascaded() function is corrected. Now 
+*         the function returns the correct value.
+*     </td>
+*     <td>Defect fixes.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>1.20</td>
 *     <td>Flattened the organization of the driver source code into the single 
 *         source directory and the single include directory.
 *     </td>
@@ -185,7 +193,7 @@ typedef struct
 #define CY_MCWDT_DRV_VERSION_MAJOR       1
 
 /** Driver minor version */
-#define CY_MCWDT_DRV_VERSION_MINOR       20
+#define CY_MCWDT_DRV_VERSION_MINOR       30
 
 /** \cond INTERNAL_MACROS */
 

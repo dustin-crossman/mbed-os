@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_syspm.c
-* \version 4.0
+* \version 4.10
 *
 * This driver provides the source code for API power management.
 *
@@ -21,7 +21,7 @@
 /*******************************************************************************
 *       Internal Functions
 *******************************************************************************/
-static void EnterDeepSleepRam(cy_en_syspm_waitfor_t waitFor);
+static bool EnterDeepSleepRam(cy_en_syspm_waitfor_t waitFor);
 
 static void SetReadMarginTrimUlp(void);
 static void SetReadMarginTrimLp(void);
@@ -163,7 +163,7 @@ static bool IsVoltageChangePossible(void);
 #define SYSPM_DEVICE_PSOC6ABLE2_REV_0B    (0x22U)
 
 /* The pointer to the Cy_EnterDeepSleep() function in the ROM */
-#define ROM_ENTER_DEEP_SLEEP_ADDR    (*(uint32_t *) 0x00000D30UL)
+#define ROM_ENTER_DEEP_SLEEP_ADDR         (*(uint32_t *) 0x00000D30UL)
 
 /* The define to call the ROM Cy_EnterDeepSleep() function. 
 * The ROM Cy_EnterDeepSleep() function prepares the system for the Deep Sleep 
@@ -190,13 +190,13 @@ typedef void (*cy_cb_syspm_deep_sleep_t)(cy_en_syspm_waitfor_t waitFor, bool *wa
 
 /* The wait time for transition into the minimum regulator current mode
 */
-#define SET_MIN_CURRENT_MODE_DELAY_US         (1U)
+#define SET_MIN_CURRENT_MODE_DELAY_US        (1U)
 
 /* The wait delay time that occurs before the active reference is settled.
 *  Intermediate delay is used in transition into the normal regulator current 
 *  mode
 */
-#define ACT_REF_SETTLE_DELAY_US         (8U)
+#define ACT_REF_SETTLE_DELAY_US              (8U)
 
 /* The wait delay time that occurs after the active reference is settled. 
 *  Final delay is used in transition into the normal regulator current mode
@@ -245,15 +245,13 @@ typedef void (*cy_cb_syspm_deep_sleep_t)(cy_en_syspm_waitfor_t waitFor, bool *wa
 #define HIBERNATE_TOKEN                    ((uint32_t) 0x1BU << SRSS_PWR_HIBERNATE_TOKEN_Pos)
 
 
-/* The mask for low power modes the power circuits (POR/BOD, Bandgap 
-*  reference, Reference buffer, Current reference) when active core regulator is
-*  LDO
+/* The mask for low power modes the power circuits (POR/BOD, Bandgap reference,
+*  Reference buffer, Current reference) when active core regulator is LDO
 */
 #define PWR_CIRCUITS_SET_LPMODE_LDO_MASK        (SRSS_PWR_CTL_LINREG_LPMODE_Msk | PWR_CIRCUITS_SET_LPMODE_BUCK_MASK)
 
-/* The mask for low power modes the power circuits (POR/BOD, Bandgap 
-*  reference, Reference buffer, Current reference) when active core regulator is
-*  Buck
+/* The mask for low power modes the power circuits (POR/BOD, Bandgap reference, 
+*  Reference buffer, Current reference) when active core regulator is Buck
 */
 #define PWR_CIRCUITS_SET_LPMODE_BUCK_MASK       (SRSS_PWR_CTL_PORBOD_LPMODE_Msk |\
                                                  SRSS_PWR_CTL_BGREF_LPMODE_Msk |\
@@ -266,6 +264,9 @@ typedef void (*cy_cb_syspm_deep_sleep_t)(cy_en_syspm_waitfor_t waitFor, bool *wa
 
 /* Array of the callback roots */
 static cy_stc_syspm_callback_t* pmCallbackRoot[CALLBACK_ROOT_NR] = {NULL, NULL, NULL, NULL, NULL};
+
+/* Structure for registers that should retain while Deep Sleep mode */
+static cy_stc_syspm_backup_regs_t regs;
 
 #if (CY_CPU_CORTEX_M4)
     /* Global boolean variable used to clear the  Event Register of the CM4 core */
@@ -433,7 +434,8 @@ uint32_t Cy_SysPm_ReadStatus(void)
 * Entered status, see \ref cy_en_syspm_status_t.
 *
 * \sideeffect
-* This function clears the Event Register of the CM4 CPU after wakeup from WFE.
+* For CY8C6xx6, CY8C6xx7 devices this function clears the Event Register of the 
+* CM4 CPU after wakeup from WFE.
 *
 * \funcusage
 * \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_CpuEnterSleep
@@ -480,17 +482,19 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterSleep(cy_en_syspm_waitfor_t waitFor)
             __WFE();
 
         #if (CY_CPU_CORTEX_M4)
-
-            /* For the CM4 CPU, the WFE instruction is called twice. 
-            *  The second WFE call clears the Event Register of CM4 CPU.
-            *  Cypress ID #279077.
-            */
-            if(wasEventSent)
+            if (Cy_SysLib_GetDevice() == CY_SYSLIB_DEVICE_PSOC6ABLE2)
             {
-                __WFE();
-            }
+                /* For the CM4 CPU, the WFE instruction is called twice. 
+                *  The second WFE call clears the Event Register of CM4 CPU.
+                *  Cypress ID #279077.
+                */
+                if(wasEventSent)
+                {
+                    __WFE();
+                }
 
-            wasEventSent = true;
+                wasEventSent = true;
+            }
         #endif /* (CY_CPU_CORTEX_M4) */
         }
         Cy_SysLib_ExitCriticalSection(interruptState);
@@ -533,10 +537,11 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterSleep(cy_en_syspm_waitfor_t waitFor)
 * enter the power mode. If any CY_SYSPM_DEEPSLEEP type with the 
 * CY_SYSPM_CHECK_READY parameter call returns CY_SYSPM_FAIL, the remaining 
 * callback CY_SYSPM_DEEPSLEEP type with the CY_SYSPM_CHECK_READY parameter are 
-* skipped. After the first CY_SYSPM_FAIL, all the CY_SYSPM_SLEEP callbacks that 
-* were previously executed before getting the CY_SYSPM_CHECK_FAIL are executed 
-* with the CY_SYSPM_CHECK_FAIL parameter. The CPU Deep Sleep mode is not entered
-* and the Cy_SysPm_CpuEnterDeepSleep() function returns CY_SYSPM_FAIL.
+* skipped. After the first CY_SYSPM_FAIL, all the CY_SYSPM_DEEPSLEEP callbacks 
+* that were previously executed before getting the CY_SYSPM_CHECK_FAIL are 
+* executed with the CY_SYSPM_CHECK_FAIL parameter. The CPU Deep Sleep mode is 
+* not entered and the Cy_SysPm_CpuEnterDeepSleep() function returns 
+* CY_SYSPM_FAIL.
 *
 * If all callbacks of the CY_SYSPM_DEEPSLEEP type with the CY_SYSPM_CHECK_READY
 * parameter return CY_SYSPM_SUCCESS, then all callbacks of the 
@@ -549,6 +554,13 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterSleep(cy_en_syspm_waitfor_t waitFor)
 * \note The last callback that returns CY_SYSPM_FAIL is not executed with the 
 * CY_SYSPM_CHECK_FAIL parameter because of the FAIL. The callback generating 
 * CY_SYSPM_FAIL is expected to not make any changes that require being undone.
+*
+* For multi-CPU devices (except CY8C6xx6 and CY8C6xx7) there is a possible
+* situation when a syscall operation (for example during flash read or write)
+* is executing. If the CM0+ CPU tries to enter Deep Sleep, it will fail. All
+* the CY_SYSPM_DEEPSLEEP callbacks that were previously executed, are executed
+* with the CY_SYSPM_CHECK_FAIL parameter. Deep Sleep mode is not entered and
+* the Cy_SysPm_CpuEnterDeepSleep() function returns CY_SYSPM_SYSCALL_PENDING.
 *
 * The return value from executed callback functions with the 
 * CY_SYSPM_CHECK_FAIL, CY_SYSPM_BEFORE_TRANSITION, and CY_SYSPM_AFTER_TRANSITION
@@ -628,7 +640,8 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterSleep(cy_en_syspm_waitfor_t waitFor)
 *   Be aware of this situation.
 *
 * \sideeffect
-* This function clears the Event Register of CM4 CPU after wakeup from WFE.
+* For CY8C6xx6, CY8C6xx7 devices this function clears the Event Register of the 
+* CM4 CPU after wakeup from WFE.
 *
 * \sideeffect
 * This side effect is applicable only for rev-08 of the CY8CKIT-062.
@@ -641,7 +654,7 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterSleep(cy_en_syspm_waitfor_t waitFor)
 *
 * \note
 * The FLL/PLL are not restored right before the CPU(s) start executing the 
-* instructions after System Deep Sleep. This can affect the peripheral that is 
+* instructions after system Deep Sleep. This can affect the peripheral that is 
 * driven by PLL/FLL. Ensure that the PLL/FLL are properly restored (locked)
 * after wakeup from System Deep Sleep. Refer to the 
 * \ref group_sysclk driver documentation for information about how to 
@@ -677,6 +690,9 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterDeepSleep(cy_en_syspm_waitfor_t waitFor)
     */
     if (retVal == CY_SYSPM_SUCCESS)
     {
+        /* System Deep Sleep indicator */
+        bool wasSystemDeepSleep = false;
+        
         /* Call the registered callback functions with the 
         * CY_SYSPM_BEFORE_TRANSITION parameter
         */
@@ -685,8 +701,6 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterDeepSleep(cy_en_syspm_waitfor_t waitFor)
         {
             (void) Cy_SysPm_ExecuteCallback(CY_SYSPM_DEEPSLEEP, CY_SYSPM_BEFORE_TRANSITION);
         }
-
-        static cy_stc_syspm_backup_regs_t regs;
 
         if (0U != cy_device->udbPresent)
         {
@@ -702,75 +716,103 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterDeepSleep(cy_en_syspm_waitfor_t waitFor)
         if (Cy_SysLib_GetDevice() == CY_SYSLIB_DEVICE_PSOC6ABLE2)
         {
             /* The CPU enters Deep Sleep and wakes up in the RAM */
-            EnterDeepSleepRam(waitFor);
+            wasSystemDeepSleep = EnterDeepSleepRam(waitFor);
         }
         else
         {
-
-        #if (CY_CPU_CORTEX_M4)
-            /* Repeat the WFI/WFE instruction if a wake up was not intended. 
-            *  Cypress ID #272909
-            */
-            do
+            
+        #if (CY_CPU_CORTEX_M0P)
+            
+            /* Check if there is a pending syscall */
+            if (Cy_IPC_Drv_IsLockAcquired(Cy_IPC_Drv_GetIpcBaseAddress(CY_IPC_CHAN_SYSCALL)) != false)
             {
-        #endif /* (CY_CPU_CORTEX_M4) */
-
-                /* The CPU enters Deep Sleep mode upon execution of WFI/WFE */
-                SCB_SCR |= SCB_SCR_SLEEPDEEP_Msk;
-
-                if(waitFor != CY_SYSPM_WAIT_FOR_EVENT)
+                /* Do not put the CPU into Deep Sleep and return pending status */
+                retVal = CY_SYSPM_SYSCALL_PENDING;
+            }
+            else
+        #endif /* (CY_CPU_CORTEX_M0P) */
+    
+            {
+            #if (CY_CPU_CORTEX_M4)
+                /* Repeat the WFI/WFE instruction if a wake up was not intended. 
+                *  Cypress ID #272909
+                */
+                do
                 {
-                    __WFI();
-                }
-                else
-                {
-                    __WFE();
+            #endif /* (CY_CPU_CORTEX_M4) */
 
-                #if (CY_CPU_CORTEX_M4)
-                    /* Call the WFE instruction twice to clear the Event register 
-                    *  of the CM4 CPU. Cypress ID #279077
-                    */
-                    if(wasEventSent)
+                    /* The CPU enters Deep Sleep mode upon execution of WFI/WFE */
+                    SCB_SCR |= SCB_SCR_SLEEPDEEP_Msk;
+
+                    if(waitFor != CY_SYSPM_WAIT_FOR_EVENT)
+                    {
+                        __WFI();
+                    }
+                    else
                     {
                         __WFE();
                     }
-                    wasEventSent = true;
-                #endif /* (CY_CPU_CORTEX_M4) */
-                }
 
-        #if (CY_CPU_CORTEX_M4)
-            } while (_FLD2VAL(CPUSS_CM4_PWR_CTL_PWR_MODE, CPUSS_CM4_PWR_CTL) == CM4_PWR_STS_RETAINED);
-        #endif /* (CY_CPU_CORTEX_M4) */
+            #if (CY_CPU_CORTEX_M4)
+                } while (_FLD2VAL(CPUSS_CM4_PWR_CTL_PWR_MODE, CPUSS_CM4_PWR_CTL) == CM4_PWR_STS_RETAINED);
+            #endif /* (CY_CPU_CORTEX_M4) */
+            }
         }
-
+        
         if (0U != cy_device->udbPresent)
         {
-            /* Do not restore the UDB if it is disabled on MMIO level */
-            if (0UL != (PERI_GR_SL_CTL(MMIO_UDB_SLAVE_NR) & PERI_UDB_SLAVE_ENABLED))
+            /* Do not restore the UDBs if there was no system Deep Sleep mode or 
+            *  UDBs are disabled on MMIO level
+            */
+            if (wasSystemDeepSleep && (0UL != (PERI_GR_SL_CTL(MMIO_UDB_SLAVE_NR) & PERI_UDB_SLAVE_ENABLED)))
             {
+                cy_stc_syspm_backup_regs_t *ptrRegs;
+                
+            #ifndef CY_PSOC6ABLE2_REV_0A_SUPPORT_DISABLE
+                if (Cy_SysLib_GetDeviceRevision() == CY_SYSLIB_DEVICE_REV_0A)
+                {
+                    ptrRegs = &regs;
+                }
+                else
+            #endif /* #ifndef CY_PSOC6ABLE2_REV_0A_SUPPORT_DISABLE */   
+                {
+                    ptrRegs = (cy_stc_syspm_backup_regs_t *) REG_IPC_STRUCT_DATA(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT));
+                }
+                
                 /* Restore non-retained registers */
-                Cy_SysPm_RestoreRegisters(&regs);
+                Cy_SysPm_RestoreRegisters(ptrRegs);
             }
         }
 
         Cy_SysLib_ExitCriticalSection(interruptState);
-
+    }
+    
+    if (retVal == CY_SYSPM_SUCCESS)
+    {
         /* Call the registered callback functions with the CY_SYSPM_AFTER_TRANSITION 
         *  parameter
         */
         if (pmCallbackRoot[cbDeepSleepRootIdx] != NULL)
         {
             (void) Cy_SysPm_ExecuteCallback(CY_SYSPM_DEEPSLEEP, CY_SYSPM_AFTER_TRANSITION);
-        }
+        }  
     }
-    else
+    else 
     {
         /* Execute callback functions with the CY_SYSPM_CHECK_FAIL parameter to 
-        * undo everything done in the callback with the CY_SYSPM_CHECK_READY 
-        * parameter
+        *  undo everything done in the callback with the CY_SYSPM_CHECK_READY 
+        *  parameter
         */
-        (void) Cy_SysPm_ExecuteCallback(CY_SYSPM_DEEPSLEEP, CY_SYSPM_CHECK_FAIL);
-        retVal = CY_SYSPM_FAIL;
+        if (pmCallbackRoot[cbDeepSleepRootIdx] != NULL)
+        {
+            (void) Cy_SysPm_ExecuteCallback(CY_SYSPM_DEEPSLEEP, CY_SYSPM_CHECK_FAIL);
+        }
+        
+        /* Rewrite return value to indicate fail */
+        if (retVal != CY_SYSPM_SYSCALL_PENDING)
+        {
+            retVal = CY_SYSPM_FAIL;  
+        }
     }
     return retVal;
 }
@@ -2783,6 +2825,10 @@ void Cy_SysPm_RestoreRegisters(cy_stc_syspm_backup_regs_t const *regs)
 * \param waitFor
 * Selects wait for action. See \ref cy_en_syspm_waitfor_t.
 *
+* \return
+* - true - System Deep Sleep was occurred. 
+* - false - System Deep Sleep was not occurred.
+*
 *******************************************************************************/
 #if defined (__ICCARM__)
     #pragma diag_suppress=Ta023
@@ -2790,20 +2836,23 @@ void Cy_SysPm_RestoreRegisters(cy_stc_syspm_backup_regs_t const *regs)
 #else
     CY_SECTION(".cy_ramfunc") CY_NOINLINE
 #endif
-static void EnterDeepSleepRam(cy_en_syspm_waitfor_t waitFor)
+static bool EnterDeepSleepRam(cy_en_syspm_waitfor_t waitFor)
 {
     /* Store the address of the Deep Sleep indicator into the RAM */
     volatile uint32_t *delayDoneFlag = &FLASHC_BIST_DATA_0;
 
+    /* Indicator of System Deep Sleep mode */
+    bool retVal = false;
+    
+    /* Acquire the IPC to prevent changing of the shared resources at the same time */
+    while (0U == _FLD2VAL(IPC_STRUCT_ACQUIRE_SUCCESS, REG_IPC_STRUCT_ACQUIRE(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT))))
+    {
+        /* Wait until the IPC structure is released by another CPU */
+    }
+    
 #ifndef CY_PSOC6ABLE2_REV_0A_SUPPORT_DISABLE
     if (Cy_SysLib_GetDeviceRevision() == CY_SYSLIB_DEVICE_REV_0A)
     {
-        /* Acquire the IPC to prevent changing of the shared resources at the same time */
-        while(0U == _FLD2VAL(IPC_STRUCT_ACQUIRE_SUCCESS, REG_IPC_STRUCT_ACQUIRE(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT))))
-        {
-            /* Wait until the IPC structure is released by another CPU */
-        }
-
         /* Set the flag that the current CPU entered Deep Sleep */
         REG_IPC_STRUCT_DATA(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT)) |= CUR_CORE_DP_MASK;
 
@@ -2831,14 +2880,16 @@ static void EnterDeepSleepRam(cy_en_syspm_waitfor_t waitFor)
             (void) CPUSS_CM0_CLOCK_CTL;
             (void) CPUSS_CM4_CLOCK_CTL;
         }
-
-        /* Release the IPC */
-        REG_IPC_STRUCT_RELEASE(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT)) = 0U;
-
-        /* Read this register to make sure it is settled */
-        (void) REG_IPC_STRUCT_RELEASE(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT));
     }
+    else
 #endif /* #ifndef CY_PSOC6ABLE2_REV_0A_SUPPORT_DISABLE */
+    {
+        /* Update pointer to the latest saved UDB structure */
+        REG_IPC_STRUCT_DATA(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT)) = (uint32_t) &regs;
+    }
+
+    /* Release the IPC */
+    REG_IPC_STRUCT_RELEASE(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT)) = 0U;
 
 #if (CY_CPU_CORTEX_M4)
 
@@ -2880,7 +2931,7 @@ static void EnterDeepSleepRam(cy_en_syspm_waitfor_t waitFor)
 #endif /* (CY_CPU_CORTEX_M4) */
 
     /* Acquire the IPC to prevent changing of the shared resources at the same time */
-    while(0U == _FLD2VAL(IPC_STRUCT_ACQUIRE_SUCCESS, REG_IPC_STRUCT_ACQUIRE(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT))))
+    while (0U == _FLD2VAL(IPC_STRUCT_ACQUIRE_SUCCESS, REG_IPC_STRUCT_ACQUIRE(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT))))
     {
         /* Wait until the IPC structure is released by another CPU */
     }
@@ -2891,7 +2942,7 @@ static void EnterDeepSleepRam(cy_en_syspm_waitfor_t waitFor)
         /* Read and change the slow and fast clock dividers only under the condition 
         * that the other CPU is already in Deep Sleep. Cypress ID #284516
         */
-        if(0U != (REG_IPC_STRUCT_DATA(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT)) & OTHER_CORE_DP_MASK))
+        if (0U != (REG_IPC_STRUCT_DATA(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT)) & OTHER_CORE_DP_MASK))
         {
             /* Restore the clock dividers for the slow and fast clocks */
             CPUSS_CM0_CLOCK_CTL = 
@@ -2901,6 +2952,8 @@ static void EnterDeepSleepRam(cy_en_syspm_waitfor_t waitFor)
             CPUSS_CM4_CLOCK_CTL = 
             _CLR_SET_FLD32U(CPUSS_CM4_CLOCK_CTL, CPUSS_CM4_CLOCK_CTL_FAST_INT_DIV, 
                            (_FLD2VAL(SYSPM_FAST_CLK_DIV, REG_IPC_STRUCT_DATA(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT)))));
+                           
+            retVal = true;
         }
 
         /* Indicate that the current CPU is out of Deep Sleep */
@@ -2943,11 +2996,15 @@ static void EnterDeepSleepRam(cy_en_syspm_waitfor_t waitFor)
             SRSS_TST_DDFT_SLOW_CTL_REG = ddftSlowCtl;
             SRSS_CLK_OUTPUT_SLOW       = clkOutputSlow;
             SRSS_TST_DDFT_FAST_CTL_REG = ddftFastCtl;
+            
+            retVal = true;
         }
     }
 
     /* Release the IPC */
     REG_IPC_STRUCT_RELEASE(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT)) = 0U;
+    
+    return retVal;
 }
 #if defined (__ICCARM__)
     #pragma diag_default=Ta023
