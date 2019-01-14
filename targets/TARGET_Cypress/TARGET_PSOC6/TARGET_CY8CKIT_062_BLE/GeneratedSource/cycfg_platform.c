@@ -162,7 +162,14 @@ void init_cycfg_platform(void)
 	/* Set worst case memory wait states (! ultra low power, 150 MHz), will update at the end */
 	Cy_SysLib_SetWaitStates(false, 150UL);
 	#if (CY_CFG_PWR_VBAC_SUPPLY == CY_CFG_PWR_VBAC_SUPPLY_VDD)
-	if (0u == Cy_SysLib_GetResetReason() /* POR, XRES, or BOD */){ Cy_SysLib_ResetBackupDomain(); }
+	if (0u == Cy_SysLib_GetResetReason() /* POR, XRES, or BOD */)
+	{
+		Cy_SysLib_ResetBackupDomain();
+
+		Cy_SysClk_IloDisable();
+
+		Cy_SysClk_IloInit();
+	}
 	#endif
 	#ifdef CY_CFG_PWR_ENABLED
 	/* Configure power mode */
