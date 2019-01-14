@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_smif_memslot.c
-* \version 1.20
+* \version 1.20.1
 *
 * \brief
 *  This file provides the source code for the memory-level APIs of the SMIF driver.
@@ -9,7 +9,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2016-2018, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2016-2019, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.

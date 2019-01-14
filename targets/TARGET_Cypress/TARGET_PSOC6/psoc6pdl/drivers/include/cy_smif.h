@@ -1,12 +1,12 @@
 /***************************************************************************//**
 * \file cy_smif.h
-* \version 1.20
+* \version 1.20.1
 *
 * Provides an API declaration of the Cypress SMIF driver.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2016-2018, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2016-2019, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -201,6 +201,11 @@
 * \section group_smif_changelog Changelog
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td>1.20.1</td>
+*     <td>Update description of size parameter in several functions.</td>
+*     <td>Documentation update and clarification.</td>
+*   </tr>
 *   <tr>
 *     <td rowspan="3">1.20</td>
 *     <td>Flattened the organization of the driver source code into the single 

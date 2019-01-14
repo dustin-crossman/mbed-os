@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_smif.c
-* \version 1.20
+* \version 1.20.1
 *
 * \brief
 *  This file provides the source code for the SMIF driver APIs.
@@ -9,7 +9,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2016-2018, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2016-2019, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -388,7 +388,7 @@ cy_en_smif_status_t  Cy_SMIF_TransmitCommand(SMIF_Type *base,
 * valid.
 *
 * \param size
-* The size of txBuffer. Must be > 0.
+* The size of txBuffer. Must be > 0 and not greater than 65536.
 *
 * \param transferWidth
 * The width of transfer \ref cy_en_smif_txfr_width_t.
@@ -480,7 +480,7 @@ cy_en_smif_status_t  Cy_SMIF_TransmitData(SMIF_Type *base,
 * valid.
 *
 * \param size
-* The size of txBuffer. Must be > 0.
+* The size of txBuffer. Must be > 0 and not greater than 65536.
 *
 * \param transferWidth
 * The width of transfer \ref cy_en_smif_txfr_width_t.
@@ -584,7 +584,7 @@ cy_en_smif_status_t  Cy_SMIF_TransmitDataBlocking(SMIF_Type *base,
 * valid.
 *
 * \param size
-* The size of data to be received. Must be > 0.
+* The size of data to be received. Must be > 0 and not greater than 65536.
 *
 * \param transferWidth
 * The width of transfer \ref cy_en_smif_txfr_width_t.
@@ -681,7 +681,7 @@ cy_en_smif_status_t  Cy_SMIF_ReceiveData(SMIF_Type *base,
 * valid.
 *
 * \param size
-* The size of data to be received. Must be > 0.
+* The size of data to be received. Must be > 0 and not greater than 65536.
 *
 * \param transferWidth
 * The width of transfer \ref cy_en_smif_txfr_width_t.
@@ -758,7 +758,7 @@ cy_en_smif_status_t  Cy_SMIF_ReceiveDataBlocking(SMIF_Type *base,
 * Holds the base address of the SMIF block registers.
 *
 * \param cycles
-* The number of dummy cycles. Must be > 0.
+* The number of dummy cycles. Must be > 0 and not greater than 65536.
 *
 * \return A status of dummy cycles sending.
 *       - \ref CY_SMIF_SUCCESS
