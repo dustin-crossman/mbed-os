@@ -763,6 +763,7 @@ void Cy_CapSense_DpFindLocalMaxDd(
 }
 
 
+/* CY_ID633 */
 #if defined(__ICCARM__)
     #pragma optimize=none
 #endif /* (__ICCARM__) */
