@@ -164,6 +164,11 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
+*     <td>1.20</td>
+*     <td>Updated API fucntion Cy_Profile_GetSumWeightedCounts.</td>
+*     <td>Minor bug fixing.</td>
+*   </tr>
+*   <tr>
 *     <td rowspan="3">1.10</td>
 *     <td>Flattened the organization of the driver source code into the single source directory and the single include directory.</td>
 *     <td>Driver library directory-structure simplification.</td>
@@ -241,8 +246,6 @@ extern "C" {
 
 /** \cond INTERNAL */
 
-#define CY_PROFILE_PRFL_CNT_NR                  (8UL) /* TODO: move this as CY_EP_CNT_NR to cy_device.h */
-
 /* Parameter check macros */
 #define CY_PROFILE_IS_MONITOR_VALID(monitor)    (CY_EP_MONITOR_COUNT > ((uint32_t)(monitor)))
 #define CY_PROFILE_IS_DURATION_VALID(duration)  (((duration) == CY_PROFILE_EVENT) || \
@@ -253,7 +256,7 @@ extern "C" {
                                                  ((refClk) == CY_PROFILE_CLK_LF) || \
                                                  ((refClk) == CY_PROFILE_CLK_HF) || \
                                                  ((refClk) == CY_PROFILE_CLK_PERI))
-#define CY_PROFILE_IS_CNT_VALID(numCounters)    (CY_PROFILE_PRFL_CNT_NR >= (numCounters))
+#define CY_PROFILE_IS_CNT_VALID(numCounters)    (CY_EP_CNT_NR >= (numCounters))
 
 /** \endcond */
 

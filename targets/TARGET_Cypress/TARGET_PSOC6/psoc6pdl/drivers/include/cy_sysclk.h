@@ -101,9 +101,14 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
-*     <td>1.30</td>
-*     <td>TODO: psoc6sw1.1 updates</td>
-*     <td></td>
+*     <td rowspan="2">1.30</td>
+*     <td>Updated the following functions implementation: \ref Cy_SysClk_EcoConfigure and \ref Cy_SysClk_FllConfigure.</td>
+*     <td>Math libary dependency is removed, the floating-point math is replaced with an integer math.</td>
+*   </tr>
+*   <tr>
+*     <td>Updated the following functions implementation: \ref Cy_SysClk_EcoEnable, \ref Cy_SysClk_EcoGetStatus<br>
+          \ref Cy_SysClk_FllGetConfiguration and \ref Cy_SysClk_DeepSleepCallback.</td>
+*     <td>Minor bug fixing.</td>
 *   </tr>
 *   <tr>
 *     <td rowspan="4">1.20</td>

@@ -974,6 +974,7 @@ void Cy_PDL_Init(const cy_stc_device_t * device);
 *******************************************************************************/
 
 #define CY_EP_MONITOR_COUNT                 ((uint32_t)(cy_device->epMonitorNr))
+#define CY_EP_CNT_NR                        (8UL)
 #define PROFILE_CTL                         (((PROFILE_V1_Type*) PROFILE_BASE)->CTL)
 #define PROFILE_STATUS                      (((PROFILE_V1_Type*) PROFILE_BASE)->STATUS)
 #define PROFILE_CMD                         (((PROFILE_V1_Type*) PROFILE_BASE)->CMD)

@@ -27,7 +27,7 @@ extern "C" {
 static cy_en_profile_status_t Cy_Profile_IsPtrValid(const cy_stc_profile_ctr_ptr_t ctrAddr);
 
 /* Internal structure - Control and status information for each counter */
-static cy_stc_profile_ctr_t cy_ep_ctrs[CY_PROFILE_PRFL_CNT_NR];
+static cy_stc_profile_ctr_t cy_ep_ctrs[CY_EP_CNT_NR];
 
 
 /* ========================================================================== */
@@ -92,7 +92,7 @@ void Cy_Profile_ISR(void)
     PROFILE_INTR = ovflowBits; /* clear the sources of the interrupts */
 
     /* scan through the overflow bits, i.e., for each counter */
-    for (ctr = 0UL; (ctr < (uint32_t)(CY_PROFILE_PRFL_CNT_NR)) && (ovflowBits != 0UL); ctr++)
+    for (ctr = 0UL; (ctr < CY_EP_CNT_NR) && (ovflowBits != 0UL); ctr++)
     {
         /* Increment the overflow bit only if the counter is being used.
            (which should always be the case.) */
