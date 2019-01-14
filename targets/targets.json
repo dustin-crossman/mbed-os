@@ -7903,7 +7903,6 @@
     "CY8CPROTO_062_4343W": {
         "inherits": ["MCU_PSOC6_M4"],
         "sub_target": "sub_target thing is needed for PSoC6.py script to look for CM0+ image",
-        "supported_form_factors": ["ARDUINO"],
         "device_has_remove": ["ANALOGOUT"],
         "extra_labels_add": ["PSOC6_02", "CY8C6XXA"],
         "macros_add": ["CY8C624ABZI_D44", "PSOC6_DYNSRM_DISABLE=1"],

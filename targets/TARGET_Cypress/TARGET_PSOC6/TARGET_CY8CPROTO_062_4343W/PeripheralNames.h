@@ -34,6 +34,11 @@ typedef enum {
     UART_5 = (int)SCB5_BASE,
     UART_6 = (int)SCB6_BASE,
     UART_7 = (int)SCB7_BASE,
+    /* SCB_8 does not support UART mode */
+    UART_9 = (int)SCB9_BASE,
+    UART_10 = (int)SCB10_BASE,
+    UART_11 = (int)SCB11_BASE,
+    UART_12 = (int)SCB12_BASE,
 } UARTName;
 
 
@@ -46,6 +51,8 @@ typedef enum {
     SPI_5 = (int)SCB5_BASE,
     SPI_6 = (int)SCB6_BASE,
     SPI_7 = (int)SCB7_BASE,
+    SPI_8 = (int)SCB8_BASE,
+    /* SCB_9 - SCB_12 does not support UART mode */
 } SPIName;
 
 typedef enum {
@@ -57,6 +64,11 @@ typedef enum {
     I2C_5 = (int)SCB5_BASE,
     I2C_6 = (int)SCB6_BASE,
     I2C_7 = (int)SCB7_BASE,
+    I2C_8 = (int)SCB8_BASE,
+    I2C_9 = (int)SCB9_BASE,
+    I2C_10 = (int)SCB10_BASE,
+    I2C_11 = (int)SCB11_BASE,
+    I2C_12 = (int)SCB12_BASE,
 } I2CName;
 
 typedef enum {
