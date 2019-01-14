@@ -1,13 +1,13 @@
 /***************************************************************************//**
 * \file cy_sd_host.h
-* \version 1.0
+* \version 1.10
 *
 *  This file provides constants and parameter values for 
 *  the SD Host Controller driver.
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -188,7 +188,8 @@
 * \section group_sd_host_lp Low Power Support
 * The SD Host does not operate in Hibernate and Deep Sleep modes but it
 * can automatically continue write/read operation after restoring from
-* Deep Sleep mode.
+* Deep Sleep mode. SD CLK must be disabled before going to Deep Sleep mode 
+* and can be enabled after wake up from Deep Sleep mode.
 * To reduce the power consumption in Active mode, the user can stop 
 * the clock of the SD bus but the following interrupts can be allowed: 
 * Card Insert, Card Removal and SDIO Interrupt. 
@@ -239,6 +240,16 @@
 * \section group_sd_host_Changelog Changelog
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td>1.10</td>
+*     <td>The PLL and CLK disable sequence in Cy_SD_Host_DisableSdClk() 
+*         is changed to disable CLK first.
+*         The Low-Power Support section is updated with additional 
+*         information about disabling CLK.
+*         The context initialization in Cy_SD_Host_Init() is corrected.
+*     </td>
+*     <td>Defect fixes.</td>
+*   </tr>
 *   <tr>
 *     <td>1.0</td>
 *     <td>The initial version.</td>
@@ -332,7 +343,7 @@ extern "C"
 #define CY_SD_HOST_DRV_VERSION_MAJOR       1
 
 /** Driver minor version */
-#define CY_SD_HOST_DRV_VERSION_MINOR       0
+#define CY_SD_HOST_DRV_VERSION_MINOR       10
 
 /******************************************************************************
 * API Constants
@@ -1520,14 +1531,16 @@ __STATIC_INLINE void Cy_SD_Host_DisableSdClk(SDHC_Type *base)
     /* Check for NULL pointer */
     if (NULL != base) 
     {
+        /* Disable SD CLK */
         SDHC_CORE_CLK_CTRL_R(base) = _CLR_SET_FLD16U(SDHC_CORE_CLK_CTRL_R(base), 
-                                        SDHC_CORE_CLK_CTRL_R_PLL_ENABLE, 0UL);
+                                        SDHC_CORE_CLK_CTRL_R_SD_CLK_EN, 0UL);
                                         
         /* Wait for at least 3 card clock periods */
         Cy_SysLib_DelayUs(CY_SD_HOST_3_PERIODS_US);
-        
+
+        /* Disable PLL */
         SDHC_CORE_CLK_CTRL_R(base) = _CLR_SET_FLD16U(SDHC_CORE_CLK_CTRL_R(base), 
-                                        SDHC_CORE_CLK_CTRL_R_SD_CLK_EN, 0UL);
+                                        SDHC_CORE_CLK_CTRL_R_PLL_ENABLE, 0UL);
     }
 }
 

@@ -1,6 +1,6 @@
 /*******************************************************************************
 * \file cy_sd_host.c
-* \version 1.0
+* \version 1.10
 *
 * \brief
 *  This file provides the driver code to the API for the SD Host Controller
@@ -8,7 +8,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2018, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2018-2019, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -2732,6 +2732,11 @@ cy_en_sd_host_status_t Cy_SD_Host_Init(SDHC_Type *base,
                                           1U);
 
         }
+        else
+        {
+            /* Save the card type. */
+            context->cardType = CY_SD_HOST_NOT_EMMC;
+        }
         
         if (config->enableLedControl)
         {                          
@@ -2755,7 +2760,7 @@ cy_en_sd_host_status_t Cy_SD_Host_Init(SDHC_Type *base,
         Cy_SD_Host_SetNormalInterruptEnable(base, CY_SD_HOST_NORMAL_INT_MSK);
         Cy_SD_Host_SetErrorInterruptEnable(base, CY_SD_HOST_ERROR_INT_MSK);
 
-        /* Enable Host Version 4 */
+        /* Enable Host Version 4. */
         SDHC_CORE_HOST_CTRL2_R(base) = (uint16_t)_CLR_SET_FLD16U(SDHC_CORE_HOST_CTRL2_R(base),
                                       SDHC_CORE_HOST_CTRL2_R_HOST_VER4_ENABLE,
                                       1U);

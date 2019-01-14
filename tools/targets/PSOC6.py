@@ -47,12 +47,12 @@ def patch(message_func, ihex, hexf, align=256):
 
     # update checksum
     checksum_str = pack('>H', lowchecksum)
-    ihex.frombytes(array('B', checksum_str), offset=0x90300000)
+#    ihex.frombytes(array('B', checksum_str), offset=0x90300000)
 
     # update metadata
     signature = unpack('>L', ihex.tobinstr(start=0x90500002, size=4))[0]
     sigcheck = pack('>L', (checksum + signature) & 0x0FFFF)
-    ihex.frombytes(array('B',sigcheck), offset=0x90500008)
+#    ihex.frombytes(array('B',sigcheck), offset=0x90500008)
 
     # align flash segments
     align_mask = align - 1
@@ -84,7 +84,7 @@ def complete_func(message_func, elf0, hexf0, hexf1=None, dest=None):
     message_func("Postprocessing %s -> %s" % (elf0, hexf0))
     ihex = merge_images(hexf0, hexf1)
     patch(message_func, ihex, hexf0)
-    ihex.write_hex_file(dest if dest else hexf0, write_start_addr=False, byte_count=64)
+    ihex.write_hex_file(dest if dest else hexf0, write_start_addr=False, byte_count=16)
 
 # Find Cortex M0 image.
 def find_cm0_image(toolchain, resources, elf, hexf):
