@@ -46,6 +46,7 @@ typedef enum {
     SPI_5 = (int)SCB5_BASE,
     SPI_6 = (int)SCB6_BASE,
     SPI_7 = (int)SCB7_BASE,
+    SPI_8 = (int)SCB8_BASE,
 } SPIName;
 
 typedef enum {
@@ -57,6 +58,7 @@ typedef enum {
     I2C_5 = (int)SCB5_BASE,
     I2C_6 = (int)SCB6_BASE,
     I2C_7 = (int)SCB7_BASE,
+    I2C_8 = (int)SCB8_BASE,
 } I2CName;
 
 typedef enum {

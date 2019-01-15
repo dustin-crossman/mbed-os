@@ -22,21 +22,6 @@
 #include "PinNamesTypes.h"
 #include "PortNames.h"
 
-#if PSOC6_ENABLE_M0_M4_DEBUG
-
-#define CY_STDIO_UART_RX  P9_0
-#define CY_STDIO_UART_TX  P9_1
-#define CY_STDIO_UART_CTS P9_2
-#define CY_STDIO_UART_RTS P9_3
-#else
-
-#define CY_STDIO_UART_RX  P5_0
-#define CY_STDIO_UART_TX  P5_1
-#define CY_STDIO_UART_CTS P5_2
-#define CY_STDIO_UART_RTS P5_3
-
-#endif // PSOC6_ENABLE_M0_M4_DEBUG
-
 // PinName[15-0] = Port[15-8] + Pin[7-0]
 typedef enum {
     P0_0    = (Port0 << 8) + 0x00,
@@ -165,71 +150,83 @@ typedef enum {
     P13_6   = (Port13 << 8) + 0x06,
     P13_7   = (Port13 << 8) + 0x07,
 
-    P14_0   = (Port14 << 8) + 0x00,
-    P14_1   = (Port14 << 8) + 0x01,
-    P14_2   = (Port14 << 8) + 0x02,
-    P14_3   = (Port14 << 8) + 0x03,
-    P14_4   = (Port14 << 8) + 0x04,
-    P14_5   = (Port14 << 8) + 0x05,
-    P14_6   = (Port14 << 8) + 0x06,
-    P14_7   = (Port14 << 8) + 0x07,
+    // Not connected
+    NC = (int)0xFFFFFFFF,
 
     // Arduino connector namings
-    A0          = P10_4,
-    A1          = P10_5,
+    A0          = P10_0,
+    A1          = P10_1,
     A2          = P10_2,
     A3          = P10_3,
-    A4          = P10_1,
-    A5          = P10_0,
+    A4          = P10_4,
+    A5          = P10_5,
 
-    D0          = P6_4,
-    D1          = P6_5,
-    D2          = P10_6,
-    D3          = P12_6,
-    D4          = P12_7,
-    D5          = P6_2,
-    D6          = P6_3,
-    D7          = P7_2,
-    D8          = P7_1,
-    D9          = P7_7,
-    D10         = P9_4,
-    D11         = P9_0,
-    D12         = P9_1,
-    D13         = P9_2,
-    D14         = P10_1,
-    D15         = P10_0,
+    D0          = P5_0,
+    D1          = P5_1,
+    D2          = P5_2,
+    D3          = P5_3,
+    D4          = P5_4,
+    D5          = P5_5,
+    D6          = P5_6,
+    D7          = P0_2,
+    D8          = P13_0,
+    D9          = P13_1,
+    D10         = P12_3,
+    D11         = P12_0,
+    D12         = P12_1,
+    D13         = P12_2,
+    D14         = P6_1,
+    D15         = P6_0,
 
     // Generic signal names
 
-    I2C_SCL     = P10_0,
-    I2C_SDA     = P10_1,
-    SPI_MOSI    = P9_0,
-    SPI_MISO    = P9_1,
-    SPI_CLK     = P9_2,
-    SPI_CS      = P9_3,
-    UART_RX     = P6_4,
-    UART_TX     = P6_5,
+    I2C_SCL     = P6_0,
+    I2C_SDA     = P6_1,
+
+    SPI_MOSI    = P12_0,
+    SPI_MISO    = P12_1,
+    SPI_CLK     = P12_2,
+    SPI_CS      = P12_4,
+
+    UART_RX     = P5_0,
+    UART_TX     = P5_1,
+    UART_RTS    = P5_2,
+    UART_CTS    = P5_3,
 
     SWITCH2     = P0_4,
     LED1        = P0_3,
     LED2        = P1_1,
     LED3        = P11_1,
-    LED4        = P6_2,
+    LED4        = P1_5,
+    LED5        = P13_7,
+
     LED_RED     = LED1,
+    LED_BLUE    = LED3,
+    LED_GREEN   = LED2,
 
     USER_BUTTON = SWITCH2,
     BUTTON1     = USER_BUTTON,
 
-    // Standardized interfaces names
-    STDIO_UART_TX   = CY_STDIO_UART_TX,
-    STDIO_UART_RX   = CY_STDIO_UART_RX,
-    STDIO_UART_CTS  = CY_STDIO_UART_CTS,
-    STDIO_UART_RTS  = CY_STDIO_UART_RTS,
-    USBTX       = CY_STDIO_UART_TX,
-    USBRX       = CY_STDIO_UART_RX,
+    QSPI_CLK        = P11_7,
+    QSPI_IO_0       = P11_6,
+    QSPI_IO_1       = P11_5,
+    QSPI_IO_2       = P11_4,
+    QSPI_IO_3       = P11_3,
+    QSPI_SEL        = P11_2,
 
-    // Not connected
-    NC = (int)0xFFFFFFFF
+    // Standardized interfaces names
+    STDIO_UART_TX   = UART_TX,
+    STDIO_UART_RX   = UART_RX,
+    STDIO_UART_CTS  = UART_CTS,
+    STDIO_UART_RTS  = UART_RTS,
+
+    CY_STDIO_UART_RX    = STDIO_UART_RX,
+    CY_STDIO_UART_TX    = STDIO_UART_TX,
+    CY_STDIO_UART_CTS   = STDIO_UART_CTS,
+    CY_STDIO_UART_RTS   = STDIO_UART_RTS,
+
+    USBTX           = UART_TX,
+    USBRX           = UART_RX
 } PinName;
 
 // PinName[15-0] = Port[15-8] + Pin[4-0]

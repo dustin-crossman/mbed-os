@@ -150,15 +150,6 @@ typedef enum {
     P13_6   = (Port13 << 8) + 0x06,
     P13_7   = (Port13 << 8) + 0x07,
 
-    P14_0   = (Port14 << 8) + 0x00,
-    P14_1   = (Port14 << 8) + 0x01,
-    P14_2   = (Port14 << 8) + 0x02,
-    P14_3   = (Port14 << 8) + 0x03,
-    P14_4   = (Port14 << 8) + 0x04,
-    P14_5   = (Port14 << 8) + 0x05,
-    P14_6   = (Port14 << 8) + 0x06,
-    P14_7   = (Port14 << 8) + 0x07,
-
     // Not connected
     NC = (int)0xFFFFFFFF,
 
@@ -166,11 +157,6 @@ typedef enum {
 
     I2C_SCL     = P6_0,
     I2C_SDA     = P6_1,
-
-    SPI_MOSI    = P5_0,
-    SPI_MISO    = P5_1,
-    SPI_CLK     = P5_2,
-    SPI_CS      = P5_7,
 
     UART_RX     = P5_0,
     UART_TX     = P5_1,
@@ -186,6 +172,31 @@ typedef enum {
 
     USER_BUTTON = SWITCH2,
     BUTTON1     = USER_BUTTON,
+
+    PDM_DATA    = P10_5,
+    PDM_CLK     = P10_4,
+    THERM_OUT_1 = P10_1,
+    THERM_OUT_2 = P10_2,
+    THERM_OUT   = THERM_OUT_1,
+    THERM_VDD   = P10_3,
+    THERM_GND   = P10_0,
+
+    CARD_DETECT_1   = P13_5,
+    CARD_DETECT_2   = P12_1,
+    CARD_DETECT     = CARD_DETECT_1,
+    SD_CMD          = P12_4,
+    SD_CLK          = P12_5,
+    SD_IO_0         = P13_0,
+    SD_IO_1         = P13_1,
+    SD_IO_2         = P13_2,
+    SD_IO_3         = P13_3,
+
+    QSPI_CLK        = P11_7,
+    QSPI_IO_0       = P11_6,
+    QSPI_IO_1       = P11_5,
+    QSPI_IO_2       = P11_4,
+    QSPI_IO_3       = P11_3,
+    QSPI_SEL        = P11_2,
 
     // Standardized interfaces names
     STDIO_UART_TX   = UART_TX,
