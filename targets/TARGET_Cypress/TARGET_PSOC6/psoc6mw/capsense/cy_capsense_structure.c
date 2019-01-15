@@ -287,7 +287,10 @@ cy_status Cy_CapSense_CheckConfigIntegrity(const cy_stc_capsense_context_t * con
     if (ptrPinCfg == NULL)          {result |= CY_RET_BAD_DATA;}
     if (ptrCommonCfg->csdShieldEn != 0u)
     {
-        if (ptrShieldPinCfg == NULL)    {result |= CY_RET_BAD_DATA;}
+        if((ptrCommonCfg->csdShieldNumPin > 0u) && (ptrShieldPinCfg == NULL))
+        {
+        	result |= CY_RET_BAD_DATA;
+        }
     }
     if (ptrActScanSns == NULL)      {result |= CY_RET_BAD_DATA;}
     

@@ -3,7 +3,7 @@
 #include "mbed_assert.h"
 #include "psoc6_utils.h"
 #include "mbed_error.h"
-#include "cy_capsense_api.h"
+#include "capsense_api.h"
 
 #if defined(DEVICE_CAPSENSE)
 

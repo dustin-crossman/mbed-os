@@ -22,7 +22,7 @@
 #include "psoc6_utils.h"
 #include "cy_syslib.h"
 #include "cy_wdt.h"
-#include "cy_board.h"
+#include "cycfg.h"
 
 #if !defined(CY_IPC_DEFAULT_CFG_DISABLE)
     #include "cy_ipc_sema.h"
@@ -344,7 +344,7 @@ void mbed_sdk_init(void)
     SystemInit();
 
     /* Set up the device based on configurator selections */
-    cybrd_init();
+    init_cycfg_all();
 
     /* Enable global interrupts */
     __enable_irq();
