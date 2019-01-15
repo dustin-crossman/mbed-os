@@ -55,10 +55,10 @@ typedef cy_en_crypto_status_t (*cy_crypto_trng_func_t)(CRYPTO_Type *base,
 * \param base
 * The pointer to the CRYPTO instance address.
 *
-* \param GAROPol;
+* \param GAROPol
 * The polynomial for the programmable Galois ring oscillator.
 *
-* \param FIROPol;
+* \param FIROPol
 * The polynomial for the programmable Fibonacci ring oscillator.
 *
 * \param max
