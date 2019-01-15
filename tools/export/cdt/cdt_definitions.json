@@ -47,7 +47,7 @@
         "gdbServerFlashMode": 2,
         "gdbServerGdbPortNumber": 3334,
         "gdbServerHaltAtHardFault": "false",
-        "gdbServerOther": "-p 3333&#13;&#10;--no-deprecation-warning",
+        "gdbServerOther": "-p 3333&#13;&#10;-t cy8c6xxa&#13;&#10;--no-deprecation-warning",
         "secondResetType": "",
         "corePortNumber": 3334
       },
