@@ -272,6 +272,159 @@ cy_status Cy_CapSense_Scan(cy_stc_capsense_context_t * context)
 
 
 /*******************************************************************************
+* Function Name: Cy_CapSense_SetupWidgetExt
+****************************************************************************//**
+*
+* Performs extended initialization for the specified widget and also performs
+* initialization required for a specific sensor in the widget. 
+* 
+* This function requires using the Cy_CapSense_ScanExt() function to 
+* initiate a scan.
+*
+* This function does the same as Cy_CapSense_SetupWidget() and also
+* does the following tasks:
+* 1. Connects the specified sensor of the widget.
+* 2. Configures HW to perform scan of the specified sensor.
+*
+* Once this function is called to initialize a widget and a sensor, the
+* Cy_CapSense_ScanExt() function is called to scan the sensor.
+*
+* This function is called when no scanning is in progress. I.e.
+* Cy_CapSense_IsBusy() returns a non-busy status.
+*
+* Calling this function directly from the application layer is not
+* recommended. This function is used to implement only the user's specific
+* use cases (for faster execution time or pipeline scanning for example).
+*
+* \param widgetId
+* Specifies the ID number of a widget.
+*
+* \param sensorId
+* Specifies the ID number of the sensor within the widget to perform hardware
+* and firmware initialization required for scanning a specific sensor in a
+* specific widget.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+**********************************************************************************/
+cy_status Cy_CapSense_SetupWidgetExt(
+                uint32_t widgetId, 
+                uint32_t sensorId, 
+                cy_stc_capsense_context_t * context)
+{
+    cy_status widgetStatus = CY_RET_BAD_PARAM;
+
+    if (CY_CAPSENSE_SW_STS_BUSY == Cy_CapSense_IsBusy(context))
+    {
+        /* Previous widget is being scanned. Return error. */
+        widgetStatus = CY_RET_INVALID_STATE;
+    }
+    /*
+     * Check whether widget id is valid, specified widget is enabled and widget did not
+     * detect any fault conditions. If all conditions are met,
+     * set widgetStatus as good, if not, set widgetStatus as bad.
+     */
+    else if (context->ptrCommonConfig->numWd > widgetId)
+    {
+        if (context->ptrWdConfig[widgetId].numSns > sensorId)
+        {
+            /* Check widget sensing method and call corresponding setup function */
+            switch(context->ptrWdConfig[widgetId].senseMethod)
+            {
+                case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSD_E:
+                    Cy_CapSense_CSDSetupWidgetExt(widgetId, sensorId, context);
+                    break;
+
+                case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E:
+                    Cy_CapSense_CSXSetupWidgetExt(widgetId, sensorId, context);
+                    break;
+
+                default:
+                    widgetStatus = CY_RET_UNKNOWN;
+                    break;
+            }
+            widgetStatus = CY_RET_SUCCESS;
+        }
+        else
+        {
+            widgetStatus = CY_RET_BAD_PARAM;
+        }
+    }
+    else
+    {
+        widgetStatus = CY_RET_BAD_PARAM;
+    }
+
+    return (widgetStatus);
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_CapSense_ScanExt
+****************************************************************************//**
+*
+* Starts a conversion on the pre-configured sensor. This function requires
+* using the Cy_CapSense_SetupWidgetExt() function to set up the a
+* widget.
+*
+* This function performs single scanning of one sensor in the widget configured
+* by the Cy_CapSense_SetupWidgetExt() function. 
+*
+* Calling this function directly from the application layer is not
+* recommended. This function is used to implement only the user's specific
+* use cases (for faster execution time or pipeline scanning for example).
+* This function is called when no scanning is in progress. I.e.
+* Cy_CapSense_IsBusy() returns a non-busy status.
+*
+* The sensor must be pre-configured by using the
+* Cy_CapSense_SetupWidgetExt() prior to calling this function.
+* The sensor remains ready for a next scan if a previous scan was triggered
+* by using the Cy_CapSense_ScanExt() function. In this case, calling
+* Cy_CapSense_SetupWidgetExt() is not required every time before the
+* Cy_CapSense_ScanExt() function. If a previous scan was triggered in
+* any other way - Cy_CapSense_Scan(), Cy_CapSense_ScanAllWidgets() or
+* Cy_CapSense_RunTuner() - (see the Cy_CapSense_RunTuner() function
+* description for more details), the sensor must be pre-configured again by
+* using the Cy_CapSense_SetupWidgetExt() prior to calling the
+* Cy_CapSense_ScanExt() function.
+*
+* \param context
+* The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+*******************************************************************************/
+cy_status Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context)
+{
+    cy_status scanStatus = CY_RET_SUCCESS;
+
+    if (CY_CAPSENSE_SW_STS_BUSY == Cy_CapSense_IsBusy(context))
+    {
+        /* Previous widget is being scanned. Return error. */
+        scanStatus = CY_RET_INVALID_STATE;
+    }
+    else
+    {
+        /* Check widget sensing method and call appropriate functions */
+        switch(context->ptrActiveScanSns->ptrWdConfig->senseMethod)
+        {
+            case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSD_E:
+                Cy_CapSense_CSDScan(context);
+                break;
+
+            case (uint8_t)CY_CAPSENSE_SENSE_METHOD_CSX_E:
+                Cy_CapSense_CSXScan(context);
+                break;
+
+            default:
+                scanStatus = CY_RET_UNKNOWN;
+                break;
+        }
+    }
+    return (scanStatus);
+}
+
+
+/*******************************************************************************
 * Function Name: Cy_CapSense_ScanAllWidgets
 ****************************************************************************//**
 *
@@ -729,17 +882,6 @@ cy_status Cy_CapSense_InternalPreCalculation(cy_stc_capsense_context_t * context
         context->ptrInternalContext->csdRegRefgen  = (CSD_REFGEN_REFGEN_EN_Msk |
                                                       CSD_REFGEN_RES_EN_Msk |
                                                       (temp << CSD_REFGEN_GAIN_Pos));
-
-
-        if (CY_CAPSENSE_IDAC_SINKING == context->ptrCommonConfig->csdChargeTransfer)
-        {
-            context->ptrInternalContext->csdRegSwShieldSelScan = CY_CAPSENSE_CSD_SW_SHIELD_SEL_SW_HCBG_HSCMP;
-        }
-        else
-        {
-            context->ptrInternalContext->csdRegSwShieldSelScan = CY_CAPSENSE_CSD_SW_SHIELD_SEL_SW_HCBV_HSCMP;
-        }
-                                                        
     }    
 
     /* Common initialization */

@@ -204,6 +204,9 @@ void Cy_CapSense_CSXDisableMode(cy_stc_capsense_context_t * context)
 * in a specific widget using the CSX sensing method. This function requires
 * using the Cy_CapSense_CSXScan() function to start scanning.
 *
+* This function is obsolete and kept for backward compatibility only. 
+* The Cy_CapSense_SetupWidget() function should be used instead.
+*
 * This function initializes the widgets specific common parameters to perform
 * the CSX scanning. The initialization includes the following:
 * 1. The CSD_CONFIG register.
@@ -277,6 +280,9 @@ void Cy_CapSense_CSXSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * c
 * initialization required for a specific sensor in the widget. This function
 * requires using the Cy_CapSense_CSXScan() function to initiate a scan.
 *
+* This function is obsolete and kept for backward compatibility only. 
+* The Cy_CapSense_SetupWidgetExt() function should be used instead.
+*
 * This function does the same tasks as Cy_CapSense_CSXSetupWidget() and
 * also connects a sensor in the widget for scanning. After this function is
 * called to initialize a widget and a sensor, the Cy_CapSense_CSXScanExt()
@@ -326,6 +332,9 @@ void Cy_CapSense_CSXSetupWidgetExt(
 * This function initiates a scan for the sensors of the widget initialized by
 * the Cy_CapSense_CSXSetupWidget() function.
 *
+* This function is obsolete and kept for backward compatibility only. 
+* The Cy_CapSense_Scan() function should be used instead.
+*
 * This function performs scanning of all the sensors in the widget configured by
 * the Cy_CapSense_CSXSetupWidget() function. It does the following tasks:
 * 1. Connects the first sensor of the widget.
@@ -372,6 +381,9 @@ void Cy_CapSense_CSXScan(cy_stc_capsense_context_t * context)
 * Starts the CSX conversion on the pre-configured sensor. This function requires
 * using the Cy_CapSense_CSXSetupWidgetExt() function to set up a
 * widget.
+*
+* This function is obsolete and kept for backward compatibility only. 
+* The Cy_CapSense_ScanExt() function should be used instead.
 *
 * This function performs single scanning of one sensor in the widget configured
 * by the Cy_CapSense_CSXSetupWidgetExt() function. It does the following
@@ -433,6 +445,9 @@ void Cy_CapSense_CSXScanExt(cy_stc_capsense_context_t * context)
 *
 * Calibrates the IDAC values of all the sensors/nodes in a CSX widget to get 
 * raw count around the specified target.
+*
+* This function is obsolete and kept for backward compatibility only. 
+* The Cy_CapSense_CalibrateWidget() function should be used instead.
 *
 * Performs a successive approximation search algorithm to find appropriate
 * IDAC values for sensors in the specified widget that provides a raw count

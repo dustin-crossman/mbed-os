@@ -46,7 +46,17 @@ void Cy_CapSense_InterruptHandler(const CSD_Type * base, cy_stc_capsense_context
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_SetPinState(uint32_t widgetId, uint32_t sensorElement, uint32_t state, cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_SetupWidgetExt(
+                uint32_t widgetId, 
+                uint32_t sensorId, 
+                cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context);
+
+cy_status Cy_CapSense_SetPinState(
+                uint32_t widgetId, 
+                uint32_t sensorElement, 
+                uint32_t state, 
+                cy_stc_capsense_context_t * context);
 
 cy_status Cy_CapSense_CalibrateWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
 cy_status Cy_CapSense_CalibrateAllWidgets(cy_stc_capsense_context_t * context);
@@ -66,7 +76,6 @@ cy_status Cy_CapSense_SsInitialize(cy_stc_capsense_context_t * context);
 void Cy_CapSense_SsPostAllWidgetsScan(cy_stc_capsense_context_t * context);
 void Cy_CapSense_SetIOsInDefaultState(const cy_stc_capsense_context_t * context);
 void Cy_CapSense_SetSpecificIOsInDefaultState(const cy_stc_capsense_context_t * context);
-
 
 
 void Cy_CapSense_SwitchSensingMode(uint8_t mode, cy_stc_capsense_context_t * context);

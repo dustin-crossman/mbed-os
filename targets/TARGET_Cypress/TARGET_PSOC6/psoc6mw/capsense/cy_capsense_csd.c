@@ -481,10 +481,11 @@ void Cy_CapSense_CSDCalculateScanDuration(cy_stc_capsense_context_t * context)
 ****************************************************************************//**
 *
 * Performs hardware and firmware initialization required for scanning sensors
-* in a specific widget using the CSD sensing method. 
-*
-* This function requires using
+* in a specific widget using the CSD sensing method. This function requires using
 * the Cy_CapSense_CSDScan() function to start scanning.
+*
+* This function is obsolete and kept for backward compatibility only. 
+* The Cy_CapSense_SetupWidget() function should be used instead.
 *
 * This function initializes the specific widget common parameters to perform
 * the CSD scanning. The initialization includes setting up a Modulator and
@@ -533,17 +534,17 @@ void Cy_CapSense_CSDSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * c
 ****************************************************************************//**
 *
 * Performs extended initialization for the CSD widget and also performs
-* initialization required for a specific sensor in the widget. 
-* 
+* initialization required for a specific sensor in the widget.  
 * This function requires using the Cy_CapSense_CSDScanExt() function to 
 * initiate a scan.
 *
+* This function is obsolete and kept for backward compatibility only. 
+* The Cy_CapSense_SetupWidgetExt() function should be used instead.
+*
 * This function does the same as Cy_CapSense_CSDSetupWidget() and also
 * does the following tasks:
-* 1. Connects the first sensor of the widget.
-* 2. Configures the IDAC value.
-* 3. Initializes an interrupt callback function to initialize a scan of the
-* next sensors in a widget.
+* 1. Connects the specified sensor of the widget.
+* 2. Configures HW to perform scan of the specified sensor.
 *
 * Once this function is called to initialize a widget and a sensor, the
 * Cy_CapSense_CSDScanExt() function is called to scan the sensor.
@@ -621,6 +622,9 @@ void Cy_CapSense_CSDStartSample(cy_stc_capsense_context_t * context)
 * using the Cy_CapSense_CSDSetupWidgetExt() function to set up the a
 * widget.
 *
+* This function is obsolete and kept for backward compatibility only. 
+* The Cy_CapSense_ScanExt() function should be used instead.
+*
 * This function performs single scanning of one sensor in the widget configured
 * by the Cy_CapSense_CSDSetupWidgetExt() function. It does the following
 * tasks:
@@ -682,6 +686,9 @@ void Cy_CapSense_CSDScanExt(cy_stc_capsense_context_t * context)
 *
 * This function initiates a scan for the sensors of the widget initialized 
 * by the Cy_CapSense_CSDSetupWidget() function.
+*
+* This function is obsolete and kept for backward compatibility only. 
+* The Cy_CapSense_Scan() function should be used instead.
 *
 * This function does the following tasks:
 * 1. Connects the first sensor of the widget.
@@ -1485,6 +1492,9 @@ static void Cy_CapSense_CSDCalibrate(
 *
 * Executes the IDAC calibration for all the sensors in the widget specified in
 * the input.
+*
+* This function is obsolete and kept for backward compatibility only. 
+* The Cy_CapSense_CalibrateWidget() function should be used instead.
 *
 * Performs a successive approximation search algorithm to find appropriate
 * IDAC values for sensors in the specified widget that provides the raw
