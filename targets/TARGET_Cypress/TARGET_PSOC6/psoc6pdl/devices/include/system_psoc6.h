@@ -469,7 +469,7 @@ extern "C" {
 * \brief Start address of the Cortex-M4 application ([address]UL)
 *        <i>(USER SETTING)</i>
 *******************************************************************************/
-#define CY_CORTEX_M4_APPL_ADDR          ( CY_FLASH_BASE + CY_FLASH_SIZE / 2U)   /* <<< Half of flash is reserved for the Cortex-M0+ application */
+#define CY_CORTEX_M4_APPL_ADDR          (CY_FLASH_BASE + 0x2000U)   /* <<< 8 kB of flash is reserved for the Cortex-M0+ application */
 
 
 /***************************************************************************//**

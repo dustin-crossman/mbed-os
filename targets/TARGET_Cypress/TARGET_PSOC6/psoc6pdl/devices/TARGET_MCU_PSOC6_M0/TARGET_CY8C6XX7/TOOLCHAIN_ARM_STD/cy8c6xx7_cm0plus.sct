@@ -41,10 +41,10 @@
 ; where 'xx' is the device group; for example, 'cy8c6xx7_cm4_dual.scat'.
 ; RAM
 #define RAM_START               0x08000000
-#define RAM_SIZE                0x00024000
+#define RAM_SIZE                0x00002000
 ; Flash
 #define FLASH_START             0x10000000
-#define FLASH_SIZE              0x00080000
+#define FLASH_SIZE              0x00002000
 
 ; The following defines describe a 32K flash region used for EEPROM emulation. 
 ; This region can also be used as the general purpose flash.

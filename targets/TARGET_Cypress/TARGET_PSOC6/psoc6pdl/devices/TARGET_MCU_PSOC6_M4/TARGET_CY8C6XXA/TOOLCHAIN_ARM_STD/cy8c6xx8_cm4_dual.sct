@@ -42,11 +42,11 @@
 ; Your changes must be aligned with the corresponding defines for CM0+ core in 'xx_cm0plus.scat',
 ; where 'xx' is the device group; for example, 'cy8c6xx7_cm0plus.scat'.
 ; RAM
-#define RAM_START               0x08020000
-#define RAM_SIZE                0x000DF800
+#define RAM_START               0x08002000
+#define RAM_SIZE                0x000FD800
 ; Flash
-#define FLASH_START             0x10100000
-#define FLASH_SIZE              0x00100000
+#define FLASH_START             0x10002000
+#define FLASH_SIZE              0x001FE000
 
 ; The following defines describe a 32K flash region used for EEPROM emulation.
 ; This region can also be used as the general purpose flash.
