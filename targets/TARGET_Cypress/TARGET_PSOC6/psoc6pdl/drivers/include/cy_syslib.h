@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_syslib.h
-* \version 2.10
+* \version 2.20
 *
 * Provides an API declaration of the SysLib driver.
 *
@@ -421,7 +421,7 @@ typedef enum
 #define CY_SYSLIB_DRV_VERSION_MAJOR    2
 
 /** The driver minor version */
-#define CY_SYSLIB_DRV_VERSION_MINOR    10
+#define CY_SYSLIB_DRV_VERSION_MINOR    20
 
 
 /*******************************************************************************
@@ -910,9 +910,7 @@ void Cy_SysLib_DelayUs(uint16_t microseconds);
  */
 void Cy_SysLib_DelayCycles(uint32_t cycles);
 __NO_RETURN void Cy_SysLib_Halt(uint32_t reason);
-#if !defined(NDEBUG) || defined(CY_DOXYGEN)
-    void Cy_SysLib_AssertFailed(const char_t * file, uint32_t line);
-#endif  /* !defined(NDEBUG) || defined(CY_DOXYGEN) */
+void Cy_SysLib_AssertFailed(const char_t * file, uint32_t line);
 void Cy_SysLib_ClearFlashCacheAndBuffer(void);
 cy_en_syslib_status_t Cy_SysLib_ResetBackupDomain(void);
 uint32_t Cy_SysLib_GetResetReason(void);

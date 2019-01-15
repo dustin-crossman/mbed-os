@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_syslib.c
-* \version 2.10
+* \version 2.20
 *
 *  Description:
 *   Provides system API implementation for the SysLib driver.
@@ -145,7 +145,6 @@ __NO_RETURN void Cy_SysLib_Halt(uint32_t reason)
 }
 
 
-#if !defined(NDEBUG) || defined(CY_DOXYGEN)
 /*******************************************************************************
 * Macro Name: Cy_SysLib_AssertFailed
 ****************************************************************************//**
@@ -165,11 +164,15 @@ __NO_RETURN void Cy_SysLib_Halt(uint32_t reason)
 *******************************************************************************/
 __WEAK void Cy_SysLib_AssertFailed(const char_t * file, uint32_t line)
 {
+#if !defined(NDEBUG) || defined(CY_DOXYGEN)
     (void) strncpy(cy_assertFileName, file, CY_MAX_FILE_NAME_SIZE);
     cy_assertLine = line;
     Cy_SysLib_Halt(0UL);
-}
+#else
+    (void) file;
+    (void) line;
 #endif  /* !defined(NDEBUG) || defined(CY_DOXYGEN) */
+}
 
 
 /*******************************************************************************
