@@ -4,7 +4,7 @@
 #if defined(DEVICE_CAPSENSE)
 
 #include "platform/platform.h"
-#include "cy_capsense_api.h"
+#include "capsense_api.h"
 #include "platform/mbed_critical.h"
 
 namespace mbed {
