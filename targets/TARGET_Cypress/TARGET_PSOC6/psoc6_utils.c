@@ -277,6 +277,7 @@ int cy_reserve_scb(uint32_t scb_num)
         core_util_critical_section_enter();
         if (scb_reservations[scb_num] == 0) {
             scb_reservations[scb_num] = 1;
+            result = 0;
         }
         core_util_critical_section_exit();
     }
@@ -292,6 +293,7 @@ void cy_free_scb(uint32_t scb_num)
         core_util_critical_section_enter();
         if (scb_reservations[scb_num] == 1) {
             scb_reservations[scb_num] = 0;
+            result = 0;
         }
         core_util_critical_section_exit();
     }
