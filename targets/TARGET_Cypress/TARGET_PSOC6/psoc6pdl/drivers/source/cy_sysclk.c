@@ -216,6 +216,7 @@ cy_en_sysclk_status_t Cy_SysClk_EcoConfigure(uint32_t freq, uint32_t cLoad, uint
 cy_en_sysclk_status_t Cy_SysClk_EcoEnable(uint32_t timeoutus)
 {
     cy_en_sysclk_status_t retVal = CY_SYSCLK_INVALID_STATE;
+    bool zeroTimeout = (0UL == timeoutus);
 
     /* Invalid state error if ECO is already enabled */
     if (0UL == (SRSS_CLK_ECO_CONFIG_ECO_EN_Msk & SRSS_CLK_ECO_CONFIG))
@@ -229,7 +230,7 @@ cy_en_sysclk_status_t Cy_SysClk_EcoEnable(uint32_t timeoutus)
             Cy_SysLib_DelayUs(1U);
         }
 
-        retVal = ((timeoutus == 0UL) ? CY_SYSCLK_TIMEOUT : CY_SYSCLK_SUCCESS);
+        retVal = (zeroTimeout || (0UL != timeoutus)) ? CY_SYSCLK_SUCCESS : CY_SYSCLK_TIMEOUT;
     }
 
     return (retVal);
