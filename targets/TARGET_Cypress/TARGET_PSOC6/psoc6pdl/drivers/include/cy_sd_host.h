@@ -247,6 +247,8 @@
 *         The Low-Power Support section is updated with additional 
 *         information about disabling CLK.
 *         The context initialization in Cy_SD_Host_Init() is corrected.
+*         Updated the Write/Read sequence in Cy_SD_Host_Read() and 
+*         Cy_SD_Host_Write()functions for non-DMA mode.
 *     </td>
 *     <td>Defect fixes.</td>
 *   </tr>

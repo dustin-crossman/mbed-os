@@ -39,6 +39,7 @@ extern "C" {
 #define CY_SD_HOST_CMD1_TIMEOUT_MS          (1000U)  /* The eMMC device timeout to complete its initialization. */
 #define CY_SD_HOST_CMD_TIMEOUT_MS           (3U)     /* The Command complete timeout. */
 #define CY_SD_HOST_BUFFER_RDY_TIMEOUT_MS    (150U)   /* The Buffer read ready timeout. */
+#define CY_SD_HOST_RD_WR_ENABLE_TIMEOUT     (1U)     /* The valid data in the Host buffer timeout. */
 #define CY_SD_HOST_READ_TIMEOUT_MS          (100U)   /* The Read timeout for one block. */
 #define CY_SD_HOST_WRITE_TIMEOUT_MS         (250U)   /* The Write timeout for one block. */
 #define CY_SD_HOST_MAX_TIMEOUT              (0x0EU)  /* The data max timeout for TOUT_CTRL_R. */
@@ -1550,19 +1551,25 @@ static cy_en_sd_host_status_t Cy_SD_Host_CmdRxData(SDHC_Type *base,
     blkCnt = pcmd->numberOfBlock;
     blkSize = pcmd->blockSize;
 
-    /* Wait for the Buffer Read ready. */
-    ret = Cy_SD_Host_PollBufferReadReady(base);
-
-    if (CY_SD_HOST_SUCCESS == ret)
+    while (blkCnt > 0UL)
     {
-        while (blkCnt > 0UL)
+        /* Wait for the Buffer Read ready. */
+        ret = Cy_SD_Host_PollBufferReadReady(base);
+
+        if (CY_SD_HOST_SUCCESS != ret)
         {
+            break;
+        }
+
+        for ( i = blkSize >> 2UL; i != 0UL; i-- )
+        {
+            /* Wait if valid data exists in the Host buffer. */
             retry = CY_SD_HOST_RETRY_TIME;
             while ((false == _FLD2BOOL(SDHC_CORE_PSTATE_REG_BUF_RD_ENABLE,
                                       SDHC_CORE_PSTATE_REG(base))) &&
                    (retry > 0UL))
             {
-                Cy_SysLib_DelayUs(CY_SD_HOST_READ_TIMEOUT_MS);
+                Cy_SysLib_DelayUs(CY_SD_HOST_RD_WR_ENABLE_TIMEOUT); 
                 retry--;
             }
 
@@ -1572,17 +1579,15 @@ static cy_en_sd_host_status_t Cy_SD_Host_CmdRxData(SDHC_Type *base,
                 break;
             }
 
-            for ( i = blkSize >> 2UL; i != 0UL; i-- )
-            {
-                *pcmd->data = Cy_SD_Host_BufferRead(base);
-                pcmd->data++;
-            }
-            blkCnt--;
+            /* Read data from the Host buffer. */
+            *pcmd->data = Cy_SD_Host_BufferRead(base);
+            pcmd->data++;
         }
-        
-        /* Wait for the Transfer Complete. */
-        ret = Cy_SD_Host_PollTransferComplete(base); 
+        blkCnt--;
     }
+
+    /* Wait for the Transfer Complete. */
+    ret = Cy_SD_Host_PollTransferComplete(base);
 
     (void)Cy_SD_Host_PollCmdLineFree(base);
     (void)Cy_SD_Host_PollDataLineNotInhibit(base);
@@ -1619,19 +1624,25 @@ __STATIC_INLINE cy_en_sd_host_status_t Cy_SD_Host_CmdTxData(SDHC_Type *base,
     blkCnt = pcmd->numberOfBlock;
     blkSize = pcmd->blockSize;
 
-    /* Wait for the Buffer Write ready. */
-    ret = Cy_SD_Host_PollBufferWriteReady(base);
-
-    if (CY_SD_HOST_SUCCESS == ret)
+    while (0UL < blkCnt)
     {
-        while (0UL < blkCnt)
+        /* Wait for the Buffer Write ready. */
+        ret = Cy_SD_Host_PollBufferWriteReady(base);
+
+        if (CY_SD_HOST_SUCCESS != ret)
         {
+            break;
+        }
+
+        for ( i = blkSize >> 2UL; i != 0UL; i-- )
+        {
+            /* Wait if space is available for writing data. */
             retry = CY_SD_HOST_RETRY_TIME;
             while ((false == _FLD2BOOL(SDHC_CORE_PSTATE_REG_BUF_WR_ENABLE,
                                       SDHC_CORE_PSTATE_REG(base))) &&
                    (retry > 0UL))
             {
-                Cy_SysLib_DelayUs(CY_SD_HOST_WRITE_TIMEOUT_MS);
+                Cy_SysLib_DelayUs(CY_SD_HOST_RD_WR_ENABLE_TIMEOUT);
                 retry--;
             }
 
@@ -1639,23 +1650,21 @@ __STATIC_INLINE cy_en_sd_host_status_t Cy_SD_Host_CmdTxData(SDHC_Type *base,
                                    SDHC_CORE_PSTATE_REG(base)))
             {
                 break;
-            } 
-            
-            for ( i = blkSize >> 2UL; i != 0UL; i-- )
-            {
-                (void)Cy_SD_Host_BufferWrite(base, *pcmd->data);
-                pcmd->data++;
             }
-            blkCnt--;
-        }
 
-        ret = Cy_SD_Host_PollTransferComplete(base);
-        
-        if (CY_SD_HOST_SUCCESS == ret)
-        {
-            /* Check if DAT line is active. */
-            ret = Cy_SD_Host_PollDataLineFree(base);
+            /* Write data to the Host buffer. */
+            (void)Cy_SD_Host_BufferWrite(base, *pcmd->data);
+            pcmd->data++;
         }
+        blkCnt--;
+    }
+
+    ret = Cy_SD_Host_PollTransferComplete(base);
+
+    if (CY_SD_HOST_SUCCESS == ret)
+    {
+        /* Check if DAT line is active. */
+        ret = Cy_SD_Host_PollDataLineFree(base);
     }
 
     return ret;
