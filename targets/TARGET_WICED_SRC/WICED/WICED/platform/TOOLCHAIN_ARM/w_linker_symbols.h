@@ -1,11 +1,7 @@
 /*
- * $ Copyright Cypress Semiconductor $
-*/
-
-/*
- * Copyright 2018, Cypress Semiconductor Corporation or a subsidiary of
+ * Copyright 2018, Cypress Semiconductor Corporation or a subsidiary of 
  * Cypress Semiconductor Corporation. All Rights Reserved.
- *
+ * 
  * This software, associated documentation and materials ("Software"),
  * is owned by Cypress Semiconductor Corporation
  * or one of its subsidiaries ("Cypress") and is protected by and subject to
@@ -34,35 +30,21 @@
  * of such system or application assumes all risk of such use and in doing
  * so agrees to indemnify Cypress against all liability.
  */
+#pragma once
 
-/** @file
- * Define default PSoC 6 initialization functions
- */
-#include "w_platform_init.h"
-#include "w_platform_isr.h"
-#include "w_platform_peripheral.h"
-#include "w_platform_sleep.h"
-#include "w_platform_config.h"
-#include "w_platform_toolchain.h"
-#include "platform/wwd_platform_interface.h"
-#include "cy_device_headers.h"
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /******************************************************
- *                      Macros
+ *                     Macros
  ******************************************************/
+#define ENTRY_ADDRESS (&reset_handler)
 
 /******************************************************
  *                    Constants
  ******************************************************/
-
-#if defined CPUSS_SYSTEM_INT_NR
-#define NO_OF_INTERRUPTS_SUPPORTED    ( CPUSS_SYSTEM_INT_NR )
-#else
-#define NO_OF_INTERRUPTS_SUPPORTED    ( CPUSS_IRQ_NR )
-#endif
-
-#define SRAM_START_ADDRESS_LOCATION    ((uint32_t)&sram_start_addr_loc)
-extern void* sram_start_addr_loc;
 
 /******************************************************
  *                   Enumerations
@@ -77,58 +59,15 @@ extern void* sram_start_addr_loc;
  ******************************************************/
 
 /******************************************************
- *               Static Function Declarations
+ *                 Global Variables
  ******************************************************/
+extern void* reset_handler;
+extern void* link_stack_end;
 
 /******************************************************
- *               Variable Definitions
+ *               Function Declarations
  ******************************************************/
 
-/******************************************************
- *               Function Definitions
- ******************************************************/
-
-
-void platform_mcu_reset( void )
-{
-    NVIC_SystemReset( );
-
-    /* Loop forever */
-    while ( 1 )
-    {
-    }
-}
-
-WEAK void platform_init_system_clocks( void )
-{
-
-}
-
-WEAK void platform_init_memory( void )
-{
-
-}
-
-void platform_init_mcu_infrastructure( void )
-{
-
-}
-
-void platform_init_connectivity_module( void )
-{
-    /* Ensure 802.11 device is in reset. */
-    host_platform_init( );
-}
-
-WEAK void platform_init_external_devices( void )
-{
-
-}
-
-uint8_t platform_get_chip_revision ( void )
-{
-     uint8_t rev;
-     rev = Cy_SysLib_GetDeviceRevision( );
-
-     return ( rev );
-}
+#ifdef __cplusplus
+} /*extern "C" */
+#endif

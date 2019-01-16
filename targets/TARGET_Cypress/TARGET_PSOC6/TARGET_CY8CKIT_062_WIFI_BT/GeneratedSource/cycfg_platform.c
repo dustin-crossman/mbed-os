@@ -20,12 +20,16 @@
 #define CY_CFG_SYSCLK_PLL_ERROR 3
 #define CY_CFG_SYSCLK_FLL_ERROR 4
 #define CY_CFG_SYSCLK_WCO_ERROR 5
+#define CY_CFG_SYSCLK_CLKALTSYSTICK_ENABLED 1
 #define CY_CFG_SYSCLK_CLKBAK_ENABLED 1
 #define CY_CFG_SYSCLK_CLKFAST_ENABLED 1
 #define CY_CFG_SYSCLK_FLL_ENABLED 1
 #define CY_CFG_SYSCLK_CLKHF0_ENABLED 1
 #define CY_CFG_SYSCLK_CLKHF0_FREQ_MHZ 100UL
 #define CY_CFG_SYSCLK_CLKHF0_CLKPATH CY_SYSCLK_CLKHF_IN_CLKPATH0
+#define CY_CFG_SYSCLK_CLKHF1_ENABLED 1
+#define CY_CFG_SYSCLK_CLKHF1_FREQ_MHZ 48UL
+#define CY_CFG_SYSCLK_CLKHF1_CLKPATH CY_SYSCLK_CLKHF_IN_CLKPATH1
 #define CY_CFG_SYSCLK_CLKHF2_ENABLED 1
 #define CY_CFG_SYSCLK_CLKHF2_FREQ_MHZ 50UL
 #define CY_CFG_SYSCLK_CLKHF2_CLKPATH CY_SYSCLK_CLKHF_IN_CLKPATH0
@@ -48,6 +52,7 @@
 #define CY_CFG_SYSCLK_CLKPERI_ENABLED 1
 #define CY_CFG_SYSCLK_PLL0_ENABLED 1
 #define CY_CFG_SYSCLK_CLKSLOW_ENABLED 1
+#define CY_CFG_SYSCLK_CLKTIMER_ENABLED 1
 #define CY_CFG_SYSCLK_WCO_ENABLED 1
 #define CY_CFG_PWR_ENABLED 1
 #define CY_CFG_PWR_USING_LDO 1
@@ -89,6 +94,10 @@ __WEAK void cycfg_ClockStartupError(uint32_t error)
     (void)error; /* Suppress the compiler warning */
     while(1);
 }
+__STATIC_INLINE void Cy_SysClk_ClkAltSysTickInit()
+{
+    Cy_SysTick_SetClockSource(CY_SYSTICK_CLOCK_SOURCE_CLK_LF);
+}
 __STATIC_INLINE void Cy_SysClk_ClkBakInit()
 {
     Cy_SysClk_ClkBakSetSource(CY_SYSCLK_BAK_IN_WCO);
@@ -112,6 +121,12 @@ __STATIC_INLINE void Cy_SysClk_ClkHf0Init()
 {
     Cy_SysClk_ClkHfSetSource(0U, CY_CFG_SYSCLK_CLKHF0_CLKPATH);
     Cy_SysClk_ClkHfSetDivider(0U, CY_SYSCLK_CLKHF_NO_DIVIDE);
+}
+__STATIC_INLINE void Cy_SysClk_ClkHf1Init()
+{
+    Cy_SysClk_ClkHfSetSource(1U, CY_CFG_SYSCLK_CLKHF1_CLKPATH);
+    Cy_SysClk_ClkHfSetDivider(1U, CY_SYSCLK_CLKHF_NO_DIVIDE);
+    Cy_SysClk_ClkHfEnable(1U);
 }
 __STATIC_INLINE void Cy_SysClk_ClkHf2Init()
 {
@@ -174,6 +189,13 @@ __STATIC_INLINE void Cy_SysClk_Pll0Init()
 __STATIC_INLINE void Cy_SysClk_ClkSlowInit()
 {
     Cy_SysClk_ClkSlowSetDivider(0U);
+}
+__STATIC_INLINE void Cy_SysClk_ClkTimerInit()
+{
+    Cy_SysClk_ClkTimerDisable();
+     Cy_SysClk_ClkTimerSetSource(CY_SYSCLK_CLKTIMER_IN_IMO);
+    Cy_SysClk_ClkTimerSetDivider(0U);
+    Cy_SysClk_ClkTimerEnable();
 }
 __STATIC_INLINE void Cy_SysClk_WcoInit()
 {

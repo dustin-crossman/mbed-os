@@ -96,76 +96,67 @@ static wiced_bool_t i2c_initialized[WICED_I2C_MAX];
 
 wiced_result_t wiced_platform_init( void )
 {
-    WPRINT_PLATFORM_INFO( ("Platform " PLATFORM " initialised\n") );
-
-    if ( WICED_TRUE == platform_watchdog_check_last_reset( ) )
-    {
-        WPRINT_PLATFORM_ERROR( ("WARNING: Watchdog reset occured previously. Please see platform_watchdog.c for debugging instructions.\n") );
-    }
-
-    memset(i2c_initialized, 0, sizeof(i2c_initialized));
-
-    return WICED_SUCCESS;
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_adc_init( wiced_adc_t adc, uint32_t sample_cycle )
 {
-    return (wiced_result_t) platform_adc_init( &platform_adc_peripherals[adc], sample_cycle );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_adc_deinit( wiced_adc_t adc )
 {
-    return (wiced_result_t) platform_adc_deinit( &platform_adc_peripherals[adc] );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_adc_take_sample( wiced_adc_t adc, uint16_t* output )
 {
-    return (wiced_result_t) platform_adc_take_sample( &platform_adc_peripherals[adc], output );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_adc_take_sample_stream( wiced_adc_t adc, void* buffer, uint16_t buffer_length )
 {
-    return (wiced_result_t) platform_adc_take_sample_stream( &platform_adc_peripherals[adc], buffer, buffer_length );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_gpio_init( wiced_gpio_t gpio, wiced_gpio_config_t configuration )
 {
-    return (wiced_result_t) platform_gpio_init( &platform_gpio_pins[gpio], configuration );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_gpio_deinit( wiced_gpio_t gpio )
 {
-    return (wiced_result_t) platform_gpio_deinit( &platform_gpio_pins[gpio] );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_gpio_output_high( wiced_gpio_t gpio )
 {
-    return (wiced_result_t) platform_gpio_output_high( &platform_gpio_pins[gpio] );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_gpio_output_low( wiced_gpio_t gpio )
 {
-    return (wiced_result_t) platform_gpio_output_low( &platform_gpio_pins[gpio] );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_bool_t wiced_gpio_input_get( wiced_gpio_t gpio )
 {
-    return platform_gpio_input_get( &platform_gpio_pins[gpio] );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_gpio_input_IRQHandler_enable( wiced_gpio_t gpio, wiced_gpio_IRQHandler_trigger_t trigger, wiced_gpio_IRQHandler_handler_t handler, void* arg )
 {
-    return (wiced_result_t) platform_gpio_IRQHandler_enable( &platform_gpio_pins[gpio], trigger, handler, (void*)arg );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_gpio_deepsleep_wakeup_enable( wiced_gpio_t gpio, wiced_gpio_IRQHandler_trigger_t trigger )
 {
-    return (wiced_result_t) platform_gpio_deepsleep_wakeup_enable( &platform_gpio_pins[ gpio ], trigger );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_gpio_input_IRQHandler_disable( wiced_gpio_t gpio )
 {
-    return (wiced_result_t) platform_gpio_IRQHandler_disable( &platform_gpio_pins[gpio] );
+    return WICED_UNSUPPORTED;
 }
 #if 0 // Unsused
 wiced_result_t wiced_led_set_state(wiced_led_index_t led_index, wiced_led_state_t off_on )
@@ -321,12 +312,12 @@ wiced_result_t wiced_pwm_stop( wiced_pwm_t pwm )
 #endif
 wiced_result_t wiced_platform_get_rtc_time( wiced_rtc_time_t* time )
 {
-    return (wiced_result_t) platform_rtc_get_time( time );
+    return WICED_UNSUPPORTED;
 }
 
 wiced_result_t wiced_platform_set_rtc_time( const wiced_rtc_time_t* time )
 {
-    return (wiced_result_t) platform_rtc_set_time( time );
+    return WICED_UNSUPPORTED;
 }
 #if 0 //Unused
 wiced_result_t wiced_spi_init( const wiced_spi_device_t* spi )
@@ -433,7 +424,7 @@ wiced_result_t wiced_uart_receive_bytes( wiced_uart_t uart, void* data, uint32_t
 #endif
 wiced_result_t wiced_watchdog_kick( void )
 {
-    return (wiced_result_t) platform_watchdog_kick( );
+    return WICED_UNSUPPORTED;
 }
 #if 0 // Unused
 uint64_t wiced_get_nanosecond_clock_value( void )

@@ -2,10 +2,8 @@
 <Design xmlns="http://cypress.com/xsd/cydesignfile_v1" version="10">
   <ToolInfo version="1.0.0"/>
   <Device mpn="CY8C6247BZI-D54"/>
-  <Platform name="PSOC6_DUAL_CORE"/>
-  <Kits>
-    <Kit name="CY8CKIT-062-WIFI-BT" version="1.0"/>
-  </Kits>
+  <Platform name=""/>
+  <Kits/>
   <Libraries>
     <Library name="psoc6sw" version="1.1"/>
   </Libraries>
@@ -28,7 +26,7 @@
         <Param id="startOnReset" value="true"/>
       </Block>
       <Block location="peri[0].div_8[2]" alias="" template="mxs40peripheralclock" version="1.0">
-        <Param id="intDivider" value="72"/>
+        <Param id="intDivider" value="109"/>
         <Param id="fracDivider" value="0"/>
         <Param id="startOnReset" value="true"/>
       </Block>
@@ -52,7 +50,7 @@
         <Param id="CRC_POLYNOMIAL" value="79764919"/>
         <Param id="CHANNEL_PRIORITY" value="1"/>
         <Param id="NUM_OF_DESCRIPTORS" value="1"/>
-        <Param id="PREEMPTABLE" value="false"/>
+        <Param id="PREEMPTABLE" value="true"/>
         <Param id="BUFFERABLE" value="false"/>
         <Param id="DESCR_SELECTION" value="0"/>
         <Param id="DESCR_NAME_0" value="Descriptor_0"/>
@@ -60,17 +58,17 @@
         <Param id="INTR_OUT_0" value="CY_DMA_1ELEMENT"/>
         <Param id="ENABLE_CHAINING_0" value="false"/>
         <Param id="CHAIN_TO_0" value="0"/>
-        <Param id="CHAN_STATE_COMPL_0" value="CY_DMA_CHANNEL_ENABLED"/>
+        <Param id="CHAN_STATE_COMPL_0" value="CY_DMA_CHANNEL_DISABLED"/>
         <Param id="TRIG_IN_TYPE_0" value="CY_DMA_1ELEMENT"/>
         <Param id="TRIG_DEACT_0" value="CY_DMA_RETRIG_IM"/>
-        <Param id="DATA_TRANSFER_WIDTH_0" value="WordToWord"/>
-        <Param id="X_NUM_OF_ELEMENTS_0" value="1"/>
-        <Param id="X_SRC_INCREMENT_0" value="1"/>
+        <Param id="DATA_TRANSFER_WIDTH_0" value="ByteToByte"/>
+        <Param id="X_NUM_OF_ELEMENTS_0" value="6"/>
+        <Param id="X_SRC_INCREMENT_0" value="0"/>
         <Param id="X_DST_INCREMENT_0" value="1"/>
         <Param id="CRC_0" value="false"/>
         <Param id="Y_NUM_OF_ELEMENTS_0" value="1"/>
-        <Param id="Y_SRC_INCREMENT_0" value="1"/>
-        <Param id="Y_DST_INCREMENT_0" value="1"/>
+        <Param id="Y_SRC_INCREMENT_0" value="0"/>
+        <Param id="Y_DST_INCREMENT_0" value="0"/>
         <Param id="DESCR_NAME_1" value="Descriptor_1"/>
         <Param id="TRIG_OUT_TYPE_1" value="CY_DMA_1ELEMENT"/>
         <Param id="INTR_OUT_1" value="CY_DMA_1ELEMENT"/>
@@ -4159,9 +4157,9 @@
         <Param id="CRC_REMINDER_REVERSE" value="false"/>
         <Param id="CRC_REMINDER_XOR" value="0"/>
         <Param id="CRC_POLYNOMIAL" value="79764919"/>
-        <Param id="CHANNEL_PRIORITY" value="3"/>
-        <Param id="NUM_OF_DESCRIPTORS" value="4"/>
-        <Param id="PREEMPTABLE" value="false"/>
+        <Param id="CHANNEL_PRIORITY" value="1"/>
+        <Param id="NUM_OF_DESCRIPTORS" value="1"/>
+        <Param id="PREEMPTABLE" value="true"/>
         <Param id="BUFFERABLE" value="false"/>
         <Param id="DESCR_SELECTION" value="0"/>
         <Param id="DESCR_NAME_0" value="Descriptor_0"/>
@@ -4169,17 +4167,17 @@
         <Param id="INTR_OUT_0" value="CY_DMA_1ELEMENT"/>
         <Param id="ENABLE_CHAINING_0" value="false"/>
         <Param id="CHAIN_TO_0" value="0"/>
-        <Param id="CHAN_STATE_COMPL_0" value="CY_DMA_CHANNEL_ENABLED"/>
+        <Param id="CHAN_STATE_COMPL_0" value="CY_DMA_CHANNEL_DISABLED"/>
         <Param id="TRIG_IN_TYPE_0" value="CY_DMA_1ELEMENT"/>
-        <Param id="TRIG_DEACT_0" value="CY_DMA_RETRIG_IM"/>
-        <Param id="DATA_TRANSFER_WIDTH_0" value="WordToWord"/>
-        <Param id="X_NUM_OF_ELEMENTS_0" value="1"/>
+        <Param id="TRIG_DEACT_0" value="CY_DMA_RETRIG_16CYC"/>
+        <Param id="DATA_TRANSFER_WIDTH_0" value="ByteToByte"/>
+        <Param id="X_NUM_OF_ELEMENTS_0" value="5"/>
         <Param id="X_SRC_INCREMENT_0" value="1"/>
-        <Param id="X_DST_INCREMENT_0" value="1"/>
+        <Param id="X_DST_INCREMENT_0" value="0"/>
         <Param id="CRC_0" value="false"/>
         <Param id="Y_NUM_OF_ELEMENTS_0" value="1"/>
-        <Param id="Y_SRC_INCREMENT_0" value="1"/>
-        <Param id="Y_DST_INCREMENT_0" value="1"/>
+        <Param id="Y_SRC_INCREMENT_0" value="0"/>
+        <Param id="Y_DST_INCREMENT_0" value="0"/>
         <Param id="DESCR_NAME_1" value="Descriptor_1"/>
         <Param id="TRIG_OUT_TYPE_1" value="CY_DMA_1ELEMENT"/>
         <Param id="INTR_OUT_1" value="CY_DMA_1ELEMENT"/>
@@ -8268,27 +8266,27 @@
         <Param id="CRC_REMINDER_REVERSE" value="false"/>
         <Param id="CRC_REMINDER_XOR" value="0"/>
         <Param id="CRC_POLYNOMIAL" value="79764919"/>
-        <Param id="CHANNEL_PRIORITY" value="3"/>
-        <Param id="NUM_OF_DESCRIPTORS" value="4"/>
+        <Param id="CHANNEL_PRIORITY" value="0"/>
+        <Param id="NUM_OF_DESCRIPTORS" value="1"/>
         <Param id="PREEMPTABLE" value="false"/>
         <Param id="BUFFERABLE" value="false"/>
         <Param id="DESCR_SELECTION" value="0"/>
         <Param id="DESCR_NAME_0" value="Descriptor_0"/>
         <Param id="TRIG_OUT_TYPE_0" value="CY_DMA_1ELEMENT"/>
-        <Param id="INTR_OUT_0" value="CY_DMA_1ELEMENT"/>
+        <Param id="INTR_OUT_0" value="CY_DMA_DESCR"/>
         <Param id="ENABLE_CHAINING_0" value="false"/>
         <Param id="CHAIN_TO_0" value="0"/>
-        <Param id="CHAN_STATE_COMPL_0" value="CY_DMA_CHANNEL_ENABLED"/>
-        <Param id="TRIG_IN_TYPE_0" value="CY_DMA_1ELEMENT"/>
-        <Param id="TRIG_DEACT_0" value="CY_DMA_RETRIG_IM"/>
-        <Param id="DATA_TRANSFER_WIDTH_0" value="WordToWord"/>
-        <Param id="X_NUM_OF_ELEMENTS_0" value="1"/>
-        <Param id="X_SRC_INCREMENT_0" value="1"/>
-        <Param id="X_DST_INCREMENT_0" value="1"/>
+        <Param id="CHAN_STATE_COMPL_0" value="CY_DMA_CHANNEL_DISABLED"/>
+        <Param id="TRIG_IN_TYPE_0" value="CY_DMA_X_LOOP"/>
+        <Param id="TRIG_DEACT_0" value="CY_DMA_RETRIG_4CYC"/>
+        <Param id="DATA_TRANSFER_WIDTH_0" value="HalfwordToHalfword"/>
+        <Param id="X_NUM_OF_ELEMENTS_0" value="10"/>
+        <Param id="X_SRC_INCREMENT_0" value="2"/>
+        <Param id="X_DST_INCREMENT_0" value="0"/>
         <Param id="CRC_0" value="false"/>
-        <Param id="Y_NUM_OF_ELEMENTS_0" value="1"/>
-        <Param id="Y_SRC_INCREMENT_0" value="1"/>
-        <Param id="Y_DST_INCREMENT_0" value="1"/>
+        <Param id="Y_NUM_OF_ELEMENTS_0" value="2"/>
+        <Param id="Y_SRC_INCREMENT_0" value="10"/>
+        <Param id="Y_DST_INCREMENT_0" value="0"/>
         <Param id="DESCR_NAME_1" value="Descriptor_1"/>
         <Param id="TRIG_OUT_TYPE_1" value="CY_DMA_1ELEMENT"/>
         <Param id="INTR_OUT_1" value="CY_DMA_1ELEMENT"/>
@@ -12377,27 +12375,27 @@
         <Param id="CRC_REMINDER_REVERSE" value="false"/>
         <Param id="CRC_REMINDER_XOR" value="0"/>
         <Param id="CRC_POLYNOMIAL" value="79764919"/>
-        <Param id="CHANNEL_PRIORITY" value="3"/>
-        <Param id="NUM_OF_DESCRIPTORS" value="4"/>
+        <Param id="CHANNEL_PRIORITY" value="0"/>
+        <Param id="NUM_OF_DESCRIPTORS" value="1"/>
         <Param id="PREEMPTABLE" value="false"/>
         <Param id="BUFFERABLE" value="false"/>
         <Param id="DESCR_SELECTION" value="0"/>
         <Param id="DESCR_NAME_0" value="Descriptor_0"/>
         <Param id="TRIG_OUT_TYPE_0" value="CY_DMA_1ELEMENT"/>
-        <Param id="INTR_OUT_0" value="CY_DMA_1ELEMENT"/>
+        <Param id="INTR_OUT_0" value="CY_DMA_DESCR"/>
         <Param id="ENABLE_CHAINING_0" value="false"/>
         <Param id="CHAIN_TO_0" value="0"/>
-        <Param id="CHAN_STATE_COMPL_0" value="CY_DMA_CHANNEL_ENABLED"/>
-        <Param id="TRIG_IN_TYPE_0" value="CY_DMA_1ELEMENT"/>
+        <Param id="CHAN_STATE_COMPL_0" value="CY_DMA_CHANNEL_DISABLED"/>
+        <Param id="TRIG_IN_TYPE_0" value="CY_DMA_X_LOOP"/>
         <Param id="TRIG_DEACT_0" value="CY_DMA_RETRIG_IM"/>
-        <Param id="DATA_TRANSFER_WIDTH_0" value="WordToWord"/>
-        <Param id="X_NUM_OF_ELEMENTS_0" value="1"/>
-        <Param id="X_SRC_INCREMENT_0" value="1"/>
-        <Param id="X_DST_INCREMENT_0" value="1"/>
+        <Param id="DATA_TRANSFER_WIDTH_0" value="HalfwordToHalfword"/>
+        <Param id="X_NUM_OF_ELEMENTS_0" value="10"/>
+        <Param id="X_SRC_INCREMENT_0" value="0"/>
+        <Param id="X_DST_INCREMENT_0" value="2"/>
         <Param id="CRC_0" value="false"/>
-        <Param id="Y_NUM_OF_ELEMENTS_0" value="1"/>
-        <Param id="Y_SRC_INCREMENT_0" value="1"/>
-        <Param id="Y_DST_INCREMENT_0" value="1"/>
+        <Param id="Y_NUM_OF_ELEMENTS_0" value="2"/>
+        <Param id="Y_SRC_INCREMENT_0" value="0"/>
+        <Param id="Y_DST_INCREMENT_0" value="10"/>
         <Param id="DESCR_NAME_1" value="Descriptor_1"/>
         <Param id="TRIG_OUT_TYPE_1" value="CY_DMA_1ELEMENT"/>
         <Param id="INTR_OUT_1" value="CY_DMA_1ELEMENT"/>
@@ -16526,15 +16524,15 @@
         <Param id="ComMode" value="CY_SCB_UART_STANDARD"/>
         <Param id="IrdaLowPower" value="false"/>
         <Param id="BaudRate" value="115200"/>
-        <Param id="Oversample" value="12"/>
+        <Param id="Oversample" value="8"/>
         <Param id="BitsOrder" value="CY_SCB_UART_LSB_FIRST"/>
-        <Param id="DataWidth" value="9"/>
+        <Param id="DataWidth" value="8"/>
         <Param id="ParityType" value="CY_SCB_UART_PARITY_NONE"/>
         <Param id="StopBits" value="CY_SCB_UART_STOP_BITS_1"/>
         <Param id="EnableInputFilter" value="false"/>
         <Param id="EnableTxEn" value="false"/>
         <Param id="FlowControl" value="false"/>
-        <Param id="CtsPolarity" value="CY_SCB_UART_ACTIVE_HIGH"/>
+        <Param id="CtsPolarity" value="CY_SCB_UART_ACTIVE_LOW"/>
         <Param id="RtsPolarity" value="CY_SCB_UART_ACTIVE_LOW"/>
         <Param id="RtsTriggerLevel" value="63"/>
         <Param id="RxTriggerLevel" value="63"/>
@@ -16835,7 +16833,7 @@
         <Param id="inFlash" value="true"/>
       </Block>
       <Block location="ioss[0].port[2].pin[0]" alias="SDHC0_DAT0" template="mxs40pin" version="1.0">
-        <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+        <Param id="DriveModes" value="CY_GPIO_DM_STRONG"/>
         <Param id="initialState" value="1"/>
         <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
         <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -16845,7 +16843,7 @@
         <Param id="inFlash" value="true"/>
       </Block>
       <Block location="ioss[0].port[2].pin[1]" alias="SDHC0_DAT1" template="mxs40pin" version="1.0">
-        <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+        <Param id="DriveModes" value="CY_GPIO_DM_STRONG"/>
         <Param id="initialState" value="1"/>
         <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
         <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -16855,7 +16853,7 @@
         <Param id="inFlash" value="true"/>
       </Block>
       <Block location="ioss[0].port[2].pin[2]" alias="SDHC0_DAT2" template="mxs40pin" version="1.0">
-        <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+        <Param id="DriveModes" value="CY_GPIO_DM_STRONG"/>
         <Param id="initialState" value="1"/>
         <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
         <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -16865,7 +16863,7 @@
         <Param id="inFlash" value="true"/>
       </Block>
       <Block location="ioss[0].port[2].pin[3]" alias="SDHC0_DAT3" template="mxs40pin" version="1.0">
-        <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+        <Param id="DriveModes" value="CY_GPIO_DM_STRONG"/>
         <Param id="initialState" value="1"/>
         <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
         <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -16875,7 +16873,7 @@
         <Param id="inFlash" value="true"/>
       </Block>
       <Block location="ioss[0].port[2].pin[4]" alias="SDHC0_CMD" template="mxs40pin" version="1.0">
-        <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+        <Param id="DriveModes" value="CY_GPIO_DM_STRONG"/>
         <Param id="initialState" value="1"/>
         <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
         <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -16885,7 +16883,27 @@
         <Param id="inFlash" value="true"/>
       </Block>
       <Block location="ioss[0].port[2].pin[5]" alias="SDHC0_CLK" template="mxs40pin" version="1.0">
-        <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+        <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
+        <Param id="initialState" value="1"/>
+        <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+        <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+        <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+        <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+        <Param id="sioOutputBuffer" value="true"/>
+        <Param id="inFlash" value="true"/>
+      </Block>
+      <Block location="ioss[0].port[2].pin[6]" alias="ENABLE_WIFI" template="mxs40pin" version="1.0">
+        <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
+        <Param id="initialState" value="0"/>
+        <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+        <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+        <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+        <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+        <Param id="sioOutputBuffer" value="true"/>
+        <Param id="inFlash" value="true"/>
+      </Block>
+      <Block location="ioss[0].port[5].pin[0]" alias="UART_RX" template="mxs40pin" version="1.0">
+        <Param id="DriveModes" value="CY_GPIO_DM_HIGHZ"/>
         <Param id="initialState" value="1"/>
         <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
         <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -17061,6 +17079,9 @@
         <Param id="traceEnable" value="false"/>
       </Block>
       <Block location="srss[0].clock[0]" alias="" template="mxs40sysclocks" version="1.0"/>
+      <Block location="srss[0].clock[0].altsystickclk[0]" alias="" template="mxs40altsystick" version="1.0">
+        <Param id="sourceClock" value="lfclk"/>
+      </Block>
       <Block location="srss[0].clock[0].bakclk[0]" alias="" template="mxs40bakclk" version="1.0">
         <Param id="sourceClock" value="wco"/>
       </Block>
@@ -17073,6 +17094,10 @@
       </Block>
       <Block location="srss[0].clock[0].hfclk[0]" alias="" template="mxs40hfclk" version="1.0">
         <Param id="sourceClockNumber" value="0"/>
+        <Param id="divider" value="1"/>
+      </Block>
+      <Block location="srss[0].clock[0].hfclk[1]" alias="" template="mxs40hfclk" version="1.0">
+        <Param id="sourceClockNumber" value="1"/>
         <Param id="divider" value="1"/>
       </Block>
       <Block location="srss[0].clock[0].hfclk[2]" alias="" template="mxs40hfclk" version="1.0">
@@ -17118,6 +17143,10 @@
       </Block>
       <Block location="srss[0].clock[0].slowclk[0]" alias="" template="mxs40slowclk" version="1.0">
         <Param id="divider" value="1"/>
+      </Block>
+      <Block location="srss[0].clock[0].timerclk[0]" alias="" template="mxs40timerclk" version="1.0">
+        <Param id="sourceClock" value="imo"/>
+        <Param id="timerDivider" value="1"/>
       </Block>
       <Block location="srss[0].clock[0].wco[0]" alias="" template="mxs40wco" version="1.0">
         <Param id="clockPort" value="CY_SYSCLK_WCO_NOT_BYPASSED"/>
@@ -17295,6 +17324,10 @@
     <Net>
       <Port name="ioss[0].port[2].pin[5].digital_out[0]"/>
       <Port name="udb[0].port_if[21]"/>
+    </Net>
+    <Net>
+      <Port name="ioss[0].port[5].pin[0].digital_inout[0]"/>
+      <Port name="scb[5].uart_rx[0]"/>
     </Net>
     <Net>
       <Port name="ioss[0].port[5].pin[1].digital_inout[0]"/>

@@ -19,6 +19,7 @@
 #include "cycfg_notices.h"
 #include "cy_sysclk.h"
 #include "cy_ble_clk.h"
+#include "cy_systick.h"
 #include "cy_gpio.h"
 #include "cy_syspm.h"
 

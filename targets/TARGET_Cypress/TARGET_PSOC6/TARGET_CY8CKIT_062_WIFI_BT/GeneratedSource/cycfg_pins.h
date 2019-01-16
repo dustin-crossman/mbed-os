@@ -195,7 +195,7 @@ extern "C" {
 #define SDHC0_DAT0_PORT GPIO_PRT2
 #define SDHC0_DAT0_PIN 0U
 #define SDHC0_DAT0_NUM 0U
-#define SDHC0_DAT0_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDHC0_DAT0_DRIVEMODE CY_GPIO_DM_STRONG
 #define SDHC0_DAT0_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_0_HSIOM
 	#define ioss_0_port_2_pin_0_HSIOM HSIOM_SEL_GPIO
@@ -205,7 +205,7 @@ extern "C" {
 #define SDHC0_DAT1_PORT GPIO_PRT2
 #define SDHC0_DAT1_PIN 1U
 #define SDHC0_DAT1_NUM 1U
-#define SDHC0_DAT1_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDHC0_DAT1_DRIVEMODE CY_GPIO_DM_STRONG
 #define SDHC0_DAT1_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_1_HSIOM
 	#define ioss_0_port_2_pin_1_HSIOM HSIOM_SEL_GPIO
@@ -215,7 +215,7 @@ extern "C" {
 #define SDHC0_DAT2_PORT GPIO_PRT2
 #define SDHC0_DAT2_PIN 2U
 #define SDHC0_DAT2_NUM 2U
-#define SDHC0_DAT2_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDHC0_DAT2_DRIVEMODE CY_GPIO_DM_STRONG
 #define SDHC0_DAT2_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_2_HSIOM
 	#define ioss_0_port_2_pin_2_HSIOM HSIOM_SEL_GPIO
@@ -225,7 +225,7 @@ extern "C" {
 #define SDHC0_DAT3_PORT GPIO_PRT2
 #define SDHC0_DAT3_PIN 3U
 #define SDHC0_DAT3_NUM 3U
-#define SDHC0_DAT3_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDHC0_DAT3_DRIVEMODE CY_GPIO_DM_STRONG
 #define SDHC0_DAT3_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_3_HSIOM
 	#define ioss_0_port_2_pin_3_HSIOM HSIOM_SEL_GPIO
@@ -235,7 +235,7 @@ extern "C" {
 #define SDHC0_CMD_PORT GPIO_PRT2
 #define SDHC0_CMD_PIN 4U
 #define SDHC0_CMD_NUM 4U
-#define SDHC0_CMD_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDHC0_CMD_DRIVEMODE CY_GPIO_DM_STRONG
 #define SDHC0_CMD_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_4_HSIOM
 	#define ioss_0_port_2_pin_4_HSIOM HSIOM_SEL_GPIO
@@ -245,13 +245,33 @@ extern "C" {
 #define SDHC0_CLK_PORT GPIO_PRT2
 #define SDHC0_CLK_PIN 5U
 #define SDHC0_CLK_NUM 5U
-#define SDHC0_CLK_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDHC0_CLK_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
 #define SDHC0_CLK_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_5_HSIOM
 	#define ioss_0_port_2_pin_5_HSIOM HSIOM_SEL_GPIO
 #endif
 #define SDHC0_CLK_HSIOM ioss_0_port_2_pin_5_HSIOM
 #define SDHC0_CLK_IRQ ioss_interrupts_gpio_2_IRQn
+#define ENABLE_WIFI_PORT GPIO_PRT2
+#define ENABLE_WIFI_PIN 6U
+#define ENABLE_WIFI_NUM 6U
+#define ENABLE_WIFI_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
+#define ENABLE_WIFI_INIT_DRIVESTATE 0
+#ifndef ioss_0_port_2_pin_6_HSIOM
+	#define ioss_0_port_2_pin_6_HSIOM HSIOM_SEL_GPIO
+#endif
+#define ENABLE_WIFI_HSIOM ioss_0_port_2_pin_6_HSIOM
+#define ENABLE_WIFI_IRQ ioss_interrupts_gpio_2_IRQn
+#define UART_RX_PORT GPIO_PRT5
+#define UART_RX_PIN 0U
+#define UART_RX_NUM 0U
+#define UART_RX_DRIVEMODE CY_GPIO_DM_HIGHZ
+#define UART_RX_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_5_pin_0_HSIOM
+	#define ioss_0_port_5_pin_0_HSIOM HSIOM_SEL_GPIO
+#endif
+#define UART_RX_HSIOM ioss_0_port_5_pin_0_HSIOM
+#define UART_RX_IRQ ioss_interrupts_gpio_5_IRQn
 #define UART_TX_PORT GPIO_PRT5
 #define UART_TX_PIN 1U
 #define UART_TX_NUM 1U
@@ -436,6 +456,8 @@ extern const cy_stc_gpio_pin_config_t SDHC0_DAT2_config;
 extern const cy_stc_gpio_pin_config_t SDHC0_DAT3_config;
 extern const cy_stc_gpio_pin_config_t SDHC0_CMD_config;
 extern const cy_stc_gpio_pin_config_t SDHC0_CLK_config;
+extern const cy_stc_gpio_pin_config_t ENABLE_WIFI_config;
+extern const cy_stc_gpio_pin_config_t UART_RX_config;
 extern const cy_stc_gpio_pin_config_t UART_TX_config;
 extern const cy_stc_gpio_pin_config_t EZI2C_SCL_config;
 extern const cy_stc_gpio_pin_config_t EZI2C_SDA_config;

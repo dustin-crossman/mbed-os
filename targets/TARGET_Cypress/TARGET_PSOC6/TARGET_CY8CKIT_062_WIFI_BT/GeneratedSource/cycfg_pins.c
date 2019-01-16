@@ -290,7 +290,7 @@ const cy_stc_gpio_pin_config_t LED8_config =
 const cy_stc_gpio_pin_config_t SDHC0_DAT0_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG,
 	.hsiom = SDHC0_DAT0_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
@@ -306,7 +306,7 @@ const cy_stc_gpio_pin_config_t SDHC0_DAT0_config =
 const cy_stc_gpio_pin_config_t SDHC0_DAT1_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG,
 	.hsiom = SDHC0_DAT1_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
@@ -322,7 +322,7 @@ const cy_stc_gpio_pin_config_t SDHC0_DAT1_config =
 const cy_stc_gpio_pin_config_t SDHC0_DAT2_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG,
 	.hsiom = SDHC0_DAT2_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
@@ -338,7 +338,7 @@ const cy_stc_gpio_pin_config_t SDHC0_DAT2_config =
 const cy_stc_gpio_pin_config_t SDHC0_DAT3_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG,
 	.hsiom = SDHC0_DAT3_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
@@ -354,7 +354,7 @@ const cy_stc_gpio_pin_config_t SDHC0_DAT3_config =
 const cy_stc_gpio_pin_config_t SDHC0_CMD_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG,
 	.hsiom = SDHC0_CMD_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
@@ -370,8 +370,40 @@ const cy_stc_gpio_pin_config_t SDHC0_CMD_config =
 const cy_stc_gpio_pin_config_t SDHC0_CLK_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
 	.hsiom = SDHC0_CLK_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t ENABLE_WIFI_config = 
+{
+	.outVal = 0,
+	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+	.hsiom = ENABLE_WIFI_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t UART_RX_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_HIGHZ,
+	.hsiom = UART_RX_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
 	.vtrip = CY_GPIO_VTRIP_CMOS,
@@ -687,6 +719,10 @@ void init_cycfg_pins(void)
 	Cy_GPIO_Pin_Init(SDHC0_CMD_PORT, SDHC0_CMD_PIN, &SDHC0_CMD_config);
 
 	Cy_GPIO_Pin_Init(SDHC0_CLK_PORT, SDHC0_CLK_PIN, &SDHC0_CLK_config);
+
+	Cy_GPIO_Pin_Init(ENABLE_WIFI_PORT, ENABLE_WIFI_PIN, &ENABLE_WIFI_config);
+
+	Cy_GPIO_Pin_Init(UART_RX_PORT, UART_RX_PIN, &UART_RX_config);
 
 	Cy_GPIO_Pin_Init(UART_TX_PORT, UART_TX_PIN, &UART_TX_config);
 

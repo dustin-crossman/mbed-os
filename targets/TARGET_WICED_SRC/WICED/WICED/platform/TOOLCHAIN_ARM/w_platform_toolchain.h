@@ -1,11 +1,7 @@
 /*
- * $ Copyright Cypress Semiconductor $
-*/
-
-/*
- * Copyright 2018, Cypress Semiconductor Corporation or a subsidiary of
+ * Copyright 2018, Cypress Semiconductor Corporation or a subsidiary of 
  * Cypress Semiconductor Corporation. All Rights Reserved.
- *
+ * 
  * This software, associated documentation and materials ("Software"),
  * is owned by Cypress Semiconductor Corporation
  * or one of its subsidiaries ("Cypress") and is protected by and subject to
@@ -34,35 +30,69 @@
  * of such system or application assumes all risk of such use and in doing
  * so agrees to indemnify Cypress against all liability.
  */
+#pragma once
 
-/** @file
- * Define default PSoC 6 initialization functions
- */
-#include "w_platform_init.h"
-#include "w_platform_isr.h"
-#include "w_platform_peripheral.h"
-#include "w_platform_sleep.h"
-#include "w_platform_config.h"
-#include "w_platform_toolchain.h"
-#include "platform/wwd_platform_interface.h"
-#include "cy_device_headers.h"
+#include <stddef.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /******************************************************
  *                      Macros
  ******************************************************/
 
+#ifndef WEAK
+#ifndef __MINGW32__
+#define WEAK             __attribute__((weak))
+#else
+/* MinGW doesn't support weak */
+#define WEAK
+#endif
+#endif
+
+#ifndef MAY_BE_UNUSED
+#define MAY_BE_UNUSED    __attribute__((unused))
+#endif
+
+#ifndef NORETURN
+#define NORETURN         __attribute__((noreturn))
+#endif
+
+#ifndef ALIGNED
+#define ALIGNED_PRE(size)
+#define ALIGNED(size)    __attribute__((aligned(size)))
+#endif
+
+#ifndef SECTION
+#define SECTION(name)    __attribute__((section(name)))
+#endif
+
+#ifndef NEVER_INLINE
+#define NEVER_INLINE     __attribute__((noinline))
+#endif
+
+#ifndef ALWAYS_INLINE
+#define ALWAYS_INLINE_PRE
+#define ALWAYS_INLINE    __attribute__((always_inline))
+#endif
+
+#if defined ( __CC_ARM )
+
+#ifndef INLINE_ASM
+#define INLINE_ASM  __asm
+#endif
+#else
+#ifndef INLINE_ASM
+#define INLINE_ASM  __asm__
+#endif
+
+#endif
+
 /******************************************************
  *                    Constants
  ******************************************************/
-
-#if defined CPUSS_SYSTEM_INT_NR
-#define NO_OF_INTERRUPTS_SUPPORTED    ( CPUSS_SYSTEM_INT_NR )
-#else
-#define NO_OF_INTERRUPTS_SUPPORTED    ( CPUSS_IRQ_NR )
-#endif
-
-#define SRAM_START_ADDRESS_LOCATION    ((uint32_t)&sram_start_addr_loc)
-extern void* sram_start_addr_loc;
 
 /******************************************************
  *                   Enumerations
@@ -77,58 +107,25 @@ extern void* sram_start_addr_loc;
  ******************************************************/
 
 /******************************************************
- *               Static Function Declarations
+ *                 Global Variables
  ******************************************************/
 
 /******************************************************
- *               Variable Definitions
+ *               Function Declarations
  ******************************************************/
 
-/******************************************************
- *               Function Definitions
- ******************************************************/
+#ifndef __linux__
+void *memrchr( const void *s, int c, size_t n );
+#endif
 
+/* Windows doesn't come with support for strlcpy */
+#if defined( WIN32 ) || defined( __linux__ ) || defined( __NUTTX__ )
+size_t strlcpy (char *dest, const char *src, size_t size);
+#endif /* WIN32 */
 
-void platform_mcu_reset( void )
-{
-    NVIC_SystemReset( );
+void platform_toolchain_sbrk_prepare(void* ptr, int incr);
 
-    /* Loop forever */
-    while ( 1 )
-    {
-    }
-}
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
-WEAK void platform_init_system_clocks( void )
-{
-
-}
-
-WEAK void platform_init_memory( void )
-{
-
-}
-
-void platform_init_mcu_infrastructure( void )
-{
-
-}
-
-void platform_init_connectivity_module( void )
-{
-    /* Ensure 802.11 device is in reset. */
-    host_platform_init( );
-}
-
-WEAK void platform_init_external_devices( void )
-{
-
-}
-
-uint8_t platform_get_chip_revision ( void )
-{
-     uint8_t rev;
-     rev = Cy_SysLib_GetDeviceRevision( );
-
-     return ( rev );
-}
