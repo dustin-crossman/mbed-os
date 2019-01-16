@@ -1,0 +1,63 @@
+##############################################################################
+# This file:
+#  -is a template for cy integration and mbed unit testing
+#  -calls cy-test.sh bash script
+#  -has one stage mbed-unit-test
+#   -mbed-unit-test stage is manual and runs the provided mbed unit tests
+#  -This setup is using the San Diego ModusToolbox Integration lab
+#   https://confluence.cypress.com/x/EILkAw
+#
+##############################################################################
+# MBED-UNIT-TEST
+# 
+# This stage runs all the mbed provided unit tests.
+# It takes about 2.5 hours to run on a single board in the San Diego Lab and
+# therefore is enabled only by manual pipeline execution from the gitlab UI.
+#
+##############################################################################
+
+##############################################################################
+# Win10 - ARM_GCC, ARM and IAR COMPILERS
+##############################################################################
+.win10-mbed-unit-test-ARM:
+  tags:
+    - mti-win10
+  script:
+    - bash -x cy-test.sh ARM
+
+.win10-mbed-unit-test-GCC_ARM:
+  tags:
+    - mti-win10
+  script:
+    - bash -x cy-test.sh GCC_ARM
+                                
+.win10-mbed-unit-test-IAR:
+  tags:
+    - mti-win10
+  script:
+    - bash -x cy-test.sh IAR
+
+##############################################################################
+# Ubuntu18 - ARM_GCC and ARM COMPILERS
+##############################################################################
+ubuntu18-mbed-unit-test-GCC_ARM:
+  tags:
+    - mti-ubuntu18
+  script:
+    - bash -x cy-test.sh GCC_ARM
+                                
+.ubuntu18-mbed-unit-test-ARM:
+  tags:
+    - mti-ubuntu18
+  script:
+    - bash -x cy-test.sh ARM
+
+##############################################################################
+# Mac - ARM_GCC COMPILER
+# DISCO PLATFORM SEEMS UNSTABLE (STLINK) ON MAC....
+##############################################################################
+#DISCO_L475VG_IOT01A-mti-mac10.14-GCC_ARM-mbed-unit-test:
+#  tags:
+#    - DISCO_L475VG_IOT01A-mti-mac10.14
+#  script:
+#    - bash -x cy-test.sh GCC_ARM
