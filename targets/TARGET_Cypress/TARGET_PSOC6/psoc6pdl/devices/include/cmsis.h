@@ -20,8 +20,12 @@
 
 #include "cy_device_headers.h"
 
-/* Cypress-provided #define BLE conflicts with class BLE
+/* #define BLE provided by Cypress PDL conflicts with mbed BLE class
  * defined in features/FEATURE_BLE/ble/BLE.h */
 #undef BLE
+
+/* #define PROFILE provided by Cypress PDL conflicts with u-blox PROFILE macro
+ * defined in ./features/cellular/framework/targets/UBLOX/AT/UBLOX_AT_CellularStack.h */
+#undef PROFILE
 
 #endif

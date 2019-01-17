@@ -48,19 +48,12 @@
 #define CY_CFG_SYSCLK_CLKPATH4_SOURCE CY_SYSCLK_CLKPATH_IN_IMO
 #define CY_CFG_SYSCLK_CLKPERI_ENABLED 1
 #define CY_CFG_SYSCLK_CLKSLOW_ENABLED 1
-#define CY_CFG_SYSCLK_WCO_ENABLED 1
 #define CY_CFG_PWR_ENABLED 1
 #define CY_CFG_PWR_USING_LDO 1
 #define CY_CFG_PWR_USING_PMIC 0
 #define CY_CFG_PWR_VBAC_SUPPLY CY_CFG_PWR_VBAC_SUPPLY_VDD
 #define CY_CFG_PWR_LDO_VOLTAGE CY_SYSPM_LDO_VOLTAGE_1_1V
 #define CY_CFG_PWR_USING_ULP 0
-#define CY_CFG_PWR_VDDA_MV 3300
-#define CY_CFG_PWR_VDDD_MV 3300
-#define CY_CFG_PWR_VBACKUP_MV 3300
-#define CY_CFG_PWR_VDD_NS_MV 3300
-#define CY_CFG_PWR_VDDIO0_MV 3300
-#define CY_CFG_PWR_VDDIO1_MV 3300
 
 static const cy_stc_fll_manual_config_t srss_0_clock_0_fll_0_fllConfig = 
 {
@@ -83,7 +76,7 @@ __WEAK void cycfg_ClockStartupError(uint32_t error)
 }
 __STATIC_INLINE void Cy_SysClk_ClkBakInit()
 {
-    Cy_SysClk_ClkBakSetSource(CY_SYSCLK_BAK_IN_WCO);
+    Cy_SysClk_ClkBakSetSource(CY_SYSCLK_BAK_IN_CLKLF);
 }
 __STATIC_INLINE void Cy_SysClk_ClkFastInit()
 {
@@ -156,15 +149,6 @@ __STATIC_INLINE void Cy_SysClk_ClkSlowInit()
 {
     Cy_SysClk_ClkSlowSetDivider(0U);
 }
-__STATIC_INLINE void Cy_SysClk_WcoInit()
-{
-    (void)Cy_GPIO_Pin_FastInit(GPIO_PRT0, 0U, 0x00U, 0x00U, HSIOM_SEL_GPIO);
-    (void)Cy_GPIO_Pin_FastInit(GPIO_PRT0, 1U, 0x00U, 0x00U, HSIOM_SEL_GPIO);
-    if (CY_SYSCLK_SUCCESS != Cy_SysClk_WcoEnable(1000000UL))
-    {
-        cycfg_ClockStartupError(CY_CFG_SYSCLK_WCO_ERROR);
-    }
-}
 
 
 void init_cycfg_platform(void)
@@ -174,11 +158,9 @@ void init_cycfg_platform(void)
 	#if (CY_CFG_PWR_VBAC_SUPPLY == CY_CFG_PWR_VBAC_SUPPLY_VDD)
 	if (0u == Cy_SysLib_GetResetReason() /* POR, XRES, or BOD */)
 	{
-		Cy_SysLib_ResetBackupDomain();
-
-		Cy_SysClk_IloDisable();
-
-		Cy_SysClk_IloInit();
+	    Cy_SysLib_ResetBackupDomain();
+	    Cy_SysClk_IloDisable();
+	    Cy_SysClk_IloInit();
 	}
 	#endif
 	#ifdef CY_CFG_PWR_ENABLED

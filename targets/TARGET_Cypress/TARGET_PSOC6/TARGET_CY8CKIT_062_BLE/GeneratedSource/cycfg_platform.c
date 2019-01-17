@@ -51,12 +51,6 @@
 #define CY_CFG_PWR_VBAC_SUPPLY CY_CFG_PWR_VBAC_SUPPLY_VDD
 #define CY_CFG_PWR_LDO_VOLTAGE CY_SYSPM_LDO_VOLTAGE_1_1V
 #define CY_CFG_PWR_USING_ULP 0
-#define CY_CFG_PWR_VDDA_MV 3300
-#define CY_CFG_PWR_VDDD_MV 3300
-#define CY_CFG_PWR_VBACKUP_MV 3300
-#define CY_CFG_PWR_VDD_NS_MV 3300
-#define CY_CFG_PWR_VDDIO0_MV 3300
-#define CY_CFG_PWR_VDDIO1_MV 3300
 
 static const cy_stc_fll_manual_config_t srss_0_clock_0_fll_0_fllConfig = 
 {
@@ -164,11 +158,9 @@ void init_cycfg_platform(void)
 	#if (CY_CFG_PWR_VBAC_SUPPLY == CY_CFG_PWR_VBAC_SUPPLY_VDD)
 	if (0u == Cy_SysLib_GetResetReason() /* POR, XRES, or BOD */)
 	{
-		Cy_SysLib_ResetBackupDomain();
-
-		Cy_SysClk_IloDisable();
-
-		Cy_SysClk_IloInit();
+	    Cy_SysLib_ResetBackupDomain();
+	    Cy_SysClk_IloDisable();
+	    Cy_SysClk_IloInit();
 	}
 	#endif
 	#ifdef CY_CFG_PWR_ENABLED
@@ -204,6 +196,9 @@ void init_cycfg_platform(void)
 	Cy_SysClk_FllDisable();
 	Cy_SysClk_ClkPathSetSource(CY_SYSCLK_CLKHF_IN_CLKPATH0, CY_SYSCLK_CLKPATH_IN_IMO);
 	Cy_SysClk_ClkHfSetSource(0UL, CY_SYSCLK_CLKHF_IN_CLKPATH0);
+	#ifdef CY_IP_MXBLESS
+	(void)Cy_BLE_EcoReset();
+	#endif
 	
 	#ifdef CY_CFG_SYSCLK_PLL1_AVAILABLE
 	(void)Cy_SysClk_PllDisable(CY_SYSCLK_CLKHF_IN_CLKPATH2);

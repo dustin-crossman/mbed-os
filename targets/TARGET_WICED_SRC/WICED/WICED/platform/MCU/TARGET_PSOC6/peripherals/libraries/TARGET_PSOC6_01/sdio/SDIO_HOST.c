@@ -51,6 +51,8 @@ static uint32_t yCounts;
 static host_semaphore_type_t        sdio_transfer_finished_semaphore;
 #endif
 
+static uint32_t udb_initialized = 0;
+
 /*******************************************************************************
 * Function Name: SDIO_Init
 ****************************************************************************//**
@@ -71,6 +73,11 @@ void SDIO_Init(stc_sdio_irq_cb_t* pfuCb)
     wwd_result_t result;
 #endif
 
+    if ( !udb_initialized )
+    {
+        udb_initialized = 1;
+        SDIO_Host_Config_UDBs();
+    }
 
     /*Set Number of Blocks to 1 initially, this will be updated later*/
     SDIO_SetNumBlocks(1);

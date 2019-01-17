@@ -42,7 +42,7 @@ typedef cy_en_crypto_status_t (*cy_crypto_trng_func_t)(CRYPTO_Type *base,
                                              uint32_t *randomNum);
 
 /*******************************************************************************
-* Function Name: Cy_Crypto_Core_V2_Trng
+* Function Name: Cy_Crypto_Core_Trng
 ****************************************************************************//**
 *
 * Generates a True Random Number and returns it in the

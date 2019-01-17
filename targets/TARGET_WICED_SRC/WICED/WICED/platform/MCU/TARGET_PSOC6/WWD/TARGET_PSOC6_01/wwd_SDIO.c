@@ -111,9 +111,6 @@ wwd_result_t host_platform_bus_init( void )
 
     irq_cbs.pfnCardIntCb      =wwd_thread_notify_IRQHandler;
 
-    /* Disable global interrupts */
-    WICED_SAVE_INTERRUPTS(flags);
-
     /* WiFi into reset */
     Cy_SysLib_Delay( 10 );
     Cy_GPIO_Write( GPIO_PRT2,6u, 0 );
@@ -129,9 +126,6 @@ wwd_result_t host_platform_bus_init( void )
 
     /* SDIO Host out of reset */
     SDIO_Reset();
-
-    /* Enable global interrupts */
-    WICED_RESTORE_INTERRUPTS(flags);
 
     platform_mcu_powersave_enable();
 

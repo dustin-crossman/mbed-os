@@ -74,10 +74,10 @@ static void Cy_Crypto_Core_V1_Trng_Init(CRYPTO_Type *base)
 * \param base
 * The pointer to the CRYPTO instance address.
 *
-* \param GAROPol;
+* \param GAROPol
 * The polynomial for the programmable Galois ring oscillator.
 *
-* \param FIROPol;
+* \param FIROPol
 * The polynomial for the programmable Fibonacci ring oscillator.
 *
 * \param max
