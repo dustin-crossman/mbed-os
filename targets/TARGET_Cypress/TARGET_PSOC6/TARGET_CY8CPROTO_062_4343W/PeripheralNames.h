@@ -52,7 +52,7 @@ typedef enum {
     SPI_6 = (int)SCB6_BASE,
     SPI_7 = (int)SCB7_BASE,
     SPI_8 = (int)SCB8_BASE,
-    /* SCB_9 - SCB_12 does not support UART mode */
+    /* SCB_9 - SCB_12 does not support SPI mode */
 } SPIName;
 
 typedef enum {
