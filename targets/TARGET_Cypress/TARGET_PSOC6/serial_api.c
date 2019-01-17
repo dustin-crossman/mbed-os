@@ -88,6 +88,9 @@ static const cy_stc_scb_uart_config_t default_uart_config = {
 int stdio_uart_inited = false;
 serial_t stdio_uart;
 
+int bt_uart_inited = false;
+serial_t bt_uart;
+
 typedef struct irq_info_s {
     serial_obj_t        *serial_obj;
     uart_irq_handler    handler;
@@ -399,12 +402,19 @@ void serial_init(serial_t *obj_in, PinName tx, PinName rx)
 {
     serial_obj_t *obj = OBJ_P(obj_in);
     bool is_stdio = (tx == CY_STDIO_UART_TX) || (rx == CY_STDIO_UART_RX);
+#if defined(TARGET_CY8CPROTO_062_4343W)
+    bool is_bt = (tx == CY_BT_UART_TX) || (rx == CY_BT_UART_RX);
+#else
+    bool is_bt = false;
+#endif
 
     if (is_stdio && stdio_uart_inited) {
         memcpy(obj_in, &stdio_uart, sizeof(serial_t));
         return;
-    }
-    {
+    } else if (is_bt && bt_uart_inited) {
+        memcpy(obj_in, &bt_uart, sizeof(serial_t));
+        return;
+    } else {
         uint32_t uart = pinmap_peripheral(tx, PinMap_UART_TX);
         uart = pinmap_merge(uart, pinmap_peripheral(rx, PinMap_UART_RX));
         if (uart != (uint32_t)NC) {
@@ -439,6 +449,9 @@ void serial_init(serial_t *obj_in, PinName tx, PinName rx)
             if (is_stdio) {
                 memcpy(&stdio_uart, obj_in, sizeof(serial_t));
                 stdio_uart_inited = true;
+            } else if (is_bt) {
+                memcpy(&bt_uart, obj_in, sizeof(serial_t));
+                bt_uart_inited = true;               
             }
         } else {
             error("Serial pinout mismatch. Requested pins Rx and Tx can't be used for the same Serial communication.");
