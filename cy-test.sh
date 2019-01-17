@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+
+set -e
+
 ########################
 # TESTRAIL CONFIG
 ########################
@@ -32,10 +36,13 @@ git clone $CI_SSH:repo/prog-mgmt.git
 ########################
 # Compile, run tests
 ########################
-mbed test --compile --toolchain $1 --target CY8CPROTO_062_4343W
+TARGET=$1
+TOOLCHAIN=$2
+REPORT_JSON=${TARGET}_${TOOLCHAIN}.json
+mbed test --compile --target $TARGET --toolchain $TOOLCHAIN
 # mbed test is not yet supported, exit early
 exit 0
-mbed test --run -v -V --report-json $1.json --target CY8CPROTO_062_4343W
+mbed test --run -v -V --report-json $REPORT_JSON --target $TARGET
 
 ########################
 # UPLOAD TO TESTRAIL
@@ -45,5 +52,5 @@ python prog-mgmt/testrail/src/tr.py --parser json \
                                     --user $TR_USER \
                                     --project $CI_PROJECT_NAME \
                                     --run ${CI_JOB_NAME}_${CI_COMMIT_SHA} \
-                                    --file $1.json
+                                    --file $REPORT_JSON
 
