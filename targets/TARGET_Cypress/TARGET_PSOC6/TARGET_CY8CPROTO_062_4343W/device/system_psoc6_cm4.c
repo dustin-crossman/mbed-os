@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file system_psoc6_cm4.c
-* \version `$CY_MAJOR_VERSION`.`$CY_MINOR_VERSION`
+* \version 2.30
 *
 * The device system-source file.
 *

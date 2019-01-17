@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy8c6xx7_cm4_dual.ld
-* \version `$CY_MAJOR_VERSION`.`$CY_MINOR_VERSION`
+* \version 2.30
 *
 * Linker file for the GNU C compiler.
 *
