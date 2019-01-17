@@ -7780,7 +7780,6 @@
     "CYW943012P6EVB_01": {
         "inherits": ["MCU_PSOC6_M4"],
         "sub_target": "sub_target thing is needed for PSoC6.py script to look for CM0+ image",
-        "supported_form_factors": ["ARDUINO"],
         "extra_labels_add": ["PSOC6_01"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "detect_code": ["1906"],

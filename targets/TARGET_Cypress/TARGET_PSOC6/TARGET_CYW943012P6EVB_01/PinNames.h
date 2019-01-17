@@ -153,31 +153,6 @@ typedef enum {
     // Not connected
     NC = (int)0xFFFFFFFF,
 
-    // Arduino connector namings
-    A0          = P10_0,
-    A1          = P10_1,
-    A2          = P10_2,
-    A3          = P10_3,
-    A4          = P10_4,
-    A5          = P10_5,
-
-    D0          = P5_0,
-    D1          = P5_1,
-    D2          = P5_2,
-    D3          = P5_3,
-    D4          = P5_4,
-    D5          = P5_5,
-    D6          = P5_6,
-    D7          = P0_2,
-    D8          = P13_0,
-    D9          = P13_1,
-    D10         = P12_3,
-    D11         = P12_0,
-    D12         = P12_1,
-    D13         = P12_2,
-    D14         = P6_1,
-    D15         = P6_0,
-
     // Generic signal names
 
     I2C_SCL     = P6_0,
@@ -188,17 +163,25 @@ typedef enum {
     SPI_CLK     = P12_2,
     SPI_CS      = P12_4,
 
-    UART_RX     = P5_0,
-    UART_TX     = P5_1,
-    UART_RTS    = P5_2,
-    UART_CTS    = P5_3,
+    UART_RX     = P13_0,
+    UART_TX     = P13_1,
+    UART_RTS    = P13_2,
+    UART_CTS    = P13_3,
+
+    BT_UART_RX  = P3_0,
+    BT_UART_TX  = P3_1,
+    BT_UART_CTS = P3_3,
+    BT_UART_RTS = P3_2,
+
+    BT_PIN_POWER        = P3_4,
+    BT_PIN_HOST_WAKE    = P3_5,
+    BT_PIN_DEVICE_WAKE  = P4_0,
+    BT_PIN_DEVICE_RESET = P4_1,
 
     SWITCH2     = P0_4,
     LED1        = P0_3,
     LED2        = P1_1,
-    LED3        = P11_1,
-    LED4        = P1_5,
-    LED5        = P13_7,
+    LED3        = P10_6,
 
     LED_RED     = LED1,
     LED_BLUE    = LED3,
@@ -224,6 +207,15 @@ typedef enum {
     CY_STDIO_UART_TX    = STDIO_UART_TX,
     CY_STDIO_UART_CTS   = STDIO_UART_CTS,
     CY_STDIO_UART_RTS   = STDIO_UART_RTS,
+
+    CY_BT_UART_RX       = BT_UART_RX,
+    CY_BT_UART_TX       = BT_UART_TX,
+    CY_BT_UART_CTS      = BT_UART_CTS,
+    CY_BT_UART_RTS      = BT_UART_RTS,
+
+    CY_BT_PIN_POWER       = BT_PIN_POWER,
+    CY_BT_PIN_HOST_WAKE   = BT_PIN_HOST_WAKE,
+    CY_BT_PIN_DEVICE_WAKE = BT_PIN_DEVICE_WAKE,
 
     USBTX   = UART_TX,
     USBRX   = UART_RX
