@@ -22,6 +22,7 @@
 #define CY_CFG_SYSCLK_WCO_ERROR 5
 #define CY_CFG_SYSCLK_CLKALTSYSTICK_ENABLED 1
 #define CY_CFG_SYSCLK_CLKBAK_ENABLED 1
+#define CY_CFG_SYSCLK_ECO_ENABLED 1
 #define CY_CFG_SYSCLK_CLKFAST_ENABLED 1
 #define CY_CFG_SYSCLK_FLL_ENABLED 1
 #define CY_CFG_SYSCLK_CLKHF0_ENABLED 1
@@ -95,6 +96,19 @@ __STATIC_INLINE void Cy_SysClk_ClkAltSysTickInit()
 __STATIC_INLINE void Cy_SysClk_ClkBakInit()
 {
     Cy_SysClk_ClkBakSetSource(CY_SYSCLK_BAK_IN_WCO);
+}
+__STATIC_INLINE void Cy_SysClk_EcoInit()
+{
+    (void)Cy_GPIO_Pin_FastInit(GPIO_PRT12, 6, 0x00u, 0x00u, HSIOM_SEL_GPIO);
+    (void)Cy_GPIO_Pin_FastInit(GPIO_PRT12, 7, 0x00u, 0x00u, HSIOM_SEL_GPIO);
+    if (CY_SYSCLK_BAD_PARAM == Cy_SysClk_EcoConfigure(24000000U, 18U, 50U, 100U))
+    {
+        cycfg_ClockStartupError(CY_CFG_SYSCLK_ECO_ERROR);
+    }
+    if (CY_SYSCLK_TIMEOUT == Cy_SysClk_EcoEnable(3000u))
+    {
+        cycfg_ClockStartupError(CY_CFG_SYSCLK_ECO_ERROR);
+    }
 }
 __STATIC_INLINE void Cy_SysClk_ClkFastInit()
 {
@@ -207,12 +221,7 @@ void init_cycfg_platform(void)
 	/* Set worst case memory wait states (! ultra low power, 150 MHz), will update at the end */
 	Cy_SysLib_SetWaitStates(false, 150UL);
 	#if (CY_CFG_PWR_VBAC_SUPPLY == CY_CFG_PWR_VBAC_SUPPLY_VDD)
-	if (0u == Cy_SysLib_GetResetReason() /* POR, XRES, or BOD */)
-	{
-	    Cy_SysLib_ResetBackupDomain();
-	    Cy_SysClk_IloDisable();
-	    Cy_SysClk_IloInit();
-	}
+	if (0u == Cy_SysLib_GetResetReason() /* POR, XRES, or BOD */){ Cy_SysLib_ResetBackupDomain(); }
 	#endif
 	#ifdef CY_CFG_PWR_ENABLED
 	/* Configure power mode */

@@ -70,6 +70,14 @@ const cy_stc_scb_uart_config_t KITPROG_UART_config =
 	.txFifoTriggerLevel = 63UL,
 	.txFifoIntEnableMask = 0UL,
 };
+const cy_stc_scb_ezi2c_config_t UART_config = 
+{
+	.numberOfAddresses = CY_SCB_EZI2C_ONE_ADDRESS,
+	.slaveAddress1 = 8U,
+	.slaveAddress2 = 0U,
+	.subAddressSize = CY_SCB_EZI2C_SUB_ADDR8_BITS,
+	.enableWakeFromSleep = false,
+};
 const cy_stc_smif_config_t QSPI_config = 
 {
 	.mode = (uint32_t)CY_SMIF_NORMAL,
@@ -156,6 +164,8 @@ void init_cycfg_peripherals(void)
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB3_CLOCK, CY_SYSCLK_DIV_8_BIT, 1U);
 
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB5_CLOCK, CY_SYSCLK_DIV_8_BIT, 2U);
+
+	Cy_SysClk_PeriphAssignDivider(PCLK_SCB6_CLOCK, CY_SYSCLK_DIV_8_BIT, 5U);
 
 	Cy_SysClk_PeriphAssignDivider(PCLK_TCPWM1_CLOCKS1, CY_SYSCLK_DIV_8_BIT, 3U);
 

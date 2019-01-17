@@ -86,7 +86,7 @@
 #define EFUSE_SIZE              0x100000
 
 
-LR_FLASH FLASH_START FLASH_SIZE
+LR_IROM1 FLASH_START FLASH_SIZE
 {
     ER_FLASH_VECTORS +0
     {
@@ -104,7 +104,7 @@ LR_FLASH FLASH_START FLASH_SIZE
         * (RESET_RAM, +FIRST)
     }
 
-    ER_RAM_DATA +0
+    RW_RAM_DATA +0
     {
         * (.cy_ramfunc)
         .ANY (+RW, +ZI)
@@ -112,7 +112,7 @@ LR_FLASH FLASH_START FLASH_SIZE
 
     ; Place variables in the section that should not be initialized during the
     ; device startup.
-    ER_RAM_NOINIT_DATA +0 UNINIT
+    RW_IRAM1 +0 UNINIT
     {
         * (.noinit)
     }

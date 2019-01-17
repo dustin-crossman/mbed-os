@@ -71,6 +71,8 @@ extern "C" {
 #define CSD_COMM_IRQ scb_3_interrupt_IRQn
 #define KITPROG_UART_HW SCB5
 #define KITPROG_UART_IRQ scb_5_interrupt_IRQn
+#define UART_HW SCB6
+#define UART_IRQ scb_6_interrupt_IRQn
 #define QSPI_HW SMIF0
 #define QSPI_IRQ smif_interrupt_IRQn
 #define QSPI_MEMORY_MODE_ALIGMENT_ERROR (0UL)
@@ -112,6 +114,7 @@ extern "C" {
 extern cy_stc_csd_context_t cy_csd_0_context;
 extern const cy_stc_scb_ezi2c_config_t CSD_COMM_config;
 extern const cy_stc_scb_uart_config_t KITPROG_UART_config;
+extern const cy_stc_scb_ezi2c_config_t UART_config;
 extern const cy_stc_smif_config_t QSPI_config;
 extern const cy_stc_mcwdt_config_t MCWDT0_config;
 extern const cy_stc_rtc_config_t RTC_config;

@@ -408,11 +408,7 @@ Reset_Handler:
     /* Enable the FPU if used */
     bl Cy_SystemInitFpuEnable
 
-#ifndef __NO_SYSTEM_INIT
-    bl    SystemInit
-#endif
-
-    bl    main
+    bl    _start
 
     /* Should never get here */
     b   .
