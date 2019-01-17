@@ -75,17 +75,10 @@
 *         that describes this bitfield. So, the code is safe by design.</td>
 *   </tr>
 *   <tr>
-*     <td>10.4</td>
+*     <td>13.7</td>
 *     <td>R</td>
-*     <td>A composite floating point expression is being cast to double, or unsigned.</td>
-*     <td>Casting a floating-point calculation result to an integer.</td>
-*   </tr>
-*   <tr>
-*     <td>13.4</td>
-*     <td>R</td>
-*     <td>The controlling expression of a for statement shall not contain any objects of floating type.</td>
-*     <td>Scanning through a list of floating point values: only greater_than/less_then checks are used 
-*         with floating point numbers, the loop counter is integer. </td>
+*     <td>Boolean operations whose result are invariant shall not be permitted.</td>
+*     <td>This math is legacy, preserving the backward compatibility.</td>
 *   </tr>
 *   <tr>
 *     <td>16.7</td>
