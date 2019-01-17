@@ -5,7 +5,7 @@
 * Common header file to be included by the drivers.
 *
 * \note
-* Generator version: 1.3.6934.1396
+* Generator version: 1.4.0.1230
 *
 ********************************************************************************
 * \copyright
@@ -128,8 +128,6 @@
     #include "cy8c624aazi_d44.h"
 #elif defined (CY8C624AFNI_D43)
     #include "cy8c624afni_d43.h"
-#elif defined (PSOC6A512K_68QFN_BLE)
-    #include "psoc6a512k_68qfn_ble.h"
 #elif defined (PSOC6A512K_68QFN)
     #include "psoc6a512k_68qfn.h"
 #elif defined (PSOC6A512K_100TQFP)

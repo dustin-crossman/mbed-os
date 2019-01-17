@@ -5,7 +5,7 @@
 * SRSS IP definitions
 *
 * \note
-* Generator version: 1.3.6934.1396
+* Generator version: 1.4.0.1230
 *
 ********************************************************************************
 * \copyright
@@ -333,6 +333,8 @@ typedef struct {
 #define SRSS_CLK_ILO_CONFIG_ENABLE_Pos          31UL
 #define SRSS_CLK_ILO_CONFIG_ENABLE_Msk          0x80000000UL
 /* SRSS.CLK_IMO_CONFIG */
+#define SRSS_CLK_IMO_CONFIG_DPSLP_ENABLE_Pos    30UL
+#define SRSS_CLK_IMO_CONFIG_DPSLP_ENABLE_Msk    0x40000000UL
 #define SRSS_CLK_IMO_CONFIG_ENABLE_Pos          31UL
 #define SRSS_CLK_IMO_CONFIG_ENABLE_Msk          0x80000000UL
 /* SRSS.CLK_OUTPUT_FAST */
