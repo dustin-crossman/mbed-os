@@ -1087,49 +1087,27 @@ uint32_t  platform_get_factory_reset_button_time ( uint32_t max_time )
 /******************************************************
  *           Interrupt Handlers
  ******************************************************/
-WWD_RTOS_DEFINE_ISR( SCB2_IRQ )
-{
-    platform_uart_irq( 2 );
-}
-WWD_RTOS_MAP_ISR( SCB2_IRQ, scb_2_interrupt_IRQn_Handler )
-
-WWD_RTOS_DEFINE_ISR( SCB5_IRQ )
-{
-    platform_uart_irq( 5 );
-}
-WWD_RTOS_MAP_ISR( SCB5_IRQ, scb_5_interrupt_IRQn_Handler )
-
-#if !defined( BOOTLOADER )
-WWD_RTOS_DEFINE_ISR( CSD_IRQ )
-{
-    platform_csd_irq();
-}
-WWD_RTOS_MAP_ISR( CSD_IRQ, csd_interrupt_IRQn_Handler )
-#endif /* !defined( BOOTLOADER) */
-
+#if 0
 void platform_smif_irq( void );
 WWD_RTOS_DEFINE_ISR( mlg_platform_smif_irq )
 {
     platform_smif_irq( );
 
 }
-
 WWD_RTOS_MAP_ISR( mlg_platform_smif_irq , smif_interrupt_IRQn_Handler )
+#endif
 
 WWD_RTOS_DEFINE_ISR( IPC4_IRQ )
 {
-#ifndef MODUSTOOLBOX
-   Cy_IPC_SystemPipeIsr();
-#else /* MODUSTOOLBOX */
    Cy_SysIpcPipeIsrCm4();
-#endif /* MODUSTOOLBOX */
 }
 
-WWD_RTOS_MAP_ISR( IPC4_IRQ, cpuss_interrupts_ipc_4_IRQn_Handler )
+
+WWD_RTOS_MAP_ISR( IPC4_IRQ, cpuss_interrupts_ipc_4_IRQHandler )
 
 WWD_RTOS_DEFINE_ISR( FLASH_FM_IRQ )
 {
    Cy_Flash_ResumeIrqHandler();
 }
 
-WWD_RTOS_MAP_ISR( FLASH_FM_IRQ, cpuss_interrupt_fm_IRQn_Handler )
+WWD_RTOS_MAP_ISR( FLASH_FM_IRQ, cpuss_interrupt_fm_IRQHandler )
