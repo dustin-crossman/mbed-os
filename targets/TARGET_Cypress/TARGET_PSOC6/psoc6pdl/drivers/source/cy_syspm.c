@@ -266,7 +266,7 @@ typedef void (*cy_cb_syspm_deep_sleep_t)(cy_en_syspm_waitfor_t waitFor, bool *wa
 static cy_stc_syspm_callback_t* pmCallbackRoot[CALLBACK_ROOT_NR] = {NULL, NULL, NULL, NULL, NULL};
 
 /* Structure for registers that should retain while Deep Sleep mode */
-static cy_stc_syspm_backup_regs_t regs;
+static cy_stc_syspm_backup_regs_t bkpRegs;
 
 #if (CY_CPU_CORTEX_M4)
     /* Global boolean variable used to clear the  Event Register of the CM4 core */
@@ -708,7 +708,7 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterDeepSleep(cy_en_syspm_waitfor_t waitFor)
             if (0UL != (PERI_GR_SL_CTL(MMIO_UDB_SLAVE_NR) & PERI_UDB_SLAVE_ENABLED))
             {
                 /* Save non-retained registers */
-                Cy_SysPm_SaveRegisters(&regs);
+                Cy_SysPm_SaveRegisters(&bkpRegs);
             }
         }
 
@@ -771,7 +771,7 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterDeepSleep(cy_en_syspm_waitfor_t waitFor)
             #ifndef CY_PSOC6ABLE2_REV_0A_SUPPORT_DISABLE
                 if (Cy_SysLib_GetDeviceRevision() == CY_SYSLIB_DEVICE_REV_0A)
                 {
-                    ptrRegs = &regs;
+                    ptrRegs = &bkpRegs;
                 }
                 else
             #endif /* #ifndef CY_PSOC6ABLE2_REV_0A_SUPPORT_DISABLE */   
@@ -2885,7 +2885,7 @@ static bool EnterDeepSleepRam(cy_en_syspm_waitfor_t waitFor)
 #endif /* #ifndef CY_PSOC6ABLE2_REV_0A_SUPPORT_DISABLE */
     {
         /* Update pointer to the latest saved UDB structure */
-        REG_IPC_STRUCT_DATA(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT)) = (uint32_t) &regs;
+        REG_IPC_STRUCT_DATA(CY_IPC_STRUCT_PTR(CY_IPC_CHAN_DDFT)) = (uint32_t) &bkpRegs;
     }
 
     /* Release the IPC */
