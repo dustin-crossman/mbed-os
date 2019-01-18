@@ -2104,11 +2104,24 @@ void Cy_CapSense_ProcessPositionFilters(
         }
         
         /* Process touches that exists from previous processing */
-        for (posIndex = 0u; posIndex < numPosMin; posIndex++)
+
+        if(CY_CAPSENSE_WD_RADIAL_SLIDER_E == ptrWdConfig->wdType)
         {
-            Cy_CapSense_RunPositionFilters(ptrWdConfig, ptrPos, ptrHistory);
-            ptrPos++;
-            ptrHistory += filterSize;
+            for (posIndex = 0u; posIndex < numPosMin; posIndex++)
+            {
+                Cy_CapSense_RunPositionFiltersRadial(ptrWdConfig, ptrPos, ptrHistory);
+                ptrPos++;
+                ptrHistory += filterSize;
+            }
+        }
+        else
+        {
+            for (posIndex = 0u; posIndex < numPosMin; posIndex++)
+            {
+                Cy_CapSense_RunPositionFilters(ptrWdConfig, ptrPos, ptrHistory);
+                ptrPos++;
+                ptrHistory += filterSize;
+            }
         }
         
         /* Initialize all rest newly detected touches */

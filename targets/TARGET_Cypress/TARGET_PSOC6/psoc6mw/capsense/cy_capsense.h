@@ -362,6 +362,11 @@
 *   </tr>
 * </table>
 *
+* \note
+* These callbacks are called by the Cy_CapSense_InterruptHandler() function and
+* lengthen its execution. Usually, Cy_CapSense_InterruptHandler() is called inside the
+* CSD ISR. In such a case, the callbacks mentioned lengthen the execution of the CSD ISR as well.
+*
 * To assign user's functions to these callbacks present in the middleware, 
 * perform the following:
 *   

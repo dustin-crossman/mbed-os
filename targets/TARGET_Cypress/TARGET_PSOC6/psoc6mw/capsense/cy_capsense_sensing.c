@@ -1405,29 +1405,31 @@ void Cy_CapSense_SsPostAllWidgetsScan(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_InterruptHandler
 ****************************************************************************//**
 *
-* Implements all CapSense actions needed to be executed inside CSD ISR.
-* 
-* This function must be called inside the user-defined interrupt service
-* routine.
+* This function is intended to handle CSD IRQs and it is recommended to call it 
+* from a user's defined CSD ISR.
 *
-* The CapSense component uses an interrupt that triggers after the end 
-* of each sensor scan. After scanning is complete, the ISR copies the 
-* measured sensor raw data to the \ref group_capsense_structures. 
-* If the scanning queue is not empty, the ISR starts the next sensor 
-* scanning.
-* 
-* The CapSense implementation avoids using critical sections in the code. 
-* In an unavoidable situation, the critical section is used and the code 
-* is optimized for the shortest execution time.
-*
+* The CapSense MW supposes using the CSD interrupt that triggers after the end
+* of each sensor scan. After scanning is complete, the Cy_CapSense_InterruptHandler()
+* routine copies the measured sensor raw data to the CapSense Structures. If the
+* scanning queue is not empty, the Cy_CapSense_InterruptHandler() starts the next
+* sensor scanning.
+* Calling this function from other routines is possible, however a user must 
+* be responsible for calling the function once after each scan.
 * The CapSense component does not alter or affect the priority of other 
 * interrupts in the system.
 * 
 * \param base
-* The pointer to the base register address of CSD HW block.
+* The pointer to the base register address of the CSD HW block.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
+*
+* \note
+* The calls of the Start Sample and End Of Scan callbacks
+* (see the \ref group_capsense_callbacks section for details) are the part of the
+* Cy_CapSense_InterruptHandler() routine and they lengthen its execution. These
+* callbacks will lengthen the CSD ISR execution in case of a direct call of the
+* Cy_CapSense_InterruptHandler() function from a CSD ISR.
 *
 *******************************************************************************/
 void Cy_CapSense_InterruptHandler(const CSD_Type * base, cy_stc_capsense_context_t * context)
