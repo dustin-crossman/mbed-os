@@ -495,6 +495,118 @@ const cy_stc_gpio_pin_config_t ENABLE_WIFI_config =
 	.vrefSel = 0UL,
 	.vohSel = 0UL,
 };
+const cy_stc_gpio_pin_config_t BT_UART_RX_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_HIGHZ,
+	.hsiom = BT_UART_RX_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t BT_UART_TX_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+	.hsiom = BT_UART_TX_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t BT_UART_RTS_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+	.hsiom = BT_UART_RTS_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t BT_UART_CTS_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_HIGHZ,
+	.hsiom = BT_UART_CTS_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t BT_POWER_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_OD_DRIVESHIGH_IN_OFF,
+	.hsiom = BT_POWER_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t BT_HOST_WAKE_config = 
+{
+	.outVal = 0,
+	.driveMode = CY_GPIO_DM_ANALOG,
+	.hsiom = BT_HOST_WAKE_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t BT_DEVICE_WAKE_config = 
+{
+	.outVal = 0,
+	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
+	.hsiom = BT_DEVICE_WAKE_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
 const cy_stc_gpio_pin_config_t EZI2C_SCL_config = 
 {
 	.outVal = 1,
@@ -877,6 +989,20 @@ void init_cycfg_pins(void)
 	Cy_GPIO_Pin_Init(SDHC0_CLK_PORT, SDHC0_CLK_PIN, &SDHC0_CLK_config);
 
 	Cy_GPIO_Pin_Init(ENABLE_WIFI_PORT, ENABLE_WIFI_PIN, &ENABLE_WIFI_config);
+
+	Cy_GPIO_Pin_Init(BT_UART_RX_PORT, BT_UART_RX_PIN, &BT_UART_RX_config);
+
+	Cy_GPIO_Pin_Init(BT_UART_TX_PORT, BT_UART_TX_PIN, &BT_UART_TX_config);
+
+	Cy_GPIO_Pin_Init(BT_UART_RTS_PORT, BT_UART_RTS_PIN, &BT_UART_RTS_config);
+
+	Cy_GPIO_Pin_Init(BT_UART_CTS_PORT, BT_UART_CTS_PIN, &BT_UART_CTS_config);
+
+	Cy_GPIO_Pin_Init(BT_POWER_PORT, BT_POWER_PIN, &BT_POWER_config);
+
+	Cy_GPIO_Pin_Init(BT_HOST_WAKE_PORT, BT_HOST_WAKE_PIN, &BT_HOST_WAKE_config);
+
+	Cy_GPIO_Pin_Init(BT_DEVICE_WAKE_PORT, BT_DEVICE_WAKE_PIN, &BT_DEVICE_WAKE_config);
 
 	Cy_GPIO_Pin_Init(EZI2C_SCL_PORT, EZI2C_SCL_PIN, &EZI2C_SCL_config);
 
