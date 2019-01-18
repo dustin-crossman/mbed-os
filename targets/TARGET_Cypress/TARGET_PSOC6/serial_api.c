@@ -262,7 +262,7 @@ static int serial_irq_setup_channel(serial_obj_t *obj)
 static uint32_t divider_value(uint32_t frequency, uint32_t frac_bits)
 {
     /* UARTs use peripheral clock */
-    return ((CY_CLK_PERICLK_FREQ_HZ * (1 << frac_bits)) + (frequency / 2)) / frequency;
+    return ((cy_PeriClkFreqHz * (1 << frac_bits)) + (frequency / 2)) / frequency;
 }
 
 

@@ -147,8 +147,8 @@ static cy_en_sysclk_status_t spi_init_clock(spi_obj_t *obj, uint32_t frequency)
     }
 
     // Set up proper frequency; round up the divider so the frequency is not higher than specified.
-    div_value = (CY_CLK_PERICLK_FREQ_HZ + frequency *(SPI_OVERSAMPLE - 1)) / frequency / SPI_OVERSAMPLE;
-    obj->clk_frequency = CY_CLK_PERICLK_FREQ_HZ / div_value / SPI_OVERSAMPLE;
+    div_value = (cy_PeriClkFreqHz + frequency *(SPI_OVERSAMPLE - 1)) / frequency / SPI_OVERSAMPLE;
+    obj->clk_frequency = cy_PeriClkFreqHz / div_value / SPI_OVERSAMPLE;
     Cy_SysClk_PeriphDisableDivider(obj->div_type, obj->div_num);
     if (Cy_SysClk_PeriphSetDivider(obj->div_type, obj->div_num, div_value) != CY_SYSCLK_SUCCESS) {
         obj->div_num = CY_INVALID_DIVIDER;

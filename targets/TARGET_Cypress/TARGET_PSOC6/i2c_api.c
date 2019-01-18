@@ -147,8 +147,8 @@ static int allocate_divider(I2cDividerType divider)
 
     if (p_div->div_num != CY_INVALID_DIVIDER) {
         // Set up proper frequency;
-        uint32_t div_value = CY_CLK_PERICLK_FREQ_HZ / p_div->clk_frequency;
-        p_div->clk_frequency = CY_CLK_PERICLK_FREQ_HZ / div_value;
+        uint32_t div_value = cy_PeriClkFreqHz / p_div->clk_frequency;
+        p_div->clk_frequency = cy_PeriClkFreqHz / div_value;
         if (Cy_SysClk_PeriphSetDivider(p_div->div_type, p_div->div_num, div_value) == CY_SYSCLK_SUCCESS) {
             Cy_SysClk_PeriphEnableDivider(p_div->div_type, p_div->div_num);
         } else {

@@ -135,7 +135,7 @@ void us_ticker_init(void)
 
     // Configure the clock, us_ticker 1 MHz from PCLK 50 MHz
     Cy_SysClk_PeriphAssignDivider(PCLK_TCPWM0_CLOCKS0 + TICKER_COUNTER_NUM, CY_SYSCLK_DIV_8_BIT, TICKER_CLOCK_DIVIDER_NUM);
-    Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, TICKER_CLOCK_DIVIDER_NUM, (CY_CLK_PERICLK_FREQ_HZ / 1000000UL) - 1);
+    Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT, TICKER_CLOCK_DIVIDER_NUM, (cy_PeriClkFreqHz / 1000000UL) - 1);
     Cy_SysClk_PeriphEnableDivider(CY_SYSCLK_DIV_8_BIT, TICKER_CLOCK_DIVIDER_NUM);
 
     /*

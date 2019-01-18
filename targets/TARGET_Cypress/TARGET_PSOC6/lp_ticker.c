@@ -40,8 +40,10 @@
 #endif
 #define LPT_MCWDT_DELAY_WAIT    0                // Recommended value is 93, but then we fail function execution time test.
 
+#define CY_CLK_LFCLK_FREQ_HZ            32768
+
 static const ticker_info_t lp_ticker_info = {
-    .frequency = CY_CLK_WCO_FREQ_HZ,
+    .frequency = CY_CLK_LFCLK_FREQ_HZ,
     .bits = 16,
 };
 
