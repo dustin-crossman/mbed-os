@@ -57,6 +57,7 @@ typedef enum
     CY_CAPSENSE_TU_CMD_RUN_SNR_TEST_E   = 4u,                   /**< Reserved */
     CY_CAPSENSE_TU_CMD_PING_E           = 5u,                   /**< Ping command to check whether application flow calls Cy_CapSense_RunTuner() */
     CY_CAPSENSE_TU_CMD_ONE_SCAN_E       = 6u,                   /**< Execute one scan cycle and then switch to suspend state */
+    CY_CAPSENSE_TU_CMD_WRITE_E          = 7u,                   /**< Writes specified data with offset into cy_capsense_tuner */
 } cy_en_capsense_tuner_cmd_t;
 
 /** Defines widget types */
@@ -481,6 +482,8 @@ typedef struct
 * the \ref cy_en_capsense_callback_event_t events occurs.
 */
 typedef void (*cy_capsense_callback_t)(cy_stc_active_scan_sns_t * ptrActiveScan);
+typedef void (*cy_capsense_tuner_send_callback_t)(void * context);
+typedef void (*cy_capsense_tuner_receive_callback_t)(uint8_t ** commandPacket, uint8_t ** tunerPacket, void * context);
 
 /** \} */
 
@@ -501,15 +504,21 @@ typedef struct
     uint8_t tunerSt;                                            /**< State of CapSense middleware tuner module. \ref cy_en_capsense_tuner_state_t */
     uint8_t initDone;                                           /**< Keep information whether initialization was done or not */        
     cy_capsense_callback_t ptrSSCallback;                       /**< Pointer to a user's Start Sample callback function. Refer to \ref group_capsense_callbacks section */
-    cy_capsense_callback_t ptrEOSCallback;
-                                                                /**< Pointer to a user's End Of Scan callback function. Refer to \ref group_capsense_callbacks section */
+    cy_capsense_callback_t ptrEOSCallback;                      /**< Pointer to a user's End Of Scan callback function. Refer to \ref group_capsense_callbacks section */
+
+    cy_capsense_tuner_send_callback_t ptrTunerSendCallback;     /**< Pointer to a user's tuner callback function. Refer to \ref group_capsense_callbacks section */
+    cy_capsense_tuner_receive_callback_t ptrTunerReceiveCallback;  /**< Pointer to a user's tuner callback function. Refer to \ref group_capsense_callbacks section */
+
     volatile uint32_t status;                                   /**< Middleware status information, scan in progress or not */
     uint32_t timestampInterval;                                 /**< Timestamp interval used at increasing the timestamp by Cy_CapSense_IncrementGestureTimestamp() */   
     uint32_t timestamp;                                         /**< Current timestamp should be kept updated and operational, which is vital for the
                                                                    * operation of Gesture and Ballistic multiplier features */                                                            
     uint8_t modCsdClk;                                          /**< The modulator clock divider for the CSD widgets */
     uint8_t modCsxClk;                                          /**< The modulator clock divider for the CSX widgets */
+    uint8_t tunerCnt;                                           /**< Command counter of CapSense middleware tuner module */
 } cy_stc_capsense_common_context_t;
+
+
 
 /** Declares top-level CapSense context data structure */
 typedef struct
