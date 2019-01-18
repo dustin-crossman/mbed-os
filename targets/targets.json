@@ -7793,7 +7793,7 @@
     },
     "CYW943012P6EVB_01": {
         "inherits": ["MCU_PSOC6_M4"],
-        "extra_labels_add": ["PSOC6_01"],
+        "extra_labels_add": ["PSOC6_01", "WICED", "CYW43012"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "detect_code": ["1906"],
         "m0_core_img": "psoc6_01_cm0p_sleep.hex",
