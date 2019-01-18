@@ -1,17 +1,21 @@
 ##############################################################################
 # Win10 - ARM and IAR COMPILERS
 ##############################################################################
-.CY8CKIT_062_BLE_ARM:
+CY8CPROTO_062_4343W_ARM:
   tags:
     - mti-win10
   script:
-    - bash -x cy-test.sh CY8CKIT_062_BLE ARM
+    - bash -x cy-test.sh CY8CPROTO_062_4343W ARM
+  only:
+    - cy-mbed-os-0.1
 
-.CY8CKIT_062_BLE_IAR:
+CY8CPROTO_062_4343W_IAR:
   tags:
     - mti-win10
   script:
-    - bash -x cy-test.sh CY8CKIT_062_BLE IAR
+    - bash -x cy-test.sh CY8CPROTO_062_4343W IAR
+  only:
+    - cy-mbed-os-0.1
 
 ##############################################################################
 # Ubuntu18 - GCC_ARM COMPILER
@@ -21,28 +25,38 @@ CY8CKIT_062_WIFI_BT_GCC_ARM:
     - mti-ubuntu18
   script:
     - bash -x cy-test.sh CY8CKIT_062_WIFI_BT GCC_ARM
+  only:
+    - cy-mbed-os-0.1
                                 
 CY8CPROTO_062_4343W_GCC_ARM:
   tags:
     - mti-ubuntu18
   script:
     - bash -x cy-test.sh CY8CPROTO_062_4343W GCC_ARM
+  only:
+    - cy-mbed-os-0.1
 
 CY8CKIT_062_BLE_GCC_ARM:
   tags:
     - mti-ubuntu18
   script:
     - bash -x cy-test.sh CY8CKIT_062_BLE GCC_ARM
+  only:
+    - cy-mbed-os-0.1
 
 CY8CKIT_062_4343W_GCC_ARM:
   tags:
     - mti-ubuntu18
   script:
     - bash -x cy-test.sh CY8CKIT_062_4343W GCC_ARM
+  only:
+    - cy-mbed-os-0.1
 
 CYW943012P6EVB_01_GCC_ARM:
   tags:
     - mti-ubuntu18
   script:
     - bash -x cy-test.sh CYW943012P6EVB_01 GCC_ARM
+  only:
+    - cy-mbed-os-0.1
 
