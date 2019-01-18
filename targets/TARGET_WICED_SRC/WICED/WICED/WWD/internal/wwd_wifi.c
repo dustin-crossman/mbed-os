@@ -5083,7 +5083,9 @@ wwd_result_t wwd_get_phyrate_statistics_counters( wiced_phyrate_counters_t *coun
     {
         data = (wiced_counters_t*)host_buffer_get_current_piece_data_pointer( response );
 
+#ifdef TARGET_CYW4343X
         memcpy( counts_buffer, &data->rx1mbps, WICED_WIFI_PHYRATE_COUNT * sizeof(uint32_t) );
+#endif /* TARGET_CYW4343X */
 
         host_buffer_release( response, WWD_NETWORK_RX );
     }

@@ -292,6 +292,19 @@ typedef enum
        NAN_BAND_INVALID = 0xFF
 } wwd_nan_band_t;
 
+/* This XTLV definitions for iovar "wl counters" have been taken for 43012 chip from
+ * IGUANA_TWIG_13_10_271 branch under ./include/wlioctl.h
+ */
+
+typedef enum  {
+        WL_CNT_XTLV_WLC = 0x100,                /**< WLC layer counters */
+        WL_CNT_XTLV_WLC_RINIT_RSN = 0x101,      /**< WLC layer reinitreason extension */
+        WL_CNT_XTLV_CNTV_LE10_UCODE = 0x200,    /**< wl counter ver < 11 UCODE MACSTAT */
+        WL_CNT_XTLV_LT40_UCODE_V1 = 0x300,      /**< corerev < 40 UCODE MACSTAT */
+        WL_CNT_XTLV_GE40_UCODE_V1 = 0x400,      /**< corerev >= 40 UCODE MACSTAT */
+        WL_CNT_XTLV_GE64_UCODEX_V1 = 0x800      /* corerev >= 64 UCODEX MACSTAT */
+}wwd_cnt_xtlv_id;
+
 
 /** Enumeration of WICED interfaces. \n
  * @note The config interface is a virtual interface that shares the softAP interface
