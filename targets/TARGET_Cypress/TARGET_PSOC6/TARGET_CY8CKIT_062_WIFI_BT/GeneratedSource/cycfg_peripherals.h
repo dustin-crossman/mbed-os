@@ -19,8 +19,8 @@
 #include "cycfg_notices.h"
 #include "cy_sysclk.h"
 #include "cy_csd.h"
-#include "cy_scb_ezi2c.h"
 #include "cy_scb_uart.h"
+#include "cy_scb_ezi2c.h"
 #include "cy_smif.h"
 #include "cy_mcwdt.h"
 #include "cy_rtc.h"
@@ -67,6 +67,8 @@ extern "C" {
 #define CintB_PORT_NUM 7u
 #define CapSense_HW CSD0
 #define CapSense_IRQ csd_interrupt_IRQn
+#define BT_UART_HW SCB2
+#define BT_UART_IRQ scb_2_interrupt_IRQn
 #define CSD_COMM_HW SCB3
 #define CSD_COMM_IRQ scb_3_interrupt_IRQn
 #define KITPROG_UART_HW SCB5
@@ -110,6 +112,7 @@ extern "C" {
 #define USBUART_LO_IRQ usb_interrupt_lo_IRQn
 
 extern cy_stc_csd_context_t cy_csd_0_context;
+extern const cy_stc_scb_uart_config_t BT_UART_config;
 extern const cy_stc_scb_ezi2c_config_t CSD_COMM_config;
 extern const cy_stc_scb_uart_config_t KITPROG_UART_config;
 extern const cy_stc_smif_config_t QSPI_config;

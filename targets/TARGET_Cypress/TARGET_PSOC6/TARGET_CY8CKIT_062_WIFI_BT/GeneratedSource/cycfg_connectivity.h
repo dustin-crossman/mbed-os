@@ -37,6 +37,10 @@ void init_cycfg_connectivity(void);
 #define ioss_0_port_2_pin_3_HSIOM P2_3_DSI_DSI
 #define ioss_0_port_2_pin_4_HSIOM P2_4_DSI_DSI
 #define ioss_0_port_2_pin_5_HSIOM P2_5_DSI_GPIO
+#define ioss_0_port_3_pin_0_HSIOM P3_0_SCB2_UART_RX
+#define ioss_0_port_3_pin_1_HSIOM P3_1_SCB2_UART_TX
+#define ioss_0_port_3_pin_2_HSIOM P3_2_SCB2_UART_RTS
+#define ioss_0_port_3_pin_3_HSIOM P3_3_SCB2_UART_CTS
 #define ioss_0_port_5_pin_0_HSIOM P5_0_SCB5_UART_RX
 #define ioss_0_port_5_pin_1_HSIOM P5_1_SCB5_UART_TX
 #define ioss_0_port_6_pin_0_HSIOM P6_0_SCB3_I2C_SCL
@@ -55,14 +59,14 @@ void init_cycfg_connectivity(void);
 #define ioss_0_port_8_pin_6_HSIOM HSIOM_SEL_AMUXA
 #define ioss_0_port_8_pin_7_HSIOM HSIOM_SEL_AMUXA
 
-#define udb_0_out_p_117_TRIGGER_IN TRIG14_IN_UDB_TR_UDB1
 #define udb_0_out_p_123_TRIGGER_IN TRIG14_IN_UDB_TR_UDB7
-#define udb_0_out_p_119_TRIGGER_IN TRIG14_IN_UDB_TR_UDB3
+#define udb_0_out_p_117_TRIGGER_IN TRIG14_IN_UDB_TR_UDB1
 #define udb_0_out_p_116_TRIGGER_IN TRIG14_IN_UDB_TR_UDB0
-#define cpuss_0_dw0_0_chan_1_tr_in_0_TRIGGER_OUT TRIG0_OUT_CPUSS_DW0_TR_IN1
+#define udb_0_out_p_119_TRIGGER_IN TRIG14_IN_UDB_TR_UDB3
 #define cpuss_0_dw1_0_chan_3_tr_in_0_TRIGGER_OUT TRIG1_OUT_CPUSS_DW1_TR_IN3
-#define cpuss_0_dw0_0_chan_0_tr_in_0_TRIGGER_OUT TRIG0_OUT_CPUSS_DW0_TR_IN0
+#define cpuss_0_dw0_0_chan_1_tr_in_0_TRIGGER_OUT TRIG0_OUT_CPUSS_DW0_TR_IN1
 #define cpuss_0_dw1_0_chan_1_tr_in_0_TRIGGER_OUT TRIG1_OUT_CPUSS_DW1_TR_IN1
+#define cpuss_0_dw0_0_chan_0_tr_in_0_TRIGGER_OUT TRIG0_OUT_CPUSS_DW0_TR_IN0
 
 #if defined(__cplusplus)
 }

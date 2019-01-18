@@ -34,6 +34,34 @@ cy_stc_csd_context_t cy_csd_0_context =
 {
 	.lockKey = CY_CSD_NONE_KEY,
 };
+const cy_stc_scb_uart_config_t BT_UART_config = 
+{
+	.uartMode = CY_SCB_UART_STANDARD,
+	.enableMutliProcessorMode = false,
+	.smartCardRetryOnNack = false,
+	.irdaInvertRx = false,
+	.irdaEnableLowPowerReceiver = false,
+	.oversample = 8,
+	.enableMsbFirst = false,
+	.dataWidth = 8UL,
+	.parity = CY_SCB_UART_PARITY_NONE,
+	.stopBits = CY_SCB_UART_STOP_BITS_1,
+	.enableInputFilter = false,
+	.breakWidth = 11UL,
+	.dropOnFrameError = false,
+	.dropOnParityError = false,
+	.receiverAddress = 0x0UL,
+	.receiverAddressMask = 0x0UL,
+	.acceptAddrInFifo = false,
+	.enableCts = true,
+	.ctsPolarity = CY_SCB_UART_ACTIVE_LOW,
+	.rtsRxFifoLevel = 63,
+	.rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
+	.rxFifoTriggerLevel = 1UL,
+	.rxFifoIntEnableMask = 0UL,
+	.txFifoTriggerLevel = 63UL,
+	.txFifoIntEnableMask = 0UL,
+};
 const cy_stc_scb_ezi2c_config_t CSD_COMM_config = 
 {
 	.numberOfAddresses = CY_SCB_EZI2C_ONE_ADDRESS,
@@ -152,6 +180,8 @@ const cy_stc_usbfs_dev_drv_config_t USBUART_config =
 void init_cycfg_peripherals(void)
 {
 	Cy_SysClk_PeriphAssignDivider(PCLK_CSD_CLOCK, CY_SYSCLK_DIV_8_BIT, 4U);
+
+	Cy_SysClk_PeriphAssignDivider(PCLK_SCB2_CLOCK, CY_SYSCLK_DIV_8_BIT, 2U);
 
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB3_CLOCK, CY_SYSCLK_DIV_8_BIT, 1U);
 
