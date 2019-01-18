@@ -583,7 +583,7 @@ class PSOC6Code:
     @staticmethod
     def complete(t_self, resources, elf, binf):
         from tools.targets.PSOC6 import complete as psoc6_complete
-        if hasattr(t_self.target, "sub_target"):
+        if hasattr(t_self.target, "m0_core_img"):
             # Completing main image involves merging M0 image.
             from tools.targets.PSOC6 import find_cm0_image
             m0hexf = find_cm0_image(t_self, resources, elf, binf)
