@@ -193,6 +193,17 @@ typedef enum {
     UART_RTS    = P5_2,
     UART_CTS    = P5_3,
 
+    BT_UART_RX  = P3_0,
+    BT_UART_TX  = P3_1,
+    BT_UART_CTS = P3_3,
+    BT_UART_RTS = P3_2,
+
+    BT_PIN_POWER       = P3_4,
+    BT_PIN_HOST_WAKE   = P3_5,
+    BT_PIN_DEVICE_WAKE = P4_0,
+    // Reset pin unavailable
+
+
     SWITCH2     = P0_4,
     LED1        = P0_3,
     LED2        = P1_1,
@@ -224,6 +235,16 @@ typedef enum {
     CY_STDIO_UART_TX    = STDIO_UART_TX,
     CY_STDIO_UART_CTS   = STDIO_UART_CTS,
     CY_STDIO_UART_RTS   = STDIO_UART_RTS,
+
+    CY_BT_UART_RX       = BT_UART_RX,
+    CY_BT_UART_TX       = BT_UART_TX,
+    CY_BT_UART_CTS      = BT_UART_CTS,
+    CY_BT_UART_RTS      = BT_UART_RTS,
+
+    CY_BT_PIN_POWER       = BT_PIN_POWER,
+    CY_BT_PIN_HOST_WAKE   = BT_PIN_HOST_WAKE,
+    CY_BT_PIN_DEVICE_WAKE = BT_PIN_DEVICE_WAKE,
+
 
     USBTX   = UART_TX,
     USBRX   = UART_RX

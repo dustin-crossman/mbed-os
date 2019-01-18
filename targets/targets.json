@@ -7782,6 +7782,7 @@
     "CY8CKIT_062_4343W": {
         "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
+        "supported_form_factors": ["ARDUINO"],
         "device_has_remove": ["ANALOGOUT"],
         "extra_labels_add": ["PSOC6_02", "WICED", "CYW4343X", "CORDIO"],
         "macros_add": ["CY8C624ABZI_D44", "PSOC6_DYNSRM_DISABLE=1"],
