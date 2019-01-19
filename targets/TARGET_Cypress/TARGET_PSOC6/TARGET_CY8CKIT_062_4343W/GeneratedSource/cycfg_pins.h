@@ -262,6 +262,76 @@ extern "C" {
 #endif
 #define ENABLE_WIFI_HSIOM ioss_0_port_2_pin_6_HSIOM
 #define ENABLE_WIFI_IRQ ioss_interrupts_gpio_2_IRQn
+#define BT_UART_RX_PORT GPIO_PRT3
+#define BT_UART_RX_PIN 0U
+#define BT_UART_RX_NUM 0U
+#define BT_UART_RX_DRIVEMODE CY_GPIO_DM_HIGHZ
+#define BT_UART_RX_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_3_pin_0_HSIOM
+	#define ioss_0_port_3_pin_0_HSIOM HSIOM_SEL_GPIO
+#endif
+#define BT_UART_RX_HSIOM ioss_0_port_3_pin_0_HSIOM
+#define BT_UART_RX_IRQ ioss_interrupts_gpio_3_IRQn
+#define BT_UART_TX_PORT GPIO_PRT3
+#define BT_UART_TX_PIN 1U
+#define BT_UART_TX_NUM 1U
+#define BT_UART_TX_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
+#define BT_UART_TX_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_3_pin_1_HSIOM
+	#define ioss_0_port_3_pin_1_HSIOM HSIOM_SEL_GPIO
+#endif
+#define BT_UART_TX_HSIOM ioss_0_port_3_pin_1_HSIOM
+#define BT_UART_TX_IRQ ioss_interrupts_gpio_3_IRQn
+#define BT_UART_RTS_PORT GPIO_PRT3
+#define BT_UART_RTS_PIN 2U
+#define BT_UART_RTS_NUM 2U
+#define BT_UART_RTS_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
+#define BT_UART_RTS_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_3_pin_2_HSIOM
+	#define ioss_0_port_3_pin_2_HSIOM HSIOM_SEL_GPIO
+#endif
+#define BT_UART_RTS_HSIOM ioss_0_port_3_pin_2_HSIOM
+#define BT_UART_RTS_IRQ ioss_interrupts_gpio_3_IRQn
+#define BT_UART_CTS_PORT GPIO_PRT3
+#define BT_UART_CTS_PIN 3U
+#define BT_UART_CTS_NUM 3U
+#define BT_UART_CTS_DRIVEMODE CY_GPIO_DM_HIGHZ
+#define BT_UART_CTS_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_3_pin_3_HSIOM
+	#define ioss_0_port_3_pin_3_HSIOM HSIOM_SEL_GPIO
+#endif
+#define BT_UART_CTS_HSIOM ioss_0_port_3_pin_3_HSIOM
+#define BT_UART_CTS_IRQ ioss_interrupts_gpio_3_IRQn
+#define BT_POWER_PORT GPIO_PRT3
+#define BT_POWER_PIN 4U
+#define BT_POWER_NUM 4U
+#define BT_POWER_DRIVEMODE CY_GPIO_DM_OD_DRIVESHIGH_IN_OFF
+#define BT_POWER_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_3_pin_4_HSIOM
+	#define ioss_0_port_3_pin_4_HSIOM HSIOM_SEL_GPIO
+#endif
+#define BT_POWER_HSIOM ioss_0_port_3_pin_4_HSIOM
+#define BT_POWER_IRQ ioss_interrupts_gpio_3_IRQn
+#define BT_HOST_WAKE_PORT GPIO_PRT3
+#define BT_HOST_WAKE_PIN 5U
+#define BT_HOST_WAKE_NUM 5U
+#define BT_HOST_WAKE_DRIVEMODE CY_GPIO_DM_ANALOG
+#define BT_HOST_WAKE_INIT_DRIVESTATE 0
+#ifndef ioss_0_port_3_pin_5_HSIOM
+	#define ioss_0_port_3_pin_5_HSIOM HSIOM_SEL_GPIO
+#endif
+#define BT_HOST_WAKE_HSIOM ioss_0_port_3_pin_5_HSIOM
+#define BT_HOST_WAKE_IRQ ioss_interrupts_gpio_3_IRQn
+#define BT_DEVICE_WAKE_PORT GPIO_PRT4
+#define BT_DEVICE_WAKE_PIN 0U
+#define BT_DEVICE_WAKE_NUM 0U
+#define BT_DEVICE_WAKE_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
+#define BT_DEVICE_WAKE_INIT_DRIVESTATE 0
+#ifndef ioss_0_port_4_pin_0_HSIOM
+	#define ioss_0_port_4_pin_0_HSIOM HSIOM_SEL_GPIO
+#endif
+#define BT_DEVICE_WAKE_HSIOM ioss_0_port_4_pin_0_HSIOM
+#define BT_DEVICE_WAKE_IRQ ioss_interrupts_gpio_4_IRQn
 #define UART_RX_PORT GPIO_PRT5
 #define UART_RX_PIN 0U
 #define UART_RX_NUM 0U
@@ -457,6 +527,13 @@ extern const cy_stc_gpio_pin_config_t SDHC0_DAT3_config;
 extern const cy_stc_gpio_pin_config_t SDHC0_CMD_config;
 extern const cy_stc_gpio_pin_config_t SDHC0_CLK_config;
 extern const cy_stc_gpio_pin_config_t ENABLE_WIFI_config;
+extern const cy_stc_gpio_pin_config_t BT_UART_RX_config;
+extern const cy_stc_gpio_pin_config_t BT_UART_TX_config;
+extern const cy_stc_gpio_pin_config_t BT_UART_RTS_config;
+extern const cy_stc_gpio_pin_config_t BT_UART_CTS_config;
+extern const cy_stc_gpio_pin_config_t BT_POWER_config;
+extern const cy_stc_gpio_pin_config_t BT_HOST_WAKE_config;
+extern const cy_stc_gpio_pin_config_t BT_DEVICE_WAKE_config;
 extern const cy_stc_gpio_pin_config_t UART_RX_config;
 extern const cy_stc_gpio_pin_config_t UART_TX_config;
 extern const cy_stc_gpio_pin_config_t EZI2C_SCL_config;

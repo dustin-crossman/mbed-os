@@ -11,7 +11,7 @@ CY8CPROTO_062_4343W_ARM:
 
 CY8CPROTO_062_4343W_IAR:
   tags:
-    - mti-win10
+    - CAD-JENKINS101
   script:
     - bash -x cy-test.sh CY8CPROTO_062_4343W IAR
   only:

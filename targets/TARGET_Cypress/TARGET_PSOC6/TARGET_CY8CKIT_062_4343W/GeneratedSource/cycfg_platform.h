@@ -27,6 +27,13 @@
 extern "C" {
 #endif
 
+#define CY_CFG_PWR_VDDA_MV 3300
+#define CY_CFG_PWR_VDDD_MV 3300
+#define CY_CFG_PWR_VBACKUP_MV 3300
+#define CY_CFG_PWR_VDD_NS_MV 3300
+#define CY_CFG_PWR_VDDIO0_MV 3300
+#define CY_CFG_PWR_VDDIO1_MV 3300
+
 void init_cycfg_platform(void);
 
 #if defined(__cplusplus)
