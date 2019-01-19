@@ -128,10 +128,6 @@
     #include "cy8c624aazi_d44.h"
 #elif defined (CY8C624AFNI_D43)
     #include "cy8c624afni_d43.h"
-#elif defined (PSOC6A512K_68QFN)
-    #include "psoc6a512k_68qfn.h"
-#elif defined (PSOC6A512K_100TQFP)
-    #include "psoc6a512k_100tqfp.h"
 #else
     #include "cy_device_common.h"
 #endif

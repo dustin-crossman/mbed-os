@@ -1,5 +1,6 @@
 #
 # Copyright (c) 2017-2018 Future Electronics
+# Copyright (c) 2018-2019 Cypress Semiconductor Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,13 +21,28 @@ import subprocess
 import errno
 from array import array
 from struct import (pack, unpack)
-from distutils.spawn import find_executable
 from shutil import copyfile
 from intelhex import IntelHex
 from intelhex.compat import asbytes
 
 from ..config import ConfigException
-from ..targets import HookError
+
+# The size of the program data in Cypress HEX files is limited to 0x80000000
+# Higher addresses contain additional metadata (chip protection, eFuse data)
+CYPROGRAM_SIZE = 0x80000000
+
+# The starting address of the hex file Checksum
+CYCHECKSUM_ADDR = 0x90300000
+
+# The starting address of the .cymeta section
+# Additional metadata include silicon revision, Silicon/JTAG ID, etc.
+CYMETA_ADDR = 0x90500000
+
+# The address of the signature
+CYSIGNATURE_ADDR = 0x90500002
+
+# The address of the sigcheck
+CYSIGCHECK_ADDR = 0x90500008
 
 
 # Patch Cypress hex file:
@@ -34,31 +50,40 @@ from ..targets import HookError
 # - update metadata
 # - align regions to page (256 bytes) boundary
 def patch(message_func, ihex, hexf, align=256):
-    #calculate checksum
+    update_checksum = False
+    update_metadata = False
+
+    # calculate checksum, detect metadata
     checksum = 0
     for start, end in ihex.segments():
-        if start  >= 0x090000000:
+        if start == CYCHECKSUM_ADDR:
+            update_checksum = True
+        if start == CYMETA_ADDR:
+            update_metadata = True
+        if start  >= CYPROGRAM_SIZE:
             continue
         segment = ihex.tobinarray(start, end)
         checksum += sum(segment)
 
-    lowchecksum = checksum & 0x0FFFF
-    message_func("Calculated checksum for %s is 0x%04x" % (hexf, lowchecksum))
+    # only update checksum if it was found in the original hex
+    if update_checksum:
+        lowchecksum = checksum & 0x0FFFF
+        message_func("Calculated checksum for %s is 0x%04x" % (hexf, lowchecksum))
 
-    # update checksum
-    checksum_str = pack('>H', lowchecksum)
-#    ihex.frombytes(array('B', checksum_str), offset=0x90300000)
+        checksum_str = pack('>H', lowchecksum)
+        ihex.frombytes(array('B', checksum_str), offset=CYCHECKSUM_ADDR)
 
-    # update metadata
-    signature = unpack('>L', ihex.tobinstr(start=0x90500002, size=4))[0]
-    sigcheck = pack('>L', (checksum + signature) & 0x0FFFF)
-#    ihex.frombytes(array('B',sigcheck), offset=0x90500008)
+    # only update metadata if it was found in the original hex
+    if update_metadata:
+        signature = unpack('>L', ihex.tobinstr(start=CYSIGNATURE_ADDR, size=4))[0]
+        sigcheck = pack('>L', (checksum + signature) & 0x0FFFF)
+        ihex.frombytes(array('B',sigcheck), offset=CYSIGCHECK_ADDR)
 
     # align flash segments
     align_mask = align - 1
     alignments = IntelHex()
     for start, end in ihex.segments():
-        if start >= 0x090000000:
+        if start >= CYPROGRAM_SIZE:
             continue
         aligned_start = start & ~align_mask
         if start != aligned_start:
@@ -76,6 +101,7 @@ def merge_images(hexf0, hexf1=None):
     ihex.padding = 0x00
     ihex.loadfile(hexf0, "hex")
     if  hexf1 is not None:
+        # Merge the CM0+ image
         ihex1 = IntelHex(hexf1)
         ihex.merge(ihex1, 'ignore')
     return ihex
@@ -87,18 +113,18 @@ def complete_func(message_func, elf0, hexf0, hexf1=None, dest=None):
     ihex.write_hex_file(dest if dest else hexf0, write_start_addr=False, byte_count=16)
 
 # Find Cortex M0 image.
-def find_cm0_image(toolchain, resources, elf, hexf):
+def find_cm0_image(toolchain, resources, elf, hexf, hex_filename):
     # Locate user-specified image
     from tools.resources import FileType
     hex_files = resources.get_file_paths(FileType.HEX)
-    m0hexf = next((f for f in hex_files if os.path.basename(f) == toolchain.target.m0_core_img), None)
+    m0hexf = next((f for f in hex_files if os.path.basename(f) == hex_filename), None)
     if toolchain.target.name.endswith('_PSA'):
         m0hexf = next((f for f in hex_files if os.path.basename(f) == os.path.basename(hexf)), m0hexf)
 
     if m0hexf:
         toolchain.notify.debug("M0 core image file found: %s." % os.path.basename(m0hexf))
     else:
-        toolchain.notify.debug("M0 core hex image file %s not found. Aborting." % toolchain.target.m0_core_img)
+        toolchain.notify.debug("M0 core hex image file %s not found. Aborting." % hex_filename)
         raise ConfigException("Required M0 core hex image not found.")
 
     return m0hexf
