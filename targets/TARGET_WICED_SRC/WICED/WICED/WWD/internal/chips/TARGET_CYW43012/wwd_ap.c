@@ -218,11 +218,13 @@ static wwd_result_t internal_ap_init( wiced_ssid_t* ssid, wiced_security_t auth_
     memcpy( &data[2], (uint8_t*) ssid->value, ssid->length );
     CHECK_RETURN_WITH_SEMAPHORE( wwd_sdpcm_send_iovar( SDPCM_SET, buffer, 0, WWD_STA_INTERFACE ), &wwd_wifi_sleep_flag );
 
+#if 0  // MLGH - Need for compilation issue
     if ( (result = wwd_wifi_set_chanspec( WWD_AP_INTERFACE, channel, &wwd_wifi_sleep_flag )) != WWD_SUCCESS )
     {
         WPRINT_WWD_DEBUG(( " Set chanspec IOVAR failed result=%d\n", result ));
         return result;
     }
+#endif /* 0 */
 
 #ifdef WICED_WIFI_SOFT_AP_WEP_SUPPORT_ENABLED
     if ( ( auth_type == WICED_SECURITY_WEP_PSK ) || ( auth_type == WICED_SECURITY_WEP_SHARED ) )
