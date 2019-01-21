@@ -169,8 +169,8 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 
         case (uint16_t)CY_CAPSENSE_TU_CMD_WRITE_E:
             /* Tuner state is not changed */
-            cmdOffset = (commandPacket[CY_CAPSENSE_COMMAND_OFFS_0_IDX] << CY_CAPSENSE_MSB_SHIFT) |
-                          commandPacket[CY_CAPSENSE_COMMAND_OFFS_1_IDX];
+            cmdOffset = (uint32_t)((uint32_t)commandPacket[CY_CAPSENSE_COMMAND_OFFS_0_IDX] << CY_CAPSENSE_MSB_SHIFT) |
+                                   (uint32_t)commandPacket[CY_CAPSENSE_COMMAND_OFFS_1_IDX];
             cmdSize = commandPacket[CY_CAPSENSE_COMMAND_SIZE_0_IDX];
 
             if (1u == cmdSize)
@@ -267,48 +267,48 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 *******************************************************************************/
 uint32_t Cy_CapSense_CheckCommandIntegrity(uint8_t * commandPacket)
 {
-    uint32_t status = CY_CAPSENSE_COMMAND_OK;
+    uint32_t cmdCheckStatus = CY_CAPSENSE_COMMAND_OK;
     uint16_t crcValue;
 
     if (CY_CAPSENSE_COMMAND_HEAD_0 != commandPacket[CY_CAPSENSE_COMMAND_HEAD_0_IDX])
     {
-        status = CY_CAPSENSE_WRONG_HEADER;
+        cmdCheckStatus = CY_CAPSENSE_WRONG_HEADER;
     }
     else if (CY_CAPSENSE_COMMAND_HEAD_1 != commandPacket[CY_CAPSENSE_COMMAND_HEAD_1_IDX])
     {
-        status = CY_CAPSENSE_WRONG_HEADER;
+        cmdCheckStatus = CY_CAPSENSE_WRONG_HEADER;
     }
     else if (CY_CAPSENSE_COMMAND_TAIL_0 != commandPacket[CY_CAPSENSE_COMMAND_TAIL_0_IDX])
     {
-        status = CY_CAPSENSE_WRONG_TAIL;
+        cmdCheckStatus = CY_CAPSENSE_WRONG_TAIL;
     }
     else if (CY_CAPSENSE_COMMAND_TAIL_1 != commandPacket[CY_CAPSENSE_COMMAND_TAIL_1_IDX])
     {
-        status = CY_CAPSENSE_WRONG_TAIL;
+        cmdCheckStatus = CY_CAPSENSE_WRONG_TAIL;
     }
     else if (CY_CAPSENSE_COMMAND_TAIL_2 != commandPacket[CY_CAPSENSE_COMMAND_TAIL_2_IDX])
     {
-        status = CY_CAPSENSE_WRONG_TAIL;
+        cmdCheckStatus = CY_CAPSENSE_WRONG_TAIL;
     }
     else if (((uint8_t)CY_CAPSENSE_TU_CMD_WRITE_E) < commandPacket[CY_CAPSENSE_COMMAND_CODE_0_IDX])
     {
-        status = CY_CAPSENSE_WRONG_CODE;
+        cmdCheckStatus = CY_CAPSENSE_WRONG_CODE;
     }
     else
     {
-        crcValue = commandPacket[CY_CAPSENSE_COMMAND_CRC_0_IDX] << CY_CAPSENSE_MSB_SHIFT;
-        crcValue |= commandPacket[CY_CAPSENSE_COMMAND_CRC_1_IDX];
+        crcValue = (uint32_t)((uint32_t)commandPacket[CY_CAPSENSE_COMMAND_CRC_0_IDX] << CY_CAPSENSE_MSB_SHIFT);
+        crcValue |= (uint32_t)commandPacket[CY_CAPSENSE_COMMAND_CRC_1_IDX];
         if (crcValue != Cy_CapSense_CalculateCrc16(&commandPacket[0u], CY_CAPSENSE_COMMAND_CRC_DATA_SIZE))
         {
-            status = CY_CAPSENSE_WRONG_CRC;
+            cmdCheckStatus = CY_CAPSENSE_WRONG_CRC;
         }
         else
         {
-            status = CY_CAPSENSE_COMMAND_OK;
+            cmdCheckStatus = CY_CAPSENSE_COMMAND_OK;
         }
     }
 
-    return status;
+    return cmdCheckStatus;
 }
 
 

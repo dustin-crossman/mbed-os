@@ -2105,7 +2105,7 @@ void Cy_CapSense_ProcessPositionFilters(
         
         /* Process touches that exists from previous processing */
 
-        if(CY_CAPSENSE_WD_RADIAL_SLIDER_E == ptrWdConfig->wdType)
+        if((uint8_t)CY_CAPSENSE_WD_RADIAL_SLIDER_E == ptrWdConfig->wdType)
         {
             for (posIndex = 0u; posIndex < numPosMin; posIndex++)
             {
