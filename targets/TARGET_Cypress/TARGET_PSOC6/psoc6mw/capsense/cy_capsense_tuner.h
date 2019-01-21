@@ -80,7 +80,7 @@ uint32_t Cy_CapSense_CheckCommandIntegrity(uint8_t * commandPacket);
 /******************************************************************************/
 
 void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context);
-uint16 Cy_CapSense_CalculateCrc16(uint8_t *ptrData, uint32_t len);
+uint16 Cy_CapSense_CalculateCrc16(const uint8_t *ptrData, uint32_t len);
 
 /** \} \endcond */
 

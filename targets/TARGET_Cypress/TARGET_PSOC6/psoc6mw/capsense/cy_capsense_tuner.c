@@ -296,8 +296,8 @@ uint32_t Cy_CapSense_CheckCommandIntegrity(uint8_t * commandPacket)
     }
     else
     {
-        crcValue = (uint32_t)((uint32_t)commandPacket[CY_CAPSENSE_COMMAND_CRC_0_IDX] << CY_CAPSENSE_MSB_SHIFT);
-        crcValue |= (uint32_t)commandPacket[CY_CAPSENSE_COMMAND_CRC_1_IDX];
+        crcValue = (uint16_t)((uint16_t)commandPacket[CY_CAPSENSE_COMMAND_CRC_0_IDX] << CY_CAPSENSE_MSB_SHIFT);
+        crcValue |= (uint16_t)commandPacket[CY_CAPSENSE_COMMAND_CRC_1_IDX];
         if (crcValue != Cy_CapSense_CalculateCrc16(&commandPacket[0u], CY_CAPSENSE_COMMAND_CRC_DATA_SIZE))
         {
             cmdCheckStatus = CY_CAPSENSE_WRONG_CRC;
@@ -336,7 +336,7 @@ uint32_t Cy_CapSense_CheckCommandIntegrity(uint8_t * commandPacket)
 * Returns a calculated CRC-16 value.
 *
 *******************************************************************************/
-uint16 Cy_CapSense_CalculateCrc16(uint8_t *ptrData, uint32_t len)
+uint16 Cy_CapSense_CalculateCrc16(const uint8_t *ptrData, uint32_t len)
 {
     uint32_t idx;
     uint32_t actualCrc = 0u;
