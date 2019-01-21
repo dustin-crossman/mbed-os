@@ -6,7 +6,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2016-2018, Cypress Semiconductor Corporation. All rights reserved.
+* Copyright 2016-2019, Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -1063,7 +1063,7 @@ __STATIC_INLINE cy_en_sysclk_status_t Cy_SysClk_IloDisable(void)
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysClk_IloHibernateOn(bool on)
 {
-    CY_REG32_CLR_SET(SRSS_CLK_ILO_CONFIG, SRSS_CLK_ILO_CONFIG_ILO_BACKUP, (uint32_t)on);
+    CY_REG32_CLR_SET(SRSS_CLK_ILO_CONFIG, SRSS_CLK_ILO_CONFIG_ILO_BACKUP, ((on) ? 1UL : 0UL));
 }
 /** \} group_sysclk_ilo_funcs */
 

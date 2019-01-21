@@ -6,7 +6,7 @@
 *
 ********************************************************************************
 * \copyright
-* Copyright 2016-2018, Cypress Semiconductor Corporation. All rights reserved.
+* Copyright 2016-2019, Cypress Semiconductor Corporation. All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -155,32 +155,28 @@ cy_en_sysclk_status_t Cy_SysClk_EcoConfigure(uint32_t freq, uint32_t cLoad, uint
         }
         else
         {
-            uint32_t atrim, wdtrim, gtrim, rtrim, ftrim, reg;
+            uint32_t atrim = (maxAmplitude < 600UL) ? 0UL :
+                              ((maxAmplitude < 700UL) ? 2UL :
+                               ((maxAmplitude < 800UL) ? 4UL :
+                                ((maxAmplitude < 900UL) ? 6UL :
+                                 ((maxAmplitude < 1150UL) ? 10UL :
+                                  ((maxAmplitude < 1275UL) ? 12UL : 14UL)))));
 
-            atrim = (maxAmplitude < 600UL) ? 0UL :
-                     ((maxAmplitude < 700UL) ? 2UL :
-                      ((maxAmplitude < 800UL) ? 4UL :
-                       ((maxAmplitude < 900UL) ? 6UL :
-                        ((maxAmplitude < 1150UL) ? 10UL :
-                         ((maxAmplitude < 1275UL) ? 12UL : 14UL)))));
+            uint32_t wdtrim = (maxAmplitude < 1200UL) ? ((maxAmplitude / 100UL) - 4UL) : 6UL;
 
-            wdtrim = (maxAmplitude < 1200UL) ? ((maxAmplitude / 100UL) - 4UL) : 6UL;
+            uint32_t gtrim = ((nAmpSections > 1000000UL) ? CY_SYSCLK_DIV_ROUND(nAmpSections, 1000000UL) :
+                             ((nAmpSections == 1000000UL) ? 0UL : 1UL));
 
-            gtrim = ((nAmpSections > 1000000UL) ? CY_SYSCLK_DIV_ROUND(nAmpSections, 1000000UL) :
-                    ((nAmpSections == 1000000UL) ? 0UL : 1UL));
-
-            rtrim = ((freq > 26800000UL) ? 0UL :
-                     ((freq > 23330000UL) ? 1UL :
-                      ((freq > 16500000UL) ? 2UL : 3UL)));
-
-            ftrim = atrim / 2UL;
+            uint32_t rtrim = ((freq > 26800000UL) ? 0UL :
+                              ((freq > 23330000UL) ? 1UL :
+                               ((freq > 16500000UL) ? 2UL : 3UL)));
 
             /* Update all fields of trim control register with one write, without changing the ITRIM field */
-            reg = _VAL2FLD(SRSS_CLK_TRIM_ECO_CTL_WDTRIM, wdtrim) |
-                  _VAL2FLD(SRSS_CLK_TRIM_ECO_CTL_ATRIM, atrim)   |
-                  _VAL2FLD(SRSS_CLK_TRIM_ECO_CTL_FTRIM, ftrim)   |
-                  _VAL2FLD(SRSS_CLK_TRIM_ECO_CTL_RTRIM, rtrim)   |
-                  _VAL2FLD(SRSS_CLK_TRIM_ECO_CTL_GTRIM, gtrim);
+            uint32_t reg = _VAL2FLD(SRSS_CLK_TRIM_ECO_CTL_WDTRIM, wdtrim)    |
+                           _VAL2FLD(SRSS_CLK_TRIM_ECO_CTL_ATRIM, atrim)      |
+                           _VAL2FLD(SRSS_CLK_TRIM_ECO_CTL_FTRIM, atrim / 2UL)|
+                           _VAL2FLD(SRSS_CLK_TRIM_ECO_CTL_RTRIM, rtrim)      |
+                           _VAL2FLD(SRSS_CLK_TRIM_ECO_CTL_GTRIM, gtrim);
                   
             CY_REG32_CLR_SET(SRSS_CLK_TRIM_ECO_CTL, CY_SYSCLK_TRIM_ECO, reg);
 
