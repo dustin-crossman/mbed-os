@@ -18,7 +18,9 @@
 #ifndef _CY_DEVICE_HEADERS_H_
 #define _CY_DEVICE_HEADERS_H_
 
-#if defined (CY8C6036BZI_F04)
+#if defined (CY_DEVICE_COMMON)
+    #include "cy_device_common.h"
+#elif defined (CY8C6036BZI_F04)
     #include "cy8c6036bzi_f04.h"
 #elif defined (CY8C6016BZI_F04)
     #include "cy8c6016bzi_f04.h"
