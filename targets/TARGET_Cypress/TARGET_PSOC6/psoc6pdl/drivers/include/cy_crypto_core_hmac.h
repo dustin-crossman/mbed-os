@@ -43,6 +43,62 @@ typedef cy_en_crypto_status_t (*cy_crypto_hmac_func_t)(CRYPTO_Type *base,
                                           uint32_t keyLength,
                                           cy_en_crypto_sha_mode_t mode);
 
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_Hmac
+****************************************************************************//**
+*
+* Performs HMAC calculation.
+*
+* This function available for Server side only.
+*
+* This function is internal and should not to be called directly by user software
+*
+* \param base
+* The pointer to the CRYPTO instance address.
+*
+* \param hmac
+* The pointer to the calculated HMAC. Must be 4-byte aligned.
+*
+* \param message
+* The pointer to a message whose hash value is being computed.
+*
+* \param messageSize
+* The size of a message.
+*
+* \param key
+* The pointer to the key.
+*
+* \param keyLength
+* The length of the key.
+*
+* \param mode
+* \ref cy_en_crypto_sha_mode_t
+*
+* \return
+* A Crypto status \ref en_crypto_status_t.
+*
+*******************************************************************************/
+__STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Hmac(CRYPTO_Type *base,
+                                          uint8_t *hmac,
+                                          uint8_t const *message,
+                                          uint32_t messageSize,
+                                          uint8_t const *key,
+                                          uint32_t keyLength,
+                                          cy_en_crypto_sha_mode_t mode)
+{
+    cy_en_crypto_status_t myResult;
+
+    if (cy_device->cryptoVersion == 1u)
+    {
+        myResult = Cy_Crypto_Core_V1_Hmac(base, hmac, message, messageSize, key, keyLength, mode);
+    }
+    else
+    {
+        myResult = Cy_Crypto_Core_V2_Hmac(base, hmac, message, messageSize, key, keyLength, mode);
+    }
+
+    return myResult;
+}
 
 #endif /* #if (CPUSS_CRYPTO_SHA == 1) */
 

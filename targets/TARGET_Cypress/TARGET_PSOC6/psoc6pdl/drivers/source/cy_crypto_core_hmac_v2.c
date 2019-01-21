@@ -55,7 +55,7 @@ typedef struct
     uint8_t opad[CY_CRYPTO_HMAC_MAX_PAD_SIZE];
     uint8_t m0Key[CY_CRYPTO_SHA_MAX_BLOCK_SIZE];
     cy_stc_crypto_v2_hmac_state_t hmacState;
-    cy_stc_crypto_v2_sha_state_t  hashState;
+    cy_stc_crypto_sha_state_t  hashState;
 } cy_stc_crypto_v2_hmac_buffers_t;
 
 /* Static fubctions declarations */
@@ -65,7 +65,7 @@ static void Cy_Crypto_Core_V2_Hmac_Init(cy_stc_crypto_v2_hmac_state_t *hmacState
                                 uint8_t *m0Key);
 static void Cy_Crypto_Core_V2_Hmac_Calculate(CRYPTO_Type *base,
                                    cy_stc_crypto_v2_hmac_state_t *hmacState,
-                                   cy_stc_crypto_v2_sha_state_t  *hashState,
+                                   cy_stc_crypto_sha_state_t  *hashState,
                                    uint8_t   const *key,
                                    uint32_t  keyLength,
                                    uint8_t   const *message,
@@ -151,7 +151,7 @@ static void Cy_Crypto_Core_V2_Hmac_Init(cy_stc_crypto_v2_hmac_state_t *hmacState
 *******************************************************************************/
 static void Cy_Crypto_Core_V2_Hmac_Calculate(CRYPTO_Type *base,
                                    cy_stc_crypto_v2_hmac_state_t *hmacState,
-                                   cy_stc_crypto_v2_sha_state_t  *hashState,
+                                   cy_stc_crypto_sha_state_t  *hashState,
                                    uint8_t   const *key,
                                    uint32_t  keyLength,
                                    uint8_t   const *message,
@@ -198,7 +198,7 @@ static void Cy_Crypto_Core_V2_Hmac_Calculate(CRYPTO_Type *base,
     }
 
     /* Step 6 according to FIPS 198-1 */
-    Cy_Crypto_Core_V2_Sha_Start(base, hashState);
+    Cy_Crypto_Core_V2_Sha_Start (base, hashState);
     Cy_Crypto_Core_V2_Sha_Update(base, hashState, ipadPtrTmp, blockSizeTmp);
 
     /* Append a message */
@@ -283,21 +283,20 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Hmac(CRYPTO_Type *base,
                                           cy_en_crypto_sha_mode_t mode)
 {
     /* Allocating internal variables into the CRYPTO SRAM Buffer */
-    cy_stc_crypto_v2_hmac_buffers_t hmacBuffersData;
+    cy_stc_crypto_v2_hmac_buffers_t  hmacBuffersData;
     cy_stc_crypto_v2_hmac_buffers_t *hmacBuffers = &hmacBuffersData;
 
     cy_stc_crypto_v2_hmac_state_t   *hmacStateTmp = &hmacBuffers->hmacState;
-    cy_stc_crypto_v2_sha_state_t    *hashStateTmp = &hmacBuffers->hashState;
+    cy_stc_crypto_sha_state_t       *hashStateTmp;
 
     uint8_t *ipadTmp      = (uint8_t*)&hmacBuffers->ipad;
     uint8_t *opadTmp      = (uint8_t*)&hmacBuffers->opad;
     uint8_t *m0KeyTmp     = (uint8_t*)&hmacBuffers->m0Key;
 
-    Cy_Crypto_Core_V2_Sha_Init       (base, hashStateTmp, mode);
+    Cy_Crypto_Core_V2_Sha_Init       (base, &hashStateTmp, mode, &hmacBuffers->hashState);
+
     Cy_Crypto_Core_V2_Hmac_Init      (hmacStateTmp, ipadTmp, opadTmp, m0KeyTmp);
-
     Cy_Crypto_Core_V2_Hmac_Calculate (base, hmacStateTmp, hashStateTmp, key, keyLength, message, messageSize, hmac);
-
     Cy_Crypto_Core_V2_Hmac_Free      (base, hmacStateTmp);
     Cy_Crypto_Core_V2_Sha_Free       (base, hashStateTmp);
 

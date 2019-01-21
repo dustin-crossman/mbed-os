@@ -51,14 +51,11 @@ typedef struct
 /* Allocating internal variables into the CRYPTO SRAM Buffer */
 typedef struct
 {
-    uint32_t block[CY_CRYPTO_SHA_MAX_BLOCK_SIZE / 4u];
-    uint32_t hash[CY_CRYPTO_SHA_MAX_HASH_SIZE / 4u];
-    uint32_t roundMem[CY_CRYPTO_SHA_MAX_ROUND_MEM_SIZE / 4u];
     uint32_t ipad[CY_CRYPTO_HMAC_MAX_PAD_SIZE / 4u];
     uint32_t opad[CY_CRYPTO_HMAC_MAX_PAD_SIZE / 4u];
     uint32_t m0Key[CY_CRYPTO_SHA_MAX_BLOCK_SIZE / 4u];
+    cy_stc_crypto_v1_sha_buffers_t shaBuffers;
     cy_stc_crypto_v1_hmac_state_t hmacState;
-    cy_stc_crypto_v1_sha_state_t  hashState;
 } cy_stc_crypto_hmac_buffers_t;
 
 /* Functions declarations */
@@ -69,7 +66,7 @@ static void Cy_Crypto_Core_V1_Hmac_Init(cy_stc_crypto_v1_hmac_state_t *hmacState
 
 static void Cy_Crypto_Core_V1_Hmac_Calculate(CRYPTO_Type *base,
                                    cy_stc_crypto_v1_hmac_state_t *hmacState,
-                                   cy_stc_crypto_v1_sha_state_t *hashState,
+                                   cy_stc_crypto_sha_state_t *hashState,
                                    uint8_t const *key,
                                    uint32_t keyLength,
                                    uint8_t const *message,
@@ -156,7 +153,7 @@ static void Cy_Crypto_Core_V1_Hmac_Init(cy_stc_crypto_v1_hmac_state_t *hmacState
 *******************************************************************************/
 static void Cy_Crypto_Core_V1_Hmac_Calculate(CRYPTO_Type *base,
                                    cy_stc_crypto_v1_hmac_state_t *hmacState,
-                                   cy_stc_crypto_v1_sha_state_t *hashState,
+                                   cy_stc_crypto_sha_state_t *hashState,
                                    uint8_t const *key,
                                    uint32_t keyLength,
                                    uint8_t const *message,
@@ -168,14 +165,13 @@ static void Cy_Crypto_Core_V1_Hmac_Calculate(CRYPTO_Type *base,
     uint8_t *opadPtrTmp  = (uint8_t*)hmacState->opad;
     uint8_t *m0KeyPtrTmp = (uint8_t*)hmacState->m0Key;
 
-
     /* Steps 1-3 according to FIPS 198-1 */
     if (keyLength > hashState->blockSize)
     {
         /* The key is larger than the block size. Do a hash on the key. */
         Cy_Crypto_Core_V1_Sha_Start  (base, hashState);
         Cy_Crypto_Core_V1_Sha_Update (base, hashState, key, keyLength);
-        Cy_Crypto_Core_V1_Sha_Finish (base, hashState, (uint8_t*)m0KeyPtrTmp, keyLength);
+        Cy_Crypto_Core_V1_Sha_Finish (base, hashState, (uint8_t*)m0KeyPtrTmp/*, keyLength*/);
 
         /* Append zeros */
         Cy_Crypto_Core_V1_MemSet(base, (m0KeyPtrTmp + hashState->digestSize), 0x00u,
@@ -202,23 +198,21 @@ static void Cy_Crypto_Core_V1_Hmac_Calculate(CRYPTO_Type *base,
 
     /* Step 6 according to FIPS 198-1 */
     Cy_Crypto_Core_V1_Sha_Start        (base, hashState);
-    Cy_Crypto_Core_V1_Sha_ProcessBlock (base, hashState, ipadPtrTmp);
+    Cy_Crypto_Core_V1_Sha_Update(base, hashState, ipadPtrTmp, hashState->blockSize);
 
     /* Append a message */
     Cy_Crypto_Core_V1_Sha_Update (base, hashState, message, messageSize);
-    Cy_Crypto_Core_V1_Sha_Finish (base,
-                               hashState, ipadPtrTmp, (messageSize + hashState->blockSize));
+    Cy_Crypto_Core_V1_Sha_Finish (base, hashState, ipadPtrTmp);
 
     /* Here is the ready part of HASH: Hash((Key^ipad)||text) */
 
     /* Steps 8, 9 according to FIPS 198-1 */
     Cy_Crypto_Core_V1_Sha_Start        (base, hashState);
-    Cy_Crypto_Core_V1_Sha_ProcessBlock (base, hashState, (uint8_t*)opadPtrTmp);
+    Cy_Crypto_Core_V1_Sha_Update(base, hashState, opadPtrTmp, hashState->blockSize);
 
     /* Append HASH from Step 6 */
     Cy_Crypto_Core_V1_Sha_Update (base, hashState, (uint8_t*)ipadPtrTmp, hashState->digestSize);
-    Cy_Crypto_Core_V1_Sha_Finish (base,
-                               hashState, hmac, (hashState->digestSize + hashState->blockSize));
+    Cy_Crypto_Core_V1_Sha_Finish (base, hashState, hmac);
 }
 
 /*******************************************************************************
@@ -241,8 +235,8 @@ static void Cy_Crypto_Core_V1_Hmac_Calculate(CRYPTO_Type *base,
 static void Cy_Crypto_Core_V1_Hmac_Free(CRYPTO_Type *base, cy_stc_crypto_v1_hmac_state_t *hmacState)
 {
     /* Clear the memory buffer. */
-    Cy_Crypto_Core_V1_MemSet(base, hmacState->ipad, 0x00u, CY_CRYPTO_HMAC_MAX_PAD_SIZE);
-    Cy_Crypto_Core_V1_MemSet(base, hmacState->opad, 0x00u, CY_CRYPTO_HMAC_MAX_PAD_SIZE);
+    Cy_Crypto_Core_V1_MemSet(base, hmacState->ipad,  0x00u, CY_CRYPTO_HMAC_MAX_PAD_SIZE);
+    Cy_Crypto_Core_V1_MemSet(base, hmacState->opad,  0x00u, CY_CRYPTO_HMAC_MAX_PAD_SIZE);
     Cy_Crypto_Core_V1_MemSet(base, hmacState->m0Key, 0x00u, CY_CRYPTO_HMAC_MAX_M0_KEY_SIZE);
 }
 
@@ -290,24 +284,21 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Hmac(CRYPTO_Type *base,
                                           cy_en_crypto_sha_mode_t mode)
 {
     /* Allocating internal variables into the CRYPTO SRAM Buffer */
-    cy_stc_crypto_hmac_buffers_t *hmacBuffers = (cy_stc_crypto_hmac_buffers_t *)(REG_CRYPTO_MEM_BUFF(base));
+    cy_stc_crypto_hmac_buffers_t  *hmacBuffers = (cy_stc_crypto_hmac_buffers_t *)(REG_CRYPTO_MEM_BUFF(base));
 
     cy_stc_crypto_v1_hmac_state_t *hmacStateTmp = &hmacBuffers->hmacState;
-    cy_stc_crypto_v1_sha_state_t  *hashStateTmp = &hmacBuffers->hashState;
+    cy_stc_crypto_sha_state_t     *hashStateTmp;
 
-    uint8_t *blockTmp     = (uint8_t*)(&hmacBuffers->block);
-    uint8_t *hashTmp      = (uint8_t*)(&hmacBuffers->hash);
-    uint8_t *roundMemTmp  = (uint8_t*)(&hmacBuffers->roundMem);
     uint8_t *ipadTmp      = (uint8_t*)(&hmacBuffers->ipad);
     uint8_t *opadTmp      = (uint8_t*)(&hmacBuffers->opad);
     uint8_t *m0KeyTmp     = (uint8_t*)(&hmacBuffers->m0Key);
 
-    Cy_Crypto_Core_V1_Sha_Init       (base, hashStateTmp, (uint8_t*)blockTmp, hashTmp, roundMemTmp, mode);
+    Cy_Crypto_Core_V1_Sha_Init       (base, &hashStateTmp, mode, &hmacBuffers->shaBuffers);
+
     Cy_Crypto_Core_V1_Hmac_Init      (hmacStateTmp, ipadTmp, opadTmp, m0KeyTmp);
-
     Cy_Crypto_Core_V1_Hmac_Calculate (base, hmacStateTmp, hashStateTmp, key, keyLength, message, messageSize, hmac);
-
     Cy_Crypto_Core_V1_Hmac_Free      (base, hmacStateTmp);
+
     Cy_Crypto_Core_V1_Sha_Free       (base, hashStateTmp);
 
     return (CY_CRYPTO_SUCCESS);

@@ -630,6 +630,26 @@ typedef struct
 #endif /* #if (CPUSS_CRYPTO_AES == 1) */
 
 #if (CPUSS_CRYPTO_SHA == 1)
+/** \cond INTERNAL */
+
+/* The structure for storing the SHA context */
+typedef struct
+{
+    uint32_t mode;
+    uint8_t *block;
+    uint32_t blockSize;
+    uint8_t *hash;
+    uint32_t hashSize;
+    uint8_t *roundMem;
+    uint32_t roundMemSize;
+    uint32_t messageSize;
+    uint32_t digestSize;
+    uint32_t blockIdx;
+    uint8_t  const *initialHash;
+} cy_stc_crypto_sha_state_t;
+
+/** \endcond */
+
 /**
  * Firmware allocates memory and provides a pointer to this structure in
  * function calls. Firmware does not write or read values in this structure.

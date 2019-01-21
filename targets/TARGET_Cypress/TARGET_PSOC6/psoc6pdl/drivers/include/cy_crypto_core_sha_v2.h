@@ -36,34 +36,23 @@
 
 /** \cond INTERNAL */
 
-typedef struct {
-    uint32_t opc;
-    uint32_t blockSize;
-    uint32_t hashSize;
-    uint32_t messageSize;
-    uint32_t lengthSize;
-    uint32_t digestSize;
-    uint8_t  delimiter;
-    uint32_t blockIdx;
-    uint8_t const *initialHash;
-} cy_stc_crypto_v2_sha_state_t;
-
 void Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
-                                cy_stc_crypto_v2_sha_state_t *hashState,
-                                cy_en_crypto_sha_mode_t mode);
+                                cy_stc_crypto_sha_state_t **shaHashState,
+                                cy_en_crypto_sha_mode_t mode,
+                                void *shaBuffers);
 
-void Cy_Crypto_Core_V2_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_v2_sha_state_t *hashState);
+void Cy_Crypto_Core_V2_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState);
 
 void Cy_Crypto_Core_V2_Sha_Update(CRYPTO_Type *base,
-                                cy_stc_crypto_v2_sha_state_t *hashState,
+                                cy_stc_crypto_sha_state_t *hashState,
                                 uint8_t const *message,
                                 uint32_t messageSize);
 
 void Cy_Crypto_Core_V2_Sha_Finish(CRYPTO_Type *base,
-                                cy_stc_crypto_v2_sha_state_t *hashState,
+                                cy_stc_crypto_sha_state_t *hashState,
                                 uint8_t *digest);
 
-void Cy_Crypto_Core_V2_Sha_Free(CRYPTO_Type *base, cy_stc_crypto_v2_sha_state_t *hashState);
+void Cy_Crypto_Core_V2_Sha_Free(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState);
 
 cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha(CRYPTO_Type *base,
                                 uint8_t const *message,
