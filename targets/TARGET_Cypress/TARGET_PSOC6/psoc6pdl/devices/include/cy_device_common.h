@@ -34,8 +34,8 @@ typedef enum {
   HardFault_IRQn                    = -13,      /*!< -13 Hard Fault, all classes of Fault */
   SVCall_IRQn                       =  -5,      /*!<  -5 System Service Call via SVC instruction */
   PendSV_IRQn                       =  -2,      /*!<  -2 Pendable request for system service */
-  SysTick_IRQn                      =  -1      /*!<  -1 System Tick Timer */
-
+  SysTick_IRQn                      =  -1,      /*!<  -1 System Tick Timer */
+  unconnected_IRQn                  = 240
 #else
   /* ARM Cortex-M4 Core Interrupt Numbers */
   Reset_IRQn                        = -15,      /*!< -15 Reset Vector, invoked on Power up and warm reset */
@@ -48,7 +48,7 @@ typedef enum {
   DebugMonitor_IRQn                 =  -4,      /*!<  -4 Debug Monitor */
   PendSV_IRQn                       =  -2,      /*!<  -2 Pendable request for system service */
   SysTick_IRQn                      =  -1,      /*!<  -1 System Tick Timer */
-
+  unconnected_IRQn                  = 240
 #endif
 } IRQn_Type;
 
