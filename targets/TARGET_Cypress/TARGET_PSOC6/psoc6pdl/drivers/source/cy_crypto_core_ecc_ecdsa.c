@@ -125,7 +125,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
 #endif  // ECC_ECDSA_DEBUG
 
     uint16_t status;
-    int bitsize = eccDp->size;
+    uint32_t bitsize = eccDp->size;
 
     /* make ephemeral key pair */
     ephKey.pubkey.x = myKGX;
@@ -224,7 +224,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
     // load message hash, truncate it if needed
     CY_CRYPTO_VU_SET_TO_ZERO(base, p_d);
 
-    if (hashlen * 8 > bitsize)
+    if ((hashlen * 8u) > bitsize)
     {
         Cy_Crypto_Core_Vu_SetMemValue (base, p_d, (uint8_t *)(&hash[hashlen - CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize)]), bitsize);
     }
@@ -293,7 +293,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
     Tb_PrintStr("\n");
 #endif  // ECC_ECDSA_DEBUG
 
-    int bitsize = eccDp->size;
+    uint32_t bitsize = eccDp->size;
     *stat = 0;
 
     //-----------------------------------------------------------------------------
@@ -359,7 +359,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
 
     // load message hash, truncate it if needed
     CY_CRYPTO_VU_SET_TO_ZERO(base, p_u1);
-    if (hashlen * 8 > bitsize)
+    if ((hashlen * 8u) > bitsize)
     {
         Cy_Crypto_Core_Vu_SetMemValue (base, p_u1, (uint8_t *)(&hash[hashlen - CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize)]), bitsize);
     }

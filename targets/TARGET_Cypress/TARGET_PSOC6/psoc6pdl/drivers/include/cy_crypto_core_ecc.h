@@ -56,7 +56,7 @@ typedef struct {
     cy_en_crypto_ecc_curve_id_t id;
 
     /** The size of the curve in bits */
-    int size;
+    uint32_t size;
 
     /** name of curve */
     const char *name;
@@ -67,20 +67,20 @@ typedef struct {
     /** The prime that defines the field the curve is in (encoded in hex) */
     const uint8_t *prime;
 
-   /** Barrett coefficient for reduction modulo ECC prime (hex) */
-   const uint8_t *barrett_p;
+    /** Barrett coefficient for reduction modulo ECC prime (hex) */
+    const uint8_t *barrett_p;
 
-   /** The order of the curve (hex) */
-   const uint8_t *order;
+    /** The order of the curve (hex) */
+    const uint8_t *order;
 
-   /** Barrett coefficient for reduction modulo ECC order (hex) */
-   const uint8_t *barrett_o;
+    /** Barrett coefficient for reduction modulo ECC order (hex) */
+    const uint8_t *barrett_o;
 
-   /** The x co-ordinate of the base point on the curve (hex) */
-   const uint8_t *Gx;
+    /** The x co-ordinate of the base point on the curve (hex) */
+    const uint8_t *Gx;
 
-   /** The y co-ordinate of the base point on the curve (hex) */
-   const uint8_t *Gy;
+    /** The y co-ordinate of the base point on the curve (hex) */
+    const uint8_t *Gy;
 } cy_stc_crypto_ecc_dp_type;
 
 
