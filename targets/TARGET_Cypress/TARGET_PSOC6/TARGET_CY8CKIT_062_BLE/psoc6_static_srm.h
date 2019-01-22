@@ -63,12 +63,28 @@
 
 // Reservations below apply to default M0 hex image.
 
-// P0_0 and p0_1 reserved for WCO, P6-6 and P6_7 reserved for SWD
-#define M0_ASSIGNED_PORTS       SRM_PORT(0, 0x03), SRM_PORT(6, 0xc0)
-// 8-bit divider 0 reserved for us ticker
-#define M0_ASSIGNED_DIVIDERS    SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x01)
-#define M0_ASSIGNED_SCBS
-// TCPWM 0,0 used for us_ticker
-#define M0_ASSIGNED_TCPWMS      SRM_TCPWM(0)
+/* P0_0 and P0_1 reserved for WCO, 
+*  P1_0 reserved for CSD TX,
+*  P4_0 reserved for BT device wakeup pin
+*  P6-0, P6-1 reserved for CSD (EZI2C)
+*  P6-4, P6-6 and P6_7 reserved for SWD,
+*  P7_1, P7_2 and P7_7 reserved for CSD
+*  P8_1 ... P8_7 reserved for CSD 
+*  P11_2 ... P11_7 reserved for QSPI
+*/
+#define M0_ASSIGNED_PORTS      SRM_PORT(0, 0x03), SRM_PORT(1, 0x01),\
+                               SRM_PORT(6, 0xd3), SRM_PORT(7, 0x86),\
+                               SRM_PORT(8, 0xfe), SRM_PORT(11, 0xfc)
+
+/*
+*  8-bit divider 0 reserved for CSD
+*  8-bit divider 1 reserved for CSD
+*/
+#define M0_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x3)
+                               
+/* SCB 3 is reserved for CSD */
+#define M0_ASSIGNED_SCBS      SRM_SCB(3)
+
+#define M0_ASSIGNED_TCPWMS
 
 /* End of File */

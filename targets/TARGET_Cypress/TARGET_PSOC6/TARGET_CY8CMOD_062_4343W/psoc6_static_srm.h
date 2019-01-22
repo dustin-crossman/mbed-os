@@ -63,12 +63,18 @@
 
 // Reservations below apply to default M0 hex image.
 
-// P0_0 and p0_1 reserved for WCO, P6-6 and P6_7 reserved for SWD
-#define M0_ASSIGNED_PORTS       SRM_PORT(0, 0x03), SRM_PORT(6, 0xc0)
-// 8-bit divider 0 reserved for us ticker
-#define M0_ASSIGNED_DIVIDERS    SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x01)
+/* P2_0 ... P2_5 reserved for SDHC 
+*  P6-4, P6-6 and P6_7 reserved for SWD,
+*/
+#define M0_ASSIGNED_PORTS      SRM_PORT(2, 0x3f), SRM_PORT(6, 0xd0)
+
+/* No dividers reservation */
+#define M0_ASSIGNED_DIVIDERS
+
+/* No SCB reservation */
 #define M0_ASSIGNED_SCBS
-// TCPWM 0,0 used for us_ticker
-#define M0_ASSIGNED_TCPWMS      SRM_TCPWM(0)
+
+/* No TCPWM reservation */
+#define M0_ASSIGNED_TCPWMS
 
 /* End of File */
