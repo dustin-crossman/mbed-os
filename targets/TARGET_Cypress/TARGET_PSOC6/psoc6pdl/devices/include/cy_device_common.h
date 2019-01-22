@@ -106,11 +106,24 @@ typedef enum {
 *******************************************************************************/
 /* For the target device these enums are defined in product-specific
 * configuration files.
+* For the library these enums define the max value or a set of values, so the
+* compiler can determine the enum width to hold the biggest number in the enum.
 */
 
-typedef int          en_clk_dst_t;          /* SysClk */
-typedef int          en_ep_mon_sel_t;       /* Profile */
-typedef int          cy_en_amux_split_t;    /* GPIO AMUX */
+typedef enum
+{
+    PCLK_CLOCK_NR_MINUS_ONE = 255
+} en_clk_dst_t;
+
+typedef enum
+{
+    PRFL_MONITOR_NR_MINUS_ONE = 127
+} en_ep_mon_sel_t;
+
+typedef enum
+{
+    AMUX_SPLIT_NR_MINUS_ONE = 63
+} cy_en_amux_split_t;
 
 typedef enum
 {
@@ -120,17 +133,17 @@ typedef enum
 
 typedef enum
 {
-    CPUSS_MS_ID_CM0                 =  0,
-    CPUSS_MS_ID_CM4                 = 14,
+    CPUSS_MS_ID_CM0 =  0,
+    CPUSS_MS_ID_CM4 = 14,
 } en_prot_master_t;
 
 typedef enum
 {
-    HSIOM_SEL_GPIO                  =  0,       /* GPIO controls 'out' */
-    HSIOM_SEL_AMUXA                 =  4,       /* Analog mux bus A */
-    HSIOM_SEL_AMUXB                 =  5,       /* Analog mux bus B */
-    HSIOM_SEL_ACT_2                 = 10,       /* Active functionality 2 */
-    HSIOM_SEL_ACT_3                 = 11,       /* Active functionality 3 */
+    HSIOM_SEL_GPIO  =  0,       /* GPIO controls 'out' */
+    HSIOM_SEL_AMUXA =  4,       /* Analog mux bus A */
+    HSIOM_SEL_AMUXB =  5,       /* Analog mux bus B */
+    HSIOM_SEL_ACT_2 = 10,       /* Active functionality 2 */
+    HSIOM_SEL_ACT_3 = 11,       /* Active functionality 3 */
 } en_hsiom_sel_t;
 
 /*******************************************************************************
