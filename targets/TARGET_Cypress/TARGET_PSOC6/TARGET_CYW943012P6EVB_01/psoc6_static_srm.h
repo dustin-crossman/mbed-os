@@ -69,13 +69,13 @@
 *  P13_0 and P13_1 reserved for UART
 *  P14_0 and P14_1 reserved for USB
 */
-#define M0_ASSIGNED_PORTS      SRM_PORT(0, 0x03), SRM_PORT(1, 0x01),\
-                               SRM_PORT(2, 0x7f), SRM_PORT(3, 0x3f),\
-                               SRM_PORT(4, 0x01), SRM_PORT(6, 0xd3),\
-                               SRM_PORT(7, 0x87), SRM_PORT(8, 0xfe),\
-                               SRM_PORT(9, 0x0f), SRM_PORT(11, 0xfc),\
-                               SRM_PORT(12, 0xc0), SRM_PORT(13, 0x03),\
-                               SRM_PORT(14, 0x03)
+#define CYCFG_ASSIGNED_PORTS      SRM_PORT(0, 0x03), SRM_PORT(1, 0x01),\
+                                  SRM_PORT(2, 0x7f), SRM_PORT(3, 0x3f),\
+                                  SRM_PORT(4, 0x01), SRM_PORT(6, 0xd3),\
+                                  SRM_PORT(7, 0x87), SRM_PORT(8, 0xfe),\
+                                  SRM_PORT(9, 0x0f), SRM_PORT(11, 0xfc),\
+                                  SRM_PORT(12, 0xc0), SRM_PORT(13, 0x03),\
+                                  SRM_PORT(14, 0x03)
 
 /*
 *  8-bit divider 8 reserved for UDB
@@ -84,15 +84,15 @@
 *  8-bit divider 5 reserved for UART
 *  16-bit divider 0 reserved for USB
 */
-#define M0_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x33), \
-                               SRM_DIVIDER(CY_SYSCLK_DIV_16_BIT, 0x01)
+#define CYCFG_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x33), \
+                                  SRM_DIVIDER(CY_SYSCLK_DIV_16_BIT, 0x01)
                                
 /* SCB 2 reserved for BT UART  
 *  SCB 3 reserved for CSD
 *  SCB 6 reserved for UART
 */
-#define M0_ASSIGNED_SCBS       SRM_SCB(2), SRM_SCB(3), SRM_SCB(6)
+#define CYCFG_ASSIGNED_SCBS       SRM_SCB(2), SRM_SCB(3), SRM_SCB(6)
 
-#define M0_ASSIGNED_TCPWMS
+#define CYCFG_ASSIGNED_TCPWMS
 
 /* End of File */

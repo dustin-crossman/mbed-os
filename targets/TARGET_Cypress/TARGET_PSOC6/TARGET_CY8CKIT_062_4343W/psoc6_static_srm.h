@@ -67,25 +67,25 @@
 *  P11_2 ... P11_7 reserved for QSPI
 *  P14_0 ... P14_1 reserved for USB
 */
-#define M0_ASSIGNED_PORTS      SRM_PORT(0,  0x03), SRM_PORT(1,  0x01),\
-                               SRM_PORT(2,  0x7f), SRM_PORT(3,  0x3f),\
-                               SRM_PORT(4,  0x01), SRM_PORT(6,  0xd3),\
-                               SRM_PORT(7,  0x86), SRM_PORT(8,  0xfe),\
-                               SRM_PORT(11, 0xfc), SRM_PORT(14, 0x03)
+#define CYCFG_ASSIGNED_PORTS      SRM_PORT(0,  0x03), SRM_PORT(1,  0x01),\
+                                  SRM_PORT(2,  0x7f), SRM_PORT(3,  0x3f),\
+                                  SRM_PORT(4,  0x01), SRM_PORT(6,  0xd3),\
+                                  SRM_PORT(7,  0x86), SRM_PORT(8,  0xfe),\
+                                  SRM_PORT(11, 0xfc), SRM_PORT(14, 0x03)
 
 /*
 *  8-bit divider 1 reserved for CSD
 *  8-bit divider 4 reserved for CSD
 *  16-bit divider 0 reserved for USB
 */
-#define M0_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x12), \
-                               SRM_DIVIDER(CY_SYSCLK_DIV_16_BIT, 0x01)
+#define CYCFG_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x12), \
+                                  SRM_DIVIDER(CY_SYSCLK_DIV_16_BIT, 0x01)
                                
 /* SCB 2 is reserved for CSD common (EZI2C)
 *  SCB 3 is reserved for BT (UART)
 */
-#define M0_ASSIGNED_SCBS       SRM_SCB(2), SRM_SCB(3)
+#define CYCFG_ASSIGNED_SCBS       SRM_SCB(2), SRM_SCB(3)
 
-#define M0_ASSIGNED_TCPWMS
+#define CYCFG_ASSIGNED_TCPWMS
 
 /* End of File */

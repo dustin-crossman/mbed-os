@@ -63,19 +63,19 @@
 *  P8_1 ... P8_7 reserved for CSD 
 *  P11_2 ... P11_7 reserved for QSPI
 */
-#define M0_ASSIGNED_PORTS      SRM_PORT(0, 0x03), SRM_PORT(1, 0x01),\
-                               SRM_PORT(6, 0xd3), SRM_PORT(7, 0x86),\
-                               SRM_PORT(8, 0xfe), SRM_PORT(11, 0xfc)
+#define CYCFG_ASSIGNED_PORTS      SRM_PORT(0, 0x03), SRM_PORT(1, 0x01),\
+                                  SRM_PORT(6, 0xd3), SRM_PORT(7, 0x86),\
+                                  SRM_PORT(8, 0xfe), SRM_PORT(11, 0xfc)
 
 /*
 *  8-bit divider 0 reserved for CSD
 *  8-bit divider 1 reserved for CSD
 */
-#define M0_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x3)
+#define CYCFG_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x3)
                                
 /* SCB 3 is reserved for CSD */
-#define M0_ASSIGNED_SCBS      SRM_SCB(3)
+#define CYCFG_ASSIGNED_SCBS      SRM_SCB(3)
 
-#define M0_ASSIGNED_TCPWMS
+#define CYCFG_ASSIGNED_TCPWMS
 
 /* End of File */
