@@ -265,7 +265,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 * - CY_CAPSENSE_WRONG_CODE - Wrong Command code.
 *
 *******************************************************************************/
-uint32_t Cy_CapSense_CheckCommandIntegrity(uint8_t * commandPacket)
+uint32_t Cy_CapSense_CheckCommandIntegrity(const uint8_t * commandPacket)
 {
     uint32_t cmdCheckStatus = CY_CAPSENSE_COMMAND_OK;
     uint16_t crcValue;
