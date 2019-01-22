@@ -282,7 +282,7 @@ cy_status Cy_CapSense_DeInit(cy_stc_capsense_context_t * context)
 {
     cy_status result = CY_RET_SUCCESS;
 
-    if (CY_CSD_SUCCESS != Cy_CSD_DeInit(context->ptrCommonConfig->ptrCsdBase, CY_CSD_CAPSENSE_KEY, context->ptrCommonConfig->ptrCsdContext))
+    if (CY_CSD_SUCCESS != Cy_CapSense_Save(context))
     {
         result = CY_RET_BAD_DATA;
     }
