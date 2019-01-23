@@ -1,4 +1,5 @@
-/* mbed Microcontroller Library
+/*
+ * mbed Microcontroller Library
  * Copyright (c) 2019 Cypress Semiconductor Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

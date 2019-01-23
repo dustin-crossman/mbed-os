@@ -1,4 +1,4 @@
-Copyright (c) 2019 Cypress Semiconductor.
+Copyright (c) 2018-2019 Cypress Semiconductor Corporation
 
 Permissive Binary License
 
