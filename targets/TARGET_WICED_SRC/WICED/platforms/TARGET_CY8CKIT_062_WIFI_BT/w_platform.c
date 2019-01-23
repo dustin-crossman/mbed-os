@@ -715,16 +715,6 @@ const platform_i2c_t platform_i2c_peripherals[] =
     },
 };
 
-const wiced_i2c_device_t auth_chip_i2c_device =
-{
-
-};
-
-const platform_mfi_auth_chip_t platform_auth_chip =
-{
-
-};
-
 const platform_i2s_port_info_t i2s_port_info =
 {
     .external_clock     = 0,

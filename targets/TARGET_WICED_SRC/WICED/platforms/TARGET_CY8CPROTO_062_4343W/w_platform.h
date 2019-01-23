@@ -250,7 +250,6 @@ typedef enum
 /******************************************************
  *                    Constants
  ******************************************************/
-#define CPUSS_IRQ_NR            167u
 
 /* Define number of buttons present on the platform */
 /* Default placeholder, to be defined per platform */

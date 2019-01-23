@@ -332,7 +332,7 @@ restart:
              * up to the nearest multiple of block size. So, providing temp buffer
              * instead of the original buffer to avoid memory corruption
              */
-            dat.data       = temp_dma_buffer;
+            dat.data       = (uint32_t *)temp_dma_buffer;
         }
 #endif
        /*Enable XFER Done interrupt, and clear CMD and XFER Complete*/
