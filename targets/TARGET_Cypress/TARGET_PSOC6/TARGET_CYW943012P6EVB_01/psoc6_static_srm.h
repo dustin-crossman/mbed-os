@@ -17,31 +17,31 @@
  */
 
 /*
- * This file defines hardware resources reserved by device generated code. These
- * resources are accessed directly by PDL.
+ * This file defines hardware resources reserved by device-generated code. These
+ * resources are accessed directly by the Peripheral Driver library (PDL).
  *
- * There are 4 classes of resources that must be declared here:
- *  - CYCFG_ASSIGNED_PORTS macro defines which ports and pins are reserved.
+ * There are four classes of resources that must be declared here:
+ *  1 CYCFG_ASSIGNED_PORTS macro defines which ports and pins are reserved.
  *    You define these as a colon separated list of ports and pins reserved
- *    using macro SRM_PORT(port_num, pins), one time for each reserved port.
- *    SRM_PORT macro arguments are port number, in the range 0 .. 14 and
- *    pins is a hex value with a bit set for each reserved pin on a port.
+ *    using macro SRM_PORT(port_num, pins), once for each reserved port.
+ *    SRM_PORT macro arguments are port number (in the range 0 ... 14) and
+ *    pins, which is a hex value with a bit set for each reserved pin on a port.
  *
- *  - CYCFG_ASSIGNED_DIVIDERS macro defines which clock dividers are reserved.
+ *  2 CYCFG_ASSIGNED_DIVIDERS macro defines which clock dividers are reserved.
  *    You define these as a colon separated list of dividers reserved
- *    using macro SRM_DIVIDER(type, reservations), one time for each required
- *    devider type.
- *    SRM_DIVIDER arguments are divider type, one of cy_en_divider_types_t
- *    values and reservations is a hex mask value with a bit set for each
- *    reserved divider of a given type.
+ *    using macro SRM_DIVIDER(type, reservations), once for each required
+ *    divider type.
+ *    SRM_DIVIDER arguments are divider type (one of cy_en_divider_types_t
+ *    values) and reservations, which is a hex mask value with a bit set for 
+ *    each reserved divider of a given type.
  *
- *  - CYCFG_ASSIGNED_SCBS macro defines which SCB blocks are reserved.
+ *  3 CYCFG_ASSIGNED_SCBS macro defines which SCB blocks are reserved.
  *    You define these as a colon separated list of SCBs reserved using
- *    macro SRM_SCB(n), which argument is SCB number in a range 0 .. 7.
+ *    macro SRM_SCB(n), which argument is SCB number in a range 0 ... 7.
  *
- *  - CYCFG_ASSIGNED_TCPWM macro defines which TCPWM blocks are reserved.
+ *  4 CYCFG_ASSIGNED_TCPWM macro defines which TCPWM blocks are reserved.
  *    You define these as a colon separated list of TCPWMs reserved using
- *    macro SRM_TCPWM(n), which argument is TCPWM number in a range 0 .. 31.
+ *    macro SRM_TCPWM(n), which argument is TCPWM number in a range 0 ... 31.
  *
  * Examples:
  *    #define CYCFG_ASSIGNED_PORTS		SRM_PORT(0, 0x30), SRM_PORT(5, 0x03)
@@ -56,13 +56,11 @@
 
 /* P0_0 and P0_1 reserved for WCO, 
 *  P1_0 reserved for CSD TX,
-*  P2_0 ... P2_6 reserved for SDHC 
-*  P3_0 ... P3_5 reserved for BT (UART and control pins)
-*  P4_0 reserved for BT device wakeup pin
-*  P6-0, P6-1 reserved for CSD (EZI2C)
+*  P2_0 ... P2_5 reserved for SDHC 
 *  P6-4, P6-6 and P6_7 reserved for SWD,
-*  P7_0 reserved for Debug trace CLK, P7_1, P7_2 and P7_7 reserved for CSD
-*  P8_1 ... P8_7 reserved for CSD 
+*  P7_0 reserved for Debug trace CLK, 
+*  P7_1, P7_2 and P7_7 reserved for CSD Capacitors
+*  P8_1 ... P8_7 reserved for CSD Buttons and Sliders
 *  P9_0 ... P9_3 reserved for Debug Trace 
 *  P11_2 ... P11_7 reserved for QSPI
 *  P12_6 ... P12_7 reserved for ECO
@@ -70,28 +68,21 @@
 *  P14_0 and P14_1 reserved for USB
 */
 #define CYCFG_ASSIGNED_PORTS      SRM_PORT(0, 0x03), SRM_PORT(1, 0x01),\
-                                  SRM_PORT(2, 0x7f), SRM_PORT(3, 0x3f),\
-                                  SRM_PORT(4, 0x01), SRM_PORT(6, 0xd3),\
+                                  SRM_PORT(2, 0x3f), SRM_PORT(6, 0xd0),\
                                   SRM_PORT(7, 0x87), SRM_PORT(8, 0xfe),\
                                   SRM_PORT(9, 0x0f), SRM_PORT(11, 0xfc),\
                                   SRM_PORT(12, 0xc0), SRM_PORT(13, 0x03),\
                                   SRM_PORT(14, 0x03)
 
 /*
-*  8-bit divider 8 reserved for UDB
-*  8-bit divider 1 reserved for CSD
 *  8-bit divider 4 reserved for CSD
-*  8-bit divider 5 reserved for UART
 *  16-bit divider 0 reserved for USB
 */
-#define CYCFG_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x33), \
+#define CYCFG_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x10), \
                                   SRM_DIVIDER(CY_SYSCLK_DIV_16_BIT, 0x01)
                                
-/* SCB 2 reserved for BT UART  
-*  SCB 3 reserved for CSD
-*  SCB 6 reserved for UART
-*/
-#define CYCFG_ASSIGNED_SCBS       SRM_SCB(2), SRM_SCB(3), SRM_SCB(6)
+/* SCB 6 reserved for UART */
+#define CYCFG_ASSIGNED_SCBS       SRM_SCB(6)
 
 #define CYCFG_ASSIGNED_TCPWMS
 

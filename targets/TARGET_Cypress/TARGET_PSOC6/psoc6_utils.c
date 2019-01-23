@@ -457,17 +457,17 @@ void cy_srm_initialize(void)
     }
 
 #if PSOC6_DYNSRM_DISABLE
-#ifdef M0_ASSIGNED_PORTS
-    SRM_INIT_RESOURCE(uint8_t, port_reservations,, M0_ASSIGNED_PORTS);
+#ifdef CYCFG_ASSIGNED_PORTS
+    SRM_INIT_RESOURCE(uint8_t, port_reservations,, CYCFG_ASSIGNED_PORTS);
 #endif
-#ifdef M0_ASSIGNED_DIVIDERS
-    SRM_INIT_RESOURCE(uint32_t, divider_allocations, .reservations, M0_ASSIGNED_DIVIDERS);
+#ifdef CYCFG_ASSIGNED_DIVIDERS
+    SRM_INIT_RESOURCE(uint32_t, divider_allocations, .reservations, CYCFG_ASSIGNED_DIVIDERS);
 #endif
-#ifdef M0_ASSIGNED_SCBS
-    SRM_INIT_RESOURCE(uint8_t, scb_reservations,, M0_ASSIGNED_SCBS);
+#ifdef CYCFG_ASSIGNED_SCBS
+    SRM_INIT_RESOURCE(uint8_t, scb_reservations,, CYCFG_ASSIGNED_SCBS);
 #endif
-#ifdef M0_ASSIGNED_TCPWMS
-    SRM_INIT_RESOURCE(uint8_t, tcpwm_reservations,,  M0_ASSIGNED_TCPWMS);
+#ifdef CYCFG_ASSIGNED_TCPWMS
+    SRM_INIT_RESOURCE(uint8_t, tcpwm_reservations,,  CYCFG_ASSIGNED_TCPWMS);
 #endif
 #endif // PSOC6_DYNSRM_DISABLE
 #endif // defined(TARGET_MCU_PSOC6_M0) || PSOC6_DSRM_DISABLE || !defined(__MBED__)

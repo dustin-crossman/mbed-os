@@ -17,31 +17,31 @@
  */
 
 /*
- * This file defines hardware resources reserved by device generated code. These
- * resources are accessed directly by PDL.
+ * This file defines hardware resources reserved by device-generated code. These
+ * resources are accessed directly by the Peripheral Driver library (PDL).
  *
- * There are 4 classes of resources that must be declared here:
- *  - CYCFG_ASSIGNED_PORTS macro defines which ports and pins are reserved.
+ * There are four classes of resources that must be declared here:
+ *  1 CYCFG_ASSIGNED_PORTS macro defines which ports and pins are reserved.
  *    You define these as a colon separated list of ports and pins reserved
- *    using macro SRM_PORT(port_num, pins), one time for each reserved port.
- *    SRM_PORT macro arguments are port number, in the range 0 .. 14 and
- *    pins is a hex value with a bit set for each reserved pin on a port.
+ *    using macro SRM_PORT(port_num, pins), once for each reserved port.
+ *    SRM_PORT macro arguments are port number (in the range 0 ... 14) and
+ *    pins, which is a hex value with a bit set for each reserved pin on a port.
  *
- *  - CYCFG_ASSIGNED_DIVIDERS macro defines which clock dividers are reserved.
+ *  2 CYCFG_ASSIGNED_DIVIDERS macro defines which clock dividers are reserved.
  *    You define these as a colon separated list of dividers reserved
- *    using macro SRM_DIVIDER(type, reservations), one time for each required
- *    devider type.
- *    SRM_DIVIDER arguments are divider type, one of cy_en_divider_types_t
- *    values and reservations is a hex mask value with a bit set for each
- *    reserved divider of a given type.
+ *    using macro SRM_DIVIDER(type, reservations), once for each required
+ *    divider type.
+ *    SRM_DIVIDER arguments are divider type (one of cy_en_divider_types_t
+ *    values) and reservations, which is a hex mask value with a bit set for 
+ *    each reserved divider of a given type.
  *
- *  - CYCFG_ASSIGNED_SCBS macro defines which SCB blocks are reserved.
+ *  3 CYCFG_ASSIGNED_SCBS macro defines which SCB blocks are reserved.
  *    You define these as a colon separated list of SCBs reserved using
- *    macro SRM_SCB(n), which argument is SCB number in a range 0 .. 7.
+ *    macro SRM_SCB(n), which argument is SCB number in a range 0 ... 7.
  *
- *  - CYCFG_ASSIGNED_TCPWM macro defines which TCPWM blocks are reserved.
+ *  4 CYCFG_ASSIGNED_TCPWM macro defines which TCPWM blocks are reserved.
  *    You define these as a colon separated list of TCPWMs reserved using
- *    macro SRM_TCPWM(n), which argument is TCPWM number in a range 0 .. 31.
+ *    macro SRM_TCPWM(n), which argument is TCPWM number in a range 0 ... 31.
  *
  * Examples:
  *    #define CYCFG_ASSIGNED_PORTS		SRM_PORT(0, 0x30), SRM_PORT(5, 0x03)
