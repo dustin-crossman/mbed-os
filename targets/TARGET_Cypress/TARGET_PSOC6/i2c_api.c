@@ -189,13 +189,11 @@ static cy_en_sysclk_status_t i2c_init_clock(i2c_obj_t *obj, uint32_t speed)
     I2cDividerType divider = select_divider(speed);
 
     if (divider == I2C_INVALID_DIVIDER) {
-        error("i2c: required speed/frequency is out of valid range.");
-        return CY_SYSCLK_BAD_PARAM;
+        error("I2C: required speed/frequency is out of valid range.");
     }
 
     if (allocate_divider(divider) < 0) {
-        error("i2c: cannot allocate clock divider.");
-        return CY_SYSCLK_INVALID_STATE;
+        error("I2C: cannot allocate clock divider.");
     }
 
     obj->divider = divider;
@@ -203,13 +201,12 @@ static cy_en_sysclk_status_t i2c_init_clock(i2c_obj_t *obj, uint32_t speed)
 
     status = Cy_SysClk_PeriphAssignDivider(obj->clock, p_div->div_type, p_div->div_num);
     if (status != CY_SYSCLK_SUCCESS) {
-        error("i2c: cannot assign clock divider.");
-        return status;
+        error("I2C: cannot assign clock divider.");
     }
 
     /* Set desired speed/frequency */
     obj->actual_speed = Cy_SCB_I2C_SetDataRate(obj->base, speed, p_div->clk_frequency);
-    return (obj->actual_speed != 0)? CY_SYSCLK_SUCCESS : CY_SYSCLK_BAD_PARAM;
+    return (obj->actual_speed != 0) ? CY_SYSCLK_SUCCESS : CY_SYSCLK_BAD_PARAM;
 }
 
 /*
@@ -339,14 +336,38 @@ void i2c_frequency(i2c_t *obj_in, int hz)
 
 int  i2c_start(i2c_t *obj_in)
 {
-    // Unsupported, start condition is sent automatically.
-    return 0;
+    i2c_obj_t *obj = OBJ_P(obj_in);
+
+    if (CY_SCB_I2C_IDLE == obj->context.state)
+    {
+        /* Set the read or write direction */
+        obj->context.state = CY_SCB_I2C_MASTER_ADDR;
+
+        /* Clean up the hardware before a transfer. Note RX FIFO is empty at here */
+        Cy_SCB_ClearMasterInterrupt(obj->base, CY_SCB_I2C_MASTER_INTR_ALL);
+        Cy_SCB_ClearRxInterrupt    (obj->base, CY_SCB_RX_INTR_NOT_EMPTY);
+        Cy_SCB_ClearTxFifo(obj->base);
+
+        /* Generate a Start and send address byte */
+        SCB_I2C_M_CMD(obj->base)= SCB_I2C_M_CMD_M_START_ON_IDLE_Msk;
+
+        /* Wait until Start is generated */
+        while (0 != (SCB_I2C_M_CMD(obj->base) & SCB_I2C_M_CMD_M_START_ON_IDLE_Msk))
+        {
+        }
+
+        return 0;
+    }
+
+    return (-1);
 }
 
 int  i2c_stop(i2c_t *obj_in)
 {
-    // Unsupported, stop condition is sent automatically.
-    return 0;
+    i2c_obj_t *obj = OBJ_P(obj_in);
+    cy_en_scb_i2c_status_t status = Cy_SCB_I2C_MasterSendStop(obj->base, obj->timeout, &obj->context);
+
+    return i2c_convert_status(status);
 }
 
 int i2c_read(i2c_t *obj_in, int address, char *data, int length, int stop)
@@ -423,27 +444,44 @@ int i2c_write(i2c_t *obj_in, int address, const char *data, int length, int stop
 
 void i2c_reset(i2c_t *obj_in)
 {
-    i2c_stop(obj_in);
+    i2c_obj_t *obj = OBJ_P(obj_in);
+
+    /* Back block into default state */
+    Cy_SCB_FwBlockReset(obj->base);
+    obj->context.state = CY_SCB_I2C_IDLE;  
 }
 
 int i2c_byte_read(i2c_t *obj_in, int last)
 {
     i2c_obj_t *obj = OBJ_P(obj_in);
     uint8_t tmp_byte = 0;
-    cy_en_scb_i2c_command_t ack = last? CY_SCB_I2C_NAK : CY_SCB_I2C_ACK;
+    cy_en_scb_i2c_command_t ack = last ? CY_SCB_I2C_NAK : CY_SCB_I2C_ACK;
+
+    /* i2c_start and i2c_byte_write was called. Update state to receive data */
+    if (CY_SCB_I2C_MASTER_TX == obj->context.state) {
+        obj->context.state = CY_SCB_I2C_MASTER_RX0;
+    }
+
     cy_en_scb_i2c_status_t status = Cy_SCB_I2C_MasterReadByte(obj->base, ack, &tmp_byte, obj->timeout, &obj->context);
 
     if (status == CY_SCB_I2C_SUCCESS) {
         return tmp_byte;
     } else {
-        return 0;
+        return (-1);
     }
 }
 
 int i2c_byte_write(i2c_t *obj_in, int data)
 {
     i2c_obj_t *obj = OBJ_P(obj_in);
+
+    /* i2c_start was called update state to receive data */
+    if (CY_SCB_I2C_MASTER_ADDR == obj->context.state) {
+        obj->context.state = CY_SCB_I2C_MASTER_TX;
+    }
+
     cy_en_scb_i2c_status_t status = Cy_SCB_I2C_MasterWriteByte(obj->base, (uint8_t)data, obj->timeout, &obj->context);
+
     switch (status) {
         case CY_SCB_I2C_MASTER_MANUAL_TIMEOUT:
             return 2;
@@ -453,7 +491,7 @@ int i2c_byte_write(i2c_t *obj_in, int data)
         case CY_SCB_I2C_SUCCESS:
             return 1;
         default:
-            // Error has occurred.
+            /* Error has occurred */
             return (-1);
     }
 }
