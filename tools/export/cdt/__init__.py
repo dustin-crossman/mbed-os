@@ -15,7 +15,7 @@ _eclipse_defs = os.path.join(
 with open(_eclipse_defs, 'r') as f:
     _CONFIGS_OPTIONS = json.load(f)
 
-supported_launches = ['debug', 'program']
+supported_launches = ['debug', 'program', 'erase']
 
 class Eclipse(Makefile):
     """Generic Eclipse project. Intended to be subclassed by classes that

@@ -31,6 +31,14 @@
       "coreLoadImage": "false",
       "coreLoadSymbols": "false",
       "setStopAt": "false"
+    },
+    "erase": {
+      "doContinue": "false",
+      "doSecondReset": "false",
+      "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3333&#13;&#10;mon reset halt&#13;&#10;mon erase --chip&#13;&#10;mon reset&#13;&#10;quit",
+      "coreLoadImage": "false",
+      "coreLoadSymbols": "false",
+      "setStopAt": "false"
     }
   },
 
@@ -45,6 +53,9 @@
       },
       "program": {
         "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;load&#13;&#10;mon reset&#13;&#10;quit"
+      },
+      "erase": {
+        "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;mon erase --chip&#13;&#10;mon reset&#13;&#10;quit"
       }
     },
 
@@ -58,6 +69,9 @@
       },
       "program": {
         "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;load&#13;&#10;mon reset&#13;&#10;quit"
+      },
+      "erase": {
+        "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;mon erase --chip&#13;&#10;mon reset&#13;&#10;quit"
       }
     },
 
@@ -71,6 +85,9 @@
       },
       "program": {
         "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;load&#13;&#10;mon reset&#13;&#10;quit"
+      },
+      "erase": {
+        "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;mon erase --chip&#13;&#10;mon reset&#13;&#10;quit"
       }
     },
 
@@ -84,6 +101,9 @@
       },
       "program": {
         "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;load&#13;&#10;mon reset&#13;&#10;quit"
+      },
+      "erase": {
+        "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;mon erase --chip&#13;&#10;mon reset&#13;&#10;quit"
       }
     },
 
@@ -97,6 +117,9 @@
       },
       "program": {
         "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;load&#13;&#10;mon reset&#13;&#10;quit"
+      },
+      "erase": {
+        "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;mon erase --chip&#13;&#10;mon reset&#13;&#10;quit"
       }
     },
 
@@ -110,6 +133,9 @@
       },
       "program": {
         "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;load&#13;&#10;mon reset&#13;&#10;quit"
+      },
+      "erase": {
+        "gdbClientOtherCommands": "set mem inaccessible-by-default off&#13;&#10;target remote localhost:3334&#13;&#10;mon reset halt&#13;&#10;mon erase --chip&#13;&#10;mon reset&#13;&#10;quit"
       }
     }
   }
