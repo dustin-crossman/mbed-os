@@ -41,6 +41,28 @@
 ;* limitations under the License.
 ;******************************************************************************/
 
+#if !defined(MBED_ROM_START)
+  #define MBED_ROM_START    0x10002000
+#endif
+
+#if !defined(MBED_ROM_SIZE)
+  #define MBED_ROM_SIZE     0x000FE000
+#endif
+
+#if !defined(MBED_RAM_START)
+  #define MBED_RAM_START    0x08002000
+#endif
+
+#if !defined(MBED_RAM_SIZE)
+  #define MBED_RAM_SIZE     0x00045800
+#endif
+
+#if !defined(MBED_BOOT_STACK_SIZE)
+  #define MBED_BOOT_STACK_SIZE 0x1000
+#endif
+
+#define Stack_Size MBED_BOOT_STACK_SIZE
+
 ; The defines below describe the location and size of blocks of memory in the target.
 ; Use these defines to specify the memory regions available for allocation.
 
@@ -51,11 +73,11 @@
 ; Your changes must be aligned with the corresponding defines for CM0+ core in 'xx_cm0plus.scat',
 ; where 'xx' is the device group; for example, 'cy8c6xx7_cm0plus.scat'.
 ; RAM
-#define RAM_START               0x08002000
-#define RAM_SIZE                0x00045800
+#define RAM_START               MBED_RAM_START
+#define RAM_SIZE                MBED_RAM_SIZE
 ; Flash
-#define FLASH_START             0x10002000
-#define FLASH_SIZE              0x000FE000
+#define FLASH_START             MBED_ROM_START
+#define FLASH_SIZE              MBED_ROM_SIZE
 
 ; The following defines describe a 32K flash region used for EEPROM emulation.
 ; This region can also be used as the general purpose flash.
@@ -126,6 +148,10 @@ LR_IROM1 FLASH_START FLASH_SIZE
         * (.noinit)
     }
 
+    ; Stack region growing down
+    ARM_LIB_STACK RAM_START + RAM_SIZE EMPTY - Stack_Size 
+    {
+    }
 
     ; Used for the digital signature of the secure application and the
     ; Bootloader SDK application. The size of the section depends on the required
