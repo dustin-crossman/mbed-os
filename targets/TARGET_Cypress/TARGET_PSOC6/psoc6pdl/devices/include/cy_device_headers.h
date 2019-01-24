@@ -5,14 +5,23 @@
 * Common header file to be included by the drivers.
 *
 * \note
-* Generator version: 1.4.0.1230
+* Generator version: 1.4.0.1232
 *
 ********************************************************************************
 * \copyright
-* Copyright 2016-2019, Cypress Semiconductor Corporation. All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions,
-* disclaimers, and limitations in the end user license agreement accompanying
-* the software package with which this file was provided.
+* Copyright 2016-2019 Cypress Semiconductor Corporation
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
 *******************************************************************************/
 
 #ifndef _CY_DEVICE_HEADERS_H_
@@ -124,6 +133,20 @@
     #include "cy8c6247bfi_d54.h"
 #elif defined (CYBLE_416045_02)
     #include "cyble_416045_02.h"
+#elif defined (CY8C6347FMI_BUD53)
+    #include "cy8c6347fmi_bud53.h"
+#elif defined (CY8C6347FMI_BUD13)
+    #include "cy8c6347fmi_bud13.h"
+#elif defined (CY8C6347FMI_BUD43)
+    #include "cy8c6347fmi_bud43.h"
+#elif defined (CY8C6347FMI_BUD33)
+    #include "cy8c6347fmi_bud33.h"
+#elif defined (CY8C6137WI_F54)
+    #include "cy8c6137wi_f54.h"
+#elif defined (CY8C6117WI_F34)
+    #include "cy8c6117wi_f34.h"
+#elif defined (CY8C6247WI_D54)
+    #include "cy8c6247wi_d54.h"
 #elif defined (CY8C624ABZI_D44)
     #include "cy8c624abzi_d44.h"
 #elif defined (CY8C624AAZI_D44)

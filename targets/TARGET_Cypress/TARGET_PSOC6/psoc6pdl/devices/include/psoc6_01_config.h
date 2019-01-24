@@ -5,14 +5,23 @@
 * PSoC6_01 device configuration header
 *
 * \note
-* Generator version: 1.3.6934.1396
+* Generator version: 1.4.0.1232
 *
 ********************************************************************************
 * \copyright
-* Copyright 2016-2019, Cypress Semiconductor Corporation. All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions,
-* disclaimers, and limitations in the end user license agreement accompanying
-* the software package with which this file was provided.
+* Copyright 2016-2019 Cypress Semiconductor Corporation
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
 *******************************************************************************/
 
 #ifndef _PSOC6_01_CONFIG_H_
@@ -2456,6 +2465,8 @@ typedef PDM_V1_Type PDM_Type;
 #define EFUSE_EFUSE_NR                  4u
 /* SONOS Flash is used or not ('0': no, '1': yes) */
 #define SFLASH_FLASHC_IS_SONOS          1u
+/* CPUSS_WOUNDING_PRESENT or not ('0': no, '1': yes) */
+#define SFLASH_CPUSS_WOUNDING_PRESENT   1u
 /* Number of UDB Interrupts */
 #define UDB_NUMINT                      16u
 /* Number of triggers */
