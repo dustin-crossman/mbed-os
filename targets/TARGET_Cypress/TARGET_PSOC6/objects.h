@@ -69,6 +69,7 @@ struct port_s {
 struct serial_s {
     CySCB_Type                  *base;
     uint32_t                    serial_id;
+    bool                        already_reserved;
     PinName                     pin_rx;
     PinName                     pin_tx;
     PinName                     pin_cts;
@@ -99,6 +100,7 @@ struct serial_s {
 struct spi_s {
     CySCB_Type                          *base;
     uint32_t                            spi_id;
+    bool                                already_reserved;    
     PinName                             pin_miso;
     PinName                             pin_mosi;
     PinName                             pin_sclk;
@@ -137,6 +139,7 @@ struct spi_s {
 struct i2c_s {
     CySCB_Type                          *base;
     uint32_t                            i2c_id;
+    bool                                already_reserved;
     PinName                             pin_sda;
     PinName                             pin_scl;
     en_clk_dst_t                        clock;
