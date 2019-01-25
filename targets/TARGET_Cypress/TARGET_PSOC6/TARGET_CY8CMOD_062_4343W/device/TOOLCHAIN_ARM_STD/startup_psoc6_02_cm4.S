@@ -33,7 +33,7 @@
                 IF :DEF:__STACK_SIZE
 Stack_Size      EQU     __STACK_SIZE
                 ELSE
-Stack_Size      EQU     0x00001000
+Stack_Size      EQU     0x00000400
                 ENDIF
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
 Stack_Mem       SPACE   Stack_Size
