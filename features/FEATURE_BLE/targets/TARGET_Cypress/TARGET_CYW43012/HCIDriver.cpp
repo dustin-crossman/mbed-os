@@ -75,29 +75,9 @@ public:
 
     virtual void do_initialize()
     {
-        //output_mode(bt_host_wake_name, 1);
-        //Cy_GPIO_Pin_FastInit( BT_HOST_WAKE_PORT, BT_HOST_WAKE_PIN, \
-        //    BT_HOST_WAKE_config.driveMode, BT_HOST_WAKE_config.outVal, BT_HOST_WAKE_config.hsiom );
-
-        //output_mode(bt_device_wake_name, 0);
-        //Cy_GPIO_Pin_FastInit( BT_DEVICE_WAKE_PORT, BT_DEVICE_WAKE_PIN, \
-        //    BT_DEVICE_WAKE_config.driveMode, BT_DEVICE_WAKE_config.outVal, BT_DEVICE_WAKE_config.hsiom );
-        
-        //output_mode(bt_power_name, 1);
-        //Cy_GPIO_Pin_FastInit( BT_POWER_PORT, BT_POWER_PIN, \
-        //    BT_POWER_config.driveMode, BT_POWER_config.outVal, BT_POWER_config.hsiom );
-        
-        wait_ms(500);
-
-        //bt_device_wake = 0;
-
-        //DigitalInOut bt_host_wake;
-        
         Cy_GPIO_Clr(BT_DEVICE_WAKE_PORT, BT_DEVICE_WAKE_PIN);
-
         wait_ms(500);
 
-        //bt_power = 1;
         Cy_GPIO_Set(BT_POWER_PORT, BT_POWER_PIN);
         wait_ms(500);
     }
