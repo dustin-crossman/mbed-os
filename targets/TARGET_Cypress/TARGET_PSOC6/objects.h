@@ -174,16 +174,16 @@ struct i2c_s {
 #include "cy_tcpwm.h"
 
 struct pwmout_s {
-    TCPWM_Type *base;
-    PinName pin;
-    uint32_t counter_id;
-    uint32_t clock;
-    uint32_t period;
-    uint32_t pulse_width;
-    uint32_t prescaler;
+    TCPWM_Type  *base;
+    PinName      pin;
+    uint32_t     counter_id;
+    en_clk_dst_t clock;
+    uint32_t     period;
+    uint32_t     pulse_width;
+    uint32_t     prescaler;
 #if DEVICE_SLEEP && DEVICE_LPTICKER
-    cy_stc_syspm_callback_params_t      pm_callback_params;
-    cy_stc_syspm_callback_t             pm_callback_handler;
+    cy_stc_syspm_callback_params_t pm_callback_params;
+    cy_stc_syspm_callback_t        pm_callback_handler;
 #endif
 };
 #endif // DEVICE_PWMOUT
@@ -195,7 +195,7 @@ struct analogin_s {
     SAR_Type *base;
     PinName pin;
     uint32_t channel_mask;
-    uint32_t clock;
+    en_clk_dst_t clock;
 };
 #endif // DEVICE_ANALOGIN
 
@@ -205,7 +205,7 @@ struct analogin_s {
 struct dac_s {
     CTDAC_Type *base;
     PinName pin;
-    uint32_t clock;
+    en_clk_dst_t clock;
 };
 #endif // DEVICE_ANALOGOUT
 
