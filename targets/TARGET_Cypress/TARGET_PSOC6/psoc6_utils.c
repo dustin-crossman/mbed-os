@@ -140,7 +140,7 @@ typedef struct {
 } divider_alloc_t;
 
 static divider_alloc_t divider_allocations[CY_NUM_DIVIDER_TYPES] = {
-    { PERI_DIV_8_NR - 1,    2,  DEFAULT_DIVIDER8_RES },   // CY_SYSCLK_DIV_8_BIT
+    { PERI_DIV_8_NR - 1,    0,  DEFAULT_DIVIDER8_RES },   // CY_SYSCLK_DIV_8_BIT
     { PERI_DIV_16_NR - 1,   0,  DEFAULT_DIVIDER_RES },    // CY_SYSCLK_DIV_16_BIT
     { PERI_DIV_16_5_NR - 1, 0,  DEFAULT_DIVIDER_RES },    // CY_SYSCLK_DIV_16_5_BIT
     { PERI_DIV_24_5_NR - 1, 0,  DEFAULT_DIVIDER_RES }     // CY_SYSCLK_DIV_24_5_BIT
@@ -246,20 +246,35 @@ uint32_t cy_clk_allocate_divider(cy_en_divider_types_t div_type)
     divider_alloc_t *p_alloc = &divider_allocations[div_type];
 
     MBED_ASSERT(div_type < CY_NUM_DIVIDER_TYPES);
+    MBED_ASSERT(p_alloc->current_index < p_alloc->max_index);
 
     core_util_critical_section_enter();
 
-    MBED_ASSERT(p_alloc->current_index < p_alloc->max_index);
+    // Try to reserve current divider
+    divider = cy_clk_reserve_divider(div_type, p_alloc->current_index);
 
+    if (CY_INVALID_DIVIDER == divider) {
 
-    for ( uint32_t first_index = p_alloc->current_index;
-            CY_INVALID_DIVIDER == (divider = cy_clk_reserve_divider(div_type, p_alloc->current_index));
-            ++p_alloc->current_index) {
+        // Store current index
+        uint32_t first_index = p_alloc->current_index;
+
+        // Move index forward before start circular search
+        ++p_alloc->current_index;
         if (p_alloc->current_index > p_alloc->max_index) {
             p_alloc->current_index = 0;
         }
-        if (p_alloc->current_index == first_index) {
-            break;
+
+        // Execute circular divider search
+        for (; (CY_INVALID_DIVIDER == (divider = cy_clk_reserve_divider(div_type, p_alloc->current_index)));
+                ++p_alloc->current_index) {
+
+            if (p_alloc->current_index > p_alloc->max_index) {
+                p_alloc->current_index = 0;
+            }
+
+            if (p_alloc->current_index == first_index) {
+                break;
+            }
         }
     }
 
@@ -277,6 +292,7 @@ int cy_reserve_scb(uint32_t scb_num)
         core_util_critical_section_enter();
         if (scb_reservations[scb_num] == 0) {
             scb_reservations[scb_num] = 1;
+            result = 0;
         }
         core_util_critical_section_exit();
     }
@@ -292,6 +308,7 @@ void cy_free_scb(uint32_t scb_num)
         core_util_critical_section_enter();
         if (scb_reservations[scb_num] == 1) {
             scb_reservations[scb_num] = 0;
+            result = 0;
         }
         core_util_critical_section_exit();
     }
@@ -376,7 +393,7 @@ IRQn_Type cy_m0_nvic_reserve_channel(IRQn_Type channel, uint32_t channel_id)
 
     core_util_critical_section_enter();
     if (irq_channels[chn]) {
-        channel =  (IRQn_Type)(-1);
+        channel = (IRQn_Type)(-1);
     } else {
         irq_channels[chn] = channel_id;
     }
@@ -455,17 +472,17 @@ void cy_srm_initialize(void)
     }
 
 #if PSOC6_DYNSRM_DISABLE
-#ifdef M0_ASSIGNED_PORTS
-    SRM_INIT_RESOURCE(uint8_t, port_reservations,, M0_ASSIGNED_PORTS);
+#ifdef CYCFG_ASSIGNED_PORTS
+    SRM_INIT_RESOURCE(uint8_t, port_reservations,, CYCFG_ASSIGNED_PORTS);
 #endif
-#ifdef M0_ASSIGNED_DIVIDERS
-    SRM_INIT_RESOURCE(uint32_t, divider_allocations, .reservations, M0_ASSIGNED_DIVIDERS);
+#ifdef CYCFG_ASSIGNED_DIVIDERS
+    SRM_INIT_RESOURCE(uint32_t, divider_allocations, .reservations, CYCFG_ASSIGNED_DIVIDERS);
 #endif
-#ifdef M0_ASSIGNED_SCBS
-    SRM_INIT_RESOURCE(uint8_t, scb_reservations,, M0_ASSIGNED_SCBS);
+#ifdef CYCFG_ASSIGNED_SCBS
+    SRM_INIT_RESOURCE(uint8_t, scb_reservations,, CYCFG_ASSIGNED_SCBS);
 #endif
-#ifdef M0_ASSIGNED_TCPWMS
-    SRM_INIT_RESOURCE(uint8_t, tcpwm_reservations,,  M0_ASSIGNED_TCPWMS);
+#ifdef CYCFG_ASSIGNED_TCPWMS
+    SRM_INIT_RESOURCE(uint8_t, tcpwm_reservations,,  CYCFG_ASSIGNED_TCPWMS);
 #endif
 #endif // PSOC6_DYNSRM_DISABLE
 #endif // defined(TARGET_MCU_PSOC6_M0) || PSOC6_DSRM_DISABLE || !defined(__MBED__)
