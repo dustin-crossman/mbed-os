@@ -175,7 +175,7 @@ typedef enum {
 
     SWITCH2     = P0_4,
     LED1        = P13_7,
-    LED2        = NC,
+    LED2        = LED1,
     LED3        = NC,
     LED4        = NC,
     LED_RED     = LED1,
