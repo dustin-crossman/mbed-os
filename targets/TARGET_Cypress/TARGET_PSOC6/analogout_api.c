@@ -66,7 +66,6 @@ static void ctdac_init(dac_t *obj)
         dac_clock_divider = cy_clk_allocate_divider(CY_SYSCLK_DIV_8_BIT);
         if (dac_clock_divider == CY_INVALID_DIVIDER) {
             error("CTDAC clock divider allocation failed.");
-            return;
         }
         Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_8_BIT,
                                    dac_clock_divider,
@@ -103,6 +102,14 @@ void analogout_init(dac_t *obj, PinName pin)
         dac_function = pinmap_function(pin, PinMap_DAC);
         obj->clock = CY_PIN_CLOCK(dac_function);
         pin_function(pin, dac_function);
+        
+        if (P9_6 != pin) {
+            const PinName directOutput = P9_6; 
+
+            /* Connect P9_6 to the AMUXA bus to drive output */
+            Cy_GPIO_SetHSIOM(Cy_GPIO_PortToAddr(CY_PORT(directOutput)), CY_PIN(directOutput), HSIOM_SEL_AMUXA);
+        }
+        
         ctdac_init(obj);
         
     } else {

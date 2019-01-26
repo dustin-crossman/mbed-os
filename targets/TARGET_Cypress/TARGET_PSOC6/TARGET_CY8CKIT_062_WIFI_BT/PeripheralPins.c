@@ -427,7 +427,8 @@ const PinMap PinMap_ADC[] = {
 
 #if DEVICE_ANALOGOUT
 const PinMap PinMap_DAC[] = {
-    {P9_6, DAC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_CTDAC)},
+    {P9_6,  DAC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_CTDAC)},
+    {P10_5, DAC_0, CY_PIN_FUNCTION(HSIOM_SEL_AMUXA, PCLK_PASS_CLOCK_CTDAC, AnalogMode, 0)},  // CTDAC connects to the P10_5 pin through the AMUXA bus
     {NC,    NC,     0}
 };
 #endif // DEVICE_ANALOGIN
