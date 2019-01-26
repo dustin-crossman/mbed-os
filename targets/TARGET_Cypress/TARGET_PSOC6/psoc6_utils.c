@@ -140,7 +140,7 @@ typedef struct {
 } divider_alloc_t;
 
 static divider_alloc_t divider_allocations[CY_NUM_DIVIDER_TYPES] = {
-    { PERI_DIV_8_NR - 1,    2,  DEFAULT_DIVIDER8_RES },   // CY_SYSCLK_DIV_8_BIT
+    { PERI_DIV_8_NR - 1,    0,  DEFAULT_DIVIDER8_RES },   // CY_SYSCLK_DIV_8_BIT
     { PERI_DIV_16_NR - 1,   0,  DEFAULT_DIVIDER_RES },    // CY_SYSCLK_DIV_16_BIT
     { PERI_DIV_16_5_NR - 1, 0,  DEFAULT_DIVIDER_RES },    // CY_SYSCLK_DIV_16_5_BIT
     { PERI_DIV_24_5_NR - 1, 0,  DEFAULT_DIVIDER_RES }     // CY_SYSCLK_DIV_24_5_BIT
@@ -246,20 +246,35 @@ uint32_t cy_clk_allocate_divider(cy_en_divider_types_t div_type)
     divider_alloc_t *p_alloc = &divider_allocations[div_type];
 
     MBED_ASSERT(div_type < CY_NUM_DIVIDER_TYPES);
+    MBED_ASSERT(p_alloc->current_index < p_alloc->max_index);
 
     core_util_critical_section_enter();
 
-    MBED_ASSERT(p_alloc->current_index < p_alloc->max_index);
+    // Try to reserve current divider
+    divider = cy_clk_reserve_divider(div_type, p_alloc->current_index);
 
+    if (CY_INVALID_DIVIDER == divider) {
 
-    for ( uint32_t first_index = p_alloc->current_index;
-            CY_INVALID_DIVIDER == (divider = cy_clk_reserve_divider(div_type, p_alloc->current_index));
-            ++p_alloc->current_index) {
+        // Store current index
+        uint32_t first_index = p_alloc->current_index;
+        
+        // Move index forward before start circular search
+        ++p_alloc->current_index;
         if (p_alloc->current_index > p_alloc->max_index) {
             p_alloc->current_index = 0;
         }
-        if (p_alloc->current_index == first_index) {
-            break;
+            
+        // Execute circular divider search
+        for ( ; (CY_INVALID_DIVIDER == (divider = cy_clk_reserve_divider(div_type, p_alloc->current_index)));
+                ++p_alloc->current_index) {
+                  
+            if (p_alloc->current_index > p_alloc->max_index) {
+                p_alloc->current_index = 0;
+            }
+        
+            if (p_alloc->current_index == first_index) {
+                break;
+            }
         }
     }
 
