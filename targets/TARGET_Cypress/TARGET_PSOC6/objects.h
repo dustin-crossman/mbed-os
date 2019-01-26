@@ -188,7 +188,7 @@ struct pwmout_s {
 };
 #endif // DEVICE_PWMOUT
 
-#ifdef DEVICE_ANALOGIN
+#if DEVICE_ANALOGIN
 #include "cy_sar.h"
 
 struct analogin_s {
@@ -199,7 +199,7 @@ struct analogin_s {
 };
 #endif // DEVICE_ANALOGIN
 
-#ifdef DEVICE_ANALOGOUT
+#if DEVICE_ANALOGOUT
 #include "cy_ctdac.h"
 
 struct dac_s {
@@ -209,7 +209,7 @@ struct dac_s {
 };
 #endif // DEVICE_ANALOGOUT
 
-#ifdef DEVICE_FLASH
+#if DEVICE_FLASH
 struct flash_s {
     /*  nothing to be stored for now */
     void *dummy;
@@ -222,15 +222,6 @@ struct trng_s {
     void *dummy;
 };
 #endif // DEVICE_TRNG
-
-#if DEVICE_CAPSENSE
-#include "cy_capsense.h"
-
-typedef struct {
-    cy_stc_capsense_context_t * ptrContext;
-} capsense_t;
-
-#endif /* DEVICE_CAPSENSE */
 
 #ifdef __cplusplus
 }
