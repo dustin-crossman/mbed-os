@@ -44,7 +44,7 @@ extern "C" uint32_t Set_GPIO_Clock(uint32_t port_idx);
 
 namespace ble {
 namespace vendor {
-namespace wise1530 {
+namespace cypress {
 
 class HCIDriver : public cordio::CordioHCIDriver {
 public:
@@ -323,7 +323,7 @@ private:
         // update service pack index
         service_pack_index += (HCI_CMD_HDR_LEN + service_pack_ptr[service_pack_index + 2]);
 
-        if (service_pack_index < service_pack_length) {
+        if (service_pack_index < (size_t)service_pack_length) {
             send_service_pack_command();
         } else {
             (this->*service_pack_next)();
@@ -412,7 +412,7 @@ private:
 
 };
 
-} // namespace wise1530
+} // namespace cypress
 } // namespace vendor
 } // namespace ble
 
@@ -421,7 +421,7 @@ ble::vendor::cordio::CordioHCIDriver& ble_cordio_get_hci_driver() {
         /* TX */ CY_BT_UART_TX, /* RX */ CY_BT_UART_RX,
         /* cts */ CY_BT_UART_CTS, /* rts */ CY_BT_UART_RTS, 115200
     );
-    static ble::vendor::wise1530::HCIDriver hci_driver(
+    static ble::vendor::cypress::HCIDriver hci_driver(
         transport_driver, /* host wake */ CY_BT_PIN_HOST_WAKE,
         /* device wake */ CY_BT_PIN_DEVICE_WAKE, /* bt_power */ CY_BT_PIN_POWER
     );
