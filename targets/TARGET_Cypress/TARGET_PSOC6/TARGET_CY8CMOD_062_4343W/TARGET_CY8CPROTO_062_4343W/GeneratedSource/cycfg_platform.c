@@ -18,7 +18,7 @@
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
+* See the License for the specific language governing permissions and 
 * limitations under the License.
 ********************************************************************************/
 
@@ -57,18 +57,13 @@
 #define CY_CFG_SYSCLK_CLKPATH4_SOURCE CY_SYSCLK_CLKPATH_IN_IMO
 #define CY_CFG_SYSCLK_CLKPERI_ENABLED 1
 #define CY_CFG_SYSCLK_CLKSLOW_ENABLED 1
+#define CY_CFG_SYSCLK_WCO_ENABLED 1
 #define CY_CFG_PWR_ENABLED 1
 #define CY_CFG_PWR_USING_LDO 1
 #define CY_CFG_PWR_USING_PMIC 0
 #define CY_CFG_PWR_VBAC_SUPPLY CY_CFG_PWR_VBAC_SUPPLY_VDD
 #define CY_CFG_PWR_LDO_VOLTAGE CY_SYSPM_LDO_VOLTAGE_1_1V
 #define CY_CFG_PWR_USING_ULP 0
-#define CY_CFG_PWR_VDDA_MV 3300
-#define CY_CFG_PWR_VDDD_MV 3300
-#define CY_CFG_PWR_VBACKUP_MV 3300
-#define CY_CFG_PWR_VDD_NS_MV 3300
-#define CY_CFG_PWR_VDDIO0_MV 3300
-#define CY_CFG_PWR_VDDIO1_MV 3300
 
 static const cy_stc_fll_manual_config_t srss_0_clock_0_fll_0_fllConfig = 
 {
@@ -134,7 +129,7 @@ __STATIC_INLINE void Cy_SysClk_IloInit()
 __STATIC_INLINE void Cy_SysClk_ClkLfInit()
 {
     /* The WDT is unlocked in the default startup code */
-    Cy_SysClk_ClkLfSetSource(CY_SYSCLK_CLKLF_IN_ILO);
+    Cy_SysClk_ClkLfSetSource(CY_SYSCLK_CLKLF_IN_WCO);
 }
 __STATIC_INLINE void Cy_SysClk_ClkPath0Init()
 {
@@ -163,6 +158,15 @@ __STATIC_INLINE void Cy_SysClk_ClkPeriInit()
 __STATIC_INLINE void Cy_SysClk_ClkSlowInit()
 {
     Cy_SysClk_ClkSlowSetDivider(0U);
+}
+__STATIC_INLINE void Cy_SysClk_WcoInit()
+{
+    (void)Cy_GPIO_Pin_FastInit(GPIO_PRT0, 0U, 0x00U, 0x00U, HSIOM_SEL_GPIO);
+    (void)Cy_GPIO_Pin_FastInit(GPIO_PRT0, 1U, 0x00U, 0x00U, HSIOM_SEL_GPIO);
+    if (CY_SYSCLK_SUCCESS != Cy_SysClk_WcoEnable(1000000UL))
+    {
+        cycfg_ClockStartupError(CY_CFG_SYSCLK_WCO_ERROR);
+    }
 }
 
 
@@ -206,9 +210,6 @@ void init_cycfg_platform(void)
 	Cy_SysClk_FllDisable();
 	Cy_SysClk_ClkPathSetSource(CY_SYSCLK_CLKHF_IN_CLKPATH0, CY_SYSCLK_CLKPATH_IN_IMO);
 	Cy_SysClk_ClkHfSetSource(0UL, CY_SYSCLK_CLKHF_IN_CLKPATH0);
-	#ifdef CY_IP_MXBLESS
-	(void)Cy_BLE_EcoReset();
-	#endif
 	
 	#ifdef CY_CFG_SYSCLK_PLL1_AVAILABLE
 	(void)Cy_SysClk_PllDisable(CY_SYSCLK_CLKHF_IN_CLKPATH2);

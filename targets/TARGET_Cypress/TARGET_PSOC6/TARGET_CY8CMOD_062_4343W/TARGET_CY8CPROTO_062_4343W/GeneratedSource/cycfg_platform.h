@@ -18,7 +18,7 @@
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
+* See the License for the specific language governing permissions and 
 * limitations under the License.
 ********************************************************************************/
 
@@ -27,12 +27,20 @@
 
 #include "cycfg_notices.h"
 #include "cy_sysclk.h"
-#include "cy_ble_clk.h"
+#include "cy_gpio.h"
 #include "cy_syspm.h"
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
+#define CY_CFG_SYSCLK_CLKLF_FREQ_HZ 32768
+#define CY_CFG_PWR_VDDA_MV 3300
+#define CY_CFG_PWR_VDDD_MV 3300
+#define CY_CFG_PWR_VBACKUP_MV 3300
+#define CY_CFG_PWR_VDD_NS_MV 3300
+#define CY_CFG_PWR_VDDIO0_MV 3300
+#define CY_CFG_PWR_VDDIO1_MV 3300
 
 void init_cycfg_platform(void);
 

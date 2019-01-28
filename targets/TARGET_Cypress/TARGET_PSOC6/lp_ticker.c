@@ -41,7 +41,7 @@
 #define LPT_MCWDT_DELAY_WAIT    0                // Recommended value is 93, but then we fail function execution time test.
 
 #if !defined (CY_CFG_SYSCLK_CLKLF_FREQ_HZ)
-    #define CY_CFG_SYSCLK_CLKLF_FREQ_HZ    32000UL  /* Default to 32K ILO */
+    #define CY_CFG_SYSCLK_CLKLF_FREQ_HZ    32768UL  /* Default to 32K ILO */
 #endif /* CY_CFG_SYSCLK_CLKLF_FREQ_HZ */
 
 static const ticker_info_t lp_ticker_info = {

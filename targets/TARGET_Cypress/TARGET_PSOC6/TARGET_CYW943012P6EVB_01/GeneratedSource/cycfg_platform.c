@@ -18,7 +18,7 @@
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
+* See the License for the specific language governing permissions and 
 * limitations under the License.
 ********************************************************************************/
 
@@ -265,9 +265,6 @@ void init_cycfg_platform(void)
 	Cy_SysClk_FllDisable();
 	Cy_SysClk_ClkPathSetSource(CY_SYSCLK_CLKHF_IN_CLKPATH0, CY_SYSCLK_CLKPATH_IN_IMO);
 	Cy_SysClk_ClkHfSetSource(0UL, CY_SYSCLK_CLKHF_IN_CLKPATH0);
-	#ifdef CY_IP_MXBLESS
-	(void)Cy_BLE_EcoReset();
-	#endif
 	
 	#ifdef CY_CFG_SYSCLK_PLL1_AVAILABLE
 	(void)Cy_SysClk_PllDisable(CY_SYSCLK_CLKHF_IN_CLKPATH2);
