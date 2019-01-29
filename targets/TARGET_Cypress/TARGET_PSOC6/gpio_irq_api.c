@@ -48,7 +48,16 @@ static void gpio_irq_dispatcher(uint32_t port_id)
             gpio_irq_t *obj = irq_objects[port_id][pin];
             MBED_ASSERT(obj);
             Cy_GPIO_ClearInterrupt(port, pin);
-            event = (obj->mode == IRQ_FALL)? IRQ_FALL : IRQ_RISE;
+        /*    event = (obj->mode == IRQ_FALL)? IRQ_FALL : IRQ_RISE; */
+
+            /* Read pin to determine the edge to support "both" mode */
+            event = (0UL != Cy_GPIO_Read(port, pin))? IRQ_RISE : IRQ_FALL;
+            if(0UL == (obj->mode & event))
+            {
+            	/* In case of very short pulse, actually both edges are occurred, so indicating only the supported one */
+            	event = obj->mode;
+            } /* Otherwise the determined edge is supported (0UL != (obj->mode & event)), so indicating it as is */
+
             obj->handler(obj->id_arg, event);
         }
     }
@@ -205,7 +214,7 @@ int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uint32
         }
         obj->handler = handler;
         obj->id_arg = id;
-        /* Safe reference to current object */  
+        /* Save reference to current object */
         irq_objects[obj->port_id][obj->pin] = obj;
 
         return gpio_irq_setup_channel(obj);
