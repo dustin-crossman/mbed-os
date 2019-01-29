@@ -17,7 +17,7 @@
 
 /*  Hardware entropy collector for the PSoC6A families */
 
-#if defined(DEVICE_TRNG)
+#if DEVICE_TRNG
 
 #include "trng_api.h"
 #include "cy_crypto_core_trng.h"
