@@ -60,3 +60,10 @@ CYW943012P6EVB_01_GCC_ARM:
   only:
     - cy-mbed-os-0.1
 
+MTB_ADV_WISE_1530_GCC_ARM:
+  tags:
+    - mti-ubuntu18
+  script:
+    - bash -x cy-test.sh MTB_ADV_WISE_1530 GCC_ARM
+  only:
+    - cy-mbed-os-0.1
