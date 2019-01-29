@@ -224,7 +224,7 @@ void SystemInit(void)
     *
     *******************************************************************************/
     /* Create an array of endpoint structures */
-    static cy_stc_ipc_pipe_ep_t       systemIpcPipeEpArray[CY_IPC_MAX_ENDPOINTS];
+    static cy_stc_ipc_pipe_ep_t systemIpcPipeEpArray[CY_IPC_MAX_ENDPOINTS];
 
     Cy_IPC_Pipe_Config(systemIpcPipeEpArray);
 
@@ -253,12 +253,10 @@ void SystemInit(void)
     /* .userPipeIsrHandler       */  &Cy_SysIpcPipeIsrCm4
     };
 
-
     if (cy_device->flashPipeRequired != 0u)
     {
         Cy_IPC_Pipe_Init(&systemIpcPipeConfigCm4);
     }
-
 
 #if defined(CY_DEVICE_PSOC6ABLE2)
     Cy_Flash_Init();
@@ -427,22 +425,22 @@ void SystemCoreClockUpdate (void)
             pathFreqHz = srcFreqHz;
         }
     }
-    else if (rootPath == 1UL)
+    else if ((rootPath == 1UL) || (rootPath == 2UL))
     {
         /* PLL */
-        bool pllLocked       = ( 0UL != _FLD2VAL(SRSS_CLK_PLL_STATUS_LOCKED,     SRSS->CLK_PLL_STATUS[0UL]));
-        bool pllOutputOutput = ( 3UL == _FLD2VAL(SRSS_CLK_PLL_CONFIG_BYPASS_SEL, SRSS->CLK_PLL_CONFIG[0UL]));
-        bool pllOutputAuto   = ((0UL == _FLD2VAL(SRSS_CLK_PLL_CONFIG_BYPASS_SEL, SRSS->CLK_PLL_CONFIG[0UL])) ||
-                                (1UL == _FLD2VAL(SRSS_CLK_PLL_CONFIG_BYPASS_SEL, SRSS->CLK_PLL_CONFIG[0UL])));
+        bool pllLocked       = ( 0UL != _FLD2VAL(SRSS_CLK_PLL_STATUS_LOCKED,     SRSS->CLK_PLL_STATUS[rootPath - 1UL]));
+        bool pllOutputOutput = ( 3UL == _FLD2VAL(SRSS_CLK_PLL_CONFIG_BYPASS_SEL, SRSS->CLK_PLL_CONFIG[rootPath - 1UL]));
+        bool pllOutputAuto   = ((0UL == _FLD2VAL(SRSS_CLK_PLL_CONFIG_BYPASS_SEL, SRSS->CLK_PLL_CONFIG[rootPath - 1UL])) ||
+                                (1UL == _FLD2VAL(SRSS_CLK_PLL_CONFIG_BYPASS_SEL, SRSS->CLK_PLL_CONFIG[rootPath - 1UL])));
         if ((pllOutputAuto && pllLocked) || pllOutputOutput)
         {
             uint32_t feedbackDiv;
             uint32_t referenceDiv;
             uint32_t outputDiv;
 
-            feedbackDiv  = _FLD2VAL(SRSS_CLK_PLL_CONFIG_FEEDBACK_DIV,  SRSS->CLK_PLL_CONFIG[0UL]);
-            referenceDiv = _FLD2VAL(SRSS_CLK_PLL_CONFIG_REFERENCE_DIV, SRSS->CLK_PLL_CONFIG[0UL]);
-            outputDiv    = _FLD2VAL(SRSS_CLK_PLL_CONFIG_OUTPUT_DIV,    SRSS->CLK_PLL_CONFIG[0UL]);
+            feedbackDiv  = _FLD2VAL(SRSS_CLK_PLL_CONFIG_FEEDBACK_DIV,  SRSS->CLK_PLL_CONFIG[rootPath - 1UL]);
+            referenceDiv = _FLD2VAL(SRSS_CLK_PLL_CONFIG_REFERENCE_DIV, SRSS->CLK_PLL_CONFIG[rootPath - 1UL]);
+            outputDiv    = _FLD2VAL(SRSS_CLK_PLL_CONFIG_OUTPUT_DIV,    SRSS->CLK_PLL_CONFIG[rootPath - 1UL]);
 
             pathFreqHz = ((srcFreqHz * feedbackDiv) / referenceDiv) / outputDiv;
 
