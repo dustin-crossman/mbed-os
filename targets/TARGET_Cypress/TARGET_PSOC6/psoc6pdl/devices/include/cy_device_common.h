@@ -115,12 +115,14 @@ typedef enum {
 *******************************************************************************/
 /* For the target device these enums are defined in product-specific
 * configuration files.
-* For the library these enums define the max value or a set of values, so the
-* compiler can determine the enum width to hold the biggest number in the enum.
+* For the library these enums define the max value or a set of values used by
+* the library that are common across all target devices, so the compiler can
+* determine the enum width to hold the biggest number in the enum.
 */
 
 typedef enum
 {
+    PCLK_PASS_CLOCK_CTDAC   = 55,
     PCLK_CLOCK_NR_MINUS_ONE = 255
 } en_clk_dst_t;
 
@@ -137,7 +139,7 @@ typedef enum
 typedef enum
 {
     TRIGGER_TYPE_LEVEL = 0u,
-    TRIGGER_TYPE_EDGE = 1u
+    TRIGGER_TYPE_EDGE  = 1u
 } en_trig_type_t;
 
 typedef enum
@@ -359,8 +361,6 @@ extern uint32_t Cy_SysGetCM4Status(void);
 #define IOSS_GPIO_GPIO_PORT_NR          15u
 /* Number of SAR channels */
 #define PASS_SAR_SAR_CHANNELS           16u
-/* CTDAC Clock Divider Number */
-#define PCLK_PASS_CLOCK_CTDAC           55
 /* CM4 Enabled State */
 #define CY_SYS_CM4_STATUS_ENABLED       3U
 /* Cryptography IP present or not (0=No, 1=Yes) */
