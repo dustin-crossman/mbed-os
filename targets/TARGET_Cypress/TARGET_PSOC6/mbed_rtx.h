@@ -20,27 +20,27 @@
 #define MBED_MBED_RTX_H
 
 #if defined(TARGET_CY8CKIT_062_4343W)
-    #ifndef INITIAL_SP
-        #define INITIAL_SP              (0x08002000 + 0x000FD800)  /* Ram origin + length */
-    #endif
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08002000 + 0x000FD800)  /* Ram origin + length */
+#endif
 #elif defined(TARGET_CY8CKIT_062_BLE)
-    #ifndef INITIAL_SP
-        #define INITIAL_SP              (0x08002000 + 0x00045800)  /* Ram origin + length */
-    #endif
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08002000 + 0x00045800)  /* Ram origin + length */
+#endif
 #elif defined(TARGET_CY8CKIT_062_WIFI_BT)
-    #ifndef INITIAL_SP
-        #define INITIAL_SP              (0x08002000 + 0x00045800)  /* Ram origin + length */
-    #endif
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08002000 + 0x00045800)  /* Ram origin + length */
+#endif
 #elif defined(TARGET_CY8CMOD_062_4343W)
-    #ifndef INITIAL_SP
-        #define INITIAL_SP              (0x08002000 + 0x000FD800)  /* Ram origin + length */
-    #endif
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08002000 + 0x000FD800)  /* Ram origin + length */
+#endif
 #elif defined(TARGET_CYW943012P6EVB_01)
-    #ifndef INITIAL_SP
-        #define INITIAL_SP              (0x08002000 + 0x00045800)  /* Ram origin + length */
-    #endif
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08002000 + 0x00045800)  /* Ram origin + length */
+#endif
 #else
-    #error "Unknown board"
+#error "Unknown board"
 #endif
 
 #endif  /* MBED_MBED_RTX_H */

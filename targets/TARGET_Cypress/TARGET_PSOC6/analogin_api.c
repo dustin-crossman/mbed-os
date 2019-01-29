@@ -128,16 +128,15 @@ void analogin_init(analogin_t *obj, PinName pin)
     MBED_ASSERT(obj);
     MBED_ASSERT(pin != (PinName)NC);
 
-
     sar = pinmap_peripheral(pin, PinMap_ADC);
     if (sar != (uint32_t)NC) {
-	
-	if ((0 != cy_reserve_io_pin(pin)) && !sar_initialized) {
+
+        if ((0 != cy_reserve_io_pin(pin)) && !sar_initialized) {
             error("ANALOG IN pin reservation conflict.");
         }
-		
+
         /* Initialize object */
-        obj->base = (SAR_Type*) CY_PERIPHERAL_BASE(sar);
+        obj->base = (SAR_Type *) CY_PERIPHERAL_BASE(sar);
         obj->pin = pin;
         obj->channel_mask = 1 << CY_PIN(pin);
 

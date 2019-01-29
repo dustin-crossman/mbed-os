@@ -34,7 +34,7 @@ extern "C" {
 
 #if DEVICE_INTERRUPTIN
 struct gpio_irq_s {
-    GPIO_PRT_Type*      port;
+    GPIO_PRT_Type      *port;
     uint32_t            port_id;
     uint32_t            pin;
     gpio_irq_event      mode;
@@ -100,7 +100,7 @@ struct serial_s {
 struct spi_s {
     CySCB_Type                          *base;
     uint32_t                            spi_id;
-    bool                                already_reserved;    
+    bool                                already_reserved;
     PinName                             pin_miso;
     PinName                             pin_mosi;
     PinName                             pin_sclk;

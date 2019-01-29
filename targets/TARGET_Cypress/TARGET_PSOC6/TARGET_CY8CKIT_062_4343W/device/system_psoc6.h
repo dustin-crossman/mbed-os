@@ -37,7 +37,7 @@
 * - \ref group_system_config_heap_stack_config
 * - \ref group_system_config_merge_apps
 * - \ref group_system_config_default_handlers
-* - \ref group_system_config_device_vector_table 
+* - \ref group_system_config_device_vector_table
 * - \ref group_system_config_cm4_functions
 *
 * \section group_system_config_configuration Configuration Considerations
@@ -57,7 +57,7 @@
 *
 * <b>ARM GCC</b>\n
 * The flash and RAM sections for the CPU are defined in the linker files:
-* 'xx_yy.ld', where 'xx' is the device group, and 'yy' is the target CPU; for example, 
+* 'xx_yy.ld', where 'xx' is the device group, and 'yy' is the target CPU; for example,
 * 'cy8c6xx7_cm0plus.ld' and 'cy8c6xx7_cm4_dual.ld'.
 * \note If the start of the Cortex-M4 application image is changed, the value
 * of the of the \ref CY_CORTEX_M4_APPL_ADDR should also be changed. The
@@ -90,7 +90,7 @@
 * 'xx_yy.scat', where 'xx' is the device group, and 'yy' is the target CPU; for example,
 * 'cy8c6xx7_cm0plus.scat' and 'cy8c6xx7_cm4_dual.scat'.
 * \note If the start of the Cortex-M4 application image is changed, the value
-* of the of the \ref CY_CORTEX_M4_APPL_ADDR should also be changed. The 
+* of the of the \ref CY_CORTEX_M4_APPL_ADDR should also be changed. The
 * \ref CY_CORTEX_M4_APPL_ADDR macro should be used as the parameter for the \ref
 * Cy_SysEnableCM4() function call.
 *
@@ -131,7 +131,7 @@
 *
 * <b>IAR</b>\n
 * The flash and RAM sections for the CPU are defined in the linker files:
-* 'xx_yy.icf', where 'xx' is the device group, and 'yy' is the target CPU; for example, 
+* 'xx_yy.icf', where 'xx' is the device group, and 'yy' is the target CPU; for example,
 * 'cy8c6xx7_cm0plus.icf' and 'cy8c6xx7_cm4_dual.icf'.
 * \note If the start of the Cortex-M4 application image is changed, the value
 * of the of the \ref CY_CORTEX_M4_APPL_ADDR should also be changed. The
@@ -170,7 +170,7 @@
 * code passes the control to the Cortex-M0+ startup code located in flash.
 *
 * \subsubsection group_system_config_dual_core_device_initialization Dual-Core Devices
-* The Cortex-M0+ startup code performs the device initialization by a call to 
+* The Cortex-M0+ startup code performs the device initialization by a call to
 * SystemInit() and then calls the main() function. The Cortex-M4 core is disabled
 * by default. Enable the core using the \ref Cy_SysEnableCM4() function.
 * See \ref group_system_config_cm4_functions for more details.
@@ -181,7 +181,7 @@
 *
 * \subsubsection group_system_config_single_core_device_initialization Single-Core Devices
 * The Cortex-M0+ core is not user-accessible on these devices. In this case the
-* Flash Boot handles setup of the CM0+ core and starts the Cortex-M4 core.  
+* Flash Boot handles setup of the CM0+ core and starts the Cortex-M4 core.
 *
 * \subsection group_system_config_heap_stack_config Heap and Stack Configuration
 * There are two ways to adjust heap and stack configurations:
@@ -387,7 +387,7 @@
 *   \details
 *   The following system functions implement CMSIS Core functions.
 *   Refer to the [CMSIS documentation]
-*   (http://www.keil.com/pack/doc/CMSIS/Core/html/group__system__init__gr.html "System and Clock Configuration") 
+*   (http://www.keil.com/pack/doc/CMSIS/Core/html/group__system__init__gr.html "System and Clock Configuration")
 *   for more details.
 * \}
 */
@@ -637,7 +637,7 @@ extern uint32_t cy_PeriClkFreqHz;
 
 /** \cond INTERNAL */
 /*******************************************************************************
-* Backward compatibility macro. The following code is DEPRECATED and must 
+* Backward compatibility macro. The following code is DEPRECATED and must
 * not be used in new projects
 *******************************************************************************/
 

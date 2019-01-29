@@ -89,29 +89,29 @@ void analogout_init(dac_t *obj, PinName pin)
 
     dac = pinmap_peripheral(pin, PinMap_DAC);
     if (dac != (uint32_t)NC) {
-      
-	if ((0 != cy_reserve_io_pin(pin)) && !ctdac_initialized) {
+
+        if ((0 != cy_reserve_io_pin(pin)) && !ctdac_initialized) {
             error("ANALOG OUT pin reservation conflict.");
         }
-		
+
         /* Initialize object */
-        obj->base = (CTDAC_Type*)CY_PERIPHERAL_BASE(dac);
+        obj->base = (CTDAC_Type *)CY_PERIPHERAL_BASE(dac);
         obj->pin = pin;
 
         /* Configure CTDAC hardware */
         dac_function = pinmap_function(pin, PinMap_DAC);
         obj->clock = CY_PIN_CLOCK(dac_function);
         pin_function(pin, dac_function);
-        
+
         if (P9_6 != pin) {
-            const PinName directOutput = P9_6; 
+            const PinName directOutput = P9_6;
 
             /* Connect P9_6 to the AMUXA bus to drive output */
             Cy_GPIO_SetHSIOM(Cy_GPIO_PortToAddr(CY_PORT(directOutput)), CY_PIN(directOutput), HSIOM_SEL_AMUXA);
         }
-        
+
         ctdac_init(obj);
-        
+
     } else {
         error("ANALOG OUT pinout mismatch.");
     }
@@ -119,7 +119,7 @@ void analogout_init(dac_t *obj, PinName pin)
 
 void analogout_free(dac_t *obj)
 {
-    /* MBED AnalogIn driver does not call this function in destructor */ 
+    /* MBED AnalogIn driver does not call this function in destructor */
 }
 
 void analogout_write(dac_t *obj, float value)

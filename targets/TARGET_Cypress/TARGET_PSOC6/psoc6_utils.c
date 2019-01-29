@@ -257,21 +257,21 @@ uint32_t cy_clk_allocate_divider(cy_en_divider_types_t div_type)
 
         // Store current index
         uint32_t first_index = p_alloc->current_index;
-        
+
         // Move index forward before start circular search
         ++p_alloc->current_index;
         if (p_alloc->current_index > p_alloc->max_index) {
             p_alloc->current_index = 0;
         }
-            
+
         // Execute circular divider search
-        for ( ; (CY_INVALID_DIVIDER == (divider = cy_clk_reserve_divider(div_type, p_alloc->current_index)));
+        for (; (CY_INVALID_DIVIDER == (divider = cy_clk_reserve_divider(div_type, p_alloc->current_index)));
                 ++p_alloc->current_index) {
-                  
+
             if (p_alloc->current_index > p_alloc->max_index) {
                 p_alloc->current_index = 0;
             }
-        
+
             if (p_alloc->current_index == first_index) {
                 break;
             }
@@ -393,7 +393,7 @@ IRQn_Type cy_m0_nvic_reserve_channel(IRQn_Type channel, uint32_t channel_id)
 
     core_util_critical_section_enter();
     if (irq_channels[chn]) {
-        channel =  (IRQn_Type)(-1);
+        channel = (IRQn_Type)(-1);
     } else {
         irq_channels[chn] = channel_id;
     }

@@ -60,14 +60,14 @@ void gpio_init(gpio_t *obj, PinName pin)
 
     MBED_ASSERT(CY_PIN(obj->pin) < 8); // PSoC6 architecture supports 8 pins per port.
 
-    /* Ignore pin reservation result because there is not possibility to release 
-     * reserved HW resource. The MBED does not provide proper destructors for 
+    /* Ignore pin reservation result because there is not possibility to release
+     * reserved HW resource. The MBED does not provide proper destructors for
      * doing that.
     */
     if (!(IsIrqMode() || IsIrqMasked())) {
-      (void) cy_reserve_io_pin(pin);
+        (void) cy_reserve_io_pin(pin);
     }
-    
+
     obj->port = Cy_GPIO_PortToAddr(CY_PORT(obj->pin));
 
     const uint32_t outputVal = 0;

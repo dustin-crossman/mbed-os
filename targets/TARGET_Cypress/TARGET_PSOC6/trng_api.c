@@ -33,8 +33,7 @@ void trng_init(trng_t *obj)
 {
     (void)obj;
 
-    if (!Cy_Crypto_Core_IsEnabled(CRYPTO))
-    {
+    if (!Cy_Crypto_Core_IsEnabled(CRYPTO)) {
         (void)Cy_Crypto_Core_Enable(CRYPTO);
     }
 }
@@ -54,16 +53,12 @@ int trng_get_bytes(trng_t *obj, uint8_t *output, size_t length, size_t *output_l
     (void)obj;
 
     /* Get Random byte */
-    while ((*output_length < length) && (ret == 0))
-    {
+    while ((*output_length < length) && (ret == 0)) {
         if (Cy_Crypto_Core_Trng(CRYPTO, GARO31_INITSTATE, FIRO31_INITSTATE, MAX_TRNG_BIT_SIZE, &random) != CY_CRYPTO_SUCCESS) {
             ret = -1;
-        }
-        else
-        {
-            for (uint8_t i = 0; (i < 4) && (*output_length < length) ; i++)
-            {
-                *output++ = ((uint8_t*)&random)[i];
+        } else {
+            for (uint8_t i = 0; (i < 4) && (*output_length < length) ; i++) {
+                *output++ = ((uint8_t *)&random)[i];
                 *output_length += 1;
             }
         }

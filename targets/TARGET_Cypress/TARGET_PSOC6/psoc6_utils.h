@@ -163,7 +163,7 @@ void cy_srm_initialize(void);
  * \return void.
  *
  */
-void cy_get_bd_mac_address(uint8_t* buffer);
+void cy_get_bd_mac_address(uint8_t *buffer);
 
 
 /** \brief Determines proper PSoC6 pin drive mode settings.

@@ -92,7 +92,7 @@ static IRQn_Type i2c_irq_allocate_channel(i2c_obj_t *obj)
     obj->cm0p_irq_src = scb_0_interrupt_IRQn + obj->i2c_id;
     return cy_m0_nvic_allocate_channel(CY_SERIAL_IRQN_ID + obj->i2c_id);
 #else
-    return (IRQn_Type)(scb_0_interrupt_IRQn + obj->i2c_id); 
+    return (IRQn_Type)(scb_0_interrupt_IRQn + obj->i2c_id);
 #endif /* (TARGET_MCU_PSOC6_M0) */
 }
 
@@ -112,7 +112,7 @@ static int i2c_irq_setup_channel(i2c_obj_t *obj)
         irq_config.cm0pSrc = obj->cm0p_irq_src;
 #endif
         if (Cy_SysInt_Init(&irq_config, (cy_israddress)(obj->handler)) != CY_SYSINT_SUCCESS) {
-            return(-1);
+            return (-1);
         }
 
         obj->irqn = irqn;
@@ -150,7 +150,7 @@ static int allocate_divider(I2cDividerType divider)
         }
     }
 
-    return (p_div->div_num == CY_INVALID_DIVIDER)? -1 : 0;
+    return (p_div->div_num == CY_INVALID_DIVIDER) ? -1 : 0;
 }
 
 /*
@@ -207,8 +207,8 @@ static cy_en_sysclk_status_t i2c_init_clock(i2c_obj_t *obj, uint32_t speed)
  * Initializes i/o pins for i2c sda/scl.
  */
 static void i2c_init_pins(i2c_obj_t *obj)
-{   
-    /* MBED driver reserves pins for I2C as Ditigal IO while doing I2C error 
+{
+    /* MBED driver reserves pins for I2C as Ditigal IO while doing I2C error
      * recovery in constructor.
      */
     pin_function(obj->pin_sda, pinmap_function(obj->pin_sda, PinMap_I2C_SDA));
@@ -225,7 +225,7 @@ static void i2c_init_peripheral(i2c_obj_t *obj)
     I2cDividerInfo *p_div = &i2c_dividers[obj->divider];
 
     Cy_SCB_I2C_Init(obj->base, &i2c_config, &obj->context);
-    Cy_SCB_I2C_SetDataRate(obj->base,obj->actual_speed, p_div->clk_frequency);
+    Cy_SCB_I2C_SetDataRate(obj->base, obj->actual_speed, p_div->clk_frequency);
     Cy_SCB_I2C_Enable(obj->base);
 }
 
@@ -271,14 +271,13 @@ static cy_en_syspm_status_t i2c_pm_callback(cy_stc_syspm_callback_params_t *call
 void i2c_init(i2c_t *obj_in, PinName sda, PinName scl)
 {
     i2c_obj_t *obj = OBJ_P(obj_in);
-    
+
     uint32_t i2c = pinmap_peripheral(sda, PinMap_I2C_SDA);
     i2c = pinmap_merge(i2c, pinmap_peripheral(scl, PinMap_I2C_SCL));
-    
-    if (i2c != (uint32_t) NC)
-    {
+
+    if (i2c != (uint32_t) NC) {
         /* Initialize configuration */
-        obj->base    = (CySCB_Type*) i2c;
+        obj->base    = (CySCB_Type *) i2c;
         obj->i2c_id  = ((I2CName) i2c - I2C_0) / (I2C_1 - I2C_0);
         obj->clock   = CY_PIN_CLOCK(pinmap_function(scl, PinMap_I2C_SCL));
         obj->divider = I2C_INVALID_DIVIDER;
@@ -289,26 +288,25 @@ void i2c_init(i2c_t *obj_in, PinName sda, PinName scl)
         obj->mode    = CY_SCB_I2C_MASTER;
         obj->timeout = I2C_DEFAULT_TIMEOUT;
 
-    #if (DEVICE_I2C_ASYNCH)
+#if DEVICE_I2C_ASYNCH
         obj->irqn    = unconnected_IRQn;
         obj->pending = PENDING_NONE;
         obj->events  = 0;
-    #endif /* (DEVICE_I2C_ASYNCH) */
+#endif /* DEVICE_I2C_ASYNCH */
 
         /* Check if resource severed */
         if (obj->already_reserved) {
 
             /* SCB pins and clocks are connected */
-            
+
             /* Disable block and get it into the default state */
             Cy_SCB_I2C_Disable(obj->base, &obj->context);
-            Cy_SCB_I2C_DeInit (obj->base);
-            
+            Cy_SCB_I2C_DeInit(obj->base);
+
             /* The proper clock will be connected by i2c_init_clock(obj, I2C_DEFAULT_SPEED) */
-            obj->divider = I2C_DIVIDER_LOW;  
-        }
-        else {
-        #if (DEVICE_SLEEP && DEVICE_LPTICKER)
+            obj->divider = I2C_DIVIDER_LOW;
+        } else {
+#if DEVICE_SLEEP && DEVICE_LPTICKER
             /* Register callback once */
             obj->pm_callback_handler.callback = i2c_pm_callback;
             obj->pm_callback_handler.type = CY_SYSPM_DEEPSLEEP;
@@ -319,9 +317,9 @@ void i2c_init(i2c_t *obj_in, PinName sda, PinName scl)
             if (!Cy_SysPm_RegisterCallback(&obj->pm_callback_handler)) {
                 error("PM callback registration failed!");
             }
-        #endif /* (DEVICE_SLEEP && DEVICE_LPTICKER) */        
+#endif /* DEVICE_SLEEP && DEVICE_LPTICKER */
         }
-        
+
         /* Configure hardware resources */
         i2c_init_clock(obj, I2C_DEFAULT_SPEED);
         i2c_init_pins(obj);
@@ -344,22 +342,20 @@ int  i2c_start(i2c_t *obj_in)
 {
     i2c_obj_t *obj = OBJ_P(obj_in);
 
-    if (CY_SCB_I2C_IDLE == obj->context.state)
-    {
+    if (CY_SCB_I2C_IDLE == obj->context.state) {
         /* Set the read or write direction */
         obj->context.state = CY_SCB_I2C_MASTER_ADDR;
 
         /* Clean up the hardware before a transfer. Note RX FIFO is empty at here */
         Cy_SCB_ClearMasterInterrupt(obj->base, CY_SCB_I2C_MASTER_INTR_ALL);
-        Cy_SCB_ClearRxInterrupt    (obj->base, CY_SCB_RX_INTR_NOT_EMPTY);
+        Cy_SCB_ClearRxInterrupt(obj->base, CY_SCB_RX_INTR_NOT_EMPTY);
         Cy_SCB_ClearTxFifo(obj->base);
 
         /* Generate a Start and send address byte */
-        SCB_I2C_M_CMD(obj->base)= SCB_I2C_M_CMD_M_START_ON_IDLE_Msk;
+        SCB_I2C_M_CMD(obj->base) = SCB_I2C_M_CMD_M_START_ON_IDLE_Msk;
 
         /* Wait until Start is generated */
-        while (0 != (SCB_I2C_M_CMD(obj->base) & SCB_I2C_M_CMD_M_START_ON_IDLE_Msk))
-        {
+        while (0 != (SCB_I2C_M_CMD(obj->base) & SCB_I2C_M_CMD_M_START_ON_IDLE_Msk)) {
         }
 
         return 0;
@@ -454,7 +450,7 @@ void i2c_reset(i2c_t *obj_in)
 
     /* Back block into default state */
     Cy_SCB_FwBlockReset(obj->base);
-    obj->context.state = CY_SCB_I2C_IDLE;  
+    obj->context.state = CY_SCB_I2C_IDLE;
 }
 
 int i2c_byte_read(i2c_t *obj_in, int last)
@@ -534,7 +530,7 @@ void i2c_transfer_asynch(i2c_t *obj_in,
     obj->rx_config.bufferSize = rx_length;
     obj->rx_config.xferPending = !stop;
 
-    obj->tx_config.buffer = (void*)tx;
+    obj->tx_config.buffer = (void *)tx;
     obj->tx_config.bufferSize = tx_length;
     obj->tx_config.xferPending = rx_length || !stop;
 
@@ -557,7 +553,7 @@ void i2c_transfer_asynch(i2c_t *obj_in,
 static void i2c_gen_stop(i2c_t *obj_in)
 {
     i2c_obj_t *obj = OBJ_P(obj_in);
-    
+
     // Enable master interrupts and generate Stop
     Cy_SCB_SetMasterInterruptMask(obj->base, CY_SCB_I2C_MASTER_INTR);
     SCB_I2C_M_CMD(obj->base) = (SCB_I2C_M_CMD_M_STOP_Msk | SCB_I2C_M_CMD_M_NACK_Msk);
@@ -570,62 +566,48 @@ uint32_t i2c_irq_handler_asynch(i2c_t *obj_in)
     uint32_t event = 0;
     // Process actual interrupt.
     Cy_SCB_I2C_Interrupt(obj->base, &obj->context);
-	
-    if (false == (CY_SCB_I2C_MASTER_BUSY & obj->context.masterStatus))
-    {   
+
+    if (false == (CY_SCB_I2C_MASTER_BUSY & obj->context.masterStatus)) {
         // Transfer was completed
         event = I2C_EVENT_TRANSFER_COMPLETE;
-      
+
         // Parse results of single transfer
-        if (CY_SCB_I2C_MASTER_ERR & obj->context.masterStatus)
-        {
-            if (CY_SCB_I2C_MASTER_ADDR_NAK & obj->context.masterStatus)
-            {
+        if (CY_SCB_I2C_MASTER_ERR & obj->context.masterStatus) {
+            if (CY_SCB_I2C_MASTER_ADDR_NAK & obj->context.masterStatus) {
                 event |= I2C_EVENT_ERROR_NO_SLAVE;
-            } 
-            else if (CY_SCB_I2C_MASTER_DATA_NAK & obj->context.masterStatus)
-            {
+            } else if (CY_SCB_I2C_MASTER_DATA_NAK & obj->context.masterStatus) {
                 event |= I2C_EVENT_TRANSFER_EARLY_NACK;
-            }
-            else
-            {
+            } else {
                 // CY_SCB_I2C_MASTER_ARB_LOST || CY_SCB_I2C_MASTER_BUS_ERR || CY_SCB_I2C_MASTER_ABORT_START
                 event |= I2C_EVENT_ERROR;
             }
         }
-        
+
         // Check if a read phase is pending after write.
-        if (obj->pending == PENDING_TX_RX)
-        {
+        if (obj->pending == PENDING_TX_RX) {
             obj->pending = PENDING_RX;
-            
-            if (event == I2C_EVENT_TRANSFER_COMPLETE)
-            {
-                // Send ReStart and continue with RX transfer 
+
+            if (event == I2C_EVENT_TRANSFER_COMPLETE) {
+                // Send ReStart and continue with RX transfer
                 event = 0;
                 Cy_SCB_I2C_MasterRead(obj->base, &obj->rx_config, &obj->context);
-            }
-            else
-            {
+            } else {
                 // NACK - generate Stop  (do not execute RX transfer)
                 // Error - do not execute RX transfer and report transfer complete
-                if (false == (event & I2C_EVENT_ERROR))
-                {
+                if (false == (event & I2C_EVENT_ERROR)) {
                     // Report events after Stop generation
                     event = 0;
                     obj->context.state       = CY_SCB_I2C_MASTER_WAIT_STOP;
                     obj->context.masterPause = false;
-                
+
                     i2c_gen_stop(obj_in);
                 }
             }
-        }
-        else
-        {
+        } else {
             obj->pending = PENDING_NONE;
         }
     }
-                 
+
     return (event & obj->events);
 }
 

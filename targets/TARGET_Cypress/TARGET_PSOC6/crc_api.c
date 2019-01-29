@@ -38,42 +38,37 @@ void hal_crc_compute_partial_start(const crc_mbed_config_t *config)
 {
     uint32_t myMask = 0;
 
-    if (!hal_crc_is_supported(config))
-    {
+    if (!hal_crc_is_supported(config)) {
         return;
     }
 
     crcWidth = config->width;
 
     crcShift = (uint32_t)(!config->reflect_out) * (crcWidth & 7u);
-    if (crcShift)
-    {
+    if (crcShift) {
         crcShift = 8u - crcShift;
-        for (uint32_t i = 0; i < crcShift; i++)
-        {
+        for (uint32_t i = 0; i < crcShift; i++) {
             myMask |= 1 << i;
         }
         crcXorMask = config->final_xor & myMask;
     }
 
-    if (!Cy_Crypto_Core_IsEnabled(CRYPTO))
-    {
+    if (!Cy_Crypto_Core_IsEnabled(CRYPTO)) {
         Cy_Crypto_Core_Enable(CRYPTO);
     }
 
     Cy_Crypto_Core_Crc_CalcInit(CRYPTO, config->width,
-                                        config->polynomial,
-                                        config->reflect_in,
-                                        0,
-                                        config->reflect_out,
-                                        config->final_xor >> crcShift,
-                                        config->initial_xor);
+                                config->polynomial,
+                                config->reflect_in,
+                                0,
+                                config->reflect_out,
+                                config->final_xor >> crcShift,
+                                config->initial_xor);
 }
 
 void hal_crc_compute_partial(const uint8_t *data, const size_t size)
 {
-    if ((data == NULL) || (size <= 0) || (crcWidth == 0))
-    {
+    if ((data == NULL) || (size <= 0) || (crcWidth == 0)) {
         return;
     }
 
@@ -84,15 +79,13 @@ uint32_t hal_crc_get_result(void)
 {
     uint32_t result = 0;
 
-    if (crcWidth == 0)
-    {
+    if (crcWidth == 0) {
         return 0xffffffffu;
     }
 
     Cy_Crypto_Core_Crc_CalcFinish(CRYPTO, crcWidth, &result);
 
-    if (crcShift)
-    {
+    if (crcShift) {
         result = result << crcShift;
         result = result ^  crcXorMask;
     }

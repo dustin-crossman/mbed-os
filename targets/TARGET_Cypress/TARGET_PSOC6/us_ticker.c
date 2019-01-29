@@ -128,8 +128,9 @@ void us_ticker_init(void)
     us_ticker_disable_interrupt();
     us_ticker_clear_interrupt();
 
-    if (us_ticker_inited)
+    if (us_ticker_inited) {
         return;
+    }
 
     us_ticker_inited = 1;
 
@@ -171,8 +172,9 @@ void us_ticker_free(void)
 
 uint32_t us_ticker_read(void)
 {
-    if (!us_ticker_inited)
+    if (!us_ticker_inited) {
         us_ticker_init();
+    }
     return Cy_TCPWM_Counter_GetCounter(TICKER_COUNTER_UNIT, TICKER_COUNTER_NUM);
 }
 
@@ -181,8 +183,9 @@ void us_ticker_set_interrupt(timestamp_t timestamp)
     uint32_t current_ts = Cy_TCPWM_Counter_GetCounter(TICKER_COUNTER_UNIT, TICKER_COUNTER_NUM);
     uint32_t delta = timestamp - current_ts;
 
-    if (!us_ticker_inited)
+    if (!us_ticker_inited) {
         us_ticker_init();
+    }
 
     // Set new output compare value
     if ((delta < 2) || (delta  > (uint32_t)(-3))) {
@@ -209,7 +212,7 @@ void us_ticker_fire_interrupt(void)
     NVIC_SetPendingIRQ(TICKER_COUNTER_NVIC_IRQN);
 }
 
-const ticker_info_t* us_ticker_get_info(void)
+const ticker_info_t *us_ticker_get_info(void)
 {
     return &us_ticker_info;
 }

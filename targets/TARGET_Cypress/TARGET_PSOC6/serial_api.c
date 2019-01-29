@@ -126,7 +126,7 @@ static irq_info_t irq_info[NUM_SERIAL_PORTS] = {
 static void serial_irq_dispatcher(uint32_t serial_id)
 {
     MBED_ASSERT(serial_id < NUM_SERIAL_PORTS);
-    
+
     irq_info_t *info = &irq_info[serial_id];
     serial_obj_t *obj = info->serial_obj;
     MBED_ASSERT(obj);
@@ -143,7 +143,7 @@ static void serial_irq_dispatcher(uint32_t serial_id)
         Cy_SCB_ClearRxInterrupt(obj->base, CY_SCB_RX_INTR_NOT_EMPTY);
     }
 
-    if (Cy_SCB_GetTxInterruptStatusMasked(obj->base) & CY_SCB_UART_TX_EMPTY) {     
+    if (Cy_SCB_GetTxInterruptStatusMasked(obj->base) & CY_SCB_UART_TX_EMPTY) {
         info->handler(info->id_arg, TxIrq);
         Cy_SCB_ClearTxInterrupt(obj->base, CY_SCB_UART_TX_EMPTY);
     }
@@ -223,7 +223,7 @@ static int serial_irq_setup_channel(serial_obj_t *obj)
         if (irqn < 0) {
             return (-1);
         }
-        
+
         /* Configure NVIC */
         irq_config.intrPriority = SERIAL_DEFAULT_IRQ_PRIORITY;
         irq_config.intrSrc = irqn;
@@ -231,16 +231,16 @@ static int serial_irq_setup_channel(serial_obj_t *obj)
         irq_config.cm0pSrc = info->cm0p_irq_src;
 #endif
         if (Cy_SysInt_Init(&irq_config, irq_dispatcher_table[obj->serial_id]) != CY_SYSINT_SUCCESS) {
-            return(-1);
+            return (-1);
         }
 
         info->irqn = irqn;
         info->serial_obj = obj;
     }
-    
+
     /* Enable interrupt after successful setup */
     NVIC_EnableIRQ(info->irqn);
-    
+
     return 0;
 }
 
@@ -311,8 +311,7 @@ static cy_en_sysclk_status_t serial_init_clock(serial_obj_t *obj, uint32_t baudr
                                                     obj->div_num,
                                                     FRACT_DIV_INT(divider),
                                                     FRACT_DIV_FARCT(divider));
-        } 
-        else {
+        } else {
             /* Get integer divider */
             status = Cy_SysClk_PeriphSetDivider(CY_SYSCLK_DIV_16_BIT,
                                                 obj->div_num,
@@ -331,12 +330,12 @@ static cy_en_sysclk_status_t serial_init_clock(serial_obj_t *obj, uint32_t baudr
  * @param obj The serial object
  */
 static void serial_init_pins(serial_obj_t *obj)
-{   
-    if ((cy_reserve_io_pin(obj->pin_tx) || cy_reserve_io_pin(obj->pin_rx)) 
-        && !obj->already_reserved) {
+{
+    if ((cy_reserve_io_pin(obj->pin_tx) || cy_reserve_io_pin(obj->pin_rx))
+            && !obj->already_reserved) {
         error("Serial TX/RX pin reservation conflict.");
     }
-    
+
     pin_function(obj->pin_tx, pinmap_function(obj->pin_tx, PinMap_UART_TX));
     pin_function(obj->pin_rx, pinmap_function(obj->pin_rx, PinMap_UART_RX));
 }
@@ -382,7 +381,7 @@ static void serial_init_peripheral(serial_obj_t *obj)
 }
 
 
-#if (DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED)
+#if DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED
 static cy_en_syspm_status_t serial_pm_callback(cy_stc_syspm_callback_params_t *params)
 {
     serial_obj_t *obj = (serial_obj_t *)params->context;
@@ -453,43 +452,42 @@ void serial_init(serial_t *obj_in, PinName tx, PinName rx)
     } else {
         uint32_t uart = pinmap_peripheral(tx, PinMap_UART_TX);
         uart = pinmap_merge(uart, pinmap_peripheral(rx, PinMap_UART_RX));
-        
+
         if (uart != (uint32_t)NC) {
             uint32_t  serial_id = ((UARTName)uart - UART_0) / (UART_1 - UART_0);
-          
+
             /* Initialize configuration */
-            obj->base      = (CySCB_Type*)uart;
+            obj->base      = (CySCB_Type *)uart;
             obj->serial_id = serial_id;
             obj->clock     = CY_PIN_CLOCK(pinmap_function(tx, PinMap_UART_TX));
             obj->div_num   = CY_INVALID_DIVIDER;
             obj->already_reserved = (0 != cy_reserve_scb(obj->serial_id));
-            
+
             obj->pin_tx    = tx;
             obj->pin_rx    = rx;
             obj->pin_rts   = NC;
             obj->pin_cts   = NC;
-            
+
             obj->data_width = 8;
             obj->stop_bits  = CY_SCB_UART_STOP_BITS_1;
             obj->parity     = CY_SCB_UART_PARITY_NONE;
-            
+
             /* Check if resource severed */
             if (obj->already_reserved) {
                 uint32_t map;
-                
+
                 /* SCB pins and clocks are connected */
-                
+
                 /* Disable block and get it into the default state */
                 Cy_SCB_UART_Disable(obj->base, NULL);
-                Cy_SCB_UART_DeInit (obj->base);
-                
+                Cy_SCB_UART_DeInit(obj->base);
+
                 /* Get connected clock */
-                map = Cy_SysClk_PeriphGetAssignedDivider(obj->clock);  
+                map = Cy_SysClk_PeriphGetAssignedDivider(obj->clock);
                 obj->div_num  = _FLD2VAL(CY_PERI_CLOCK_CTL_DIV_SEL,  map);
-                obj->div_type = (cy_en_divider_types_t) _FLD2VAL(CY_PERI_CLOCK_CTL_TYPE_SEL, map);                     
-            }
-            else {
-            #if (DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED)
+                obj->div_type = (cy_en_divider_types_t) _FLD2VAL(CY_PERI_CLOCK_CTL_TYPE_SEL, map);
+            } else {
+#if DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED
                 /* Register callback once */
                 obj->pm_callback_handler.callback = serial_pm_callback;
                 obj->pm_callback_handler.type = CY_SYSPM_DEEPSLEEP;
@@ -497,13 +495,13 @@ void serial_init(serial_t *obj_in, PinName tx, PinName rx)
                 obj->pm_callback_handler.callbackParams = &obj->pm_callback_params;
                 obj->pm_callback_params.base = obj->base;
                 obj->pm_callback_params.context = obj;
-                
+
                 if (!Cy_SysPm_RegisterCallback(&obj->pm_callback_handler)) {
                     error("PM callback registration failed!");
                 }
-            #endif /* (DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED) */
+#endif /* (DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED) */
             }
-            
+
             /* Configure hardware resources */
             serial_init_clock(obj, UART_DEFAULT_BAUDRATE);
             serial_init_pins(obj);
@@ -514,7 +512,7 @@ void serial_init(serial_t *obj_in, PinName tx, PinName rx)
                 stdio_uart_inited = true;
             } else if (is_bt) {
                 memcpy(&bt_uart, obj_in, sizeof(serial_t));
-                bt_uart_inited = true;               
+                bt_uart_inited = true;
             }
         } else {
             error("Serial pinout mismatch. Requested pins Rx and Tx can't be used for the same Serial communication.");
@@ -534,8 +532,8 @@ void serial_baud(serial_t *obj_in, int baudrate)
     serial_obj_t *obj = OBJ_P(obj_in);
 
     Cy_SCB_UART_Disable(obj->base, NULL);
-    serial_init_clock  (obj, baudrate);
-    Cy_SCB_UART_Enable (obj->base);
+    serial_init_clock(obj, baudrate);
+    Cy_SCB_UART_Enable(obj->base);
 }
 
 
@@ -587,7 +585,7 @@ void serial_format(serial_t *obj_in, int data_bits, SerialParity parity, int sto
 void serial_putc(serial_t *obj_in, int c)
 {
     serial_obj_t *obj = OBJ_P(obj_in);
-    
+
     while (0 == serial_writable(obj_in)) {
         /* There is an entry to be written */
     }
@@ -598,11 +596,11 @@ void serial_putc(serial_t *obj_in, int c)
 int serial_getc(serial_t *obj_in)
 {
     serial_obj_t *obj = OBJ_P(obj_in);
-    
+
     while (0 == serial_readable(obj_in)) {
         /* There is an item to be read */
     }
-    
+
     return Cy_SCB_UART_Get(obj->base);
 }
 
@@ -703,10 +701,10 @@ void serial_irq_handler(serial_t *obj_in, uart_irq_handler handler, uint32_t id)
         /* Seccessful serial_irq_setup_channel enables interrupt in NVIC */
         NVIC_DisableIRQ(info->irqn);
     }
-    
+
     info->handler = handler;
     info->id_arg = id;
-    
+
     if (0 != serial_irq_setup_channel(obj)) {
         error("Interrupt setup failed.");
     }
@@ -723,7 +721,7 @@ void serial_irq_set(serial_t *obj_in, SerialIrq irq, uint32_t enable)
             break;
 
         case TxIrq: /* TxIrq for transmit (buffer is empty) */
-            Cy_SCB_SetTxInterruptMask (obj->base, (0 != enable) ? CY_SCB_UART_TX_EMPTY : 0);
+            Cy_SCB_SetTxInterruptMask(obj->base, (0 != enable) ? CY_SCB_UART_TX_EMPTY : 0);
             break;
     }
 }
@@ -746,24 +744,23 @@ int serial_tx_asynch(serial_t *obj_in, const void *tx, size_t tx_length, uint8_t
     if (serial_irq_setup_channel(obj) < 0) {
         return 0;
     }
-    
+
     /* Clear TX_DONE interrupt it might remain set from previous call */
     Cy_SCB_ClearTxInterrupt(obj->base, CY_SCB_UART_TX_DONE | CY_SCB_TX_INTR_LEVEL);
 
     /* Write as much as possible into the FIFO first */
-    while ((tx_length > 0) && (0 != Cy_SCB_UART_Put(obj->base, *p_buf))) 
-    {
+    while ((tx_length > 0) && (0 != Cy_SCB_UART_Put(obj->base, *p_buf))) {
         ++p_buf;
         --tx_length;
     }
 
     if (tx_length > 0) {
         obj->tx_pending = true;
-        obj->tx_events  = event; 
+        obj->tx_events  = event;
         obj_in->tx_buff.pos    = 0;
         obj_in->tx_buff.buffer = (void *)p_buf;
         obj_in->tx_buff.length = tx_length;
-        
+
         /* Enable LEVEL interrupt to complete transmission */
         Cy_SCB_SetTxInterruptMask(obj->base, CY_SCB_TX_INTR_LEVEL);
     } else {
@@ -781,7 +778,7 @@ void serial_rx_asynch(serial_t *obj_in, void *rx, size_t rx_length, uint8_t rx_w
     (void) hint;     /* At the moment we do not support DMA transfers, so this parameter gets ignored. */
 
     serial_obj_t *obj = OBJ_P(obj_in);
-    
+
     if (obj->rx_pending || (rx_length == 0)) {
         return;
     }
@@ -799,7 +796,7 @@ void serial_rx_asynch(serial_t *obj_in, void *rx, size_t rx_length, uint8_t rx_w
     obj_in->rx_buff.pos    = 0;
     obj_in->rx_buff.buffer = rx;
     obj_in->rx_buff.length = rx_length;
-    
+
     /* Enable interrupts to start receiving */
     Cy_SCB_SetRxInterruptMask(obj->base, UART_RX_INTR_MASK);
 }
@@ -817,7 +814,7 @@ uint8_t serial_rx_active(serial_t *obj)
 }
 
 
-/** Finishes TX asynchronous transfer: disable TX interrupts and clear 
+/** Finishes TX asynchronous transfer: disable TX interrupts and clear
  * pending state.
  *
  * @param obj The serial object
@@ -829,7 +826,7 @@ static void serial_finish_tx_asynch(serial_obj_t *obj)
 }
 
 
-/** Finishes TX asynchronous transfer: disable TX interrupts and clear 
+/** Finishes TX asynchronous transfer: disable TX interrupts and clear
  * pending state.
  *
  * @param obj The serial object
@@ -848,27 +845,27 @@ int serial_irq_handler_asynch(serial_t *obj_in)
     uint32_t rx_status;
 
     serial_obj_t *obj = OBJ_P(obj_in);
-    
+
     /* Interrupt cause is TX */
     if (0 != (CY_SCB_TX_INTR & Cy_SCB_GetInterruptCause(obj->base))) {
-    
+
         /* Get interrupt sources and clear them */
-        tx_status = Cy_SCB_GetTxInterruptStatusMasked(obj->base);  
+        tx_status = Cy_SCB_GetTxInterruptStatusMasked(obj->base);
         Cy_SCB_ClearTxInterrupt(obj->base, tx_status);
-      
+
         if (0 != (tx_status & CY_SCB_TX_INTR_LEVEL)) {
 
             /* Get current buffer position */
             uint8_t *ptr = obj_in->tx_buff.buffer;
             ptr += obj_in->tx_buff.pos;
-            
+
             /* FIFO has space available for more TX */
             while ((obj_in->tx_buff.pos < obj_in->tx_buff.length) &&
-                   (0 != Cy_SCB_UART_Put(obj->base, *ptr))) {
+                    (0 != Cy_SCB_UART_Put(obj->base, *ptr))) {
                 ++ptr;
                 ++(obj_in->tx_buff.pos);
             }
-            
+
             if (obj_in->tx_buff.pos == obj_in->tx_buff.length) {
                 /* No more bytes to follow; check to see if we need to signal completion */
                 if (0 != (obj->tx_events & SERIAL_EVENT_TX_COMPLETE)) {
@@ -880,7 +877,7 @@ int serial_irq_handler_asynch(serial_t *obj_in)
                 }
             }
         }
-    
+
         if (0 != (tx_status & CY_SCB_TX_INTR_UART_DONE)) {
             /* Mark end of the transmission */
             serial_finish_tx_asynch(obj);
@@ -894,7 +891,7 @@ int serial_irq_handler_asynch(serial_t *obj_in)
         /* Get interrupt sources and clear them */
         rx_status = Cy_SCB_GetRxInterruptStatusMasked(obj->base);
         Cy_SCB_ClearRxInterrupt(obj->base, rx_status);
-        
+
         if (0 != (rx_status & CY_SCB_RX_INTR_OVERFLOW)) {
             cur_events |= SERIAL_EVENT_RX_OVERRUN_ERROR;
         }
@@ -908,28 +905,28 @@ int serial_irq_handler_asynch(serial_t *obj_in)
         }
 
         if (0 != (rx_status & CY_SCB_RX_INTR_LEVEL)) {
-        
+
             /* Get current buffer position */
             uint8_t *ptr = obj_in->rx_buff.buffer;
             ptr += obj_in->rx_buff.pos;
-            
+
             /* Get data from the RX FIFO */
             while (obj_in->rx_buff.pos < obj_in->rx_buff.length) {
                 uint32_t c = Cy_SCB_UART_Get(obj->base);
-                
+
                 if (c == CY_SCB_UART_RX_NO_DATA) {
                     break;
                 }
-                
+
                 *ptr++ = (uint8_t) c;
                 ++(obj_in->rx_buff.pos);
-                
+
                 /* Check for character match condition */
                 if (obj_in->char_match != SERIAL_RESERVED_CHAR_MATCH) {
                     if (c == obj_in->char_match)  {
                         obj_in->char_found = true;
                         cur_events |= SERIAL_EVENT_RX_CHARACTER_MATCH;
-                        
+
                         /* Clamp RX buffer */
                         obj_in->rx_buff.length = obj_in->rx_buff.pos;
                         break;

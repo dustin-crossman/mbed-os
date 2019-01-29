@@ -185,13 +185,13 @@ void SystemInit(void)
         SRSS->CLK_FLL_CONFIG2 = CY_FB_CLK_FLL_CONFIG2_VALUE;
         SRSS->CLK_FLL_CONFIG3 = CY_FB_CLK_FLL_CONFIG3_VALUE;
         SRSS->CLK_FLL_CONFIG4 = CY_FB_CLK_FLL_CONFIG4_VALUE;
-        
+
         /* Unlock and disable WDT */
         Cy_WDT_Unlock();
-        Cy_WDT_Disable();    
+        Cy_WDT_Disable();
     #endif /* (__CM0P_PRESENT == 0) */
 #endif /* __CM0P_PRESENT */
-    
+
     Cy_SystemInit();
     SystemCoreClockUpdate();
 
@@ -214,8 +214,8 @@ void SystemInit(void)
     *
     * Initializes the system pipes. The system pipes are used by BLE and Flash.
     *
-    * If the default startup file is not used, or SystemInit() is not called in your 
-    * project, call the following three functions prior to executing any flash or 
+    * If the default startup file is not used, or SystemInit() is not called in your
+    * project, call the following three functions prior to executing any flash or
     * EmEEPROM write or erase operation:
     *  -# Cy_IPC_Sema_Init()
     *  -# Cy_IPC_Pipe_Config()
