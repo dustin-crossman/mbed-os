@@ -60,29 +60,27 @@
 *  P6-4, P6-6 and P6_7 reserved for SWD,
 *  P7_0 reserved for Debug trace CLK, 
 *  P7_1, P7_2 and P7_7 reserved for CSD Capacitors
-*  P8_1 ... P8_7 reserved for CSD Buttons and Sliders
+*  P8_1 ... P8_7 reserved for CSD Buttons and Slider
 *  P9_0 ... P9_3 reserved for Debug Trace 
 *  P11_2 ... P11_7 reserved for QSPI
 *  P12_6 ... P12_7 reserved for ECO
-*  P13_0 and P13_1 reserved for UART
-*  P14_0 and P14_1 reserved for USB
+*  P14_0 ... P14_1 reserved for USB
 */
 #define CYCFG_ASSIGNED_PORTS      SRM_PORT(0, 0x03), SRM_PORT(1, 0x01),\
                                   SRM_PORT(2, 0x3f), SRM_PORT(6, 0xd0),\
-                                  SRM_PORT(7, 0x87), SRM_PORT(8, 0xfe),\
+                                  SRM_PORT(7, 0x86), SRM_PORT(8, 0xfe),\
                                   SRM_PORT(9, 0x0f), SRM_PORT(11, 0xfc),\
-                                  SRM_PORT(12, 0xc0), SRM_PORT(13, 0x03),\
-                                  SRM_PORT(14, 0x03)
+                                  SRM_PORT(12, 0xc0), SRM_PORT(14, 0x03)
 
 /*
+*  8-bit divider 0 reserved for UDB
 *  8-bit divider 4 reserved for CSD
 *  16-bit divider 0 reserved for USB
 */
-#define CYCFG_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x10), \
+#define CYCFG_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x11), \
                                   SRM_DIVIDER(CY_SYSCLK_DIV_16_BIT, 0x01)
                                
-/* SCB 6 reserved for UART */
-#define CYCFG_ASSIGNED_SCBS       SRM_SCB(6)
+#define CYCFG_ASSIGNED_SCBS
 
 #define CYCFG_ASSIGNED_TCPWMS
 
