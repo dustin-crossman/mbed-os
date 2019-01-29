@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_prot.h
-* \version 1.20
+* \version 1.30
 *
 * \brief
 * Provides an API declaration of the Protection Unit driver
@@ -389,8 +389,14 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
+*     <td>1.30</td>
+*     <td>Defect in Cy_Prot_GetPpuProgStruct() function due to faulty #defines is fixed.</td>
+*     <td>Defect fixes.</td>
+*   </tr>
+*   <tr>
 *     <td rowspan="3">1.20</td>
-*     <td>Flattened the organization of the driver source code into the single source directory and the single include directory.</td>
+*     <td>Flattened the organization of the driver source code into the single 
+*         source directory and the single include directory.</td>
 *     <td>Driver library directory-structure simplification.</td>
 *   </tr>
 *   <tr>
@@ -467,7 +473,7 @@ extern "C" {
 #define CY_PROT_DRV_VERSION_MAJOR       1
 
 /** Driver minor version */
-#define CY_PROT_DRV_VERSION_MINOR       20
+#define CY_PROT_DRV_VERSION_MINOR       30
 
 /** Prot driver ID */
 #define CY_PROT_ID                      (CY_PDL_DRV_ID(0x30U))

@@ -278,7 +278,7 @@ cy_en_intr_t Cy_SysInt_GetInterruptActive(IRQn_Type IRQn)
     {
         tempReg = _FLD2VAL(CPUSS_V2_CM0_INT0_STATUS_SYSTEM_INT_IDX, CPUSS_CM0_INT_STATUS[locIdx]);
     }
-    return (cy_en_intr_t)tempReg;
+    return ((cy_en_intr_t)tempReg);
 }
 
 #endif
@@ -327,7 +327,7 @@ cy_israddress Cy_SysInt_SetVector(IRQn_Type IRQn, cy_israddress userIsr)
         prevIsr = __Vectors[CY_INT_IRQ_BASE + IRQn];
     }
 
-    return prevIsr;
+    return (prevIsr);
 }
 
 
@@ -368,7 +368,7 @@ cy_israddress Cy_SysInt_GetVector(IRQn_Type IRQn)
         currIsr = __Vectors[CY_INT_IRQ_BASE + IRQn];
     }
     
-    return currIsr;
+    return (currIsr);
 }
 
 

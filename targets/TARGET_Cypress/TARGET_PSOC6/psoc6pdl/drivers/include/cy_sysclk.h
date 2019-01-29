@@ -853,7 +853,7 @@ __STATIC_INLINE cy_en_sysclk_status_t Cy_SysClk_FllDisable(void)
     CY_REG32_CLR_SET(SRSS_CLK_FLL_CONFIG3, SRSS_CLK_FLL_CONFIG3_BYPASS_SEL, CY_SYSCLK_FLLPLL_OUTPUT_INPUT);
     SRSS_CLK_FLL_CONFIG  &= ~SRSS_CLK_FLL_CONFIG_FLL_ENABLE_Msk;
     SRSS_CLK_FLL_CONFIG4 &= ~SRSS_CLK_FLL_CONFIG4_CCO_ENABLE_Msk;
-    return CY_SYSCLK_SUCCESS;
+    return (CY_SYSCLK_SUCCESS);
 }
 /** \} group_sysclk_fll_funcs */
 
@@ -1050,7 +1050,7 @@ __STATIC_INLINE cy_en_sysclk_status_t Cy_SysClk_IloDisable(void)
         SRSS_CLK_ILO_CONFIG &= ~SRSS_CLK_ILO_CONFIG_ENABLE_Msk;
         retVal = CY_SYSCLK_SUCCESS;
     }
-    return retVal;
+    return (retVal);
 }
 
 /*******************************************************************************
@@ -1644,7 +1644,7 @@ __STATIC_INLINE cy_en_sysclk_status_t Cy_SysClk_ClkHfSetSource(uint32_t clkHf, c
 __STATIC_INLINE cy_en_clkhf_in_sources_t Cy_SysClk_ClkHfGetSource(uint32_t clkHf)
 {
     CY_ASSERT_L1(clkHf < CY_SRSS_NUM_HFROOT);
-    return (cy_en_clkhf_in_sources_t)(_FLD2VAL(SRSS_CLK_ROOT_SELECT_ROOT_MUX, SRSS_CLK_ROOT_SELECT[clkHf]));
+    return ((cy_en_clkhf_in_sources_t)(_FLD2VAL(SRSS_CLK_ROOT_SELECT_ROOT_MUX, SRSS_CLK_ROOT_SELECT[clkHf])));
 }
 
 /*******************************************************************************
@@ -1705,7 +1705,7 @@ __STATIC_INLINE cy_en_sysclk_status_t Cy_SysClk_ClkHfSetDivider(uint32_t clkHf, 
 __STATIC_INLINE cy_en_clkhf_dividers_t Cy_SysClk_ClkHfGetDivider(uint32_t clkHf)
 {
     CY_ASSERT_L1(clkHf < CY_SRSS_NUM_HFROOT);
-    return (cy_en_clkhf_dividers_t)(_FLD2VAL(SRSS_CLK_ROOT_SELECT_ROOT_DIV, SRSS_CLK_ROOT_SELECT[clkHf]));
+    return ((cy_en_clkhf_dividers_t)(_FLD2VAL(SRSS_CLK_ROOT_SELECT_ROOT_DIV, SRSS_CLK_ROOT_SELECT[clkHf])));
 }
 /** \} group_sysclk_clk_hf_funcs */
 
@@ -2403,7 +2403,7 @@ __STATIC_INLINE void Cy_SysClk_ClkLfSetSource(cy_en_clklf_in_sources_t source)
 *******************************************************************************/
 __STATIC_INLINE cy_en_clklf_in_sources_t Cy_SysClk_ClkLfGetSource(void)
 {
-    return (cy_en_clklf_in_sources_t)(_FLD2VAL(SRSS_CLK_SELECT_LFCLK_SEL, SRSS_CLK_SELECT));
+    return ((cy_en_clklf_in_sources_t)(_FLD2VAL(SRSS_CLK_SELECT_LFCLK_SEL, SRSS_CLK_SELECT)));
 }
 /** \} group_sysclk_clk_lf_funcs */
 
@@ -2482,7 +2482,7 @@ __STATIC_INLINE void Cy_SysClk_ClkTimerSetSource(cy_en_clktimer_in_sources_t sou
 __STATIC_INLINE cy_en_clktimer_in_sources_t Cy_SysClk_ClkTimerGetSource(void)
 {
     /* return both fields TIMER_SEL and TIMER_HF0_DIV as a single combined value */
-    return (cy_en_clktimer_in_sources_t)(SRSS_CLK_TIMER_CTL & CY_SRSS_CLK_TIMER_CTL_TIMER_Msk);
+    return ((cy_en_clktimer_in_sources_t)(SRSS_CLK_TIMER_CTL & CY_SRSS_CLK_TIMER_CTL_TIMER_Msk));
 }
 
 /*******************************************************************************
@@ -2658,7 +2658,7 @@ __STATIC_INLINE void Cy_SysClk_ClkPumpSetSource(cy_en_clkpump_in_sources_t sourc
 *******************************************************************************/
 __STATIC_INLINE cy_en_clkpump_in_sources_t Cy_SysClk_ClkPumpGetSource(void)
 {
-    return (cy_en_clkpump_in_sources_t)_FLD2VAL(SRSS_CLK_SELECT_PUMP_SEL, SRSS_CLK_SELECT);
+    return ((cy_en_clkpump_in_sources_t)_FLD2VAL(SRSS_CLK_SELECT_PUMP_SEL, SRSS_CLK_SELECT));
 }
 
 /*******************************************************************************
@@ -2696,7 +2696,7 @@ __STATIC_INLINE void Cy_SysClk_ClkPumpSetDivider(cy_en_clkpump_divide_t divider)
 *******************************************************************************/
 __STATIC_INLINE cy_en_clkpump_divide_t Cy_SysClk_ClkPumpGetDivider(void)
 {
-    return (cy_en_clkpump_divide_t)_FLD2VAL(SRSS_CLK_SELECT_PUMP_DIV, SRSS_CLK_SELECT);
+    return ((cy_en_clkpump_divide_t)_FLD2VAL(SRSS_CLK_SELECT_PUMP_DIV, SRSS_CLK_SELECT));
 }
 
 /*******************************************************************************
@@ -2795,7 +2795,7 @@ __STATIC_INLINE void Cy_SysClk_ClkBakSetSource(cy_en_clkbak_in_sources_t source)
 *******************************************************************************/
 __STATIC_INLINE cy_en_clkbak_in_sources_t Cy_SysClk_ClkBakGetSource(void)
 {
-    return (cy_en_clkbak_in_sources_t)_FLD2VAL(BACKUP_CTL_CLK_SEL, BACKUP_CTL);
+    return ((cy_en_clkbak_in_sources_t)_FLD2VAL(BACKUP_CTL_CLK_SEL, BACKUP_CTL));
 }
 /** \} group_sysclk_clk_bak_funcs */
 

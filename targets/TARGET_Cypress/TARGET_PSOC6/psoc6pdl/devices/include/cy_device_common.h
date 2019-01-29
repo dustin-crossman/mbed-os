@@ -68,7 +68,7 @@ typedef enum {
      (defined(__ghs__)         && defined(__CORE_CORTEXM0PLUS__)))
 
 typedef enum {
-  disconnected_IRQn                 = 240       /*!< 240 Disconnected */
+  disconnected_IRQn                 = 1023       /*!< 1023 Disconnected */
 } cy_en_intr_t;
 
 #endif

@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_prot.c
-* \version 1.20
+* \version 1.30
 *
 * \brief
 * Provides an API implementation of the Protection Unit driver

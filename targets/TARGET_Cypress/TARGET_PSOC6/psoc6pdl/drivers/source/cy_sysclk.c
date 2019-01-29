@@ -331,7 +331,7 @@ cy_en_clkpath_in_sources_t Cy_SysClk_ClkPathGetSource(uint32_t clkPath)
         retVal = (cy_en_clkpath_in_sources_t)(CY_SYSCLK_CLKPATH_IN_DSI |
                     (_FLD2VAL(SRSS_CLK_DSI_SELECT_DSI_MUX, SRSS_CLK_DSI_SELECT[clkPath])));
     }
-    return retVal;
+    return (retVal);
 }
 /** \} group_sysclk_path_src_funcs */
 
@@ -1681,7 +1681,7 @@ cy_en_syspm_status_t Cy_SysClk_DeepSleepCallback(cy_stc_syspm_callback_params_t 
                 break;
         }
     }
-    return retVal;
+    return (retVal);
 }
 /** \} group_sysclk_pm_funcs */
 
@@ -1813,7 +1813,7 @@ uint32_t Cy_SysClk_PeriphGetFrequency(cy_en_divider_types_t dividerType, uint32_
      */
     freq /= (integer + 1UL + ((frac >= 16UL) ? 1UL : 0UL)); /* peripheral divider output frequency */
 
-    return freq;
+    return (freq);
 }
 /** \} group_sysclk_clk_peripheral_funcs */
 
