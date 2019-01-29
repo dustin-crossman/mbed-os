@@ -186,6 +186,7 @@ static int gpio_irq_setup_channel(gpio_irq_t *obj)
         }
 
         irq_port_usage[obj->port_id].pin_mask |= (1 << obj->pin);
+        gpio_irq_enable(obj);
         NVIC_EnableIRQ(irqn);
     }
 
@@ -204,6 +205,9 @@ int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uint32
         }
         obj->handler = handler;
         obj->id_arg = id;
+        /* Safe reference to current object */  
+        irq_objects[obj->port_id][obj->pin] = obj;
+
         return gpio_irq_setup_channel(obj);
     } else {
         return (-1);
