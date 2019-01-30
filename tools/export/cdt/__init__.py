@@ -37,10 +37,6 @@ class Eclipse(Makefile):
             
             eclipse_config.update(target_info)
 
-        #special case for gdbClientOtherOptions param - in some cases it may contain dynamical values, fill in it here
-        eclipse_config['gdbClientOtherOptions'] = eclipse_config['gdbClientOtherOptions'].format(
-                                                    elf_location=ctx['elf_location'])
-
         Eclipsedevice = namedtuple('Eclipsedevice', eclipse_config.keys())
         return Eclipsedevice(**eclipse_config)
 
