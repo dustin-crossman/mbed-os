@@ -158,6 +158,15 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
+*     <td rowspan="4">2.20</td>
+*     <td>Updated implementation of the \ref Cy_SysLib_Assert() function to be available in the Release and Debug modes.</td>
+*     <td>Provided support for the PDL static library in the Release mode.</td>
+*   </tr>
+*   <tr>
+*     <td>Minor documentation edits</td>
+*     <td>Documentation update and clarification</td>
+*   </tr>
+*   <tr>
 *     <td rowspan="4">2.10</td>
 *     <td>Flattened the organization of the driver source code into the single source directory and the single include directory.</td>
 *     <td>Driver library directory-structure simplification.</td>

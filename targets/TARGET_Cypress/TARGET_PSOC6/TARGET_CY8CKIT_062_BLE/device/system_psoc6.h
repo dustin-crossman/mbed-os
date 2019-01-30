@@ -317,7 +317,16 @@
 *       <th>Version</th>
 *       <th>Changes</th>
 *       <th>Reason for Change</th>
-*    </tr>
+*   </tr>
+*   <tr>
+*       <td rowspan="2">2.30</td>
+*       <td>Added assembler files, linker skripts for Mbed OS.</td>
+*       <td>Arm Mbed OS embedded operating system support.</td>
+*   </tr>
+*   <tr>
+*       <td>Updated linker scripts to extend the Flash and Ram memories size available for the CM4 core.</td>
+*       <td>Enhanced PDL usability.</td>
+*   </tr>
 *   <tr>
 *       <td>2.20</td>
 *       <td>Moved the Cy_IPC_SystemSemaInit(), Cy_IPC_SystemPipeInit() functions implementation from IPC to Startup.</td>
