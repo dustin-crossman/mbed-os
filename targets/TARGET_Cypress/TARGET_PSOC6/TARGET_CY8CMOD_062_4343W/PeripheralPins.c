@@ -443,14 +443,20 @@ const PinMap PinMap_PWM_OUT[] = {
 
 #if DEVICE_ANALOGIN
 const PinMap PinMap_ADC[] = {
-    {P10_0, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},
-    {P10_1, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},
-    {P10_2, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},
-    {P10_3, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},
-    {P10_4, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},
-    {P10_5, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},
-    {P10_6, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},
-    {P10_7, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},
+    {P9_0, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},  // The SAR ADC Vplus input connects to the P9_0 pin through the AMUXA bus
+    {P9_1, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},  // The SAR ADC Vplus input connects to the P9_1 pin through the AMUXA bus
+    {P9_2, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},  // The SAR ADC Vplus input connects to the P9_2 pin through the AMUXA bus
+    {P9_4, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},  // The SAR ADC Vplus input connects to the P9_4 pin through the AMUXA bus
+    {P9_5, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},  // The SAR ADC Vplus input connects to the P9_5 pin through the AMUXA bus
+    {P9_6, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)},  // The SAR ADC Vplus input connects to the P9_6 pin through the AMUXA bus
+    {P10_0, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)}, // The SAR ADC Vplus input has the direct connection to the P10_0 pin
+    {P10_1, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)}, // The SAR ADC Vplus input has the direct connection to the P10_1 pin
+    {P10_2, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)}, // The SAR ADC Vplus input has the direct connection to the P10_2 pin
+    {P10_3, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)}, // The SAR ADC Vplus input has the direct connection to the P10_3 pin
+    {P10_4, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)}, // The SAR ADC Vplus input has the direct connection to the P10_4 pin
+    {P10_5, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)}, // The SAR ADC Vplus input has the direct connection to the P10_5 pin
+    {P10_6, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)}, // The SAR ADC Vplus input has the direct connection to the P10_6 pin
+    {P10_7, ADC_0, CY_PIN_ANALOG_FUNCTION(PCLK_PASS_CLOCK_SAR)}, // The SAR ADC Vplus input has the direct connection to the P10_7 pin
     {NC,    NC,     0}
 };
 #endif // DEVICE_ANALOGIN
