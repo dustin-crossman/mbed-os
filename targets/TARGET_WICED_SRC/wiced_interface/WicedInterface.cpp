@@ -144,6 +144,9 @@ static wiced_result_t wiced_scan_security_handler(
 
 nsapi_error_t WicedInterface::connect()
 {
+#define MAX_RETRY_COUNT    ( 5 )
+    int i;
+
     if (!_interface) {
         nsapi_error_t err = _stack.add_ethernet_interface(_emac, true, &_interface);
         if (err != NSAPI_ERROR_OK) {
@@ -193,12 +196,19 @@ nsapi_error_t WicedInterface::connect()
     }
 
     // join the network
-    res = (wiced_result_t)wwd_wifi_join(
+    for ( i = 0; i < MAX_RETRY_COUNT; i++ ) 
+    {
+       res = (wiced_result_t)wwd_wifi_join(
             &ssid,
             security,
             (const uint8_t *)_pass, strlen(_pass),
             NULL,
             WWD_STA_INTERFACE);
+       if (res == WICED_SUCCESS) {
+           break;
+       }
+    }
+
     if (res != WICED_SUCCESS) {
         return wiced_toerror(res);
     }
