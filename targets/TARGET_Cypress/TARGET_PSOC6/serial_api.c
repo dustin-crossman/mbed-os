@@ -437,7 +437,7 @@ void serial_init(serial_t *obj_in, PinName tx, PinName rx)
 {
     serial_obj_t *obj = OBJ_P(obj_in);
     bool is_stdio = (tx == CY_STDIO_UART_TX) || (rx == CY_STDIO_UART_RX);
-#if defined(TARGET_CY8CPROTO_062_4343W)
+#if !defined(TARGET_CY8CKIT_062_BLE)
     bool is_bt = (tx == CY_BT_UART_TX) || (rx == CY_BT_UART_RX);
 #else
     bool is_bt = false;
