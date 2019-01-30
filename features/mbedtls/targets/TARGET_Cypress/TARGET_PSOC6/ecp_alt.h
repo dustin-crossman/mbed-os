@@ -102,69 +102,11 @@ typedef struct mbedtls_ecp_group
 }
 mbedtls_ecp_group;
 
-#if defined(MBEDTLS_ECP_RESTARTABLE)
-
-/**
- * \brief           Internal restart context for multiplication
- *
- * \note            Opaque struct
- */
-typedef struct mbedtls_ecp_restart_mul mbedtls_ecp_restart_mul_ctx;
-
-/**
- * \brief           Internal restart context for ecp_muladd()
- *
- * \note            Opaque struct
- */
-typedef struct mbedtls_ecp_restart_muladd mbedtls_ecp_restart_muladd_ctx;
-
-/**
- * \brief           General context for resuming ECC operations
- */
-typedef struct
-{
-    unsigned ops_done;                  /*!<  current ops count             */
-    unsigned depth;                     /*!<  call depth (0 = top-level)    */
-    mbedtls_ecp_restart_mul_ctx *rsm;   /*!<  ecp_mul_comb() sub-context    */
-    mbedtls_ecp_restart_muladd_ctx *ma; /*!<  ecp_muladd() sub-context      */
-} mbedtls_ecp_restart_ctx;
-
-/*
- * Operation counts for restartable functions
- */
-#define MBEDTLS_ECP_OPS_CHK   3 /*!< basic ops count for ecp_check_pubkey()  */
-#define MBEDTLS_ECP_OPS_DBL   8 /*!< basic ops count for ecp_double_jac()    */
-#define MBEDTLS_ECP_OPS_ADD  11 /*!< basic ops count for see ecp_add_mixed() */
-#define MBEDTLS_ECP_OPS_INV 120 /*!< empirical equivalent for mpi_mod_inv()  */
-
-/**
- * \brief           Internal; for restartable functions in other modules.
- *                  Check and update basic ops budget.
- *
- * \param grp       Group structure
- * \param rs_ctx    Restart context
- * \param ops       Number of basic ops to do
- *
- * \return          \c 0 if doing \p ops basic ops is still allowed,
- * \return          #MBEDTLS_ERR_ECP_IN_PROGRESS otherwise.
- */
-int mbedtls_ecp_check_budget( const mbedtls_ecp_group *grp,
-                              mbedtls_ecp_restart_ctx *rs_ctx,
-                              unsigned ops );
-
-/* Utility macro for checking and updating ops budget */
-#define MBEDTLS_ECP_BUDGET( ops )   \
-    MBEDTLS_MPI_CHK( mbedtls_ecp_check_budget( grp, rs_ctx, \
-                                               (unsigned) (ops) ) );
-
-#else /* MBEDTLS_ECP_RESTARTABLE */
-
 #define MBEDTLS_ECP_BUDGET( ops )   /* no-op; for compatibility */
 
 /* We want to declare restartable versions of existing functions anyway */
 typedef void mbedtls_ecp_restart_ctx;
 
-#endif /* MBEDTLS_ECP_RESTARTABLE */
 
 /**
  * \name SECTION: Module settings
