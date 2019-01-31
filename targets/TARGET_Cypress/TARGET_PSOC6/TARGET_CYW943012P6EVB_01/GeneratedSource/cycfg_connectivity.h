@@ -6,18 +6,19 @@
 * This file was automatically generated and should not be modified.
 * 
 ********************************************************************************
-* Copyright (c) 2017-2019 Cypress Semiconductor Corporation.
+* Copyright 2017-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*    http://www.apache.org/licenses/LICENSE-2.0
+*     http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and 
+* See the License for the specific language governing permissions and
 * limitations under the License.
 ********************************************************************************/
 
@@ -76,13 +77,13 @@ void init_cycfg_connectivity(void);
 #define cpuss_0_dw1_0_chan_1_tr_in_0_TRIGGER_OUT TRIG1_OUT_CPUSS_DW1_TR_IN1
 #define cpuss_0_dw1_0_chan_3_tr_in_0_TRIGGER_OUT TRIG1_OUT_CPUSS_DW1_TR_IN3
 #define udb_0_out_p_116_TRIGGER_IN_0 TRIG14_IN_UDB_TR_UDB0
-#define udb_0_out_p_116_TRIGGER_IN_1 TRIG1_IN_TR_GROUP14_OUTPUT6
-#define udb_0_out_p_117_TRIGGER_IN_0 TRIG0_IN_TR_GROUP14_OUTPUT5
+#define udb_0_out_p_116_TRIGGER_IN_1 TRIG1_IN_TR_GROUP14_OUTPUT0
+#define udb_0_out_p_117_TRIGGER_IN_0 TRIG0_IN_TR_GROUP14_OUTPUT3
 #define udb_0_out_p_117_TRIGGER_IN_1 TRIG14_IN_UDB_TR_UDB1
-#define udb_0_out_p_119_TRIGGER_IN_0 TRIG0_IN_TR_GROUP14_OUTPUT0
+#define udb_0_out_p_119_TRIGGER_IN_0 TRIG0_IN_TR_GROUP14_OUTPUT1
 #define udb_0_out_p_119_TRIGGER_IN_1 TRIG14_IN_UDB_TR_UDB3
 #define udb_0_out_p_123_TRIGGER_IN_0 TRIG14_IN_UDB_TR_UDB7
-#define udb_0_out_p_123_TRIGGER_IN_1 TRIG1_IN_TR_GROUP14_OUTPUT2
+#define udb_0_out_p_123_TRIGGER_IN_1 TRIG1_IN_TR_GROUP14_OUTPUT0
 
 #if defined(__cplusplus)
 }
