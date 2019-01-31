@@ -39,8 +39,6 @@
 #ifndef INITIAL_SP
 #define INITIAL_SP              (0x08002000 + 0x00045800)  /* Ram origin + length */
 #endif
-#else
-#error "Unknown board"
 #endif
 
 #endif  /* MBED_MBED_RTX_H */
