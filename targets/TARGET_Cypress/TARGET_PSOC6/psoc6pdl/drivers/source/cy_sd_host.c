@@ -4709,6 +4709,11 @@ __WEAK void Cy_SD_Host_ChangeIoVoltage(SDHC_Type *base, cy_en_sd_host_io_voltage
 *
 *  Checks to see if a card is currently connected.
 *
+* \note You can use any GPIO custom pin for Card Detect. Add the SD Host driver 
+* Cy_SD_Host_IsCardConnected() function with the __WEAK type to your code.
+* This function could read the value from any GPIO pin and return true when
+* the card is connected.
+*
 * \param *base
 *     The SD host registers structure pointer.
 *
