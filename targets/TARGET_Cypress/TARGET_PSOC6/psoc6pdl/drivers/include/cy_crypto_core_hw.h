@@ -228,6 +228,8 @@ cy_en_crypto_status_t Cy_Crypto_Core_Disable(CRYPTO_Type *base);
 
 cy_en_crypto_status_t Cy_Crypto_Core_GetLibInfo(cy_en_crypto_lib_info_t *libInfo);
 
+void Cy_Crypto_Core_ClearVuRegisters(CRYPTO_Type *base);
+
 void Cy_Crypto_Core_InvertEndianness(void *inArrPtr, uint32_t byteSize);
 
 /*******************************************************************************
@@ -249,6 +251,11 @@ void Cy_Crypto_Core_InvertEndianness(void *inArrPtr, uint32_t byteSize);
 *******************************************************************************/
 __STATIC_INLINE bool Cy_Crypto_Core_IsEnabled(CRYPTO_Type *base)
 {
+    if (cy_cryptoIP == NULL)
+    {
+        Cy_Crypto_Core_HwInit();
+    }
+
     return (1uL == (uint32_t)_FLD2VAL(CRYPTO_CTL_ENABLED, REG_CRYPTO_CTL(base)));
 }
 

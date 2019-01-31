@@ -64,7 +64,7 @@ typedef cy_en_crypto_status_t (*cy_crypto_sha_func_t)(CRYPTO_Type *base,
 * The pointer to the hash digest.
 *
 * \return
-* A Crypto status \ref en_crypto_status_t.
+* A Crypto status \ref cy_en_crypto_status_t.
 *
 *******************************************************************************/
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha(CRYPTO_Type *base,
@@ -110,20 +110,27 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha(CRYPTO_Type *base,
 * \param shaBuffers
 * The pointer to memory buffers storage
 *
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
 *******************************************************************************/
-__STATIC_INLINE void Cy_Crypto_Core_Sha_Init(CRYPTO_Type *base,
-                             cy_stc_crypto_sha_state_t **shaHashState,
+__STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Init(CRYPTO_Type *base,
+                             cy_stc_crypto_sha_state_t *shaHashState,
                              cy_en_crypto_sha_mode_t mode,
                              void *shaBuffers)
 {
+    cy_en_crypto_status_t myResult;
+
     if (cy_device->cryptoVersion == 1u)
     {
-        Cy_Crypto_Core_V1_Sha_Init(base, shaHashState, mode, shaBuffers);
+        myResult = Cy_Crypto_Core_V1_Sha_Init(base, shaHashState, mode, shaBuffers);
     }
     else
     {
-        Cy_Crypto_Core_V2_Sha_Init(base, shaHashState, mode, shaBuffers);
+        myResult = Cy_Crypto_Core_V2_Sha_Init(base, shaHashState, mode, shaBuffers);
     }
+
+    return myResult;
 }
 
 /*******************************************************************************
@@ -142,17 +149,24 @@ __STATIC_INLINE void Cy_Crypto_Core_Sha_Init(CRYPTO_Type *base,
 * \param hashState
 * The pointer to the SHA context.
 *
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
 *******************************************************************************/
-__STATIC_INLINE void Cy_Crypto_Core_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
+__STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
 {
+    cy_en_crypto_status_t myResult;
+
     if (cy_device->cryptoVersion == 1u)
     {
-        Cy_Crypto_Core_V1_Sha_Start(base, hashState);
+        myResult = Cy_Crypto_Core_V1_Sha_Start(base, hashState);
     }
     else
     {
-        Cy_Crypto_Core_V2_Sha_Start(base, hashState);
+        myResult = Cy_Crypto_Core_V2_Sha_Start(base, hashState);
     }
+
+    return myResult;
 }
 
 /*******************************************************************************
@@ -177,20 +191,27 @@ __STATIC_INLINE void Cy_Crypto_Core_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_s
 * \param messageSize
 * The size of the message whose Hash is being computed.
 *
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
 *******************************************************************************/
-__STATIC_INLINE void Cy_Crypto_Core_Sha_Update(CRYPTO_Type *base,
+__STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Update(CRYPTO_Type *base,
                                cy_stc_crypto_sha_state_t *hashState,
                                uint8_t const *message,
                                uint32_t  messageSize)
 {
+    cy_en_crypto_status_t myResult;
+
     if (cy_device->cryptoVersion == 1u)
     {
-        Cy_Crypto_Core_V1_Sha_Update(base, hashState, message, messageSize);
+        myResult = Cy_Crypto_Core_V1_Sha_Update(base, hashState, message, messageSize);
     }
     else
     {
-        Cy_Crypto_Core_V2_Sha_Update(base, hashState, message, messageSize);
+        myResult = Cy_Crypto_Core_V2_Sha_Update(base, hashState, message, messageSize);
     }
+
+    return myResult;
 }
 
 /*******************************************************************************
@@ -212,19 +233,26 @@ __STATIC_INLINE void Cy_Crypto_Core_Sha_Update(CRYPTO_Type *base,
 * \param digest
 * The pointer to the calculated hash digest.
 *
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
 *******************************************************************************/
-__STATIC_INLINE void Cy_Crypto_Core_Sha_Finish(CRYPTO_Type *base,
+__STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Finish(CRYPTO_Type *base,
                                cy_stc_crypto_sha_state_t *hashState,
                                uint8_t *digest)
 {
+    cy_en_crypto_status_t myResult;
+
     if (cy_device->cryptoVersion == 1u)
     {
-        Cy_Crypto_Core_V1_Sha_Finish(base, hashState, digest);
+        myResult = Cy_Crypto_Core_V1_Sha_Finish(base, hashState, digest);
     }
     else
     {
-        Cy_Crypto_Core_V2_Sha_Finish(base, hashState, digest);
+        myResult = Cy_Crypto_Core_V2_Sha_Finish(base, hashState, digest);
     }
+
+    return myResult;
 }
 
 /*******************************************************************************
@@ -242,17 +270,24 @@ __STATIC_INLINE void Cy_Crypto_Core_Sha_Finish(CRYPTO_Type *base,
 * \param hashState
 * The pointer to the SHA context.
 *
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
 *******************************************************************************/
-__STATIC_INLINE void Cy_Crypto_Core_Sha_Free(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
+__STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Free(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
 {
+    cy_en_crypto_status_t myResult;
+
     if (cy_device->cryptoVersion == 1u)
     {
-        Cy_Crypto_Core_V1_Sha_Free(base, hashState);
+        myResult = Cy_Crypto_Core_V1_Sha_Free(base, hashState);
     }
     else
     {
-        Cy_Crypto_Core_V2_Sha_Free(base, hashState);
+        myResult = Cy_Crypto_Core_V2_Sha_Free(base, hashState);
     }
+
+    return myResult;
 }
 
 

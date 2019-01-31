@@ -55,7 +55,7 @@ typedef struct
     uint32_t ipad[CY_CRYPTO_HMAC_MAX_PAD_SIZE / 4u];
     uint32_t opad[CY_CRYPTO_HMAC_MAX_PAD_SIZE / 4u];
     uint32_t m0Key[CY_CRYPTO_SHA_MAX_BLOCK_SIZE / 4u];
-    cy_stc_crypto_v1_sha_buffers_t shaBuffers;
+    cy_stc_crypto_v1_sha512_buffers_t shaBuffers;
     cy_stc_crypto_v1_hmac_state_t hmacState;
 } cy_stc_crypto_hmac_buffers_t;
 
@@ -288,19 +288,19 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Hmac(CRYPTO_Type *base,
     cy_stc_crypto_hmac_buffers_t  *hmacBuffers = (cy_stc_crypto_hmac_buffers_t *)(REG_CRYPTO_MEM_BUFF(base));
 
     cy_stc_crypto_v1_hmac_state_t *hmacStateTmp = &hmacBuffers->hmacState;
-    cy_stc_crypto_sha_state_t     *hashStateTmp;
+    cy_stc_crypto_sha_state_t      hashState;
 
     uint8_t *ipadTmp      = (uint8_t*)(&hmacBuffers->ipad);
     uint8_t *opadTmp      = (uint8_t*)(&hmacBuffers->opad);
     uint8_t *m0KeyTmp     = (uint8_t*)(&hmacBuffers->m0Key);
 
-    Cy_Crypto_Core_V1_Sha_Init       (base, &hashStateTmp, mode, &hmacBuffers->shaBuffers);
+    Cy_Crypto_Core_V1_Sha_Init       (base, &hashState, mode, &hmacBuffers->shaBuffers);
 
     Cy_Crypto_Core_V1_Hmac_Init      (hmacStateTmp, ipadTmp, opadTmp, m0KeyTmp);
-    Cy_Crypto_Core_V1_Hmac_Calculate (base, hmacStateTmp, hashStateTmp, key, keyLength, message, messageSize, hmac);
+    Cy_Crypto_Core_V1_Hmac_Calculate (base, hmacStateTmp, &hashState, key, keyLength, message, messageSize, hmac);
     Cy_Crypto_Core_V1_Hmac_Free      (base, hmacStateTmp);
 
-    Cy_Crypto_Core_V1_Sha_Free       (base, hashStateTmp);
+    Cy_Crypto_Core_V1_Sha_Free       (base, &hashState);
 
     return (CY_CRYPTO_SUCCESS);
 }

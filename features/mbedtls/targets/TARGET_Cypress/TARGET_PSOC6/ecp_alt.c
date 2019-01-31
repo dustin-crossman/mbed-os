@@ -1,20 +1,21 @@
 /*
  * Elliptic curves over GF(p): generic functions
  *
- * mbed Microcontroller Library
- * Copyright (c) 2019 Cypress Semiconductor Corporation
+ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
+ *  Copyright (C) 2019 Cypress Semiconductor Corporation
+ *  SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may
+ *  not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 /*
@@ -51,9 +52,6 @@
 #include "mbedtls/threading.h"
 #include "mbedtls/platform_util.h"
 
-#include <string.h>
-#include "cy_crypto_core_ecc_nist_p.h"
-
 #if defined(MBEDTLS_ECP_ALT)
 
 #if defined(MBEDTLS_PLATFORM_C)
@@ -62,11 +60,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 #define mbedtls_printf     printf
-#define mbedtls_calloc    calloc
+#define mbedtls_calloc     calloc
 #define mbedtls_free       free
 #endif
 
+#include <string.h>
 #include "mbedtls/ecp_internal.h"
+
+#include "psoc6_utils.h"
+#include "crypto_common.h"
+
+#include "cy_crypto_core_ecc_nist_p.h"
 
 #if ( defined(__ARMCC_VERSION) || defined(_MSC_VER) ) && \
     !defined(inline) && !defined(__cplusplus)
@@ -1254,116 +1258,6 @@ static void ecp_comb_recode_core( unsigned char x[], size_t d,
 }
 
 /*
- * Precompute points for the adapted comb method
- *
- * Assumption: T must be able to hold 2^{w - 1} elements.
- *
- * Operation: If i = i_{w-1} ... i_1 is the binary representation of i,
- *            sets T[i] = i_{w-1} 2^{(w-1)d} P + ... + i_1 2^d P + P.
- *
- * Cost: d(w-1) D + (2^{w-1} - 1) A + 1 N(w-1) + 1 N(2^{w-1} - 1)
- *
- * Note: Even comb values (those where P would be omitted from the
- *       sum defining T[i] above) are not needed in our adaption
- *       the comb method. See ecp_comb_recode_core().
- *
- * This function currently works in four steps:
- * (1) [dbl]      Computation of intermediate T[i] for 2-power values of i
- * (2) [norm_dbl] Normalization of coordinates of these T[i]
- * (3) [add]      Computation of all T[i]
- * (4) [norm_add] Normalization of all T[i]
- *
- * Step 1 can be interrupted but not the others; together with the final
- * coordinate normalization they are the largest steps done at once, depending
- * on the window size. Here are operation counts for P-256:
- *
- * step     (2)     (3)     (4)
- * w = 5    142     165     208
- * w = 4    136      77     160
- * w = 3    130      33     136
- * w = 2    124      11     124
- *
- * So if ECC operations are blocking for too long even with a low max_ops
- * value, it's useful to set MBEDTLS_ECP_WINDOW_SIZE to a lower value in order
- * to minimize maximum blocking time.
- */
-static int ecp_precompute_comb( const mbedtls_ecp_group *grp,
-                                mbedtls_ecp_point T[], const mbedtls_ecp_point *P,
-                                unsigned char w, size_t d,
-                                mbedtls_ecp_restart_ctx *rs_ctx )
-{
-    int ret;
-    unsigned char i;
-    size_t j = 0;
-    const unsigned char T_size = 1U << ( w - 1 );
-    mbedtls_ecp_point *cur, *TT[COMB_MAX_PRE - 1];
-
-    (void) rs_ctx;
-
-    /*
-     * Set T[0] = P and
-     * T[2^{l-1}] = 2^{dl} P for l = 1 .. w-1 (this is not the final value)
-     */
-    MBEDTLS_MPI_CHK( mbedtls_ecp_copy( &T[0], P ) );
-
-    j = 0;
-
-    for( ; j < d * ( w - 1 ); j++ )
-    {
-        MBEDTLS_ECP_BUDGET( MBEDTLS_ECP_OPS_DBL );
-
-        i = 1U << ( j / d );
-        cur = T + i;
-
-        if( j % d == 0 )
-            MBEDTLS_MPI_CHK( mbedtls_ecp_copy( cur, T + ( i >> 1 ) ) );
-
-        MBEDTLS_MPI_CHK( ecp_double_jac( grp, cur, cur ) );
-    }
-
-    /*
-     * Normalize current elements in T. As T has holes,
-     * use an auxiliary array of pointers to elements in T.
-     */
-    j = 0;
-    for( i = 1; i < T_size; i <<= 1 )
-        TT[j++] = T + i;
-
-    MBEDTLS_ECP_BUDGET( MBEDTLS_ECP_OPS_INV + 6 * j - 2 );
-
-    MBEDTLS_MPI_CHK( ecp_normalize_jac_many( grp, TT, j ) );
-
-    /*
-     * Compute the remaining ones using the minimal number of additions
-     * Be careful to update T[2^l] only after using it!
-     */
-    MBEDTLS_ECP_BUDGET( ( T_size - 1 ) * MBEDTLS_ECP_OPS_ADD );
-
-    for( i = 1; i < T_size; i <<= 1 )
-    {
-        j = i;
-        while( j-- )
-            MBEDTLS_MPI_CHK( ecp_add_mixed( grp, &T[i + j], &T[j], &T[i] ) );
-    }
-
-    /*
-     * Normalize final elements in T. Even though there are no holes now, we
-     * still need the auxiliary array for homogeneity with the previous
-     * call. Also, skip T[0] which is already normalised, being a copy of P.
-     */
-    for( j = 0; j + 1 < T_size; j++ )
-        TT[j] = T + j + 1;
-
-    MBEDTLS_ECP_BUDGET( MBEDTLS_ECP_OPS_INV + 6 * j - 2 );
-
-    MBEDTLS_MPI_CHK( ecp_normalize_jac_many( grp, TT, j ) );
-
-cleanup:
-
-    return( ret );
-}
-
-/*
  * Select precomputed point: R = sign(i) * T[ abs(i) / 2 ]
  *
  * See ecp_comb_recode_core() for background
@@ -1596,15 +1490,22 @@ static int ecp_mul_comb( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
     mbedtls_mpi di;
     mbedtls_ecp_point Pi;
 
+    cy_en_crypto_ecc_curve_id_t curveId = get_dp_idx(grp->id);
+
+    if (curveId == CY_CRYPTO_ECC_ECP_NONE)
+        return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
+
+    /* we need N to be odd to transform m in an odd number, check now */
+    if( mbedtls_mpi_get_bit( &grp->N, 0 ) != 1 )
+        return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
+
+    cy_reserve_crypto(CY_CRYPTO_VU_HW);
+
     mbedtls_mpi_init(&di);
     MBEDTLS_MPI_CHK( mbedtls_mpi_copy(&di, m) );
 
     mbedtls_ecp_point_init(&Pi);
     MBEDTLS_MPI_CHK( mbedtls_ecp_copy( &Pi, P ) );
-
-    /* we need N to be odd to transform m in an odd number, check now */
-    if( mbedtls_mpi_get_bit( &grp->N, 0 ) != 1 )
-        return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
 
     MBEDTLS_MPI_CHK( mbedtls_mpi_grow(&di, data_size) );
 
@@ -1615,7 +1516,7 @@ static int ecp_mul_comb( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
     MBEDTLS_MPI_CHK( mbedtls_mpi_grow(&R->Y, data_size) );
 
     Cy_Crypto_Core_EC_NistP_PointMultiplication (CRYPTO,
-    		CY_CRYPTO_ECC_ECP_SECP256R1,
+    		curveId,
 			(uint8_t *)Pi.X.p, (uint8_t *)Pi.Y.p,
 			(uint8_t *)di.p,
 			(uint8_t *)R->X.p, (uint8_t *)R->Y.p);
@@ -1630,6 +1531,8 @@ cleanup:
 
     if( ret != 0 )
         mbedtls_ecp_point_free( R );
+
+    cy_free_crypto(CY_CRYPTO_VU_HW);
 
     return( ret );
 }

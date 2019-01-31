@@ -8,7 +8,6 @@
 *
 ********************************************************************************
 * Copyright 2016-2019 Cypress Semiconductor Corporation
-* SPDX-License-Identifier: Apache-2.0
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -49,9 +48,8 @@ bool test_zero(CRYPTO_Type *base, int rsrc0)
     uint16_t status;
 
     CY_CRYPTO_VU_TST(base, rsrc0);
-    Cy_Crypto_Core_WaitForReady(base);
-
     status = Cy_Crypto_Core_Vu_StatusRead(base);
+
     if (status & (1 << CY_CRYPTO_VU_STATUS_ZERO))
         result = true;
     else
@@ -67,7 +65,6 @@ bool test_equal(CRYPTO_Type *base, int rsrc0, int rsrc1)
     uint16_t status;
 
     CY_CRYPTO_VU_CMP_SUB (base, rsrc1, rsrc0);                    // C = (a >= b)
-    Cy_Crypto_Core_WaitForReady(base);
     status = Cy_Crypto_Core_Vu_StatusRead(base);
 
     if (status &  (1 << CY_CRYPTO_VU_STATUS_ZERO))
@@ -85,9 +82,8 @@ bool test_less_than(CRYPTO_Type *base, int rsrc0, int rsrc1)
     uint16_t status;
 
     CY_CRYPTO_VU_CMP_SUB (base, rsrc1, rsrc0);                    // C = (a >= b)
-    Cy_Crypto_Core_WaitForReady(base);
-
     status = Cy_Crypto_Core_Vu_StatusRead(base);
+
     if (status &  (1 << CY_CRYPTO_VU_STATUS_CARRY))
         result = true;
     else
@@ -139,7 +135,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
 
 #if ECC_ECDSA_DEBUG
     Tb_PrintStr("%10s: \t", "hash");
-    Crypto_PrintNumber(hash, CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize));
+    Crypto_PrintNumber((uint8_t *)hash, CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize));
 
     Tb_PrintStr("%10s: \t", "k");
     Crypto_PrintNumber(messageKey, CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize));
@@ -174,11 +170,14 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
         return CY_CRYPTO_HW_ERROR;
     }
 
+    // use barrett reduction algorithm for operations modulo n (order of the base point)
+    Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
+    Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
+
     // check that x1 is smaller than the order of the base point
     CY_CRYPTO_VU_CMP_SUB (base, p_r, VR_P);                    // C = (a >= b)
-    Cy_Crypto_Core_WaitForReady(base);
-
     status = Cy_Crypto_Core_Vu_StatusRead(base);
+
     if (status & CY_CRYPTO_VU_STATUS_CARRY_BIT)
     {
         // x1 >= order, needs reduction
@@ -215,9 +214,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
 
     // load signing private key
     Cy_Crypto_Core_Vu_SetMemValue (base, p_d, (uint8_t *)key->k, bitsize);
-
-    // use barrett reduction algorithm for operations modulo n (order of the base point)
-    Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
 
     // d*r mod n
     Cy_Crypto_Core_EC_MulMod(base, p_s, p_d, p_r, bitsize);    // z = a * b % mod
@@ -329,8 +325,8 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
     Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, (uint8_t *)eccDp->barrett_o, bitsize + 1);
 
     // use barrett reduction algorithm for operations modulo n (order of the base point)
-     Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
-     Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
+    Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
+    Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
 
     //-----------------------------------------------------------------------------
     // check that R and S are within the valid range, i.e. 0 < R < n and 0 < S < n
@@ -387,7 +383,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
     // u1 = e*w mod n
     Cy_Crypto_Core_EC_MulMod(base, p_u1, p_u1, p_s, bitsize);
     // u2 = r*w mod n
-    Cy_Crypto_Core_EC_MulMod(base, p_u2, p_r, p_s, bitsize);
+    Cy_Crypto_Core_EC_MulMod(base, p_u2, p_r,  p_s, bitsize);
 
 #if ECC_ECDSA_DEBUG
     Crypto_PrintRegister(p_u1, "u1");
@@ -439,9 +435,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
     Crypto_PrintRegister(p_s, "s");
 #endif // ECC_ECDSA_DEBUG
 
-    Cy_Crypto_Core_EC_SquareMod(base, p_s, p_s, bitsize);     // s^2
-    Cy_Crypto_Core_EC_SubMod(base, p_s, p_s, p_gx);           // s^2 - x1
-    Cy_Crypto_Core_EC_SubMod(base, p_s, p_s, p_qx);           // s^2 - x1 - x2 which is Px mod n
+    Cy_Crypto_Core_EC_SquareMod (base, p_s, p_s, bitsize);     // s^2
+    Cy_Crypto_Core_EC_SubMod    (base, p_s, p_s, p_gx);           // s^2 - x1
+    Cy_Crypto_Core_EC_SubMod    (base, p_s, p_s, p_qx);           // s^2 - x1 - x2 which is Px mod n
 
 #if ECC_ECDSA_DEBUG
     Crypto_PrintRegister(p_s, "px");

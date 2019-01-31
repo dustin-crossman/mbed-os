@@ -22,8 +22,9 @@
 #include "mbed_assert.h"
 #include "crc_api.h"
 
+#include "psoc6_utils.h"
+
 #include "cy_crypto_core_crc.h"
-#include "cy_crypto_core_hw.h"
 
 static uint32_t crcWidth = 0;
 static uint32_t crcShift = 0;
@@ -39,7 +40,8 @@ void hal_crc_compute_partial_start(const crc_mbed_config_t *config)
 {
     uint32_t myMask = 0;
 
-    if (!hal_crc_is_supported(config)) {
+    if (!hal_crc_is_supported(config) || (cy_reserve_crypto(CY_CRYPTO_CRC_HW) != 0))
+    {
         return;
     }
 
@@ -52,10 +54,6 @@ void hal_crc_compute_partial_start(const crc_mbed_config_t *config)
             myMask |= 1 << i;
         }
         crcXorMask = config->final_xor & myMask;
-    }
-
-    if (!Cy_Crypto_Core_IsEnabled(CRYPTO)) {
-        Cy_Crypto_Core_Enable(CRYPTO);
     }
 
     Cy_Crypto_Core_Crc_CalcInit(CRYPTO, config->width,
@@ -92,6 +90,8 @@ uint32_t hal_crc_get_result(void)
     }
 
     crcWidth = 0;
+
+    cy_free_crypto(CY_CRYPTO_CRC_HW);
 
     return result;
 }

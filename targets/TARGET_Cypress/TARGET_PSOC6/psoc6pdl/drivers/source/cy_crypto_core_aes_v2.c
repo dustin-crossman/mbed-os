@@ -70,6 +70,8 @@ void Cy_Crypto_Core_V2_Aes_LoadEncKey(CRYPTO_Type *base,
     {
         Cy_Crypto_Core_V2_BlockMov(base, CY_CRYPTO_V2_RB_KEY1, CY_CRYPTO_V2_RB_FF_LOAD0, keySize);
     }
+
+    Cy_Crypto_Core_WaitForReady(CRYPTO);
 }
 
 /*******************************************************************************
@@ -107,6 +109,8 @@ void Cy_Crypto_Core_V2_Aes_LoadDecKey(CRYPTO_Type *base,
     {
         Cy_Crypto_Core_V2_BlockMov(base, CY_CRYPTO_V2_RB_KEY1, CY_CRYPTO_V2_RB_KEY3, keySize);
     }
+
+    Cy_Crypto_Core_WaitForReady(base);
 }
 
 /*******************************************************************************
@@ -201,6 +205,8 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Ecb(CRYPTO_Type *base,
     (CY_CRYPTO_ENCRYPT == dirMode) ? Cy_Crypto_Core_V2_RunAes(base) : Cy_Crypto_Core_V2_RunAesInv(base);
 
     Cy_Crypto_Core_V2_BlockMov(base, CY_CRYPTO_V2_RB_FF_STORE, CY_CRYPTO_V2_RB_BLOCK1, CY_CRYPTO_AES_BLOCK_SIZE);
+
+    Cy_Crypto_Core_WaitForReady(base);
 
     return (CY_CRYPTO_SUCCESS);
 }
@@ -297,6 +303,8 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Cbc(CRYPTO_Type *base,
         myResult = CY_CRYPTO_SUCCESS;
     }
 
+    Cy_Crypto_Core_WaitForReady(base);
+
     return (myResult);
 }
 
@@ -386,6 +394,8 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Cfb(CRYPTO_Type *base,
 
         myResult = CY_CRYPTO_SUCCESS;
     }
+
+    Cy_Crypto_Core_WaitForReady(base);
 
     return (myResult);
 }

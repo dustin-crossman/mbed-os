@@ -42,6 +42,21 @@
 #define CY_CRYPTO_VU_DATA_FLD_POS     (16u)
 
 /*******************************************************************************
+* Function Name: Cy_Crypto_Core_Cleanup
+****************************************************************************//**
+*
+* Cleanup the the CRYPTO block.
+*
+* \param base
+* The pointer to the CRYPTO instance address.
+*
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
+*******************************************************************************/
+cy_en_crypto_status_t Cy_Crypto_Core_Cleanup(CRYPTO_Type *base);
+
+/*******************************************************************************
 * Function Name: Cy_Crypto_Core_Vu_SetMemValue
 ****************************************************************************//**
 *
@@ -253,27 +268,6 @@ __STATIC_INLINE uint32_t * Cy_Crypto_Core_Vu_RegMemPointer(CRYPTO_Type *base, ui
 }
 
 /*******************************************************************************
-* Function Name: Cy_Crypto_Core_Vu_StatusRead
-****************************************************************************//**
-*
-* Returns value of the VU status register
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
-* \param base
-* The pointer to the CRYPTO instance address.
-*
-*******************************************************************************/
-__STATIC_INLINE uint16_t Cy_Crypto_Core_Vu_StatusRead(CRYPTO_Type *base)
-{
-    Cy_Crypto_Core_WaitForReady(base);
-
-    return((uint16_t)REG_CRYPTO_VU_STATUS(base));
-}
-
-/*******************************************************************************
 * Function Name: Cy_Crypto_Wait_Vu_ForComplete
 ****************************************************************************//**
 *
@@ -302,6 +296,27 @@ __STATIC_INLINE void Cy_Crypto_Core_Vu_WaitForComplete(CRYPTO_Type *base)
         {
         }
     }
+}
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_Vu_StatusRead
+****************************************************************************//**
+*
+* Returns value of the VU status register
+*
+* This function available for Server side only.
+*
+* This function is internal and should not to be called directly by user software
+*
+* \param base
+* The pointer to the CRYPTO instance address.
+*
+*******************************************************************************/
+__STATIC_INLINE uint16_t Cy_Crypto_Core_Vu_StatusRead(CRYPTO_Type *base)
+{
+    Cy_Crypto_Core_Vu_WaitForComplete(base);
+
+    return((uint16_t)REG_CRYPTO_VU_STATUS(base));
 }
 
 

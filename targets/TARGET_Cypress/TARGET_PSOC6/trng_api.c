@@ -1,5 +1,4 @@
-/*
- * mbed Microcontroller Library
+/* mbed Microcontroller Library
  * Copyright (c) 2019 Cypress Semiconductor Corporation
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -21,8 +20,8 @@
 #if DEVICE_TRNG
 
 #include "trng_api.h"
+#include "psoc6_utils.h"
 #include "cy_crypto_core_trng.h"
-#include "cy_crypto_core_hw.h"
 
 /* Initialization polynomial values fro True Random Generator */
 #define GARO31_INITSTATE          (0x04c11db7u)
@@ -34,15 +33,15 @@ void trng_init(trng_t *obj)
 {
     (void)obj;
 
-    if (!Cy_Crypto_Core_IsEnabled(CRYPTO)) {
-        (void)Cy_Crypto_Core_Enable(CRYPTO);
-    }
+    cy_reserve_crypto(CY_CRYPTO_TRNG_HW);
 }
 
 void trng_free(trng_t *obj)
 {
     /* Deinitialization is not needed for the driver */
     (void)obj;
+
+    cy_free_crypto(CY_CRYPTO_TRNG_HW);
 }
 
 int trng_get_bytes(trng_t *obj, uint8_t *output, size_t length, size_t *output_length)

@@ -8,7 +8,6 @@
 *
 ********************************************************************************
 * Copyright 2016-2019 Cypress Semiconductor Corporation
-* SPDX-License-Identifier: Apache-2.0
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -1571,7 +1570,7 @@ void Cy_Crypto_Core_JacobianEcScalarMul(CRYPTO_Type *base,
     CY_CRYPTO_VU_CLSAME (base, t, my_d, clr);
     CY_CRYPTO_VU_LSL (base, my_d, my_d, t); // Get rid of leading '0's
 
-    Cy_Crypto_Core_WaitForReady(base);
+    Cy_Crypto_Core_Vu_WaitForComplete(base);
 
     clsame = Cy_Crypto_Core_Vu_RegDataPtrRead (base, t);
     CY_CRYPTO_VU_LSL1 (base, my_d, my_d); // Get rid of leading '1'
@@ -1586,7 +1585,8 @@ void Cy_Crypto_Core_JacobianEcScalarMul(CRYPTO_Type *base,
         //Carry set if current bit is equal to 1 (hence, perform point addition - point doubling is always performed)
         CY_CRYPTO_VU_LSL1 (base, my_d, my_d);
         status = Cy_Crypto_Core_Vu_StatusRead(base);
-        carry = status & (1 << CY_CRYPTO_VU_STATUS_CARRY);
+
+        carry = status & CY_CRYPTO_VU_STATUS_CARRY_BIT;
 
         Cy_Crypto_Core_JacobianEcDouble (base, my_s_x, my_s_y, my_s_z, size);
 
@@ -1661,24 +1661,7 @@ void Cy_Crypto_Core_EC_NistP_SetRedAlg(cy_en_crypto_ecc_red_mul_algs_t alg)
  */
 void Cy_Crypto_Core_EC_NistP_PointMul(CRYPTO_Type *base, int p_x, int p_y, int p_d, int p_order, int bitsize)
 {
-    if (bitsize == CY_CRYPTO_ECC_P192_SIZE || bitsize == CY_CRYPTO_ECC_P224_SIZE || bitsize == CY_CRYPTO_ECC_P521_SIZE)
-    {
-        Cy_Crypto_Core_EC_NistP_SetRedAlg(CY_CRYPTO_NIST_P_CURVE_SPECIFIC_RED_ALG);
-    }
-    else if (bitsize == CY_CRYPTO_ECC_P256_SIZE || bitsize == CY_CRYPTO_ECC_P384_SIZE)
-    {
-        Cy_Crypto_Core_EC_NistP_SetRedAlg(CY_CRYPTO_NIST_P_BARRETT_RED_ALG);
-    }
-    else
-    {
-        //Tb_PrintStr("Cy_Crypto_Core_EC_NistP_PointMul: invalid bit size!!!\n");
-        return;
-    }
-
-    Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
-
     Cy_Crypto_Core_JacobianEcScalarMul (base, p_x, p_y, p_d, bitsize);
-
     Cy_Crypto_Core_Vu_WaitForComplete(base);
 }
 
@@ -1701,30 +1684,29 @@ cy_en_crypto_status_t Cy_Crypto_Core_EC_NistP_PointMultiplication(CRYPTO_Type *b
     const uint8_t *p_polynomial = NULL;
     const uint8_t *p_barrett = NULL;
 
-    cy_stc_crypto_ecc_dp_type   *params = Cy_Crypto_Core_ECC_GetCurveParams(curveID);
+    cy_stc_crypto_ecc_dp_type   *eccDp = Cy_Crypto_Core_ECC_GetCurveParams(curveID);
 
     cy_en_crypto_status_t myStatus = CY_CRYPTO_NOT_SUPPORTED;
 
-    if (params != NULL)
+    if (eccDp != NULL)
     {
         //------------------------------------------------------------------------------
         // Setup curve specific parameters depending on mode
         //------------------------------------------------------------------------------
-        int size;
+        uint32_t size;
 
+        p_polynomial = eccDp->prime;
+        p_barrett    = eccDp->barrett_p;
+        size         = eccDp->size;
 
-        p_polynomial = params->prime;
-        p_barrett    = params->barrett_p;
-        size         = params->size;
-
-        Cy_Crypto_Core_EC_NistP_SetRedAlg(params->algo);
+        // use barrett reduction algorithm for operations modulo n (order of the base point)
+        Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
+        Cy_Crypto_Core_EC_NistP_SetMode(eccDp->size);
 
         myStatus = CY_CRYPTO_BAD_PARAMS;
 
         if ((NULL != ecpGX) && (NULL != ecpGY) && (NULL != ecpD) && (NULL != ecpQX) && (NULL != ecpQY))
         {
-            Cy_Crypto_Core_EC_NistP_SetMode(size);
-
             //Public parameters and characteristics of elliptic curve
             CY_CRYPTO_VU_ALLOC_MEM (base, VR_D,       size);        // Scalar factor
             CY_CRYPTO_VU_ALLOC_MEM (base, VR_S_X,     size);

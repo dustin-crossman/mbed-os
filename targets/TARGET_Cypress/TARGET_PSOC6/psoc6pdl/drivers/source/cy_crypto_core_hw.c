@@ -104,9 +104,17 @@ const cy_stc_cryptoIP_t cy_cryptoIpBlockCfgPSoC6_02 =
 #define CY_CRYPTO_PWR_MODE_RETAINED          (2UL)
 #define CY_CRYPTO_PWR_MODE_ENABLED           (3UL)
 
-static void Cy_Crypto_Core_ClearVuRegisters(CRYPTO_Type *base);
-
-static void Cy_Crypto_Core_ClearVuRegisters(CRYPTO_Type *base)
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_ClearVuRegisters
+****************************************************************************//**
+*
+* The function to initialize the Crypto VU registers.
+*
+* \param base
+* The pointer to the CRYPTO instance address.
+*
+*******************************************************************************/
+void Cy_Crypto_Core_ClearVuRegisters(CRYPTO_Type *base)
 {
     /* Clear whole register file */
     CY_CRYPTO_VU_SET_REG(base, CY_CRYPTO_VU_HW_REG14, 0u, 1u);
@@ -132,8 +140,6 @@ static void Cy_Crypto_Core_ClearVuRegisters(CRYPTO_Type *base)
 *
 * The function to initialize the Crypto hardware.
 *
-* This function available for CM0+ core only.
-*
 * This function is internal and should not to be called directly by user software
 *
 *******************************************************************************/
@@ -147,10 +153,6 @@ void Cy_Crypto_Core_HwInit(void)
 ****************************************************************************//**
 *
 * The function to enable the Crypto hardware.
-*
-* This function available for CM0+ core only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -226,10 +228,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_Enable(CRYPTO_Type *base)
 *
 * Get Crypto service information
 *
-* This function available for CM0+ core only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param libInfo
 * The pointer to a variable to store gathered crypto library information.
 *
@@ -249,10 +247,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_GetLibInfo(cy_en_crypto_lib_info_t *libInfo
 ****************************************************************************//**
 *
 * Disables the operation of the CRYPTO block.
-*
-* This function available for CM0+ core only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

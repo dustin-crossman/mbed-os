@@ -26,17 +26,16 @@
 
 #include "cy_crypto_core_ecc.h"
 #include "cy_crypto_core_ecc_nist_p.h"
-
+#include "cy_crypto_core_vu.h"
 #include "cy_crypto_core_trng.h"
+
 #define CY_ECC_CONFIG_TR_GARO_CTL      0x6C740B8Du
 #define CY_ECC_CONFIG_TR_FIRO_CTL      0x52D246E1u
-
-#include "cy_crypto_core_vu.h"
 
 //////////////////////////////////////////////////////////////////////////////
 
 // print some debug information. enabling this will render meaningless all time measurements
-// #define ECC_KEY_GEN_DEBUG               0
+#define ECC_KEY_GEN_DEBUG               0
 
 /**
   Make a new ECC key pair
@@ -93,7 +92,8 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
     Cy_Crypto_Core_Vu_SetMemValue (base, p_x, eccDp->Gx, bitsize);
     Cy_Crypto_Core_Vu_SetMemValue (base, p_y, eccDp->Gy, bitsize);
 
-     Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
+    Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
+    Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
 
     //-----------------------------------------------------------------------------
     // generate random string
@@ -117,9 +117,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
         }
     }
 
-    //Tb_PrintStr("private key:   ");
-    //Crypto_PrintNumber((uint8_t *)key->k, CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize));
-
     //-----------------------------------------------------------------------------
     // Load random data into VU
     CY_CRYPTO_VU_ALLOC_MEM(base, p_d, bitsize);
@@ -135,11 +132,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
     //-----------------------------------------------------------------------------
     // check that the key is smaller than the order of base point
     CY_CRYPTO_VU_CMP_SUB (base, p_d, p_order);                    // C = (a >= b)
-    CY_CRYPTO_VU_MOV_STATUS_TO_REG(base, p_temp);
-    Cy_Crypto_Core_WaitForReady(base);
+    uint16_t status = Cy_Crypto_Core_Vu_StatusRead(base);
 
-    uint16_t status = Cy_Crypto_Core_Vu_RegDataPtrRead(base, p_temp);
-    if (status &  (1 << CY_CRYPTO_VU_STATUS_CARRY))
+    if (status &  CY_CRYPTO_VU_STATUS_CARRY_BIT)
     {
         // random data >= order, needs reduction
 
@@ -281,12 +276,15 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
     //-----------------------------------------------------------------------------
     // check that the key is smaller than the order of base point
     CY_CRYPTO_VU_CMP_SUB (base, p_d, VR_P);                    // C = (a >= b)
-    Cy_Crypto_Core_WaitForReady(base);
-
     uint16_t status = Cy_Crypto_Core_Vu_StatusRead(base);
+
     if (status & CY_CRYPTO_VU_STATUS_CARRY_BIT)
     {
         // private key (random data) >= order, needs reduction
+
+        // use barrett reduction algorithm for operations modulo n (order of the base point)
+        Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
+        Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
 
         // z = x % mod
         Cy_Crypto_Core_EC_Bar_MulRed(base, p_d, p_temp, bitsize);
@@ -367,6 +365,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
     Cy_Crypto_Core_Vu_SetMemValue (base, p_y, eccDp->Gy, bitsize);
 
     Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
+    Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
 
     // Load random data into VU
     CY_CRYPTO_VU_ALLOC_MEM(base, p_d, bitsize);

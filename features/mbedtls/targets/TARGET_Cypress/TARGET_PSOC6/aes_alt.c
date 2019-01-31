@@ -1,20 +1,21 @@
 /*
- * FIPS-197 compliant AES implementation
+ *  Source file for mbedtls AES HW acceleration functions
  *
- * mbed Microcontroller Library
- * Copyright (c) 2019 Cypress Semiconductor Corporation
+ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
+ *  Copyright (C) 2019 Cypress Semiconductor Corporation
+ *  SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may
+ *  not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 /*
@@ -40,8 +41,12 @@
 
 #if defined(MBEDTLS_AES_ALT)
 
+#include "psoc6_utils.h"
+
 void mbedtls_aes_init( mbedtls_aes_context *ctx )
 {
+    cy_reserve_crypto(CY_CRYPTO_COMMON_HW);
+
     memset( ctx, 0, sizeof( mbedtls_aes_context ) );
 }
 
@@ -51,6 +56,8 @@ void mbedtls_aes_free( mbedtls_aes_context *ctx )
         return;
 
     mbedtls_platform_zeroize( ctx, sizeof( mbedtls_aes_context ) );
+
+    cy_free_crypto(CY_CRYPTO_COMMON_HW);
 }
 
 #if defined(MBEDTLS_CIPHER_MODE_XTS)
@@ -98,8 +105,8 @@ static int aes_set_keys( mbedtls_aes_context *ctx, const unsigned char *key,
     memcpy(ctx->aes_buffers.keyInv, ctx->aes_state.invKey, CY_CRYPTO_AES_256_KEY_SIZE);
 
     ctx->aes_state.buffers = (uint32_t *) &ctx->aes_buffers;
-    ctx->aes_state.key     = (uint8_t *) (ctx->aes_buffers.key);
-    ctx->aes_state.invKey  = (uint8_t *) (ctx->aes_buffers.keyInv);
+    ctx->aes_state.key     = (uint8_t *)  (ctx->aes_buffers.key);
+    ctx->aes_state.invKey  = (uint8_t *)  (ctx->aes_buffers.keyInv);
 
 exit:
     return( ret );
@@ -205,6 +212,7 @@ int mbedtls_internal_aes_encrypt( mbedtls_aes_context *ctx,
     cy_en_crypto_status_t status;
 
     status = Cy_Crypto_Core_Aes_Ecb(CRYPTO, CY_CRYPTO_ENCRYPT, output, input, &ctx->aes_state);
+
     if (CY_CRYPTO_SUCCESS != status)
     {
     	ret = MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
@@ -233,6 +241,7 @@ int mbedtls_internal_aes_decrypt( mbedtls_aes_context *ctx,
     cy_en_crypto_status_t status;
 
     status = Cy_Crypto_Core_Aes_Ecb(CRYPTO, CY_CRYPTO_DECRYPT, output, input, &ctx->aes_state);
+
     if (CY_CRYPTO_SUCCESS != status)
     {
     	ret = MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
@@ -268,8 +277,6 @@ int mbedtls_aes_crypt_ecb( mbedtls_aes_context *ctx,
 /*
  * AES-CBC buffer encryption/decryption
  */
-#if defined(CY_CIPHER_MODE_CBC_ALT)
-
 int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
                     int mode,
                     size_t length,
@@ -306,71 +313,6 @@ int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
 
     return( ret );
 }
-
-#else /* CY_CIPHER_MODE_CBC_ALT */
-
-int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
-                    int mode,
-                    size_t length,
-                    unsigned char iv[16],
-                    const unsigned char *input,
-                    unsigned char *output )
-{
-    int i;
-    unsigned char temp[16];
-
-    if( length % 16 )
-        return( MBEDTLS_ERR_AES_INVALID_INPUT_LENGTH );
-
-#if defined(MBEDTLS_PADLOCK_C) && defined(MBEDTLS_HAVE_X86)
-    if( aes_padlock_ace )
-    {
-        if( mbedtls_padlock_xcryptcbc( ctx, mode, length, iv, input, output ) == 0 )
-            return( 0 );
-
-        // If padlock data misaligned, we just fall back to
-        // unaccelerated mode
-        //
-    }
-#endif
-
-    if( mode == MBEDTLS_AES_DECRYPT )
-    {
-        while( length > 0 )
-        {
-            memcpy( temp, input, 16 );
-            mbedtls_aes_crypt_ecb( ctx, mode, input, output );
-
-            for( i = 0; i < 16; i++ )
-                output[i] = (unsigned char)( output[i] ^ iv[i] );
-
-            memcpy( iv, temp, 16 );
-
-            input  += 16;
-            output += 16;
-            length -= 16;
-        }
-    }
-    else
-    {
-        while( length > 0 )
-        {
-            for( i = 0; i < 16; i++ )
-                output[i] = (unsigned char)( input[i] ^ iv[i] );
-
-            mbedtls_aes_crypt_ecb( ctx, mode, output, output );
-            memcpy( iv, output, 16 );
-
-            input  += 16;
-            output += 16;
-            length -= 16;
-        }
-    }
-
-    return( 0 );
-}
-
-#endif /* CY_CIPHER_MODE_CBC_ALT */
 
 #endif /* MBEDTLS_CIPHER_MODE_CBC */
 
@@ -535,8 +477,6 @@ int mbedtls_aes_crypt_xts( mbedtls_aes_xts_context *ctx,
 
 #if defined(MBEDTLS_CIPHER_MODE_CFB)
 
-#if defined(CY_CIPHER_MODE_CFB_ALT)
-
 static void aes_decrypt_cfb128( mbedtls_aes_context *ctx,
 		size_t length,
         size_t *iv_off,
@@ -604,35 +544,9 @@ int mbedtls_aes_crypt_cfb128( mbedtls_aes_context *ctx,
     	if (0 != n)
     	{
     		tmp_len = length < (16 - n) ? length : (16 - n);
-    		aes_encrypt_cfb128(ctx, tmp_len, &n, iv, input, output);
-    		length -= tmp_len;
-    		input += tmp_len;
-    		output += tmp_len;
-    	}
-    	if (length > CY_CRYPTO_AES_BLOCK_SIZE)
-    	{
-    		tmp_len = length & (~(CY_CRYPTO_AES_BLOCK_SIZE - 1u));
-    		status = Cy_Crypto_Core_Aes_Cfb(CRYPTO, CY_CRYPTO_DECRYPT, tmp_len, iv, output, input, &ctx->aes_state);
-    		length -= tmp_len;
-    		input += tmp_len;
-    		output += tmp_len;
 
-    	    memcpy(iv, ctx->aes_buffers.iv, CY_CRYPTO_AES_BLOCK_SIZE);
-
-    	    if (CY_CRYPTO_SUCCESS != status)
-    	    {
-    	    	ret = MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
-    	    }
-
-    	}
-    	aes_encrypt_cfb128(ctx, length, &n, iv, input, output);
-    }
-    else
-    {
-    	if (0 != n)
-    	{
-    		tmp_len = length < (16 - n) ? length : (16 - n);
     		aes_decrypt_cfb128(ctx, tmp_len, &n, iv, input, output);
+
     		length -= tmp_len;
     		input += tmp_len;
     		output += tmp_len;
@@ -640,7 +554,9 @@ int mbedtls_aes_crypt_cfb128( mbedtls_aes_context *ctx,
     	if (length > CY_CRYPTO_AES_BLOCK_SIZE)
     	{
     		tmp_len = length & (~(CY_CRYPTO_AES_BLOCK_SIZE - 1u));
-    		status = Cy_Crypto_Core_Aes_Cfb(CRYPTO, CY_CRYPTO_ENCRYPT, tmp_len, iv, output, input, &ctx->aes_state);
+
+    		status = Cy_Crypto_Core_Aes_Cfb(CRYPTO, CY_CRYPTO_DECRYPT, tmp_len, iv, output, input, &ctx->aes_state);
+
     		length -= tmp_len;
     		input += tmp_len;
     		output += tmp_len;
@@ -655,58 +571,44 @@ int mbedtls_aes_crypt_cfb128( mbedtls_aes_context *ctx,
     	}
     	aes_decrypt_cfb128(ctx, length, &n, iv, input, output);
     }
+    else
+    {
+    	if (0 != n)
+    	{
+    		tmp_len = length < (16 - n) ? length : (16 - n);
+
+    		aes_encrypt_cfb128(ctx, tmp_len, &n, iv, input, output);
+
+    		length -= tmp_len;
+    		input += tmp_len;
+    		output += tmp_len;
+    	}
+    	if (length > CY_CRYPTO_AES_BLOCK_SIZE)
+    	{
+    		tmp_len = length & (~(CY_CRYPTO_AES_BLOCK_SIZE - 1u));
+
+    		status = Cy_Crypto_Core_Aes_Cfb(CRYPTO, CY_CRYPTO_ENCRYPT, tmp_len, iv, output, input, &ctx->aes_state);
+
+    		length -= tmp_len;
+    		input += tmp_len;
+    		output += tmp_len;
+
+    	    memcpy(iv, ctx->aes_buffers.iv, CY_CRYPTO_AES_BLOCK_SIZE);
+
+    	    if (CY_CRYPTO_SUCCESS != status)
+    	    {
+    	    	ret = MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
+    	    }
+
+    	}
+
+    	aes_encrypt_cfb128(ctx, length, &n, iv, input, output);
+    }
 
     *iv_off = n;
 
     return( ret );
 }
-
-#else /* CY_CIPHER_MODE_CFB_ALT */
-
-int mbedtls_aes_crypt_cfb128( mbedtls_aes_context *ctx,
-                       int mode,
-                       size_t length,
-                       size_t *iv_off,
-                       unsigned char iv[16],
-                       const unsigned char *input,
-                       unsigned char *output )
-{
-    int c;
-    size_t n = *iv_off;
-
-    if( mode == MBEDTLS_AES_DECRYPT )
-    {
-        while( length-- )
-        {
-            if( n == 0 )
-                mbedtls_aes_crypt_ecb( ctx, MBEDTLS_AES_ENCRYPT, iv, iv );
-
-            c = *input++;
-            *output++ = (unsigned char)( c ^ iv[n] );
-            iv[n] = (unsigned char) c;
-
-            n = ( n + 1 ) & 0x0F;
-        }
-    }
-    else
-    {
-        while( length-- )
-        {
-            if( n == 0 )
-                mbedtls_aes_crypt_ecb( ctx, MBEDTLS_AES_ENCRYPT, iv, iv );
-
-            iv[n] = *output++ = (unsigned char)( iv[n] ^ *input++ );
-
-            n = ( n + 1 ) & 0x0F;
-        }
-    }
-
-    *iv_off = n;
-
-    return( 0 );
-}
-
-#endif /* CY_CIPHER_MODE_CFB_ALT */
 
 /*
  * AES-CFB8 buffer encryption/decryption

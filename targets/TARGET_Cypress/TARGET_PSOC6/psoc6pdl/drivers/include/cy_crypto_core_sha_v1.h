@@ -39,37 +39,62 @@
 typedef struct
 {
     /* Allocate CRYPTO_MAX_BLOCK_SIZE Bytes for block */
-    uint32_t block[CY_CRYPTO_SHA_MAX_BLOCK_SIZE / 4u];
+    uint32_t block[CY_CRYPTO_SHA1_BLOCK_SIZE / 4u];
+
     /* Allocate CRYPTO_MAX_HASH_SIZE Bytes for hash */
-    uint32_t hash[CY_CRYPTO_SHA_MAX_HASH_SIZE / 4u];
+    uint32_t hash[CY_CRYPTO_SHA1_HASH_SIZE / 4u];
+
     /* Allocate CRYPTO_MAX_ROUND_MEM_SIZE Bytes for roundMem */
-    uint32_t roundMem[CY_CRYPTO_SHA_MAX_ROUND_MEM_SIZE / 4u];
-    /* Allocate space for the structure which stores the SHA context */
-    cy_stc_crypto_sha_state_t hashState;
-} cy_stc_crypto_v1_sha_buffers_t;
+    uint32_t roundMem[CY_CRYPTO_SHA1_ROUND_MEM_SIZE / 4u];
+} cy_stc_crypto_v1_sha1_buffers_t;
+
+typedef struct
+{
+    /* Allocate CRYPTO_MAX_BLOCK_SIZE Bytes for block */
+    uint32_t block[CY_CRYPTO_SHA256_BLOCK_SIZE / 4u];
+
+    /* Allocate CRYPTO_MAX_HASH_SIZE Bytes for hash */
+    uint32_t hash[CY_CRYPTO_SHA256_HASH_SIZE / 4u];
+
+    /* Allocate CRYPTO_MAX_ROUND_MEM_SIZE Bytes for roundMem */
+    uint32_t roundMem[CY_CRYPTO_SHA256_ROUND_MEM_SIZE / 4u];
+} cy_stc_crypto_v1_sha256_buffers_t;
+
+typedef struct
+{
+    /* Allocate CRYPTO_MAX_BLOCK_SIZE Bytes for block */
+    uint32_t block[CY_CRYPTO_SHA512_BLOCK_SIZE / 4u];
+
+    /* Allocate CRYPTO_MAX_HASH_SIZE Bytes for hash */
+    uint32_t hash[CY_CRYPTO_SHA512_HASH_SIZE / 4u];
+
+    /* Allocate CRYPTO_MAX_ROUND_MEM_SIZE Bytes for roundMem */
+    uint32_t roundMem[CY_CRYPTO_SHA512_ROUND_MEM_SIZE / 4u];
+} cy_stc_crypto_v1_sha512_buffers_t;
+
 
 void Cy_Crypto_Core_V1_Sha_ProcessBlock(CRYPTO_Type *base,
                                 cy_stc_crypto_sha_state_t *hashState,
                                 uint8_t const *block);
 
-void Cy_Crypto_Core_V1_Sha_Init(CRYPTO_Type *base,
-                                cy_stc_crypto_sha_state_t **hashState,
+cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Init(CRYPTO_Type *base,
+                                cy_stc_crypto_sha_state_t *hashState,
                                 cy_en_crypto_sha_mode_t mode,
                                 void *shaBuffers);
 
-void Cy_Crypto_Core_V1_Sha_Start(CRYPTO_Type *base,
+cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Start(CRYPTO_Type *base,
                                 cy_stc_crypto_sha_state_t *hashState);
 
-void Cy_Crypto_Core_V1_Sha_Update(CRYPTO_Type *base,
+cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Update(CRYPTO_Type *base,
                                 cy_stc_crypto_sha_state_t *hashState,
                                 uint8_t const *message,
                                 uint32_t messageSize);
 
-void Cy_Crypto_Core_V1_Sha_Finish(CRYPTO_Type *base,
+cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Finish(CRYPTO_Type *base,
                                 cy_stc_crypto_sha_state_t *hashState,
                                 uint8_t *digest);
 
-void Cy_Crypto_Core_V1_Sha_Free(CRYPTO_Type *base,
+cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Free(CRYPTO_Type *base,
                                 cy_stc_crypto_sha_state_t *hashState);
 
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha(CRYPTO_Type *base,

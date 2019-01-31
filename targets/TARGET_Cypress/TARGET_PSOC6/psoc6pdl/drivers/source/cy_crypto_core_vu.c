@@ -30,7 +30,8 @@
 
 #if (CPUSS_CRYPTO_VU == 1)
 
-#include "cy_crypto_core_hw.h"
+#include "cy_crypto_core_hw_v1.h"
+#include "cy_crypto_core_hw_v2.h"
 #include "cy_crypto_core_mem.h"
 #include "cy_syslib.h"
 
@@ -100,6 +101,53 @@ void Cy_Crypto_Core_Vu_GetMemValue(CRYPTO_Type *base, uint8_t *dst, uint32_t src
         CY_CRYPTO_VU_RESTORE_REG(base, CY_CRYPTO_VU_HW_REG0, reg0_data);
         CY_CRYPTO_VU_RESTORE_REG(base, CY_CRYPTO_VU_HW_REG1, reg1_data);
     }
+}
+
+cy_en_crypto_status_t Cy_Crypto_Core_Cleanup(CRYPTO_Type *base)
+{
+    /* Set the stack pointer to the Crypto buff size, in words */
+    CY_CRYPTO_VU_SET_REG(base, CY_CRYPTO_VU_HW_REG15, cy_device->cryptoMemSize, 1u);
+
+    /* Clear whole register file */
+    Cy_Crypto_Core_ClearVuRegisters(base);
+
+    /* PRNG */
+    REG_CRYPTO_PR_LFSR_CTL0(base) = 0u;
+    REG_CRYPTO_PR_LFSR_CTL1(base) = 0u;
+    REG_CRYPTO_PR_LFSR_CTL2(base) = 0u;
+    REG_CRYPTO_PR_RESULT(base)    = 0u;
+
+    /* TRNG */
+    REG_CRYPTO_TR_CTL0(base)      = 0u;
+    REG_CRYPTO_TR_CTL1(base)      = 0u;
+    REG_CRYPTO_TR_RESULT(base)    = 0u;
+
+    /* CRC */
+    REG_CRYPTO_CRC_POL_CTL(base)  = 0u;
+    REG_CRYPTO_CRC_REM_CTL(base)  = 0u;
+
+    /* AES */
+    REG_CRYPTO_AES_CTL(base)      = 0u;
+
+    if (cy_device->cryptoVersion == 1u)
+    {
+        REG_CRYPTO_CRC_LFSR_CTL(base) = 0u;
+        REG_CRYPTO_SHA_CTL(base)  = 0u;
+    }
+    else
+    {
+        REG_CRYPTO_TR_CTL2(base)  = 0u;
+        REG_CRYPTO_RESULT(base)   = 0u;
+
+        Cy_Crypto_Core_V2_FFStop(base, CY_CRYPTO_V2_RB_FF_LOAD0);
+        Cy_Crypto_Core_V2_FFStop(base, CY_CRYPTO_V2_RB_FF_LOAD1);
+        Cy_Crypto_Core_V2_FFStop(base, CY_CRYPTO_V2_RB_FF_STORE);
+        Cy_Crypto_Core_V2_RBClear(base);
+    }
+
+    Cy_Crypto_Core_MemSet(base, (void *)REG_CRYPTO_MEM_BUFF(base), 0u, CY_CRYPTO_MEM_BUFF_SIZE);
+
+    return (CY_CRYPTO_SUCCESS);
 }
 
 

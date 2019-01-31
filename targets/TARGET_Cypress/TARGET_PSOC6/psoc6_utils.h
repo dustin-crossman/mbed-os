@@ -215,6 +215,31 @@ static inline uint32_t gpio_get_cy_drive_mode(PinDirection dir, PinMode mode)
     return cymode;
 }
 
+typedef enum
+{
+    CY_CRYPTO_TRNG_HW,
+    CY_CRYPTO_CRC_HW,
+    CY_CRYPTO_VU_HW,
+    CY_CRYPTO_COMMON_HW
+} cy_en_crypto_submodule_t;
+
+#define NUM_CRYPTO_HW     ((uint32_t)CY_CRYPTO_COMMON_HW + 1u)
+
+/** \brief Request allocation of CRYPTO block.
+ *
+ * \param module_num      Id of the CRYPTO submodule.
+ * \return (0) when OK, (-1) when reservation conflict occurs.
+ *
+ */
+int cy_reserve_crypto(cy_en_crypto_submodule_t module_num);
+
+/** \brief Releases CRYPTO block.
+ *
+ * \param module_num      Id of the CRYPTO submodule.
+ * \return void
+ *
+ */
+void cy_free_crypto(cy_en_crypto_submodule_t module_num);
 
 
 #if defined(__cplusplus)

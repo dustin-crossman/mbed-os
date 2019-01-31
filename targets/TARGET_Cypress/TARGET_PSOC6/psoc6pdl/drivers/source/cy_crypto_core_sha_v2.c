@@ -58,9 +58,12 @@
 * \param shaBuffers
 * The pointer to memory buffers storage
 *
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
 *******************************************************************************/
-void Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
-                             cy_stc_crypto_sha_state_t **shaHashState,
+cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
+                             cy_stc_crypto_sha_state_t *hashState,
                              cy_en_crypto_sha_mode_t mode,
                              void *shaBuffers)
 {
@@ -148,11 +151,7 @@ void Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
     };
     #endif /* #if (CPUSS_CRYPTO_SHA512 == 1) */
 
-    cy_stc_crypto_sha_state_t  *hashState;
-
-    CY_ASSERT_L1((shaBuffers != NULL) && (shaHashState != NULL));
-
-    hashState = shaBuffers;
+    CY_ASSERT_L1(hashState != NULL);
 
     Cy_Crypto_Core_V2_MemSet(base, hashState, 0x00u, sizeof(cy_stc_crypto_sha_state_t));
 
@@ -217,7 +216,7 @@ void Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
                 break;
     }
 
-    *shaHashState = hashState;
+    return (CY_CRYPTO_SUCCESS);
 }
 
 /*******************************************************************************
@@ -236,8 +235,11 @@ void Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
 * \param hashState
 * The pointer to the SHA context.
 *
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
 *******************************************************************************/
-void Cy_Crypto_Core_V2_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
+cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
 {
     hashState->blockIdx = 0u;
     hashState->messageSize = 0u;
@@ -249,6 +251,8 @@ void Cy_Crypto_Core_V2_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *h
     Cy_Crypto_Core_V2_RBXor(base, 0u, hashState->hashSize);
     Cy_Crypto_Core_V2_Sync(base);
     Cy_Crypto_Core_V2_RBSwap(base);
+
+    return (CY_CRYPTO_SUCCESS);
 }
 
 /*******************************************************************************
@@ -273,8 +277,11 @@ void Cy_Crypto_Core_V2_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *h
 * \param messageSize
 * The size of the message whose Hash is being computed.
 *
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
 *******************************************************************************/
-void Cy_Crypto_Core_V2_Sha_Update(CRYPTO_Type *base,
+cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Update(CRYPTO_Type *base,
                                cy_stc_crypto_sha_state_t *hashState,
                                uint8_t const *message,
                                uint32_t messageSize)
@@ -294,6 +301,8 @@ void Cy_Crypto_Core_V2_Sha_Update(CRYPTO_Type *base,
 
     /* Remaining block will be calculated Finish function */
     hashState->blockIdx = messageSize;
+
+    return (CY_CRYPTO_SUCCESS);
 }
 
 /*******************************************************************************
@@ -315,8 +324,11 @@ void Cy_Crypto_Core_V2_Sha_Update(CRYPTO_Type *base,
 * \param digest
 * The pointer to the calculated hash digest.
 *
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
 *******************************************************************************/
-void Cy_Crypto_Core_V2_Sha_Finish(CRYPTO_Type *base,
+cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Finish(CRYPTO_Type *base,
                                cy_stc_crypto_sha_state_t *hashState,
                                uint8_t *digest)
 {
@@ -369,6 +381,8 @@ void Cy_Crypto_Core_V2_Sha_Finish(CRYPTO_Type *base,
     Cy_Crypto_Core_V2_RBStore(base, 0u, hashState->digestSize);
 
     Cy_Crypto_Core_V2_FFStoreSync(base);
+
+    return (CY_CRYPTO_SUCCESS);
 }
 
 /*******************************************************************************
@@ -386,14 +400,19 @@ void Cy_Crypto_Core_V2_Sha_Finish(CRYPTO_Type *base,
 * \param hashState
 * The pointer to the SHA context.
 *
-*******************************************************************************/
-void Cy_Crypto_Core_V2_Sha_Free(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
+* *******************************************************************************/
+cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Free(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
 {
     Cy_Crypto_Core_V2_MemSet(base, hashState, 0x00u, sizeof(cy_stc_crypto_sha_state_t));
 
     /* Clears the memory buffer. */
     Cy_Crypto_Core_V2_RBClear(base);
     Cy_Crypto_Core_V2_Sync(base);
+
+    return (CY_CRYPTO_SUCCESS);
 }
 
 /*******************************************************************************
@@ -421,7 +440,7 @@ void Cy_Crypto_Core_V2_Sha_Free(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *ha
 * The pointer to the hash digest.
 *
 * \return
-* A Crypto status \ref en_crypto_status_t.
+* A Crypto status \ref cy_en_crypto_status_t.
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha(CRYPTO_Type *base,
@@ -431,14 +450,14 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha(CRYPTO_Type *base,
                                 cy_en_crypto_sha_mode_t mode)
 {
     /* Allocate space for the structure which stores the SHA context */
-    cy_stc_crypto_sha_state_t hashStateData;
-    cy_stc_crypto_sha_state_t *hashState; // = &hashStateData;
+    cy_stc_crypto_sha_state_t     hashState;
 
-    Cy_Crypto_Core_V2_Sha_Init   (base, &hashState, mode, &hashStateData);
-    Cy_Crypto_Core_V2_Sha_Start  (base, hashState);
-    Cy_Crypto_Core_V2_Sha_Update (base, hashState, message, messageSize);
-    Cy_Crypto_Core_V2_Sha_Finish (base, hashState, digest);
-    Cy_Crypto_Core_V2_Sha_Free   (base, hashState);
+    /* No any buffers needed for Crypto_ver2 IP block */
+    (void)Cy_Crypto_Core_V2_Sha_Init   (base, &hashState, mode, NULL);
+    (void)Cy_Crypto_Core_V2_Sha_Start  (base, &hashState);
+    (void)Cy_Crypto_Core_V2_Sha_Update (base, &hashState, message, messageSize);
+    (void)Cy_Crypto_Core_V2_Sha_Finish (base, &hashState, digest);
+    (void)Cy_Crypto_Core_V2_Sha_Free   (base, &hashState);
 
     return (CY_CRYPTO_SUCCESS);
 }
