@@ -71,7 +71,7 @@ void Cy_Crypto_Core_V2_Aes_LoadEncKey(CRYPTO_Type *base,
         Cy_Crypto_Core_V2_BlockMov(base, CY_CRYPTO_V2_RB_KEY1, CY_CRYPTO_V2_RB_FF_LOAD0, keySize);
     }
 
-    Cy_Crypto_Core_WaitForReady(CRYPTO);
+    Cy_Crypto_Core_WaitForReady(base);
 }
 
 /*******************************************************************************
