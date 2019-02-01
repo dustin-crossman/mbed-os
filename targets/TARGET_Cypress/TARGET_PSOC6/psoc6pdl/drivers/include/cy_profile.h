@@ -175,8 +175,8 @@
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
 *     <td>1.20</td>
-*     <td>Updated API function Cy_Profile_GetSumWeightedCounts.</td>
-*     <td>Minor bug fixing: now the function supports a correct number of counters.</td>
+*     <td>Updated API function \ref Cy_Profile_GetSumWeightedCounts().</td>
+*     <td>Minor defect fixing: now the function supports the correct number of counters.</td>
 *   </tr>
 *   <tr>
 *     <td rowspan="3">1.10</td>

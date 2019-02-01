@@ -159,13 +159,13 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
-*     <td rowspan="4">2.20</td>
-*     <td>Updated implementation of the \ref Cy_SysLib_Assert() function to be available in the Release and Debug modes.</td>
-*     <td>Provided support for the PDL static library in the Release mode.</td>
+*     <td rowspan="2">2.20</td>
+*     <td>Updated implementation of the \ref Cy_SysLib_AssertFailed() function to be available in Release and Debug modes.</td>
+*     <td>Provided support for the PDL static library in Release mode.</td>
 *   </tr>
 *   <tr>
-*     <td>Minor documentation edits</td>
-*     <td>Documentation update and clarification</td>
+*     <td>Minor documentation edits.</td>
+*     <td>Documentation update and clarification.</td>
 *   </tr>
 *   <tr>
 *     <td rowspan="4">2.10</td>

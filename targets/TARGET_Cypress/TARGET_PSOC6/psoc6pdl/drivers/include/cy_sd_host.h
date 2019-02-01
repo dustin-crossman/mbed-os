@@ -252,15 +252,15 @@
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
 *     <td>1.10</td>
-*     <td>The PLL and CLK disable sequence in Cy_SD_Host_DisableSdClk() 
-*         is changed to disable CLK first.
+*     <td>The PLL and CLK disable sequence in \ref Cy_SD_Host_DisableSdClk()
+*         is changed to disable CLK first.<br>
 *         The Low-Power Support section is updated with additional 
-*         information about disabling CLK.
-*         The context initialization in Cy_SD_Host_Init() is corrected.
-*         Updated the Write/Read sequence in Cy_SD_Host_Read() and 
-*         Cy_SD_Host_Write()functions for non-DMA mode.
+*         information about disabling CLK.<br>
+*         The context initialization in \ref Cy_SD_Host_Init() is corrected.<br>
+*         Updated the Write/Read sequence in \ref Cy_SD_Host_Read() and
+*         \ref Cy_SD_Host_Write()functions for non DMA mode.<br>
 *     </td>
-*     <td>Defect fixes.</td>
+*     <td>Defect fixing.</td>
 *   </tr>
 *   <tr>
 *     <td>1.0</td>

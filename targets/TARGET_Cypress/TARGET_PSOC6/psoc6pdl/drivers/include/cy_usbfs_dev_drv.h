@@ -635,13 +635,13 @@
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
 *     <td rowspan="2"> 1.10</td>
-*     <td>Fixed \ref Cy_USBFS_Dev_Drv_Disable function to not disable DMA 
-*         in the CPU mode.</td>
+*     <td>Fixed the \ref Cy_USBFS_Dev_Drv_Disable function to not disable DMA
+*         in CPU mode.</td>
 *     <td>Calling this function triggers assert because DMA for endpoints is not 
 *         initialized/used in the CPU mode.</td>
 *   </tr>
 *   <tr>
-*     <td>Updated condition statement in the \ref CY_USBFS_DEV_DRV_ALLOC_ENDPOINT_BUFFER 
+*     <td>Updated the condition statement in the \ref CY_USBFS_DEV_DRV_ALLOC_ENDPOINT_BUFFER
 *         macro to explicitly check against non-zero.</td>
 *     <td>Fixed MISRA 13.2 violation in the macro.</td>
 *   </tr>

@@ -106,14 +106,14 @@
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
 *     <td>1.30</td>
-*     <td>The Cy_MCWDT_GetCountCascaded() function is corrected. Now 
+*     <td>The \ref Cy_MCWDT_GetCountCascaded() function is corrected. Now
 *         the function returns the correct value.
 *     </td>
-*     <td>Defect fixes.
+*     <td>Defect fixing.
 *     </td>
 *   </tr>
 *   <tr>
-*     <td>1.20</td>
+*     <td rowspan="2">1.20</td>
 *     <td>Flattened the organization of the driver source code into the single 
 *         source directory and the single include directory.
 *     </td>
