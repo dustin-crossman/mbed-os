@@ -453,7 +453,8 @@ static void set_key_init_deinit()
     TEST_ASSERT_EQUAL_ERROR_CODE(MBED_SUCCESS, res);
 
     res = kvstore->get(key, buffer, buffer_size, &actual_size, 0);
-    TEST_ASSERT_EQUAL_STRING(buffer, data);
+    TEST_ASSERT_EQUAL_ERROR_CODE(MBED_SUCCESS, res);
+    TEST_ASSERT_EQUAL_STRING(data, buffer);
     memset(buffer, 0, buffer_size);
 
     res = kvstore->remove(key);

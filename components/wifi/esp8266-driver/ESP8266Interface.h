@@ -373,8 +373,10 @@ private:
     struct {
         void (*callback)(void *);
         void *data;
+        uint8_t deferred;
     } _cbs[ESP8266_SOCKET_COUNT];
     void event();
+    void event_deferred();
 
     // Connection state reporting to application
     nsapi_connection_status_t _conn_stat;
@@ -387,6 +389,9 @@ private:
     int _connect_event_id;
     void proc_oob_evnt();
     void _oob2global_event_queue();
+    void _connect_async();
+    rtos::Mutex _cmutex; // Protect asynchronous connection logic
+
 };
 #endif
 #endif

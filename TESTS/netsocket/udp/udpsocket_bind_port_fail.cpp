@@ -37,14 +37,21 @@ void UDPSOCKET_BIND_PORT_FAIL()
     if (!sock) {
         TEST_FAIL();
     }
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(get_interface()));
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->bind(1024));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(NetworkInterface::get_default_instance()));
+    nsapi_error_t bind_result = sock->bind(1024);
+    if (bind_result == NSAPI_ERROR_UNSUPPORTED) {
+        TEST_IGNORE_MESSAGE("bind() not supported");
+        delete sock;
+        return;
+    } else {
+        TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, bind_result);
+    }
 
     UDPSocket *sock2 = new UDPSocket;
     if (!sock2) {
         TEST_FAIL();
     }
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock2->open(get_interface()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock2->open(NetworkInterface::get_default_instance()));
     TEST_ASSERT_EQUAL(NSAPI_ERROR_PARAMETER, sock2->bind(1024));
 
     delete sock;

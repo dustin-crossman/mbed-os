@@ -105,10 +105,10 @@ void analogout_init(dac_t *obj, PinName pin)
         obj->clock = CY_PIN_CLOCK(dac_function);
         pin_function(pin, dac_function);
 
-        if (AOUT != pin) {
-            const PinName directOutput = AOUT;
+        if (P9_6 != pin) {
+            const PinName directOutput = P9_6;
 
-            /* Connect AOUT to the AMUXA bus to drive output */
+            /* Connect P9_6 to the AMUXA bus to drive output */
             Cy_GPIO_SetHSIOM(Cy_GPIO_PortToAddr(CY_PORT(directOutput)), CY_PIN(directOutput), HSIOM_SEL_AMUXA);
         }
 

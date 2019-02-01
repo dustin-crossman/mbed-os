@@ -36,11 +36,17 @@ void TCPSOCKET_BIND_WRONG_TYPE()
     TCPSocket *sock = new TCPSocket;
     if (!sock) {
         TEST_FAIL();
+        return;
     }
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(get_interface()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(NetworkInterface::get_default_instance()));
     char addr_bytes[16] = {0xfe, 0x80, 0xff, 0x1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     SocketAddress sockAddr = SocketAddress(addr_bytes, NSAPI_IPv4, 80);
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_PARAMETER, sock->bind(sockAddr));
+    nsapi_error_t bind_result = sock->bind(sockAddr);
+    if (bind_result == NSAPI_ERROR_UNSUPPORTED) {
+        TEST_IGNORE_MESSAGE("bind() not supported");
+    } else {
+        TEST_ASSERT_EQUAL(NSAPI_ERROR_PARAMETER, bind_result);
+    }
 
     delete sock;
 

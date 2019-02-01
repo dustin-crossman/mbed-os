@@ -222,7 +222,6 @@ void test_single_mbr()
     TEST_ASSERT_EQUAL(0, err);
 
     delete bd;
-    bd = 0;
 }
 
 void test_with_other_fs()

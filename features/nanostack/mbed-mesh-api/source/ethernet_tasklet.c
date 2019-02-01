@@ -120,7 +120,8 @@ void enet_tasklet_main(arm_event_s *event)
         case APPLICATION_EVENT:
             if (event->event_id == APPL_EVENT_CONNECT) {
                 enet_tasklet_configure_and_connect_to_network();
-            } else if (event->event_id == APPL_BACKHAUL_INTERFACE_PHY_UP) {
+            } else if (event->event_id == APPL_BACKHAUL_INTERFACE_PHY_UP
+                       && tasklet_data_ptr->tasklet_state != TASKLET_STATE_BOOTSTRAP_STARTED) {
                 // Ethernet cable has been plugged in
                 arm_nwk_interface_configure_ipv6_bootstrap_set(
                     tasklet_data_ptr->network_interface_id, NET_IPV6_BOOTSTRAP_AUTONOMOUS, NULL);

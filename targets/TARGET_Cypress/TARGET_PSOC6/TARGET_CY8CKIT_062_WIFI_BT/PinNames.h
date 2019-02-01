@@ -249,9 +249,7 @@ typedef enum {
 
 
     USBTX   = UART_TX,
-    USBRX   = UART_RX,
-     
-    AOUT    = P9_6
+    USBRX   = UART_RX
 } PinName;
 
 // PinName[15-0] = Port[15-8] + Pin[4-0]

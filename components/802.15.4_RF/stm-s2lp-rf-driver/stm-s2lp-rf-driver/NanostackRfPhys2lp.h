@@ -18,7 +18,7 @@
 #define NANOSTACK_PHY_S2LP_H_
 
 #if defined(MBED_CONF_NANOSTACK_CONFIGURATION) && DEVICE_SPI  && defined(MBED_CONF_RTOS_PRESENT)
-#include "mbed.h"
+#include "inttypes.h"
 #include "NanostackRfPhy.h"
 #include "DigitalIn.h"
 #include "DigitalOut.h"

@@ -538,6 +538,18 @@ public:
      */
     virtual uint16_t getMaxAdvertisingDataLength();
 
+    /** Return maximum advertising data length supported for connectable advertising.
+     *
+     * @return Maximum advertising data length supported for connectable advertising.
+     */
+    virtual uint16_t getMaxConnectableAdvertisingDataLength();
+
+    /** Return maximum advertising data length you may set if advertising set is active.
+     *
+     * @return Maximum advertising data length you may set if advertising set is active.
+     */
+    virtual uint16_t getMaxActiveSetAdvertisingDataLength();
+
     /** Create an advertising set and apply the passed in parameters. The handle returned
      *  by this function must be used for all other calls that accept an advertising handle.
      *  When done with advertising, remove from the system using destroyAdvertisingSet().

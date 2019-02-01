@@ -234,8 +234,7 @@ qspi_status_t qspi_frequency(qspi_t *obj, int hz)
     int div = HAL_RCC_GetHCLKFreq() / hz;
     if (div > 255) {
         div = 255;
-    }
-    else {
+    } else {
         if ((HAL_RCC_GetHCLKFreq() % hz) == 0) {
             div = div - 1;
         }
@@ -260,8 +259,7 @@ qspi_status_t qspi_write(qspi_t *obj, const qspi_command_t *command, const void 
 
     if (HAL_QSPI_Command(&obj->handle, &st_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) {
         status = QSPI_STATUS_ERROR;
-    }
-    else {
+    } else {
         if (HAL_QSPI_Transmit(&obj->handle, (uint8_t *)data, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) {
             status = QSPI_STATUS_ERROR;
         }
@@ -280,8 +278,7 @@ qspi_status_t qspi_read(qspi_t *obj, const qspi_command_t *command, void *data, 
 
     if (HAL_QSPI_Command(&obj->handle, &st_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) {
         status = QSPI_STATUS_ERROR;
-    }
-    else {
+    } else {
         if (HAL_QSPI_Receive(&obj->handle, data, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) {
             status = QSPI_STATUS_ERROR;
         }

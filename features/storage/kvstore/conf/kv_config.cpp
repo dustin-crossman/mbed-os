@@ -628,8 +628,6 @@ int _storage_config_TDB_INTERNAL()
         if (_get_flashiap_bd_default_addresses_tdb_internal(&internal_start_address, &internal_size) != MBED_SUCCESS) {
             return MBED_ERROR_FAILED_OPERATION;
         }
-        internal_start_address = align_up(FLASHIAP_APP_ROM_END_ADDR, flash.get_sector_size(FLASHIAP_APP_ROM_END_ADDR));
-        flash.deinit();
     }
 
     //Get internal memory FLASHIAP block device.
@@ -652,12 +650,14 @@ int _storage_config_TDB_INTERNAL()
         return MBED_ERROR_INVALID_ARGUMENT;
     }
 
+    //Deinitialize internal block device and TDB will reinitialize and take control on it.
     ret = kvstore_config.internal_bd->deinit();
     if (ret != MBED_SUCCESS) {
         tr_error("KV Config: Fail to deinit internal BlockDevice.");
         return MBED_ERROR_FAILED_OPERATION;
     }
 
+    //Create a TDBStore in the internal FLASHIAP block device.
     static TDBStore tdb_internal(kvstore_config.internal_bd);
     kvstore_config.internal_store = &tdb_internal;
 

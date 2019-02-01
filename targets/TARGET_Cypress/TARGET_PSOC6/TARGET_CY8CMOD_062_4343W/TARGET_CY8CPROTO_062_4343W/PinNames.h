@@ -231,10 +231,7 @@ typedef enum {
     CY_BT_PIN_DEVICE_WAKE = BT_PIN_DEVICE_WAKE,
 
     USBTX           = UART_TX,
-    USBRX           = UART_RX,
-
-    // Not connected
-    AOUT            = (int)0xFFFFFFFF
+    USBRX           = UART_RX
 } PinName;
 
 // PinName[15-0] = Port[15-8] + Pin[4-0]
