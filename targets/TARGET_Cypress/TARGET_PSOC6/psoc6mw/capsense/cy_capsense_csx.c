@@ -684,7 +684,9 @@ static void Cy_CapSense_CSXStartSample(cy_stc_capsense_context_t * context)
 * the Cy_CapSense_CSXConnectRx() function, hence all GPIOs connected 
 * using this function must be disconnected using 
 * the Cy_CapSense_CSXDisconnectRx() function prior to initializing 
-* new widgets.
+* new widgets. Use this function in StartSample 
+* callback (see the \ref group_capsense_callbacks section for details) 
+* or with low-level functions that perform a single-sensor scanning.
 * 
 * Scanning should be completed before calling this function.
 *
@@ -695,6 +697,11 @@ static void Cy_CapSense_CSXStartSample(cy_stc_capsense_context_t * context)
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
+* \funcusage
+* 
+* An example of using the function to perform port pin re-connection: 
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSXConnect
+* 
 *******************************************************************************/
 void Cy_CapSense_CSXConnectRx(
                 const cy_stc_capsense_pin_config_t * rxPtr, 
@@ -723,7 +730,9 @@ void Cy_CapSense_CSXConnectRx(
 * the Cy_CapSense_CSXConnectTx() function, hence all GPIOs connected 
 * using this function must be disconnected using 
 * the Cy_CapSense_CSXDisconnectTx() function prior to initializing 
-* new widgets.
+* new widgets. Use this function in StartSample 
+* callback (see the \ref group_capsense_callbacks section for details) 
+* or with low-level functions that perform a single-sensor scanning.
 * 
 * Scanning should be completed before calling this function.
 *
@@ -734,6 +743,11 @@ void Cy_CapSense_CSXConnectRx(
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
+* \funcusage
+* 
+* An example of using the function to perform port pin re-connection: 
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSXConnect
+* 
 *******************************************************************************/
 void Cy_CapSense_CSXConnectTx(
                 const cy_stc_capsense_pin_config_t * txPtr, 
@@ -768,6 +782,11 @@ void Cy_CapSense_CSXConnectTx(
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
+* \funcusage
+* 
+* An example of using the function to perform port pin re-connection: 
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSXConnect
+* 
 *******************************************************************************/
 void Cy_CapSense_CSXDisconnectRx(
                 const cy_stc_capsense_pin_config_t * rxPtr, 
@@ -807,6 +826,11 @@ void Cy_CapSense_CSXDisconnectRx(
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
+* \funcusage
+* 
+* An example of using the function to perform port pin re-connection: 
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSXConnect
+* 
 *******************************************************************************/
 void Cy_CapSense_CSXDisconnectTx(
                 const cy_stc_capsense_pin_config_t * txPtr, 

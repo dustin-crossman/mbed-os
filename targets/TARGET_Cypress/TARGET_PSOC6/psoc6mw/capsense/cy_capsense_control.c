@@ -51,7 +51,11 @@
 * When the middleware operation is stopped by the Cy_CapSense_DeInit()
 * function, subsequent call of the Cy_CapSense_Init() function repeats 
 * initialization process and it is not needed to call the Cy_CapSense_Enable() 
-* function second time.
+* function second time. However, to implement time-multiplexed mode 
+* (sharing the CSD HW Block between multiple middleware) 
+* the Cy_CapSense_Save()/Cy_CapSense_Restore() functions should be used 
+* instead of the Cy_CapSense_DeInit()/Cy_CapSense_Init() functions for 
+* further compatibility.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t
@@ -282,8 +286,14 @@ cy_status Cy_CapSense_Initialize(cy_stc_capsense_context_t * context)
 * After it is stopped, the CSD HW block may be reconfigured by the 
 * application program or other middleware for any other usage. 
 * 
-* The middleware operation can be resumed by calling the Cy_CapSense_Init()
-* function.
+* When the middleware operation is stopped by the Cy_CapSense_DeInit()
+* function, subsequent call of the Cy_CapSense_Init() function repeats 
+* initialization process and it is not needed to call the Cy_CapSense_Enable() 
+* function second time. However, to implement time-multiplexed mode 
+* (sharing the CSD HW Block between multiple middleware) 
+* the Cy_CapSense_Save()/Cy_CapSense_Restore() functions should be used 
+* instead of the Cy_CapSense_DeInit()/Cy_CapSense_Init() functions for 
+* further compatibility.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -941,9 +951,6 @@ void Cy_CapSense_SetGestureTimestamp(
 * Resumes the middleware operation if the Cy_CapSense_Save() function was
 * called previously.
 *
-* This function performs the same tasks as Cy_CapSense_Init() function and is 
-* kept for API consistency among middlewares.
-*
 * This function, along with the Cy_CapSense_Save() function is specifically 
 * designed for ease of use and support time multiplexing of the CSD HW block 
 * among multiple middlewares. When the CSD HW block is shared by two or more
@@ -952,12 +959,23 @@ void Cy_CapSense_SetGestureTimestamp(
 * Cy_CapSense_Save() function. See the function usage example below for 
 * details on usage.
 * 
+* This function performs the same tasks as Cy_CapSense_Init() function and is 
+* kept for API consistency among middlewares. It is recommended to use 
+* Cy_CapSense_Save()/Cy_CapSense_Restore() functions to implement 
+* time-multiplexed mode instead of Cy_CapSense_DeInit()/Cy_CapSense_Init()
+* functions for further compatibility.
+*
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * Returns the status of the resume process. If CY_RET_SUCCESS is not received,
 * the resume process fails and retries may be required.
+*
+* \funcusage
+* 
+* An example of sharing the CSD HW block by CapSense and CSDADC middleware:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_TimeMultiplex
 *
 *******************************************************************************/
 cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
@@ -1019,9 +1037,6 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 * Saves the state of CapSense so the functionality can be restored
 * using Cy_CapSense_Restore() function.
 *
-* This function performs the same tasks as Cy_CapSense_DeInit() function and is 
-* kept for API consistency among middlewares.
-*
 * This function, along with the Cy_CapSense_Restore() function is specifically 
 * designed for ease of use and support time multiplexing of the CSD HW block 
 * among multiple middlewares. When the CSD HW block is shared by two or more 
@@ -1030,14 +1045,18 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 * for use by other middleware. See the function usage example below for 
 * details on usage.
 * 
-* When different functionality of the CSD HW block is required, this function is  
-* used to switch the CSD HW block assignment between different middleware in 
-* time-multiplexed mode. 
+* This function performs the same tasks as Cy_CapSense_DeInit() function and is 
+* kept for API consistency among middlewares. It is recommended to use 
+* Cy_CapSense_Save()/Cy_CapSense_Restore() functions to implement 
+* time-multiplexed mode instead of Cy_CapSense_DeInit()/Cy_CapSense_Init()
+* functions for further compatibility.
+*
 * This function performs the following operations:
-* - Release the CSD HW block.
-* - Configure sensor pins to the default state and disconnect them from 
+* * Release the CSD HW block.
+* * Configure sensor pins to the default state and disconnect them from 
 *   analog buses.
-* - Disconnect external capacitors from analog buses.
+* * Disconnect external capacitors from analog buses.
+* * Set the middleware state to default.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -1045,6 +1064,11 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 * \return
 * Returns the status of the process. If CY_RET_SUCCESS is not received,
 * the save process fails and retries may be required.
+*
+* \funcusage
+* 
+* An example of sharing the CSD HW block by CapSense and CSDADC middleware:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_TimeMultiplex
 *
 *******************************************************************************/
 cy_status Cy_CapSense_Save(cy_stc_capsense_context_t * context)

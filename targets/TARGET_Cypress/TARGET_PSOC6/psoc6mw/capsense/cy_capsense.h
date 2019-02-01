@@ -217,17 +217,17 @@
 *         * Added two new functions:
 *           * Cy_CapSense_SetupWidgetExt()
 *           * Cy_CapSense_ScanExt()
-*         * Fixed shield operation when Csh is disabled.
+*         * Fixed the shield operation when Csh is disabled.
 *         * Fixed implementation of position filtering for Radial Slider widget.
-*         * Fixed Cy_CapSense_DeInit() implementation by restoring hardware to the 
-*           default state.
-*         * Added possibility to enable shield with no dedicated electrodes.
+*         * Fixed Cy_CapSense_DeInit() implementation by restoring hardware to  
+*           its default state.
+*         * Added the possibility to enable the shield with no dedicated electrodes.
 *         * Added support of protocol-agnostic tuning (UART, SPI, etc.).
 *     </td>
 *     <td>
-*         * Improved user's experience with API.
+*         * Improved user's experience with an API.
 *         * Improved documentation.
-*         * Fixed defects.
+*         * Defect fixing.
 *         * Enhanced functionality.
 *     </td>
 *   </tr>

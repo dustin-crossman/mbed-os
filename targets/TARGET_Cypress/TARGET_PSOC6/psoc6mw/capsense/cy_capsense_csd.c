@@ -803,7 +803,9 @@ void Cy_CapSense_CSDDisconnectSnsExt(cy_stc_capsense_context_t * context)
 * the Cy_CapSense_CSDConnectSns() function, hence all GPIOs connected 
 * using this function must be disconnected using 
 * the Cy_CapSense_CSDDisconnectSns() function prior to initializing 
-* new widgets.
+* new widgets. Use this function in StartSample 
+* callback (see the \ref group_capsense_callbacks section for details) 
+* or with low-level functions that perform a single-sensor scanning.
 * 
 * Scanning should be completed before calling this function.
 *
@@ -814,6 +816,11 @@ void Cy_CapSense_CSDDisconnectSnsExt(cy_stc_capsense_context_t * context)
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
+* \funcusage
+* 
+* An example of using the function to perform port pin re-connection: 
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSDConnect
+* 
 *******************************************************************************/
 void Cy_CapSense_CSDConnectSns(
                 const cy_stc_capsense_pin_config_t * snsAddrPtr, 
@@ -847,6 +854,11 @@ void Cy_CapSense_CSDConnectSns(
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
+* \funcusage
+* 
+* An example of using the function to perform port pin re-connection: 
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSDConnect
+* 
 *******************************************************************************/
 void Cy_CapSense_CSDDisconnectSns(
                 const cy_stc_capsense_pin_config_t * snsAddrPtr, 
