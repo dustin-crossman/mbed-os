@@ -18,17 +18,17 @@
 #ifndef MBEDTLS_DEVICE_H
 #define MBEDTLS_DEVICE_H
 
-#define MBEDTLS_SHA1_C
-#define MBEDTLS_SHA1_ALT
-#define MBEDTLS_SHA256_ALT
-#define MBEDTLS_SHA512_ALT
-
-/* AES alternate implementation is disabled: concurrent hardware accelerated
+/* SHA alternate implementations are disabled: concurrent hardware accelerated
    operation of AES and SHA blocks is not currently supported */
-//#define MBEDTLS_AES_ALT
-//#define MBEDTLS_CIPHER_MODE_CBC
-//#define MBEDTLS_CIPHER_MODE_CFB
-//#define MBEDTLS_CIPHER_MODE_CTR
+//#define MBEDTLS_SHA1_C
+//#define MBEDTLS_SHA1_ALT
+//#define MBEDTLS_SHA256_ALT
+//#define MBEDTLS_SHA512_ALT
+
+#define MBEDTLS_AES_ALT
+#define MBEDTLS_CIPHER_MODE_CBC
+#define MBEDTLS_CIPHER_MODE_CFB
+#define MBEDTLS_CIPHER_MODE_CTR
 
 #define MBEDTLS_ECP_ALT
 #define MBEDTLS_ECP_DP_SECP192R1_ENABLED
