@@ -3,7 +3,7 @@
 * \version 1.1
 *
 * \brief
-* The file contains application public interface to the CapSense library.
+* The file contains application programming interface to the CapSense library.
 *
 ********************************************************************************
 * \copyright
@@ -73,20 +73,69 @@ typedef struct
     uint8_t twoFingersEn;                           /**< Two-finger detection enabled */
 } cy_stc_capsense_advanced_centroid_config_t;
 
-/** Declares Advanced Centroid position structure */
+/** Declares position structure that keep information of a single touch.
+* Depending on a widget type each structure field keeps the following 
+* information:
+* 
+* <table class="doxtable">
+*   <tr>
+*     <th>Structure Field</th>
+*     <th>Slider</th>
+*     <th>Matrix Buttons</th>
+*     <th>CSD Touchpad</th>
+*     <th>CSX Touchpad</th>
+*   </tr>
+*   <tr>
+*     <td>x</td>
+*     <td>X-axis position</td>
+*     <td>Active Column</td>
+*     <td>X-axis position</td>
+*     <td>X-axis position</td>
+*   </tr>
+*   <tr>
+*     <td>y</td>
+*     <td>Reserved</td>
+*     <td>Active Row</td>
+*     <td>Y-axis position</td>
+*     <td>Y-axis position</td>
+*   </tr>
+*   <tr>
+*     <td>z</td>
+*     <td>Reserved</td>
+*     <td>Reserved</td>
+*     <td>Reserved</td>
+*     <td>MSB = Age of touch; LSB = Z-value</td>
+*   </tr>
+*   <tr>
+*     <td>id</td>
+*     <td>Reserved</td>
+*     <td>Logical number of button</td>
+*     <td>Reserved</td>
+*     <td>MSB = Debounce; LSB = touch ID</td>
+*   </tr>
+* </table>
+*/
 typedef struct
 {
     uint16_t x;                                     /**< X position */
     uint16_t y;                                     /**< Y position */
-    uint16_t z;                                     /**< Z value of X axis */
-    uint16_t id;                                    /**< Z value of Y axis */
+    uint16_t z;                                     /**< Z value */
+    uint16_t id;                                    /**< ID of touch */
 } cy_stc_capsense_position_t;
 
-/** Declares Advanced Centroid touch structure */
+/** Declares touch structure used to store positions of Touchpad, Matrix buttons and Slider widgets */
 typedef struct
 {
-    cy_stc_capsense_position_t * ptrPosition;       /**< Array of position structure */
-    uint8_t numPosition;                            /**< Number of touches */
+    cy_stc_capsense_position_t * ptrPosition;       /**< Pointer to the array containing the position information. 
+                                                         A number of elements is defined by numPosition. */
+    uint8_t numPosition;                            /**< Total number of detected touches on a widget:
+                                                    *    * 0 - no touch is detected 
+                                                    *    * 1 - a single touch is detected
+                                                    *    * 2 - two touches are detected
+                                                    *    * 3 - three touches are detected
+                                                    *    * CY_CAPSENSE_POSITION_MULTIPLE - multiple touches are detected 
+                                                    *        and information in position structure should be ignored.
+                                                    */
 } cy_stc_capsense_touch_t;
 
 /** Declares HW SmartSense data structure for CSD widgets */

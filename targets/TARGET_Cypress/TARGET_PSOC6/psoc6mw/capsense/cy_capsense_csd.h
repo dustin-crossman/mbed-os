@@ -4,7 +4,7 @@
 *
 * \brief
 * This file provides the function prototypes specific to the CSD sensing
-* implementation.
+* method implementation.
 *
 ********************************************************************************
 * \copyright
@@ -47,11 +47,11 @@ extern "C" {
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
 
+cy_status Cy_CapSense_CSDCalibrateWidget(uint32_t widgetId, uint32_t target, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSDSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSDSetupWidgetExt(uint32_t widgetId, uint32_t sensorId, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSDScan(cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSDScanExt(cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_CSDCalibrateWidget(uint32_t widgetId, uint32_t target, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSDConnectSns(const cy_stc_capsense_pin_config_t * snsAddrPtr, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSDDisconnectSns(const cy_stc_capsense_pin_config_t * snsAddrPtr, const cy_stc_capsense_context_t * context);
 

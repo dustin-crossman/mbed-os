@@ -38,11 +38,11 @@ extern "C" {
 /** \addtogroup group_capsense_enums *//** \{ */
 /******************************************************************************/
 
-/** Defines FW Tuner states */
+/** Defines MW Tuner module states */
 typedef enum
 {
     CY_CAPSENSE_TU_FSM_RUNNING          = 0x00u,                /**< Running state is a state when CapSense middleware is not 
-                                                                   * blocked by the Tuner and application continuously scans */
+                                                                   * blocked by the CapSense Tuner tool and application program continuously scans */
     CY_CAPSENSE_TU_FSM_SUSPENDED        = 0x01u,                /**< Scanning is suspended */
     CY_CAPSENSE_TU_FSM_ONE_SCAN         = 0x03u,                /**< Scanning is suspended after one scan cycle */
 } cy_en_capsense_tuner_state_t;
@@ -55,7 +55,7 @@ typedef enum
     CY_CAPSENSE_TU_CMD_RESUME_E         = 2u,                   /**< Resume command switches state from suspend to running */
     CY_CAPSENSE_TU_CMD_RESTART_E        = 3u,                   /**< Restart command requests to perform CapSense re-initialization */
     CY_CAPSENSE_TU_CMD_RUN_SNR_TEST_E   = 4u,                   /**< Reserved */
-    CY_CAPSENSE_TU_CMD_PING_E           = 5u,                   /**< Ping command to check whether application flow calls Cy_CapSense_RunTuner() */
+    CY_CAPSENSE_TU_CMD_PING_E           = 5u,                   /**< Ping command to check whether application program calls Cy_CapSense_RunTuner() */
     CY_CAPSENSE_TU_CMD_ONE_SCAN_E       = 6u,                   /**< Execute one scan cycle and then switch to suspend state */
     CY_CAPSENSE_TU_CMD_WRITE_E          = 7u,                   /**< Writes specified data with offset into cy_capsense_tuner */
 } cy_en_capsense_tuner_cmd_t;
@@ -74,7 +74,7 @@ typedef enum
 /** Defines sensing methods types */
 typedef enum
 {
-    CY_CAPSENSE_UNDEFINED_E             = 0x00u,                /**< Undefined method used at initialization or releasing HW */
+    CY_CAPSENSE_UNDEFINED_E             = 0x00u,                /**< Undefined method used at initialization or releasing the CSD HW block */
     CY_CAPSENSE_SENSE_METHOD_CSD_E      = 0x01u,                /**< CSD sensing method */
     CY_CAPSENSE_SENSE_METHOD_CSX_E      = 0x02u,                /**< CSX sensing method */
 } cy_en_capsense_sensing_method_t;
@@ -334,7 +334,7 @@ typedef struct
 
     uint8_t periDividerType;                                    /**< Peripheral clock type (8- or 16-bit type) */
     uint8_t periDividerIndex;                                   /**< Peripheral divider index */
-    uint8_t analogWakeupDelay;                                  /**< Time needed to establish correct operation of CSD HW block after power up or deep sleep. */
+    uint8_t analogWakeupDelay;                                  /**< Time needed to establish correct operation of the CSD HW block after power up or deep sleep. */
 
     uint8_t ssIrefSource;                                       /**< Iref source */
     uint8_t ssVrefSource;                                       /**< Vref source */
@@ -482,7 +482,21 @@ typedef struct
 * the \ref cy_en_capsense_callback_event_t events occurs.
 */
 typedef void (*cy_capsense_callback_t)(cy_stc_active_scan_sns_t * ptrActiveScan);
+
+/**
+* Provides the typedef for the callback function that is called by the 
+* Cy_CapSense_RunTuner() function to establish communication with 
+* the CapSense Tuner tool to monitor CapSense operation. 
+* Refer to \ref group_capsense_callbacks section.
+*/
 typedef void (*cy_capsense_tuner_send_callback_t)(void * context);
+
+/**
+* Provides the typedef for the callback function that is called by the 
+* Cy_CapSense_RunTuner() function to establish communication with 
+* the CapSense Tuner tool to support life-time tunning. 
+* Refer to \ref group_capsense_callbacks section.
+*/
 typedef void (*cy_capsense_tuner_receive_callback_t)(uint8_t ** commandPacket, uint8_t ** tunerPacket, void * context);
 
 /** \} */
@@ -496,7 +510,7 @@ typedef void (*cy_capsense_tuner_receive_callback_t)(uint8_t ** commandPacket, u
 /** Declares top-level Context Data Structure */
 typedef struct
 {
-    uint16_t configId;                                          /**< 16-bit CRC calculated by the configuration tool for the CapSense configuration. 
+    uint16_t configId;                                          /**< 16-bit CRC calculated by the CapSense Configurator tool for the CapSense configuration. 
                                                                    * Used by the CapSense Tuner tool to identify if the FW corresponds to the specific user configuration. */
     uint16_t tunerCmd;                                          /**< Tuner Command Register \ref cy_en_capsense_tuner_cmd_t. 
                                                                    * Used for the communication between the CapSense Tuner tool and the middleware */

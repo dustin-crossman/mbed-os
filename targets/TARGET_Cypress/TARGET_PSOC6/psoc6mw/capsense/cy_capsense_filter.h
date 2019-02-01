@@ -38,16 +38,16 @@ extern "C" {
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
 
-cy_status Cy_CapSense_UpdateAllBaselines(const cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_UpdateWidgetBaseline(uint32_t widgetId, const cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_UpdateSensorBaseline(uint32_t widgetId, uint32_t sensorId, const cy_stc_capsense_context_t * context);
-
 void Cy_CapSense_InitializeAllBaselines(cy_stc_capsense_context_t * context);
 void Cy_CapSense_InitializeWidgetBaseline(uint32_t widgetId, cy_stc_capsense_context_t * context);
 void Cy_CapSense_InitializeSensorBaseline(uint32_t widgetId, uint32_t sensorId, cy_stc_capsense_context_t * context);
 
 void Cy_CapSense_InitializeAllFilters(const cy_stc_capsense_context_t * context);
 void Cy_CapSense_InitializeWidgetFilter(uint32_t widgetId, const cy_stc_capsense_context_t * context);
+
+cy_status Cy_CapSense_UpdateAllBaselines(const cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_UpdateWidgetBaseline(uint32_t widgetId, const cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_UpdateSensorBaseline(uint32_t widgetId, uint32_t sensorId, const cy_stc_capsense_context_t * context);
 
 /** \} */
 

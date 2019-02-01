@@ -44,9 +44,9 @@ extern "C" {
 
 
 /* Scanning status */
-/** Software component is busy */
+/** The CapSense middleware is busy */
 #define CY_CAPSENSE_SW_STS_BUSY                         (0x80u)
-/** Software component is not busy */
+/** The CapSense middleware is not busy */
 #define CY_CAPSENSE_NOT_BUSY                            (0x00u)
 
 /** Feature enabled */

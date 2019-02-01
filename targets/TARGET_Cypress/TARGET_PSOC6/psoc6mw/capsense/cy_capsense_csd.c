@@ -5,7 +5,7 @@
 * \brief
 * This file defines the data structure global variables and provides
 * implementation for the low-level functions of the CSD part of
-* the Sensing module. The file contains the functions used for the CSD block
+* the Sensing module. The file contains the functions used for the CSD HW block
 * initialization, calibration, and scanning.
 *
 ********************************************************************************
@@ -296,7 +296,7 @@ void Cy_CapSense_CSDSnsStateCheck(cy_stc_capsense_context_t * context)
 ****************************************************************************//**
 *
 * This function writes both IDACs available in CSD method into corresponding 
-* CSD HW block registers.
+* the CSD HW block registers.
 *
 * Modulator IDAC is taken from widget context structure and Compensation
 * IDAC is taken from sensor context structure.
@@ -471,7 +471,7 @@ void Cy_CapSense_CSDCalculateScanDuration(cy_stc_capsense_context_t * context)
     subConv = Cy_CapSense_CSDGetNumberOfConversions(divider, (uint32_t)ptrWdCxt->resolution, 
                 ((uint32_t)ptrWdCxt->snsClkSource & ((uint32_t)~(uint32_t)CY_CAPSENSE_CLK_SOURCE_AUTO_MASK)));
 
-    /* Write number of sub-conversions into CSD HW block register */
+    /* Write number of sub-conversions into the CSD HW block register */
     Cy_CSD_WriteReg(context->ptrCommonConfig->ptrCsdBase, CY_CSD_REG_OFFSET_SEQ_NORM_CNT, (subConv & CY_CAPSENSE_CSD_SEQ_NORM_CNT_CONV_CNT_MSK));
 }
 
@@ -480,33 +480,35 @@ void Cy_CapSense_CSDCalculateScanDuration(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_CSDSetupWidget
 ****************************************************************************//**
 *
-* Performs hardware and firmware initialization required for scanning sensors
-* in a specific widget using the CSD sensing method. This function requires using
-* the Cy_CapSense_CSDScan() function to start scanning.
+* Performs the initialization required to scan the specified CSD widget.
 *
-* This function is obsolete and kept for backward compatibility only. 
+* \note This function is obsolete and kept for backward compatibility only. 
 * The Cy_CapSense_SetupWidget() function should be used instead.
 *
-* This function initializes the specific widget common parameters to perform
-* the CSD scanning. The initialization includes setting up a Modulator and
-* Sense clock frequency and scanning resolution.
+* This function prepares the middleware to scan all the sensors in the 
+* specified CSD widget by executing the following tasks:
+* 1. Configure the CSD HW block if it is not configured to perform the
+* CSD sensing method used by the specified widget.
+* 2. Initialize the CSD HW block with specific sensing configuration (e.g.
+* sensor clock, scan resolution) used by the widget.
+* 3. Disconnect all previously connected electrodes, if the electrodes
+* connected by the Cy_CapSense_CSDSetupWidgetExt(),
+* Cy_CapSense_CSXSetupWidgetExt() functions and not disconnected.
 *
-* This function does not connect any specific sensors to the scanning hardware,
-* neither does it start a scanning process. The Cy_CapSense_CSDScan()
-* must be called after initializing the widget to start scanning.
-*
-* This function is called when no scanning is in progress. I.e.
-* Cy_CapSense_IsBusy() returns a non-busy status.
-*
-* This function is called by the Cy_CapSense_SetupWidget() if the
-* given widget uses the CSD sensing method.
-*
-* Calling this function directly from the application layer is not
+* This function does not start sensor scanning. The Cy_CapSense_CSDScan()
+* function must be called to start the scan sensors in the widget. If this
+* function is called more than once, it does not break the middleware 
+* operation, but only the last initialized widget is in effect.
+* Calling this function directly from the application program is not
 * recommended. This function is used to implement only the user's specific
-* use cases (for faster execution time or pipeline scanning for example).
+* use cases (for example faster execution).
 *
+* The status of a sensor scan must be checked using the Cy_CapSense_IsBusy() 
+* function prior to starting a next scan or setting up another widget.
+* 
 * \param widgetId
-* Specifies the ID number of a widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -533,36 +535,36 @@ void Cy_CapSense_CSDSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * c
 * Function Name: Cy_CapSense_CSDSetupWidgetExt
 ****************************************************************************//**
 *
-* Performs extended initialization for the CSD widget and also performs
-* initialization required for a specific sensor in the widget.  
-* This function requires using the Cy_CapSense_CSDScanExt() function to 
-* initiate a scan.
-*
-* This function is obsolete and kept for backward compatibility only. 
+* Performs extended initialization required to scan a specified sensor in 
+* a widget using CSD sensing method.
+* 
+* \note This function is obsolete and kept for backward compatibility only. 
 * The Cy_CapSense_SetupWidgetExt() function should be used instead.
 *
-* This function does the same as Cy_CapSense_CSDSetupWidget() and also
-* does the following tasks:
-* 1. Connects the specified sensor of the widget.
-* 2. Configures HW to perform scan of the specified sensor.
-*
-* Once this function is called to initialize a widget and a sensor, the
-* Cy_CapSense_CSDScanExt() function is called to scan the sensor.
-*
-* This function is called when no scanning is in progress. I.e.
-* Cy_CapSense_IsBusy() returns a non-busy status.
-*
-* Calling this function directly from the application layer is not
-* recommended. This function is used to implement only the user's specific
-* use cases (for faster execution time or pipeline scanning for example).
-*
+* This function performs the same tasks of Cy_CapSense_CSDSetupWidget() and 
+* also connects and configures specified sensor for scan. Hence this 
+* function, along with Cy_CapSense_CSDScanExt() function, can be used to 
+* scan a specific sensor in the widget.
+* 
+* This function should be called for widget that is configured to use 
+* CSD sensing method, using this function on a non-CSD sensing widget 
+* would cause unexpected result.
+* 
+* This function requires using the Cy_CapSense_CSDScanExt() function to 
+* initiate a scan.
+* 
+* Calling this function directly from the application layer is not 
+* recommended. This function is used to implement only the user's 
+* specific use cases (for example faster execution).
+* 
 * \param widgetId
-* Specifies the ID number of a widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId
-* Specifies the ID number of the sensor within the widget to perform hardware
-* and firmware initialization required for scanning a specific sensor in a
-* specific widget.
+* Specifies the ID number of the sensor within the widget. A macro for the 
+* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -591,7 +593,7 @@ void Cy_CapSense_CSDSetupWidgetExt(uint32_t widgetId, uint32_t sensorId, cy_stc_
 *
 * Starts the CSD conversion.
 *
-* This function assumes that the CSD block is already set up using
+* This function assumes that the CSD HW block is already set up using
 * the Cy_CapSense_CSDSetupWidget() and the sensor port-pin is connected to the CSD
 * block using Cy_CapSense_CSDConnectSns().
 *
@@ -618,42 +620,30 @@ void Cy_CapSense_CSDStartSample(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_CSDScanExt
 ****************************************************************************//**
 *
-* Starts the CSD conversion on the preconfigured sensor. This function requires
-* using the Cy_CapSense_CSDSetupWidgetExt() function to set up the a
-* widget.
-*
-* This function is obsolete and kept for backward compatibility only. 
+* Starts the CSD conversion on the preconfigured sensor. 
+* 
+* \note This function is obsolete and kept for backward compatibility only. 
 * The Cy_CapSense_ScanExt() function should be used instead.
 *
-* This function performs single scanning of one sensor in the widget configured
-* by the Cy_CapSense_CSDSetupWidgetExt() function. It does the following
-* tasks:
-* 1. Sets the busy flag in the cy_capsense_context structure.
-* 2. Performs the clock-phase alignment of the sense and modulator clocks.
-* 3. Performs the Cmod pre-charging.
-* 4. Starts single scanning.
-*
-* Calling this function directly from the application layer is not
-* recommended. This function is used to implement only the user's specific
-* use cases (for faster execution time or pipeline scanning for example).
-* This function is called when no scanning is in progress. I.e.
-* Cy_CapSense_IsBusy() returns a non-busy status.
-*
-* The sensor must be preconfigured by using the
-* Cy_CapSense_CSDSetupWidgetExt() prior to calling this function.
-* The sensor remains ready for a next scan if a previous scan was triggered
-* by using the Cy_CapSense_CSDScanExt() function. In this case, calling
-* Cy_CapSense_CSDSetupWidgetExt() is not required every time before the
-* Cy_CapSense_CSDScanExt() function. If a previous scan was triggered in
-* any other way - Cy_CapSense_Scan(), Cy_CapSense_ScanAllWidgets() or
-* Cy_CapSense_RunTuner() - (see the Cy_CapSense_RunTuner() function
-* description for more details), the sensor must be preconfigured again by
-* using the Cy_CapSense_CSDSetupWidgetExt() prior to calling the
-* Cy_CapSense_CSDScanExt() function.
-*
-* If disconnection of the sensors is required after calling
-* Cy_CapSense_CSDScanExt(), the Cy_CapSense_CSDDisconnectSns()
-* function can be used.
+* This function performs scanning of a specific sensor in the widget 
+* previously initialized using the Cy_CapSense_CSDSetupWidgetExt() function. 
+* 
+* This function is called when no scanning is in progress. 
+* I.e. Cy_CapSense_IsBusy() returns a non-busy status and the widget must 
+* be preconfigured using Cy_CapSense_CSDSetupWidgetExt() function prior 
+* to calling this function. Calling this function directly from 
+* the application program is not recommended. This function is used to 
+* implement only the user's specific use cases (for example faster execution).
+* 
+* This function does not disconnect sensor GPIOs from CSD HW block at the 
+* end of a scan, therefore making subsequent scan of the same sensor is faster. 
+* If sensor needs to be disconnected after the scan, 
+* Cy_CapSense_CSDDisconnectSns() function can be used.
+* 
+* Calling Cy_CapSense_SetupWidget(), Cy_CapSense_CSDSetupWidget(), 
+* Cy_CapSense_ScanAllWidgets(), or if Cy_CapSense_RunTuner() returns 
+* CY_CAPSENSE_STATUS_RESTART_DONE status invalidated initialization 
+* made by this function.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -687,27 +677,25 @@ void Cy_CapSense_CSDScanExt(cy_stc_capsense_context_t * context)
 * This function initiates a scan for the sensors of the widget initialized 
 * by the Cy_CapSense_CSDSetupWidget() function.
 *
-* This function is obsolete and kept for backward compatibility only. 
+* \note This function is obsolete and kept for backward compatibility only. 
 * The Cy_CapSense_Scan() function should be used instead.
 *
 * This function does the following tasks:
 * 1. Connects the first sensor of the widget.
 * 2. Configures the IDAC value.
-* 3. Initializes the interrupt callback function to initialize a scan of
-* the next sensors in a widget.
-* 4. Starts scanning for the first sensor in the widget.
+* 3. Starts scanning for the first sensor in the widget.
 *
 * This function is called by the Cy_CapSense_Scan() if the given
 * widget uses the CSD sensing method.
 *
-* Calling this function directly from the application layer is not
+* Calling this function directly from the application program is not
 * recommended. This function is used to implement only the user's specific
-* use cases (for faster execution time or pipeline scanning for example).
+* use cases (for example faster execution).
 *
 * This function is called when no scanning is in progress. I.e.
-* Cy_CapSense_IsBusy() returns a non-busy status. The widget must be
-* preconfigured by the Cy_CapSense_CSDSetupWidget() function if any other
-* widget was previously scanned or any other type of the scan functions was used.
+* Cy_CapSense_IsBusy() returns a non-busy status and the widget must be
+* preconfigured using the Cy_CapSense_CSDSetupWidget() function prior
+* to calling this function.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -734,7 +722,7 @@ void Cy_CapSense_CSDScan(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_CSDConnectSnsExt
 ****************************************************************************//**
 *
-* Connects a ganged sensor port-pin to the sensing HW block via the AMUX bus.
+* Connects a ganged sensor port-pin to the CSD HW block via the AMUX bus.
 *
 * The function gets the IO configuration registers addresses, their shifts and
 * masks from the cy_stc_capsense_pin_config_t object. Basing on this data, it
@@ -765,7 +753,7 @@ void Cy_CapSense_CSDConnectSnsExt(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_CSDDisconnectSnsExt
 ****************************************************************************//**
 *
-* Disconnects a ganged sensor port-pin from the sensing HW block and AMUX bus.
+* Disconnects a ganged sensor port-pin from the CSD HW block and AMUX bus.
 * Sets the default state of the un-scanned sensor.
 *
 * The function gets the IO configuration registers addresses, their shifts and
@@ -800,22 +788,28 @@ void Cy_CapSense_CSDDisconnectSnsExt(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_CSDConnectSns
 ****************************************************************************//**
 *
-* Connects a port pin used by the sensor to the AMUX bus of the sensing 
-* HW block. The function ignores the fact if the sensor is a ganged sensor 
-* and connects only a specified pin.
-*
+* Connects port pin to the CSD HW block using AMUX bus.
+* 
+* This function can be used to customize default sensor connection 
+* by connecting one or more pins to existing sensor prior to initiating 
+* scan of the sensor.
+* 
+* The function ignores the fact if the sensor is a ganged sensor and 
+* connects only a specified port pin to the CSD HW block. This function can 
+* only use GPIOs that is already assigned to CapSense middleware.
+* 
+* The functions that perform a setup and scan of a sensor/widget do not 
+* take into account changes in the design made by 
+* the Cy_CapSense_CSDConnectSns() function, hence all GPIOs connected 
+* using this function must be disconnected using 
+* the Cy_CapSense_CSDDisconnectSns() function prior to initializing 
+* new widgets.
+* 
 * Scanning should be completed before calling this function.
-*
-* Calling this function directly from the application layer is not
-* recommended. This function is used to implement only the user's specific
-* use cases. Functions that perform a setup and scan of a sensor/widget,
-* automatically set the required pin states and perform the sensor connection.
-* They do not take into account changes in the design made by the
-* Cy_CapSense_CSDConnectSns() function.
 *
 * \param snsAddrPtr
 * Specifies the pointer to the cy_stc_capsense_pin_config_t object belonging to
-* a sensor which to be connected to the sensing HW block.
+* a sensor which to be connected to the CSD HW block.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -833,22 +827,22 @@ void Cy_CapSense_CSDConnectSns(
 * Function Name: Cy_CapSense_CSDDisconnectSns
 ****************************************************************************//**
 *
-* Disconnects a sensor port pin from the sensing HW block and the AMUX bus. 
-* Sets the default state of the non-scanned sensor.
+* Disconnects port pin from the CSD HW block by disconnecting it from AMUX bus.
+* 
+* This function can be used to disconnect a sensor connected 
+* using the Cy_CapSense_CSDConnectSns() function. In addition, this 
+* function can be used to customize default sensor connection by 
+* disconnecting one or more already connected sensors prior to 
+* initiating scan of the sensor.
+* 
+* This function works identically to the Cy_CapSense_CSDConnectSns() function 
+* except it disconnects the specified port-pin used by the sensor.
 *
-* This function works identically to Cy_CapSense_CSDConnectSns() except
-* it disconnects the specified port-pin used by the sensor.
-*
-* Calling this function directly from the application layer is not
-* recommended. This function is used to implement only the user's specific
-* use cases. Functions that perform a setup and scan of sensor/widget
-* automatically set the required pin states and perform the sensor connection.
-* They ignore changes in the design made by the
-* Cy_CapSense_CSDDisconnectSns() function.
+* Scanning should be completed before calling this function.
 *
 * \param  snsAddrPtr
 * Specifies the pointer to the cy_stc_capsense_pin_config_t object belonging to
-* a sensor which should be disconnected from the sensing HW block.
+* a sensor which should be disconnected from the CSD HW block.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -1308,7 +1302,8 @@ static void Cy_CapSense_CSDNormalizeIdac(
 * in sensor structure.
 *
 * \param widgetId
-* Specifies the ID number of the CSD widget to calibrate its raw count.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param target
 * Specifies the calibration target in percentages of the maximum raw count.
@@ -1378,9 +1373,9 @@ static void Cy_CapSense_CSDCalibrate(
         
         do
         {
-            /* Need to configure HW block with each IDAC change */
+            /* Need to configure the CSD HW block with each IDAC change */
             Cy_CapSense_CSDSetupWidgetExt(widgetId, snsIndex, context);
-            /* Need to discharge Cmod capacitor */                
+            /* Need to discharge Cmod capacitor */
             Cy_CapSense_CSDDischargeCmod(context);
             /* Scan the sensor */
             Cy_CapSense_CSDScanExt(context);
@@ -1493,21 +1488,25 @@ static void Cy_CapSense_CSDCalibrate(
 * Executes the IDAC calibration for all the sensors in the widget specified in
 * the input.
 *
-* This function is obsolete and kept for backward compatibility only. 
+* \note This function is obsolete and kept for backward compatibility only. 
 * The Cy_CapSense_CalibrateWidget() function should be used instead.
 *
 * Performs a successive approximation search algorithm to find appropriate
-* IDAC values for sensors in the specified widget that provides the raw
-* count to the level specified by the target parameter.
+* modulator and compensation IDAC (if enabled) values for all sensors in 
+* the specified widget that provides the raw count to the level 
+* specified by the target parameter.
 *
-* Calibration fails if the achieved raw count is outside of the range specified
-* by the target and acceptable calibration deviation.
+* Calibration returns CYRET_BAD_DATA if the achieved raw count is outside 
+* of the range specified by the target and acceptable calibration deviation
+* parameters.
 *
-* This function is available when the CSD Enable IDAC auto-calibration
-* parameter is enabled or the  SmartSense auto-tuning mode is configured.
+* This function could be used when the CSD Enable IDAC auto-calibration
+* parameter is enabled. It is recommended not to use this function when 
+* the SmartSense auto-tuning mode is configured.
 *
 * \param widgetId
-* Specifies the ID number of the CSD widget to calibrate its raw count.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param target
 * Specifies the calibration target in percentages of the maximum raw count.
@@ -1517,12 +1516,12 @@ static void Cy_CapSense_CSDCalibrate(
 *
 * \return
 * Returns the status of the specified widget calibration:
-* - CYRET_SUCCESS - The operation is successfully completed.
-* - CYRET_BAD_PARAM - The input parameter is invalid.
-* - CYRET_BAD_DATA - The calibration failed and the Component may not operate
-* as expected.
-* - CYRET_INVALID_STATE - The previous scanning is not completed and the
-* hardware block is busy.
+* - CYRET_SUCCESS       - The operation is successfully completed.
+* - CYRET_BAD_PARAM     - The input parameter is invalid.
+* - CYRET_BAD_DATA      - The calibration failed and CapSense may not operate
+*                         as expected.
+* - CYRET_INVALID_STATE - The previous scanning is not completed, and 
+*                         the CapSense middleware is busy.
 *
 *******************************************************************************/
 cy_status Cy_CapSense_CSDCalibrateWidget(
@@ -1770,7 +1769,7 @@ static void Cy_CapSense_CSDTriggerScan(cy_stc_capsense_context_t * context)
 *   conversions is greater than the Noise Metric Threshold.
 * - Initiate the scan of the next sensor for multiple sensor scanning mode.
 * - Update the status register in the data structure.
-* - Switch the HW IP block to the default state if scanning of all the sensors is
+* - Switch the CSD HW block to the default state if scanning of all the sensors is
 *   completed.
 *
 * This is an internal ISR function for the single-sensor scanning implementation.

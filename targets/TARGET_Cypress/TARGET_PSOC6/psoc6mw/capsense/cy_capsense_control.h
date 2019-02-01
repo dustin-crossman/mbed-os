@@ -47,20 +47,20 @@ cy_status Cy_CapSense_DeInit(cy_stc_capsense_context_t * context);
 
 cy_status Cy_CapSense_Enable(cy_stc_capsense_context_t * context);
 
-cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context);
 cy_status Cy_CapSense_Save(cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context);
 
 cy_status Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * context);
 cy_status Cy_CapSense_ProcessWidget(
                 uint32_t widgetId, 
                 cy_stc_capsense_context_t * context);
 
-void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context);
-
 void Cy_CapSense_IncrementGestureTimestamp(cy_stc_capsense_context_t * context);
 void Cy_CapSense_SetGestureTimestamp(
                 uint32_t value, 
                 cy_stc_capsense_context_t * context);
+
+void Cy_CapSense_Wakeup(const cy_stc_capsense_context_t * context);
 
 cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
                 cy_stc_syspm_callback_params_t * callbackParams, 

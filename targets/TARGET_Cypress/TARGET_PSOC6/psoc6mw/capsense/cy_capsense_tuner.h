@@ -3,7 +3,7 @@
 * \version 1.1
 *
 * \brief
-* This file provides Tuner FW module function prototypes.
+* This file provides CapSense MW Tuner module function prototypes.
 *
 ********************************************************************************
 * \copyright

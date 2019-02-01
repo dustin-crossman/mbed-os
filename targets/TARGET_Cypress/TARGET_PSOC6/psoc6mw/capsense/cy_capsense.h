@@ -26,17 +26,63 @@
 * interfaces (widgets) using both CSX and CSD sensing methods with robust 
 * performance.
 * 
+* CapSense has become a popular technology to replace conventional 
+* mechanical- and optical- based user interfaces. There are fewer parts 
+* involved, which saves cost and increases reliability, with no wear-and-tear. 
+* The main advantages of CapSense compared with other solutions are:  
+* robust performance in harsh environmental conditions and rejection of a 
+* wide range of external noise sources. 
+* 
+* Use CapSense for:
+* * Touch and gesture detection for various interfaces
+* * Proximity detection for innovative user experiences and low-power 
+*   optimization
+* * Contactless liquid-level sensing in a variety of applications
+* * Touch-free operations in hazardous materials
+* 
 ********************************************************************************
 * \section section_capsense_general General Description
 ********************************************************************************
 *
-* A CapSense solution includes a configuration wizard to create and configure 
-* CapSense widgets, an API to control the design from the application firmware,
-* and the CapSense Tuner tool for tuning, testing, and debugging for 
-* easy and smooth design of human interfaces on customer products. 
-*
+* The CSD HW block enables multiple sensing capabilities on PSoC devices 
+* including self-cap and mutual-cap capacitive touch sensing solution, 
+* a 10-bit ADC, IDAC and Comparator. The CSD driver is a low-level 
+* peripheral driver, a wrapper to manage access to the CSD HW block. 
+* Each middleware access to the CSD HW block through the CSD Driver. 
+* 
+* The CSD HW block can support only one function at a time. However, all  
+* supported functionality (like CapSense, ADC, etc.) can be 
+* time-multiplexed in a design. I.e. it is possible to save existing state 
+* of the CapSense middleware, restore state of the ADC middleware, perform 
+* ADC measurements, and then switch back to the CapSense functionality.
+* For more details and code examples refer to the description of the 
+* Cy_CapSense_Save() and Cy_CapSense_Restore() functions.
+* 
+* \image html capsense_solution.png "CapSense Solution" width=800px
+* \image latex capsense_solution.png
+* 
+* This section describes only CapSense middleware. Refer to the corresponding 
+* sections for documentation of other middleware supported by the CSD HW block.
+* 
+* A CapSense solution includes: 
+* * The CapSense Configurator tool which is a configuration wizard to create 
+*   and configure CapSense widgets. It could be launched in ModusToolbox 
+*   from the CSD personality as well as in standalone mode. 
+*   It contains a separate documentation of how to create and 
+*   configure widgets, parameters and algorithms descriptions.
+* * API to control the design from the application program. This documentation 
+*   describes API with code snippets of how to use them.
+* * The CapSense Tuner tool for real-time tuning, testing, and debugging,
+*   for easy and smooth designing of human interfaces on customer products. 
+*   The Tuner tool communicates with a device through a HW bridge and 
+*   communication drivers (EzI2C, UART, etc.) and allows to monitor 
+*   widget statuses, sensor signals, detected touch positions, gestures, etc.
+* The application program does not need to interact with the CSD driver 
+* and/or other drivers such as GPIO, SysClk directly. All of that is 
+* configured and managed by middleware.
+* 
 * Include cy_capsense.h to get access to all functions and other declarations 
-* in this library. If you are using the ModusToolbox CapSense Configurator, 
+* in this library. If you are using the ModusToolbox CapSense Configurator tool, 
 * you can include cycfg_capsense.h only.
 * 
 * \subsection subsection_capsense_features Features
@@ -57,34 +103,16 @@
 * * Offers best-in-class liquid tolerance
 * * Supports one-finger and two-finger gestures 
 *
-* \subsection subsection_capsense_usage When to use a CapSense
-* 
-* CapSense has become a popular technology to replace conventional 
-* mechanical- and optical- based user interfaces. There are fewer parts 
-* involved, which saves cost and increases reliability, with no wear-and-tear. 
-* The main advantages of CapSense compared with other solutions are:  
-* robust performance in harsh environmental conditions and rejection of a 
-* wide range of external noise sources. 
-* 
-* Use CapSense for:
-* * Touch and gesture detection for various interfaces
-* * Proximity detection for innovative user experiences and low-power 
-*   optimization
-* * Replacement for the IR-based proximity detection, which is sensitive 
-*   to skin and colors
-* * Contactless liquid-level sensing in a variety of applications
-* * Touch-free operations in hazardous materials
-* 
 ********************************************************************************
-* \section section_capsense_configuration Configuration Considerations
+* \section section_capsense_configuration Summary of Application Programming Interface (API)
 ********************************************************************************
 *
 * The CapSense operates on the top of the CapSense Sigma Delta (CSD) driver.
 * Refer to the PDL API Reference Manual.
 *
-* This document includes the Application Programming Interface (API). It provides 
-* descriptions of the functions in the firmware library, and descriptions 
-* of the data structures (Register map) used by the firmware library.
+* This document provides descriptions of the functions in the CapSense 
+* middleware library, and descriptions of the data structures (Register map) 
+* used by the middleware library.
 * 
 * The Application Programming Interface (API) routines allow controlling and 
 * executing specific tasks using the CapSense middleware. The CapSense API 
@@ -173,13 +201,41 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
-*     <td>1.0</td>
-*     <td>The initial version.</td>
-*     <td></td>
+*     <td>1.1</td>
+*     <td>
+*         * Marked several functions as obsolete:
+*           * Cy_CapSense_CSDSetupWidget()
+*           * Cy_CapSense_CSDSetupWidgetExt()
+*           * Cy_CapSense_CSDScan()
+*           * Cy_CapSense_CSDScanExt()
+*           * Cy_CapSense_CSDCalibrateWidget()
+*           * Cy_CapSense_CSXSetupWidget()
+*           * Cy_CapSense_CSXSetupWidgetExt()
+*           * Cy_CapSense_CSXScan()
+*           * Cy_CapSense_CSXScanExt()
+*           * Cy_CapSense_CSXCalibrateWidget()
+*         * Added two new functions:
+*           * Cy_CapSense_SetupWidgetExt()
+*           * Cy_CapSense_ScanExt()
+*         * Fixed shield operation when Csh is disabled.
+*         * Fixed implementation of position filtering for Radial Slider widget.
+*         * Fixed Cy_CapSense_DeInit() implementation by restoring hardware to the 
+*           default state.
+*         * Added possibility to enable shield with no dedicated electrodes.
+*         * Added support of protocol-agnostic tuning (UART, SPI, etc.).
+*     </td>
+*     <td>
+*         * Improved user's experience with API.
+*         * Improved documentation.
+*         * Fixed defects.
+*         * Enhanced functionality.
+*     </td>
 *   </tr>
 *   <tr>
-*     <td>1.1</td>
-*     <td>TBD</td>
+*     <td>1.0</td>
+*     <td>
+*         * The initial version.
+*     </td>
 *     <td></td>
 *   </tr>
 * </table>
@@ -237,11 +293,11 @@
 * \{
 *
 * High-level functions represent the highest abstraction layer of the 
-* CapSense software component.
+* CapSense middleware.
 * 
 * These functions perform tasks such as scanning, data processing, data 
 * reporting and tuning interfaces. When performing a task, different 
-* initialization is required based on a the sensing method or type of 
+* initialization is required based on a sensing method or type of 
 * widgets is automatically handled by these functions. Therefore, these 
 * functions are sensing methods, features, and widget type agnostics. 
 * 
@@ -296,7 +352,7 @@
 *
 * The section documents CapSense related internal function.
 *
-* These function should not be used in the application layer.
+* These function should not be used in the application program.
 *
 * \} \endcond */
 
@@ -308,7 +364,7 @@
 * output data shared among different FW modules within the CapSense. 
 * 
 * The key responsibilities of the Data Structure are as follows:
-* * The Data Structure is the only data container in the Component.
+* * The Data Structure is the only data container in the CapSense middleware.
 * * It serves as storage for the configuration and the output data.
 * * All CapSense modules use the data structure for the communication 
 *   and data exchange.
@@ -329,7 +385,7 @@
 * 
 * CapSense Data Structure does not perform error checking on the data 
 * written to CapSense Data Structure. It is the responsibility of application 
-* layer to ensure register map rule are not violated while 
+* program to ensure register map rule are not violated while 
 * modifying the value of data field in CapSense Data Structure.
 *
 * \} */

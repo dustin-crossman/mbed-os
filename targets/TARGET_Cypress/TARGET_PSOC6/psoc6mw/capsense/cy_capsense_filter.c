@@ -39,17 +39,21 @@
 * Function Name: Cy_CapSense_UpdateAllBaselines
 ****************************************************************************//**
 *
-* Updates the baseline for all the sensors in all the widgets.
-*
-* Updates the baseline for all the sensors in all the widgets. Baseline 
-* updating is a part of data processing performed by the process functions. 
-* So, no need to call this function except when a specific process flow is 
-* implemented.
-*
-* This function ignores the widget enable bit in the widget status register. 
-* Multiple calling of this function (or any other function with a baseline 
-* updating task) without scanning leads to unexpected behavior.
-*
+* Updates the baseline for all the sensors in all the widgets. 
+* 
+* Baseline needs to be updated after sensor scan to ignore low frequency 
+* changes in the sensor data caused by environment changes such as 
+* temperature from senor status decision. 
+* 
+* This function ignores the widget enable bit in the widget status register.
+* Calling this function multiple time without new sensor scan leads to 
+* unexpected behavior and should be avoided. 
+* 
+* This function is called by Cy_CapSense_ProcessAllWidgets() and 
+* Cy_CapSense_ProcessWidget(), hence the application program need not use this  
+* function if any of the above function is already used. This function can be 
+* used for custom application implementation.
+* 
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
@@ -77,19 +81,21 @@ cy_status Cy_CapSense_UpdateAllBaselines(const cy_stc_capsense_context_t * conte
 * Function Name: Cy_CapSense_UpdateWidgetBaseline
 ****************************************************************************//**
 *
-* Updates the baselines for all the sensors in a widget specified by the 
-* input parameter.
-*
-* This function performs exactly the same tasks as
+* Updates the baselines for all the sensors in a widget specified by 
+* the input parameter. 
+* 
+* This function performs exactly the same tasks as 
 * Cy_CapSense_UpdateAllBaselines() but only for a specified widget.
-*
-* This function ignores the widget enable bit in the widget status register. 
-* Multiple calling of this function (or any other function with a baseline 
-* updating task) without scanning leads to unexpected behavior.
+* 
+* Calling this function multiple time without new sensor scan leads to 
+* unexpected behavior and should be avoided. The application program need 
+* not use this function if the Cy_CapSense_UpdateAllBaselines(), 
+* Cy_CapSense_ProcessAllWidgets() or Cy_CapSense_ProcessWidget() functions 
+* are already used.
 *
 * \param widgetId
-* Specifies the ID number of the widget to update the baseline of all the 
-* sensors in the widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -121,22 +127,26 @@ cy_status Cy_CapSense_UpdateWidgetBaseline(
 ****************************************************************************//**
 *
 * Updates the baseline for a sensor in a widget specified by the 
-* input parameters.
-*
-* This function performs exactly the same tasks as
+* input parameters. 
+* 
+* This function performs exactly the same tasks as 
 * Cy_CapSense_UpdateAllBaselines() and Cy_CapSense_UpdateWidgetBaseline() 
 * but only for a specified sensor.
-*
-* This function ignores the widget enable bit in the widget status register. 
-* Multiple calling of this function (or any other function with a baseline 
-* updating task) without scanning leads to unexpected behavior.
+* 
+* Calling this function multiple time without new sensor scan leads to 
+* unexpected behavior and should be avoided. The application need not use 
+* this function if the Cy_CapSense_UpdateWidgetBaseline (), 
+* Cy_CapSense_UpdateAllBaselines (), Cy_CapSense_ProcessAllWidgets() 
+* or Cy_CapSense_ProcessWidget() functions are already used.
 *
 * \param widgetId
-* Specifies the ID number of the widget to update the baseline of the sensor
-* specified by the sensorId argument.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId
-* Specifies the ID number of the sensor within the widget to update baseline.
+* Specifies the ID number of the sensor within the widget. A macro for the 
+* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -244,12 +254,20 @@ uint32_t Cy_CapSense_FtUpdateBaseline(
 ****************************************************************************//**
 *
 * Initializes the baselines of all the sensors of all the widgets.
-*
-* Also, this function can be used to re-initialize baselines. 
-*
-* Calling this function is accompanied by 
-* - Cy_CapSense_InitializeAllStatuses().
-* - Cy_CapSense_InitializeAllFilters().
+* 
+* This function initializes baseline for all sensors and widgets in the project. 
+* It can also be used to re-initialize baselines at any time, however, note 
+* that all sensor data history information and sensor status shall be reset 
+* along with re-initialization of baseline.
+* 
+* Following functions to initialize sensor and widgets and filter history 
+* should be called after initializing baseline for proper operation of 
+* the CapSense middleware:
+* * Cy_CapSense_InitializeAllStatuses()
+* * Cy_CapSense_InitializeAllFilters()
+* 
+* These functions are called by the CapSense_Enable() function, hence it is 
+* not required to use this function if above function is used.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -270,16 +288,25 @@ void Cy_CapSense_InitializeAllBaselines(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_InitializeWidgetBaseline
 ****************************************************************************//**
 *
-* Initializes the baselines of all the sensors in a widget
-* specified by the input parameter.
-*
-* Calling this function is accompanied by 
-* - Cy_CapSense_InitializeWidgetStatus().
-* - Cy_CapSense_InitializeWidgetFilter().
-*
+* Initializes the baselines of all the sensors in a specific widget. 
+* 
+* This function initializes baseline for all sensors in a specific widget 
+* in the project. It can also be used to re-initialize baselines at any time, 
+* however, note that all sensor data history information and sensor status 
+* should be reset along with re-initialization of baseline.
+* 
+* Following functions to initialize sensor and widgets and filter history 
+* should be called after initializing baseline for proper operation of 
+* middleware.
+* * Cy_CapSense_InitializeWidgetStatus()
+* * Cy_CapSense_InitializeWidgetFilter()
+* 
+* These functions are called by CapSense_Enable() function, hence it is not 
+* required to use this function is above function is used.
+* 
 * \param widgetId
-* Specifies the ID number of a widget to initialize the baseline 
-* of all the sensors in the widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -306,12 +333,13 @@ void Cy_CapSense_InitializeWidgetBaseline(
 * by the input parameters.
 *
 * \param widgetId
-* Specifies the ID number of a widget to initialize the baseline of the sensor
-* in the widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId
-* Specifies the ID number of the sensor within the widget to initialize its
-* baseline.
+* Specifies the ID number of the sensor within the widget. A macro for the 
+* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -358,11 +386,12 @@ void Cy_CapSense_FtInitializeBaseline(cy_stc_capsense_sensor_context_t * ptrSnsC
 * Function Name: Cy_CapSense_InitializeAllFilters
 ****************************************************************************//**
 *
-* Initializes all the firmware filter history, except the baseline filter.
+* Initializes (or re-initializes) all the firmware filter history, except 
+* the baseline.
 *
 * Calling this function is accompanied by 
-* - Cy_CapSense_InitializeAllStatuses().
-* - Cy_CapSense_InitializeAllBaselines().
+* * Cy_CapSense_InitializeAllStatuses()
+* * Cy_CapSense_InitializeAllBaselines()
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -391,8 +420,8 @@ void Cy_CapSense_InitializeAllFilters(const cy_stc_capsense_context_t * context)
 * - Cy_CapSense_InitializeWidgetBaseline().
 *
 * \param widgetId
-* Specifies the ID number of a widget to initialize the filter history of all
-* the sensors in the widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -477,10 +506,13 @@ void Cy_CapSense_InitializeWidgetFilter(
 * Initializes the IIR filter history.
 *
 * \param widgetId 
-* Specifies the ID number of the widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId 
-* Specifies the ID number of the sensor in the widget.
+* Specifies the ID number of the sensor within the widget. A macro for the 
+* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -514,10 +546,13 @@ void Cy_CapSense_InitializeIIR(
 * parameter.
 *
 * \param widgetId 
-* Specifies the ID number of the widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId 
-* Specifies the ID number of the sensor in the widget.
+* Specifies the ID number of the sensor within the widget. A macro for the 
+* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -632,10 +667,13 @@ void Cy_CapSense_RunIIRInternal(
 * Initializes the median filter history.
 *
 * \param widgetId 
-* Specifies the ID number of the widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId 
-* Specifies the ID number of the sensor in the widget.
+* Specifies the ID number of the sensor within the widget. A macro for the 
+* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -666,10 +704,13 @@ void Cy_CapSense_InitializeMedian(
 * the input parameters.
 *
 * \param widgetId 
-* Specifies the ID number of the widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId
-* Specifies the ID number of the sensor in the widget.
+* Specifies the ID number of the sensor within the widget. A macro for the 
+* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -762,10 +803,13 @@ void Cy_CapSense_RunMedianInternal(
 * Initializes the average filter history.
 *
 * \param widgetId 
-* Specifies the ID number of the widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId 
-* Specifies the ID number of the sensor in the widget.
+* Specifies the ID number of the sensor within the widget. A macro for the 
+* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -799,10 +843,13 @@ void Cy_CapSense_InitializeAverage(
 * parameter.
 *
 * \param widgetId 
-* Specifies the ID number of the widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId 
-* Specifies the ID number of the sensor in the widget.
+* Specifies the ID number of the sensor within the widget. A macro for the 
+* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.

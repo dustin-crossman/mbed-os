@@ -27,11 +27,11 @@
 * Function Name: Cy_CapSense_IsAnyWidgetActive
 ****************************************************************************//**
 *
-* Reports whether any widget has detected a touch.
+* Reports whether any widget has detected touch.
 *
 * This function reports whether any widget has detected a touch by extracting
 * information from the widget status registers. This function does 
-* not process a widget but extracts processed results 
+* not process widget data but extracts previously processed results 
 * from the \ref group_capsense_structures.
 *
 * \param context
@@ -61,15 +61,16 @@ uint32_t Cy_CapSense_IsAnyWidgetActive(const cy_stc_capsense_context_t * context
 * Function Name: Cy_CapSense_IsWidgetActive
 ****************************************************************************//**
 *
-* Reports whether the specified widget detects a touch on any of its sensors.
+* Reports whether the specified widget detected touch on any of its sensors.
 *
 * This function reports whether the specified widget has detected a touch by
 * extracting information from the widget status register.
-* This function does not process the widget but extracts processed 
+* This function does not process widget data but extracts previously processed 
 * results from the \ref group_capsense_structures.
 *
 * \param widgetId
-* Specifies the ID number of the widget to get its status.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -100,23 +101,25 @@ uint32_t Cy_CapSense_IsWidgetActive(
 * Function Name: Cy_CapSense_IsSensorActive
 ****************************************************************************//**
 *
-* Reports whether the specified sensor in the widget detects a touch.
+* Reports whether the specified sensor in the widget detected touch.
 *
 * This function reports whether the specified sensor in the widget has detected a
 * touch by extracting information from the widget status register.
-* This function does not process the widget or sensor but extracts processed 
-* results from the \ref group_capsense_structures.
+* This function does not process widget or sensor data but extracts previously  
+* processed results from the \ref group_capsense_structures.
 *
 * For proximity sensors, this function returns the proximity detection status. 
-* To get the finger touch status of proximity sensors, use the
+* To get the touch status of proximity sensors, use the
 * Cy_CapSense_IsProximitySensorActive() function.
 *
 * \param widgetId
-* Specifies the ID number of the widget.
-
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
+* 
 * \param sensorId
-* Specifies the ID number of the sensor within the widget to get its touch
-* detection status.
+* Specifies the ID number of the sensor within the widget. A macro for the 
+* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -152,20 +155,22 @@ uint32_t Cy_CapSense_IsSensorActive(
 * Function Name: Cy_CapSense_IsProximitySensorActive
 ****************************************************************************//**
 *
-* Reports the finger detection status of the specified proximity widget/sensor.
+* Reports the status of the specified proximity widget/sensor.
 *
-* This function reports whether the specified proximity sensor has detected a touch
-* by extracting information from the widget status register.
-* This function is used only with proximity sensor widgets. 
-* This function does not process the widget but extracts processed results 
-* from the \ref group_capsense_structures.
+* This function reports whether the specified proximity sensor has detected 
+* touch or proximity event by extracting information from the widget 
+* status register. This function is used only with proximity widgets. 
+* This function does not process widget data but extracts previously processed 
+* results from the \ref group_capsense_structures.
 *
 * \param widgetId
-* Specifies the ID number of the proximity widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param sensorId
-* Specifies the ID number of the proximity sensor within the proximity widget to
-* get its touch detection status.
+* Specifies the ID number of the sensor within the widget. A macro for the 
+* sensor ID within a specified widget can be found in the cycfg_capsense.h 
+* file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -205,22 +210,23 @@ uint32_t Cy_CapSense_IsProximitySensorActive(
 * Function Name: Cy_CapSense_GetTouchInfo
 ****************************************************************************//**
 *
-* Reports the touch position detected for the specified touchpad, matrix
-* button, and slider widgets.
+* Reports the details of touch position detected on the specified touchpad, 
+* matrix buttons or slider widgets.
 *
-* This function does not process the widget but extracts processed 
+* This function does not process widget data but extracts previously processed 
 * results from the \ref group_capsense_structures.
 *
 * \param widgetId
-* Specifies the ID number of a touchpad widget to get the X/Y position of a
-* detected touch.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Returns the pointer to touch widget touch cy_stc_capsense_touch_t that 
+* Returns the pointer to widget cy_stc_capsense_touch_t structure that 
 * contains number of positions and data about each position.
+* 
 *
 *******************************************************************************/
 cy_stc_capsense_touch_t * Cy_CapSense_GetTouchInfo(

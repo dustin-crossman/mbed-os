@@ -35,6 +35,7 @@ extern "C" {
 /** \addtogroup group_capsense_low_level *//** \{ */
 /******************************************************************************/
 
+cy_status Cy_CapSense_CSXCalibrateWidget(uint32_t widgetId, uint32_t target, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSXSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSXSetupWidgetExt(uint32_t widgetId, uint32_t sensorId, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSXScan(cy_stc_capsense_context_t * context);
@@ -44,8 +45,6 @@ void Cy_CapSense_CSXConnectRx(const cy_stc_capsense_pin_config_t * rxPtr, cy_stc
 void Cy_CapSense_CSXConnectTx(const cy_stc_capsense_pin_config_t * txPtr, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSXDisconnectRx(const cy_stc_capsense_pin_config_t * rxPtr, cy_stc_capsense_context_t * context);
 void Cy_CapSense_CSXDisconnectTx(const cy_stc_capsense_pin_config_t * txPtr, cy_stc_capsense_context_t * context);
-
-cy_status Cy_CapSense_CSXCalibrateWidget(uint32_t widgetId, uint32_t target, cy_stc_capsense_context_t * context);
 
 /** \} */
 

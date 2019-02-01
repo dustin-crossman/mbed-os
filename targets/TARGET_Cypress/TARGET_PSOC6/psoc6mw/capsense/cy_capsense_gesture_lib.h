@@ -209,65 +209,6 @@ void Cy_CapSense_Gesture_Decode(
 /******************************************************************************/
 /** \addtogroup group_capsense_macros_gesture *//** \{ */
 /******************************************************************************/
-/* Direction */
-/** CLOCKWISE direction of Rotate gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_CW                    (0x00u)
-/** COUNTER CLOCKWISE direction of Rotate gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_CCW                   (0x01u)
-
-/** ZOOM-IN direction of Zoom gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_IN                    (0x00u)
-/** ZOOM-OUT direction of Zoom gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_OUT                   (0x01u)
-
-/** UP direction of Scroll, Flick and Edge Swipe gestures */
-#define CY_CAPSENSE_GESTURE_DIRECTION_UP                    (0x00u)
-/** DOWN direction of Scroll, Flick and Edge Swipe gestures */
-#define CY_CAPSENSE_GESTURE_DIRECTION_DOWN                  (0x01u)
-/** RIGHT direction of Scroll, Flick and Edge Swipe gestures */
-#define CY_CAPSENSE_GESTURE_DIRECTION_RIGHT                 (0x02u)
-/** LEFT direction of Scroll, Flick and Edge Swipe gestures */
-#define CY_CAPSENSE_GESTURE_DIRECTION_LEFT                  (0x03u)
-/** UP-RIGHT direction of Flick gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_UP_RIGHT              (0x04u)
-/** DOWN-LEFT direction of Flick gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_DOWN_LEFT             (0x05u)
-/** DOWN-RIGHT direction of Flick gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_DOWN_RIGHT            (0x06u)
-/** UP-LEFT direction of Flick gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_UP_LEFT               (0x07u)
-
-/* Direction Offsets */
-/** Offset of direction of one-finger scroll gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_ONE_SCROLL     (0x00u)
-/** Offset of direction of two-finger scroll gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_TWO_SCROLL     (0x02u)
-/** Offset of direction of one-finger edge swipe gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_ONE_EDGE       (0x04u)
-/** Offset of direction of one-finger rotate gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_ONE_ROTATE     (0x06u)
-/** Offset of direction of two-finger zoom gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_TWO_ZOOM       (0x07u)
-/** Offset of direction of one-finger flick gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_ONE_FLICK      (0x08u)
-
-/* Direction Masks */
-/** Mask of direction of one-finger scroll gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_ONE_SCROLL       (0x0003u)
-/** Mask of direction of two-finger scroll gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_TWO_SCROLL       (0x000Cu)
-/** Mask of direction of one-finger edge swipe gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_ONE_EDGE         (0x0030u)
-/** Mask of direction of one-finger rotate gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_ONE_ROTATE       (0x0040u)
-/** Mask of direction of two-finger zoom gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_TWO_ZOOM         (0x0080u)
-/** Mask of direction of one-finger flick gesture */
-#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_ONE_FLICK        (0x0700u)
-
-/** An extra direction offset returned by Cy_CapSense_DecodeWidgetGestures() */
-#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET                (16u)
-
 /* Enable and Detection */
 /** No gesture detected */
 #define CY_CAPSENSE_GESTURE_NO_GESTURE                      (0x00u)
@@ -300,6 +241,65 @@ void Cy_CapSense_Gesture_Decode(
 #define CY_CAPSENSE_GESTURE_ONE_FNGR_ROTATE_MASK            (0x0100u)
 /** Enable / detection mask of two-finger zoom gesture */
 #define CY_CAPSENSE_GESTURE_TWO_FNGR_ZOOM_MASK              (0x0200u)
+
+/* Direction Offsets */
+/** Offset of direction of one-finger scroll gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_ONE_SCROLL     (0x00u)
+/** Offset of direction of two-finger scroll gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_TWO_SCROLL     (0x02u)
+/** Offset of direction of one-finger edge swipe gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_ONE_EDGE       (0x04u)
+/** Offset of direction of one-finger rotate gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_ONE_ROTATE     (0x06u)
+/** Offset of direction of two-finger zoom gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_TWO_ZOOM       (0x07u)
+/** Offset of direction of one-finger flick gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET_ONE_FLICK      (0x08u)
+
+/* Direction Masks */
+/** Mask of direction of one-finger scroll gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_ONE_SCROLL       (0x0003u)
+/** Mask of direction of two-finger scroll gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_TWO_SCROLL       (0x000Cu)
+/** Mask of direction of one-finger edge swipe gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_ONE_EDGE         (0x0030u)
+/** Mask of direction of one-finger rotate gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_ONE_ROTATE       (0x0040u)
+/** Mask of direction of two-finger zoom gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_TWO_ZOOM         (0x0080u)
+/** Mask of direction of one-finger flick gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_MASK_ONE_FLICK        (0x0700u)
+
+/** An extra direction offset returned by Cy_CapSense_DecodeWidgetGestures() */
+#define CY_CAPSENSE_GESTURE_DIRECTION_OFFSET                (16u)
+
+/* Direction */
+/** CLOCKWISE direction of Rotate gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_CW                    (0x00u)
+/** COUNTER CLOCKWISE direction of Rotate gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_CCW                   (0x01u)
+
+/** ZOOM-IN direction of Zoom gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_IN                    (0x00u)
+/** ZOOM-OUT direction of Zoom gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_OUT                   (0x01u)
+
+/** UP direction of Scroll, Flick and Edge Swipe gestures */
+#define CY_CAPSENSE_GESTURE_DIRECTION_UP                    (0x00u)
+/** DOWN direction of Scroll, Flick and Edge Swipe gestures */
+#define CY_CAPSENSE_GESTURE_DIRECTION_DOWN                  (0x01u)
+/** RIGHT direction of Scroll, Flick and Edge Swipe gestures */
+#define CY_CAPSENSE_GESTURE_DIRECTION_RIGHT                 (0x02u)
+/** LEFT direction of Scroll, Flick and Edge Swipe gestures */
+#define CY_CAPSENSE_GESTURE_DIRECTION_LEFT                  (0x03u)
+/** UP-RIGHT direction of Flick gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_UP_RIGHT              (0x04u)
+/** DOWN-LEFT direction of Flick gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_DOWN_LEFT             (0x05u)
+/** DOWN-RIGHT direction of Flick gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_DOWN_RIGHT            (0x06u)
+/** UP-LEFT direction of Flick gesture */
+#define CY_CAPSENSE_GESTURE_DIRECTION_UP_LEFT               (0x07u)
 
 /** \} */
 

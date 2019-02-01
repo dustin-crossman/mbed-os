@@ -32,19 +32,19 @@
 * Function Name: Cy_CapSense_InitializeAllStatuses
 ****************************************************************************//**
 *
-* Performs initialization of all statuses, debounce counters and touch positions
-* of all the widgets.
+* Performs initialization of all statuses and related modules including
+* debounce counters and touch positions of all the widgets.
 *
 * The initialization includes the following tasks:
-* - Reset the debounce counters of all the widgets.
-* - Reset the number of touches.
-* - Reset the position filter history for slider and touchpad widgets.
-* - Clear all status of widgets and sensors.
-* - Enable all the widgets.
+* * Reset the debounce counters of all the widgets.
+* * Reset the number of touches.
+* * Reset the position filter history for slider and touchpad widgets.
+* * Clear all status of widgets and sensors.
+* * Enable all the widgets.
 *
 * Calling this function is accompanied by 
-* - Cy_CapSense_InitializeAllBaselines().
-* - Cy_CapSense_InitializeAllFilters().
+* * Cy_CapSense_InitializeAllBaselines().
+* * Cy_CapSense_InitializeAllFilters().
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -70,11 +70,11 @@ void Cy_CapSense_InitializeAllStatuses(const cy_stc_capsense_context_t * context
 * of the specified widget.
 *
 * The initialization includes:
-* - Resets the debounce counter of the widget.
-* - Resets the number of touches.
-* - Resets the position filter history for slider and touchpad widgets.
-* - Clears widget and sensor statuses.
-* - Enables the widget.
+* * Resets the debounce counter of the widget.
+* * Resets the number of touches.
+* * Resets the position filter history for slider and touchpad widgets.
+* * Clears widget and sensor statuses.
+* * Enables the widget.
 *
 * The Button and Matrix Button widgets have individual debounce counter per
 * sensor for the CSD widgets and per node for the CSX widgets.
@@ -88,11 +88,12 @@ void Cy_CapSense_InitializeAllStatuses(const cy_stc_capsense_context_t * context
 * onDebounce widget parameter.
 *
 * Calling this function is accompanied by 
-* - Cy_CapSense_InitializeWidgetBaseline().
-* - Cy_CapSense_InitializeWidgetFilter().
+* * Cy_CapSense_InitializeWidgetBaseline().
+* * Cy_CapSense_InitializeWidgetFilter().
 * 
 * \param widgetId
-* Specifies the ID number of a widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -219,7 +220,8 @@ void Cy_CapSense_InitializeWidgetStatus(
 * Performs initialization of all gestures for the specified widget.
 *
 * \param widgetId
-* Specifies the ID number of a widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -254,16 +256,29 @@ void Cy_CapSense_InitializeWidgetGestures(
 *
 * Performs processing of all gestures for the specified widget.
 *
+* This function should be called by application program only after all sensors
+* are scanned and all data processing is executed using 
+* Cy_CapSense_ProcessAllWidgets() or Cy_CapSense_ProcessWidget() functions 
+* for the widget. Calling this function multiple times without new sensor
+* scan and process causes unexpected behavior.
+* 
+* \note The function (Gesture detection functionality) requires a timestamp 
+* for it's operation. The timestamp should be initialized and maintained 
+* in the application program prior to calling this function. See the 
+* descriptions of the Cy_CapSense_SetGestureTimestamp() and 
+* Cy_CapSense_IncrementGestureTimestamp() functions for details.
+* 
 * \param widgetId
-* Specifies the ID number of a widget.
+* Specifies the ID number of the widget. A macro for the widget ID can be found 
+* in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* Returns the gesture detection status and corresponding direction. The same
-* information is stored in ptrWdContext->gestureDetected and
-* ptrWdContext->gestureDirection registers. Corresponding macros could be found
+* Returns the detected Gesture mask and direction of detected gestures.
+* The same information is stored in ptrWdContext->gestureDetected and 
+* ptrWdContext->gestureDirection registers. Corresponding macros could be found 
 * \ref group_capsense_macros_gesture.
 * * bit[0..15] - detected gesture masks gesture
 *   * bit[0] - one-finger single click gesture
@@ -286,10 +301,14 @@ void Cy_CapSense_InitializeWidgetGestures(
 *    * bit[7] - direction of two-finger zoom gesture
 *    * bit[8..10] - direction of one-finger flick gesture
 *
-* \note The Gesture detection functionality requires the timestamp update on the
-*       application layer. See the descriptions of the Cy_CapSense_SetGestureTimestamp()
-*       and the Cy_CapSense_IncrementGestureTimestamp() functions for details.
-*
+* \funcusage
+* 
+* An example of gesture decoding:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Gesture
+* 
+* An example of gesture status parsing:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Gesture_Macro
+* 
 *******************************************************************************/
 uint32_t Cy_CapSense_DecodeWidgetGestures(
                 uint32_t widgetId, 

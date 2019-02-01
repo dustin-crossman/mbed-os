@@ -52,16 +52,16 @@ cy_status Cy_CapSense_SetupWidgetExt(
                 cy_stc_capsense_context_t * context);
 cy_status Cy_CapSense_ScanExt(cy_stc_capsense_context_t * context);
 
+cy_status Cy_CapSense_CalibrateWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_CalibrateAllWidgets(cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_CalibrateAllCsdWidgets(cy_stc_capsense_context_t * context);
+cy_status Cy_CapSense_CalibrateAllCsxWidgets(cy_stc_capsense_context_t * context);
+
 cy_status Cy_CapSense_SetPinState(
                 uint32_t widgetId, 
                 uint32_t sensorElement, 
                 uint32_t state, 
                 cy_stc_capsense_context_t * context);
-
-cy_status Cy_CapSense_CalibrateWidget(uint32_t widgetId, cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_CalibrateAllWidgets(cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_CalibrateAllCsdWidgets(cy_stc_capsense_context_t * context);
-cy_status Cy_CapSense_CalibrateAllCsxWidgets(cy_stc_capsense_context_t * context);
 
 /** \} */
 
@@ -114,14 +114,14 @@ cy_status Cy_CapSense_InternalPreCalculation(cy_stc_capsense_context_t * context
 
 /*
  *  Definition of the default configuration of the CSD HW registers that is
- *  intended to be used on the CSD HW capturing stage.
+ *  intended to be used on the CSD HW block capturing stage.
  *  The configuration includes:
  *  1. Start of the analog settling process:
  *      - Enables the CSD HW block;
- *      - Enables all the CSD HW sub blocks (AMBUF, REFGEN, CSDCMP, HSCMP);
+ *      - Enables all the modules of the CSD HW block (AMBUF, REFGEN, CSDCMP, HSCMP);
  *      - Enables the Sense Modulator output;
- *  2. Clear all of the pending CSD HW interrupt requests (SAMPLE, INIT, ADC_RES);
- *  3. Sets into default state the rest CSD HW options which are not related
+ *  2. Clear all of the pending interrupt requests of the CSD HW block (SAMPLE, INIT, ADC_RES);
+ *  3. Sets into default state the rest of the CSD HW block registers which are not related
  *     to actions #1 and #2.
 */
 #define CY_CAPSENSE_CSD_CONFIG_DEFAULT  {\
@@ -170,7 +170,7 @@ extern const cy_stc_csd_config_t cy_capsense_csdCfg;
 
 
 /*******************************************************************************
-* HW CSD Waveform Selection values
+* CSD HW Waveform Selection values
 *******************************************************************************/
 #define CY_CAPSENSE_CSD_WAVEFORM_STATIC_OPEN           (0x00000000uL)
 #define CY_CAPSENSE_CSD_WAVEFORM_STATIC_CLOSED         (0x00000001uL)
@@ -191,7 +191,7 @@ extern const cy_stc_csd_config_t cy_capsense_csdCfg;
 
 
 /*******************************************************************************
-* HW CSD Block Register Mask Definition
+* CSD HW Block Register Mask Definition
 *******************************************************************************/
 
 /* CSD_CONFIG register masks */

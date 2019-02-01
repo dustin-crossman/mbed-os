@@ -24,7 +24,7 @@
 * Function Name: Cy_CapSense_TuInitialize
 ****************************************************************************//**
 *
-* Initializes the communication interface with the Tuner tool.
+* Initializes the communication interface with the CapSense Tuner tool.
 *
 *******************************************************************************/
 void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
@@ -38,42 +38,65 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 * Function Name: Cy_CapSense_RunTuner
 ****************************************************************************//**
 *
-* Establishes synchronized communication with the CapSense Tuner tool.
-*
-* This function is used to establish synchronized communication between the
-* CapSense FW and Tuner tool (or other Host controllers).
-* This function is called periodically in the application program loop
-* to serve the CapSense Tuner tool (or Host controller) requests and commands.
-* In most cases, the best place to call this function is after processing and
-* before next scanning.
-*
-* If this function is absent from the application program, then communication is
-* asynchronous and the following disadvantages are applicable:
-* - The raw counts displayed in the tuner may be filtered and/or non-filtered.
-* As a result, noise and SNR measurements will not be accurate.
-* - The Tuner tool may read the sensor data such as raw counts from a scan
-* multiple times. As a result, noise and SNR measurement will not be
-* accurate.
-* - The Tuner tool and Host controller should not change the parameters
-* via the tuner interface. Changing the parameters via the tuner
-* interface in the async mode will result in abnormal behavior.
-* - Displaying detected gestures may be missed.
-*
-* Note that calling this function is not mandatory for the application, but
-* required only to synchronize the communication with the Host controller or
+* Establishes synchronized operation between the CapSense middleware and 
 * the CapSense Tuner tool.
 *
+* This function should be called periodically in the application program to 
+* serve the CapSense Tuner tool requests and commands to synchronize the 
+* operation, however there is no specific timing requirement for this function. 
+* In most cases, the best place to call this function is after processing 
+* and before next scanning.
+* 
+* If a user changes some parameters in the Tuner tool, a re-initialization 
+* of the middleware is required, in such cases, tuner issues a re-initialize 
+* command and which is executed by this function.
+* 
+* If this function is not called by the application program, the middleware 
+* operation is asynchronous to the Tuner tool and the following disadvantages 
+* are applicable:
+*
+* * The raw counts displayed in the CapSense Tuner tool may be filtered 
+*   and/or non-filtered. As a result, noise and SNR measurements will 
+*   not be accurate.
+* * The CapSense Tuner tool may read the sensor data such as raw counts 
+*   from a scan multiple times. As a result, noise and SNR measurement 
+*   will not be accurate.
+* * The CapSense Tuner tool and Host controller should not change 
+*   the parameters via the tuner interface. Changing the parameters via 
+*   the Tuner interface in the async mode will result in abnormal behavior.
+* * Displaying detected gestures may be missed.
+*
+* \note 
+* Calling this function is not mandatory and required only to 
+* synchronize the communication with the CapSense Tuner tool when the Tuner 
+* is used.
+*
+* \warning 
+* This function executes received commands. Two commands 
+* CY_CAPSENSE_TU_CMD_ONE_SCAN_E and CY_CAPSENSE_TU_CMD_SUSPEND_E change the 
+* FW tuner module state to suspend. In this state the function waits until 
+* CY_CAPSENSE_TU_CMD_RESUME_E is received. A callback mechanism of command 
+* receiving should be used to avoid FW hang.
+* 
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
-* In some cases, the application program may need to know whether the CapSense was
-* re-initialized. The return indicates whether a restart command was executed:
+* Returns a status of whether a re-initialization of the middleware was 
+* executed by this function or not:
 * - CY_CAPSENSE_STATUS_RESTART_DONE - Based on a received command, the
-* CapSense was restarted.
-* - CY_CAPSENSE_STATUS_RESTART_NONE - No restart was executed by this
+* CapSense was re-initialized.
+* - CY_CAPSENSE_STATUS_RESTART_NONE - No re-initialization was executed by this
 * function.
 *
+* \funcusage
+* 
+* An example of synchronization with the Tuner tool using EzI2C:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Tuner_EzI2C
+* 
+* An example of synchronization with the Tuner tool using UART:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Tuner_UART
+* 
 *******************************************************************************/
 uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 {
@@ -108,7 +131,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
             Cy_SysLib_ExitCriticalSection(interruptState);
         }
 
-        /* Send Data to the Tuner tool */
+        /* Send Data to the CapSense Tuner tool */
         if(NULL != sendCallback)
         {
             sendCallback((void *)context);
@@ -228,7 +251,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 *
 * This function checks if the specified packet with the size
 * CY_CAPSENSE_COMMAND_PACKET_SIZE could be represented as a
-* command received from the Tuner tool.
+* command received from the CapSense Tuner tool.
 * The verification includes the following items:
 * * Header
 * * Tail
@@ -318,9 +341,9 @@ uint32_t Cy_CapSense_CheckCommandIntegrity(const uint8_t * commandPacket)
 *
 * Calculates CRC for the specified buffer and length. CRC Poly: 0xAC9A
 *
-* This API is used for the CRC protection of a packet received from the Tuner
-* tool. CRC polynomial is 0xAC9A. It has a Hamming distance 5 for data
-* words up to 241 bits.
+* This API is used for the CRC protection of a packet received from 
+* the CapSense Tuner tool. CRC polynomial is 0xAC9A. It has a Hamming 
+* distance 5 for data words up to 241 bits.
 *
 * Reference:  "P. Koopman, T. Chakravarthy,
 * "Cyclic Redundancy Code (CRC) Polynomial Selection for Embedded Networks",
