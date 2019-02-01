@@ -228,7 +228,9 @@ typedef enum {
     CY_STDIO_UART_RTS   = STDIO_UART_RTS,
 
     USBTX           = UART_TX,
-    USBRX           = UART_RX
+    USBRX           = UART_RX,
+    
+    AOUT            = P9_6
 } PinName;
 
 // PinName[15-0] = Port[15-8] + Pin[4-0]

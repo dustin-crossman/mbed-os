@@ -8,7 +8,6 @@
 #include "arm_hal_phy.h"
 #include "EMAC.h"
 #include "enet_tasklet.h"
-#include "mbed_interface.h"
 
 class EMACPhy : public NanostackEthernetPhy {
 public:

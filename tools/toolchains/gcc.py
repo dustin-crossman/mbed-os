@@ -53,28 +53,19 @@ class GCC(mbedToolchain):
             self.flags["common"].append("-DMBED_RTOS_SINGLE_THREAD")
             self.flags["ld"].append("--specs=nano.specs")
 
-        core = target.core
-        if CORE_ARCH[target.core] == 8:
-            # Add linking time preprocessor macro DOMAIN_NS
-            if target.core.endswith("-NS"):
-                self.flags["ld"].append("-DDOMAIN_NS=1")
-                core = target.core[:-3]
-            else:
-                self.cpu.append("-mcmse")
-                self.flags["ld"].extend([
-                    "-Wl,--cmse-implib",
-                    "-Wl,--out-implib=%s" % join(build_dir, "cmse_lib.o")
-                ])
-
-        cpu = {
-            "Cortex-M0+": "cortex-m0plus",
-            "Cortex-M4F": "cortex-m4",
-            "Cortex-M7F": "cortex-m7",
-            "Cortex-M7FD": "cortex-m7",
-            "Cortex-M33F": "cortex-m33+no_dsp",
-            "Cortex-M33FE": "cortex-m33"}.get(core, core)
-
-        if core == "Cortex-M33":
+        if target.core == "Cortex-M0+":
+            self.cpu = ["-mcpu=cortex-m0plus"]
+        elif target.core.startswith("Cortex-M4"):
+            self.cpu = ["-mcpu=cortex-m4"]
+        elif target.core.startswith("Cortex-M7"):
+            self.cpu = ["-mcpu=cortex-m7"]
+        elif target.core.startswith("Cortex-M23"):
+            self.cpu = ["-mcpu=cortex-m23"]
+        elif target.core.startswith("Cortex-M33FD"):
+            self.cpu = ["-mcpu=cortex-m33"]
+        elif target.core.startswith("Cortex-M33F"):
+            self.cpu = ["-mcpu=cortex-m33+nodsp"]
+        elif target.core.startswith("Cortex-M33"):
             self.cpu = ["-march=armv8-m.main"]
         else:
             self.cpu = ["-mcpu={}".format(cpu.lower())]
@@ -92,7 +83,7 @@ class GCC(mbedToolchain):
         elif core == "Cortex-M7FD":
             self.cpu.append("-mfpu=fpv5-d16")
             self.cpu.append("-mfloat-abi=softfp")
-        elif core.startswith("Cortex-M33F"):
+        elif target.core.startswith("Cortex-M33F"):
             self.cpu.append("-mfpu=fpv5-sp-d16")
             self.cpu.append("-mfloat-abi=softfp")
 
@@ -103,6 +94,21 @@ class GCC(mbedToolchain):
             self.cpu.append("-mfpu=vfpv3")
             self.cpu.append("-mfloat-abi=hard")
             self.cpu.append("-mno-unaligned-access")
+
+        if ((target.core.startswith("Cortex-M23") or
+             target.core.startswith("Cortex-M33")) and
+            not target.core.endswith("-NS")):
+            self.cpu.append("-mcmse")
+            self.flags["ld"].extend([
+                "-Wl,--cmse-implib",
+                "-Wl,--out-implib=%s" % join(build_dir, "cmse_lib.o")
+            ])
+
+        # Add linking time preprocessor macro DOMAIN_NS
+        if ((target.core.startswith("Cortex-M23") or
+             target.core.startswith("Cortex-M33")) and
+            target.core.endswith("-NS")):
+            self.flags["ld"].append("-DDOMAIN_NS=1")
 
         self.flags["common"] += self.cpu
 

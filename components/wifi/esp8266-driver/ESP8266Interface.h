@@ -387,9 +387,6 @@ private:
     int _connect_event_id;
     void proc_oob_evnt();
     void _oob2global_event_queue();
-    void _connect_async();
-    rtos::Mutex _cmutex; // Protect asynchronous connection logic
-
 };
 #endif
 #endif

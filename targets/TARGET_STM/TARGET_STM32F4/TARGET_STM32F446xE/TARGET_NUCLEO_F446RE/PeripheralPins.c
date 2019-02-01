@@ -322,15 +322,6 @@ MBED_WEAK const PinMap PinMap_QSPI_DATA1[] = {
     {NC, NC, 0}
 };
 
-MBED_WEAK const PinMap PinMap_QSPI_DATA2[] = {
-    {NC, NC, 0}
-};
-
-MBED_WEAK const PinMap PinMap_QSPI_DATA3[] = {
-    {PA_1,      QSPI_1, STM_PIN_DATA(STM_MODE_AF_PP, GPIO_PULLUP, GPIO_AF9_QSPI)},  // QUADSPI_BK1_IO3
-    {NC, NC, 0}
-};
-
 MBED_WEAK const PinMap PinMap_QSPI_SCLK[] = {
     {PB_2,      QSPI_1, STM_PIN_DATA(STM_MODE_AF_PP, GPIO_PULLUP, GPIO_AF9_QSPI)},  // QUADSPI_CLK
     {NC, NC, 0}

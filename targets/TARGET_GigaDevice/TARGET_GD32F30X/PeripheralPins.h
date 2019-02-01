@@ -27,12 +27,12 @@ extern const int GD_GPIO_MODE[];
 extern const int GD_GPIO_SPEED[];
 
 /* ADC */
-#if DEVICE_ANALOGIN
+#ifdef DEVICE_ANALOGIN
 extern const PinMap PinMap_ADC[];
 #endif
 
 /* DAC */
-#if DEVICE_ANALOGOUT
+#ifdef DEVICE_ANALOGOUT
 extern const PinMap PinMap_DAC[];
 #endif
 
@@ -48,17 +48,17 @@ extern const PinMap PinMap_PWM[];
 #endif
 
 /* SERIAL */
-#if DEVICE_SERIAL
+#ifdef DEVICE_SERIAL
 extern const PinMap PinMap_UART_TX[];
 extern const PinMap PinMap_UART_RX[];
-#if DEVICE_SERIAL_FC
+#ifdef DEVICE_SERIAL_FC
 extern const PinMap PinMap_UART_RTS[];
 extern const PinMap PinMap_UART_CTS[];
 #endif
 #endif
 
 /* SPI */
-#if DEVICE_SPI
+#ifdef DEVICE_SPI
 extern const PinMap PinMap_SPI_MOSI[];
 extern const PinMap PinMap_SPI_MISO[];
 extern const PinMap PinMap_SPI_SCLK[];
@@ -66,7 +66,7 @@ extern const PinMap PinMap_SPI_SSEL[];
 #endif
 
 /* CAN */
-#if DEVICE_CAN
+#ifdef DEVICE_CAN
 extern const PinMap PinMap_CAN_RD[];
 extern const PinMap PinMap_CAN_TD[];
 #endif

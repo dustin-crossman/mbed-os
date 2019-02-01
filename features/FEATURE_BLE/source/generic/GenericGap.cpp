@@ -2227,12 +2227,6 @@ ble_error_t GenericGap::setExtendedAdvertisingParameters(
         return err;
     }
 
-    if (event_properties.connectable) {
-        _set_is_connectable.set(handle);
-    } else {
-        _set_is_connectable.clear(handle);
-    }
-
     return _pal_gap.set_advertising_set_random_address(
         handle,
         _random_static_identity_address
@@ -2401,11 +2395,6 @@ ble_error_t GenericGap::startAdvertising(
 
     if (!_existing_sets.get(handle)) {
         return BLE_ERROR_INVALID_PARAM;
-    }
-
-    if (_connectable_payload_size_exceeded.get(handle) && _set_is_connectable.get(handle)) {
-        MBED_WARNING(MBED_ERROR_INVALID_SIZE, "Payload size exceeds size allowed for connectable advertising.");
-        return BLE_ERROR_INVALID_STATE;
     }
 
     if (is_extended_advertising_available()) {

@@ -121,11 +121,7 @@ class Testcase(Bench):
             except TestStepFail:
                 self.logger.info("Warning, iteration failed #"  + str(loop+1))
                 loop = loop + 1
-                if (loop < 5):
-                    self.stop_event.set()
-                    self.th.join()
-                    self.delay(5)
-
+                self.delay(5)
         else:
              raise TestStepFail("Too many failed iterations!")
 

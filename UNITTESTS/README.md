@@ -79,7 +79,7 @@ The build system automatically generates names of test suites. The name is const
 
 ### Unit testing with Mbed CLI
 
-Mbed CLI supports unit tests through the `mbed test --unittests` command. For information on using Mbed CLI, please see the [CLI documentation](https://os.mbed.com/docs/mbed-os/latest/tools/developing-mbed-cli.html).
+Mbed CLI supports unit tests through the `mbed test --unittests` command. For information on using Mbed CLI, please see the [CLI documentation](https://os.mbed.com/docs/latest/tools/developing-arm-mbed-cli.html).
 
 ### Writing unit tests
 

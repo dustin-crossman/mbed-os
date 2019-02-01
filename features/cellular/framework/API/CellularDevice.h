@@ -21,7 +21,6 @@
 #include "CellularTargets.h"
 #include "CellularStateMachine.h"
 #include "Callback.h"
-#include "ATHandler.h"
 
 namespace mbed {
 

@@ -261,7 +261,6 @@ int DeviceKey::generate_key_by_random(uint32_t *output, size_t size)
     }
 
 #if DEVICE_TRNG
-    uint32_t test_buff[DEVICE_KEY_32BYTE / sizeof(int)];
     mbedtls_entropy_context *entropy = new mbedtls_entropy_context;
     mbedtls_entropy_init(entropy);
     memset(output, 0, size);

@@ -36,14 +36,8 @@ void TCPSOCKET_BIND_UNOPENED()
     TCPSocket *sock = new TCPSocket;
     if (!sock) {
         TEST_FAIL();
-        return;
     }
-    nsapi_error_t bind_result = sock->bind(1024);
-    if (bind_result == NSAPI_ERROR_UNSUPPORTED) {
-        TEST_IGNORE_MESSAGE("bind() not supported");
-    } else {
-        TEST_ASSERT_EQUAL(NSAPI_ERROR_NO_SOCKET, bind_result);
-    }
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_NO_SOCKET, sock->bind(1024));
 
     delete sock;
 
