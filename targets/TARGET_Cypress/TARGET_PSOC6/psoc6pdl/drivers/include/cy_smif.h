@@ -213,8 +213,8 @@
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
 *     <td>1.20.1</td>
-*     <td>Update description of size parameter in several functions.</td>
-*     <td>Documentation update and clarification.</td>
+*     <td>Added upper limit to size parameter in several functions.</td>
+*     <td>Documentation improvement.</td>
 *   </tr>
 *   <tr>
 *     <td rowspan="3">1.20</td>
