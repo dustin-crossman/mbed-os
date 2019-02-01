@@ -62,10 +62,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_Cleanup(CRYPTO_Type *base);
 *
 * Sets the value in the crypto memory allocated by destination VU register.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -87,10 +83,6 @@ void Cy_Crypto_Core_Vu_SetMemValue(CRYPTO_Type *base, uint32_t dstReg, uint8_t c
 *
 * Gets the value located in the crypto memory and pointed by source VU register.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -106,6 +98,66 @@ void Cy_Crypto_Core_Vu_SetMemValue(CRYPTO_Type *base, uint32_t dstReg, uint8_t c
 *******************************************************************************/
 void Cy_Crypto_Core_Vu_GetMemValue(CRYPTO_Type *base, uint8_t *dst, uint32_t srcReg, uint32_t size);
 
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_Vu_IsRegZero
+****************************************************************************//**
+*
+* Returns TRUE if srcReg contains 0. FALSE otherwise.
+*
+* \param base
+* The pointer to the CRYPTO instance address.
+*
+* \param srcReg
+* The source vector unit register.
+*
+* \return
+* The result of the comparison.
+*
+*******************************************************************************/
+bool Cy_Crypto_Core_Vu_IsRegZero(CRYPTO_Type *base, uint32_t srcReg);
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_Vu_IsRegEqual
+****************************************************************************//**
+*
+* Returns TRUE if srcReg0 contains the same value as srcReg1. FALSE otherwise.
+*
+* \param base
+* The pointer to the CRYPTO instance address.
+*
+* \param srcReg0
+* The source 0 vector unit register.
+*
+* \param srcReg1
+* The source 1 vector unit register.
+*
+* \return
+* The result of the comparison.
+*
+*******************************************************************************/
+bool Cy_Crypto_Core_Vu_IsRegEqual(CRYPTO_Type *base, uint32_t srcReg0, uint32_t srcReg1);
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_Vu_IsRegEqual
+****************************************************************************//**
+*
+* Returns TRUE if srcReg0 contains the value less than value of srcReg1.
+* FALSE otherwise.
+*
+* \param base
+* The pointer to the CRYPTO instance address.
+*
+* \param srcReg0
+* The source 0 vector unit register.
+*
+* \param srcReg1
+* The source 1 vector unit register.
+*
+* \return
+* The result of the comparison.
+*
+*******************************************************************************/
+bool Cy_Crypto_Core_Vu_IsRegLess(CRYPTO_Type *base, uint32_t srcReg0, uint32_t srcReg1);
 
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Vu_RegRead

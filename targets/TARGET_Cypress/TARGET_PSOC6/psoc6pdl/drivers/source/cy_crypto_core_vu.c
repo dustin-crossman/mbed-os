@@ -7,7 +7,7 @@
 *  in the Crypto driver.
 *
 ********************************************************************************
-* Copyright 2016-2019 Cypress Semiconductor Corporation
+* Copyright 2016-2018 Cypress Semiconductor Corporation
 * SPDX-License-Identifier: Apache-2.0
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -106,7 +106,7 @@ void Cy_Crypto_Core_Vu_GetMemValue(CRYPTO_Type *base, uint8_t *dst, uint32_t src
 cy_en_crypto_status_t Cy_Crypto_Core_Cleanup(CRYPTO_Type *base)
 {
     /* Set the stack pointer to the Crypto buff size, in words */
-    CY_CRYPTO_VU_SET_REG(base, CY_CRYPTO_VU_HW_REG15, cy_device->cryptoMemSize, 1u);
+    CY_CRYPTO_VU_SET_REG(base, CY_CRYPTO_VU_HW_REG15, CY_CRYPTO_MEM_BUFF_SIZE_U32, 1u);
 
     /* Clear whole register file */
     Cy_Crypto_Core_ClearVuRegisters(base);
@@ -148,6 +148,66 @@ cy_en_crypto_status_t Cy_Crypto_Core_Cleanup(CRYPTO_Type *base)
     Cy_Crypto_Core_MemSet(base, (void *)REG_CRYPTO_MEM_BUFF(base), 0u, CY_CRYPTO_MEM_BUFF_SIZE);
 
     return (CY_CRYPTO_SUCCESS);
+}
+
+bool Cy_Crypto_Core_Vu_IsRegZero(CRYPTO_Type *base, uint32_t srcReg)
+{
+    bool result;
+    uint16_t status;
+
+    CY_CRYPTO_VU_TST(base, srcReg);
+    status = Cy_Crypto_Core_Vu_StatusRead(base);
+
+    if (status & CY_CRYPTO_VU_STATUS_ZERO_BIT)
+    {
+        result = true;
+    }
+    else
+    {
+        result = false;
+    }
+
+    return result;
+}
+
+bool Cy_Crypto_Core_Vu_IsRegEqual(CRYPTO_Type *base, uint32_t srcReg0, uint32_t srcReg1)
+{
+    bool result;
+    uint16_t status;
+
+    CY_CRYPTO_VU_CMP_SUB (base, srcReg1, srcReg0);                /* C = (a >= b) */
+    status = Cy_Crypto_Core_Vu_StatusRead(base);
+
+    if (status &  CY_CRYPTO_VU_STATUS_ZERO_BIT)
+    {
+        result = true;
+    }
+    else
+    {
+        result = false;
+    }
+
+    return result;
+}
+
+bool Cy_Crypto_Core_Vu_IsRegLess(CRYPTO_Type *base, uint32_t srcReg0, uint32_t srcReg1)
+{
+    bool result;
+    uint16_t status;
+
+    CY_CRYPTO_VU_CMP_SUB (base, srcReg1, srcReg0);                /* C = (a >= b) */
+    status = Cy_Crypto_Core_Vu_StatusRead(base);
+
+    if (status &  CY_CRYPTO_VU_STATUS_CARRY_BIT)
+    {
+        result = true;
+    }
+    else
+    {
+        result = false;
+    }
+
+    return result;
 }
 
 
