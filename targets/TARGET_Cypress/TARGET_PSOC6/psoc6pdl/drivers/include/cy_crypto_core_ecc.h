@@ -107,7 +107,6 @@ typedef struct {
     cy_en_crypto_ecc_key_type_t type;
 
     /** pointer to domain parameters */
-    // const cy_en_crypto_ecc_dp_type *dp;
 
     cy_en_crypto_ecc_curve_id_t curveID;
 
@@ -120,60 +119,25 @@ typedef struct {
 
 
 typedef int (*cy_func_get_random_data_t)(void *, unsigned char *, size_t);
-
-// /**
-//   Make a new ECC key pair
-//   @param ecc_dp       Pointer to the domain parameters of the required curve
-//   @param key          [out] Destination of the newly created key
-// */
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
                                    cy_en_crypto_ecc_curve_id_t curveID,
                                    cy_stc_crypto_ecc_key *key,
                                    cy_func_get_random_data_t GetRandomDataFunc, void *randomDataInfo);
-
-// /**
-//   Sign a message digest
-//   @param hash      The message digest to sign
-//   @param hashlen   The length of the digest in bytes
-//   @param sig       [out] The destination for the signature, 'r' followed by 's'
-//   @param key       Key used for signature generation
-// */
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base,
                                     const uint8_t *hash,
                                     uint32_t hashlen,
                                     uint8_t *sig,
                                     cy_stc_crypto_ecc_key *key,
                                     uint8_t *messageKey);
-
-// /**
-//   Verify an ECC signature
-//    @param sig         The signature to verify, 'R' followed by 'S'
-//    @param hash        The hash (message digest) that was signed
-//    @param hashlen     The length of the hash (octets)
-//    @param status      Result of signature, 1==valid, 0==invalid
-//    @param key         The corresponding public ECC key
-// */
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
                                       const uint8_t *sig,
                                       const uint8_t *hash,
                                       uint32_t hashlen,
                                       uint8_t *status,
                                       cy_stc_crypto_ecc_key *key);
-
-/**
-  Make a new ECC private key
-  @param eccDp       Pointer to the domain parameters of the required curve
-  @param key          [out] Destination of the newly created key
-*/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
         cy_en_crypto_ecc_curve_id_t curveID, uint8_t *key,
         cy_func_get_random_data_t GetRandomDataFunc, void *randomDataInfo);
-
-/**
-  Make a new ECC public key
-  @param eccDp       Pointer to the domain parameters of the required curve
-  @param key          [out] Destination of the newly created key
-*/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
         cy_en_crypto_ecc_curve_id_t curveID,
         uint8_t *privateKey,
@@ -183,36 +147,37 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
 #define CY_CRYPTO_BYTE_SIZE_OF_BITS(x)     (uint32_t)(((x) + 7u) >> 3u)
 
 /* Sizes for NIST P-curves */
-#define CY_CRYPTO_ECC_P192_SIZE            (192u)      // 2^192 - 2^64 - 1
+#define CY_CRYPTO_ECC_P192_SIZE            (192u)      /* 2^192 - 2^64 - 1 */
 #define CY_CRYPTO_ECC_P192_BYTE_SIZE       CY_CRYPTO_BYTE_SIZE_OF_BITS(CY_CRYPTO_ECC_P192_SIZE)
 
-#define CY_CRYPTO_ECC_P224_SIZE            (224u)      // 2^224 - 2^96  + 1
+#define CY_CRYPTO_ECC_P224_SIZE            (224u)      /* 2^224 - 2^96  + 1 */
 #define CY_CRYPTO_ECC_P224_BYTE_SIZE       CY_CRYPTO_BYTE_SIZE_OF_BITS(CY_CRYPTO_ECC_P224_SIZE)
 
-#define CY_CRYPTO_ECC_P256_SIZE            (256u)      // 2^256 - 2^224 + 2^192 + 2^96 - 1
+#define CY_CRYPTO_ECC_P256_SIZE            (256u)      /* 2^256 - 2^224 + 2^192 + 2^96 - 1 */
 #define CY_CRYPTO_ECC_P256_BYTE_SIZE       CY_CRYPTO_BYTE_SIZE_OF_BITS(CY_CRYPTO_ECC_P256_SIZE)
 
-#define CY_CRYPTO_ECC_P384_SIZE            (384u)      // 2^384 - 2^128 - 2^96 + 2^32 - 1
+#define CY_CRYPTO_ECC_P384_SIZE            (384u)      /* 2^384 - 2^128 - 2^96 + 2^32 - 1 */
 #define CY_CRYPTO_ECC_P384_BYTE_SIZE       CY_CRYPTO_BYTE_SIZE_OF_BITS(CY_CRYPTO_ECC_P384_SIZE)
 
-#define CY_CRYPTO_ECC_P521_SIZE            (521u)      // 2^521 - 1
+#define CY_CRYPTO_ECC_P521_SIZE            (521u)      /* 2^521 - 1 */
 #define CY_CRYPTO_ECC_P521_BYTE_SIZE       CY_CRYPTO_BYTE_SIZE_OF_BITS(CY_CRYPTO_ECC_P521_SIZE)
 
 #define CY_CRYPTO_ECC_MAX_SIZE             (CY_CRYPTO_ECC_P521_SIZE)
 #define CY_CRYPTO_ECC_MAX_BYTE_SIZE        (CY_CRYPTO_ECC_P521_BYTE_SIZE)
 
-// "Global" vector unit registers.
+/* "Global" vector unit registers. */
 #define VR_D                               10
 #define VR_S_X                             11
 #define VR_S_Y                             12
 #define VR_BARRETT                         13
-#define VR_P                               14          // polynomial
-
-//////////////////////////////////////////////////////////////////////////////
+#define VR_P                               14          /* polynomial */
 
 
 #endif /* #if (CPUSS_CRYPTO_VU == 1) */
 
 #endif /* #if defined(CY_IP_MXCRYPTO) */
 
-#endif // CY_CRYPTO_CORE_ECC_H
+#endif /* CY_CRYPTO_CORE_ECC_H  */
+
+
+/* [] END OF FILE */
