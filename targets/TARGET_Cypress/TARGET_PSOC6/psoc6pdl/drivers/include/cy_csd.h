@@ -2,7 +2,6 @@
 * \file cy_csd.h
 * \version 1.0.1
 *
-* \brief
 * The header file of the CSD driver.
 *
 ********************************************************************************
@@ -33,9 +32,9 @@
 ********************************************************************************
 * \{
 *
-* The CSD HW block enables multiple sensing capabilities on PSoC devices including
-* self-cap and mutual-cap capacitive touch sensing solution, a 10-bit ADC, IDAC and
-* Comparator.
+* The CSD HW block enables multiple sensing capabilities on PSoC devices 
+* including self-cap and mutual-cap capacitive touch sensing solution,
+* a 10-bit ADC, IDAC, and Comparator.
 *
 * A CapSense solution includes: 
 * * The CapSense Configurator tool which is a configuration wizard to create 
@@ -61,7 +60,7 @@
 * for documentation of middlewares, supported by the CSD HW block.
 *
 * The CSD driver is a low-level peripheral driver that provides an interface to
-* a complex mixed signal CSD HW block.
+* a complex mixed signal of the CSD HW block.
 *
 * The CSD driver alone does not provide system level functions. Instead, it is
 * used by upper level middleware to configure the CSD HW block required by
@@ -69,16 +68,16 @@
 *
 * The CSD HW block can support only one function at a time. To allow seamless
 * time-multiplex implementation of functionality and to avoid conflicting access
-* to hardware from the upper level, the CSD driver also implements a lock semaphore
-* mechanism.
+* to hardware from the upper level, the CSD driver also implements a lock 
+* semaphore mechanism.
 *
 * The CSD driver supports re-entrance. If a device contains several
-* CSD hardware blocks, the same CSD driver is used to configure any HW block. For
-* that, each function of the CSD driver contains a base address to define with which
-* CSD HW block the CSD driver communicates.
+* CSD HW blocks, the same CSD driver is used to configure any HW block. For
+* that, each function of the CSD driver contains a base address to define
+* the CSD HW block the CSD driver communicates to.
 *
-* For dual-core devices, the CSD driver functions could be called either by the CM0+
-* or CM4 cores. In case both cores need an access to the CSD Driver, you
+* For dual-core devices, the CSD driver functions could be called either by the 
+* CM0+ or CM4 cores. In case both cores need an access to the CSD Driver, you
 * should properly manage the memory access.
 *
 * There is no restriction on the CSD Driver usage in RTOS.
@@ -88,26 +87,28 @@
 ********************************************************************************
 *
 * CSD driver is simple wrapper driver specifically designed to be used by higher
-* level Middleware, hence it is highly not recommended to use CSD driver directly
-* in an application. In order incorporate a CSD HW block functionality in an application,
-* an associated Middleware should be used.
+* level Middleware, hence it is highly not recommended to use CSD driver 
+* directly in the application program. In order incorporate a CSD HW block 
+* functionality in the application program, an associated middleware 
+* should be used.
 *
-* CSD Driver can be used to implement custom sensing solution. In such case, application
-* must acquire and lock CSD HW block prior accessing it.
+* CSD Driver can be used to implement custom sensing solution. In such case, 
+* the application program must acquire and lock the CSD HW block prior 
+* accessing it.
 * 
 * Setting up and using the CSD driver can be summed up in these four stages:
 * * Define configuration in the config structure.
 * * Allocate context structure variable for the driver.
-* * Capture CSD HW block. 
+* * Capture the CSD HW block. 
 * * Executing required action to perform any kind of conversion.
 *
-* The following code snippet demonstrates how to capture the CSD HW block for custom
-* implementation:
+* The following code snippet demonstrates how to capture the CSD HW block for 
+* custom implementation:
 * 
 * \snippet csd/1.0/snippet/main.c snippet_Cy_CSD_Conversion
 * 
-* The entire solution, either CapSense or CSDADC, in addition to the CSD HW block,
-* incorporates the following instances:
+* The entire solution, either CapSense or CSDADC, in addition to 
+* the CSD HW block, incorporates the following instances:
 *
 * * \ref group_csd_config_clocks
 * * \ref group_csd_config_refgen
@@ -122,11 +123,11 @@
 * \subsection group_csd_config_clocks Clocks
 ********************************************************************************
 *
-* CSD HW block requires a peripheral clock (clk_peri) input and it can be assigned
-* in two methods:
+* The CSD HW block requires a peripheral clock (clk_peri) input and it can be 
+* assigned in two methods:
 * * Using the Device Configurator (Peripheral-Clocks tab ).
-* * Using SysClk (System Clock) driver. Refer to \ref group_sysclk driver section.
-*   for more details.
+* * Using SysClk (System Clock) driver. Refer to \ref group_sysclk driver 
+*   section for more details.
 * If a middleware is used, clock is managed by Middleware.
 *
 ********************************************************************************
@@ -134,19 +135,20 @@
 ********************************************************************************
 *
 * Any analog-capable GPIO pin that can be connected to an analog multiplexed bus
-* (AMUXBUS) can be connected to CSD HW block as input.
+* (AMUXBUS) can be connected to the CSD HW block as input.
 * 
 * GPIO input can be assigned CSD HW block in following methods:
 * * Using the Device Configurator (Pins tab).
 * * Using GPIO (General Purpose Input Output) driver. Refer to \ref group_gpio
 *   driver section.
 *
-* If a middleware is used, pin configuration is managed by middleware. When using
-* CSD driver for custom implementation, application must manage pin connections.
+* If a middleware is used, pin configuration is managed by middleware. When 
+* using the CSD driver for custom implementation, the application program must 
+* manage pin connections.
 *
-* Each AMUXBUS can be split into multiple segments. Ensure CSD HW block and a GPIO
-* belong to the same bus segment or join the segments to establish GPIO to CSD HW block
-* connection.
+* Each AMUXBUS can be split into multiple segments. Ensure the CSD HW block 
+* and a GPIO belong to the same bus segment or join the segments to establish 
+* GPIO to the CSD HW block connection.
 *
 * For more information about pin configuration, refer to the \ref group_gpio
 * driver.
@@ -155,8 +157,9 @@
 * \subsection group_csd_config_refgen Reference Voltage Input
 ********************************************************************************
 *
-* CSD HW block requires a reference voltage input to generate programmable reference
-* voltage within the CSD HW block. There are two on-chip reference sources:
+* The CSD HW block requires a reference voltage input to generate programmable 
+* reference voltage within the CSD HW block. There are two on-chip reference 
+* sources:
 * * VREF
 * * AREF
 *
@@ -168,9 +171,9 @@
 * \subsection group_csd_config_interrupts Interrupts
 ********************************************************************************
 *
-* The CSD HW block has one interrupt that could be assigned to either the Cortex-M4
-* or Cortex M0+ core. The CSD HW block can generate interrupts on the following
-* events:
+* The CSD HW block has one interrupt that could be assigned to either the 
+* Cortex-M4 or Cortex M0+ core. The CSD HW block can generate interrupts 
+* on the following events:
 *
 * * End of sample: when scanning of a single sensor is complete.
 * * End of initialization: when initialization of an analog circuit is complete.
@@ -182,15 +185,16 @@
 *
 * If a CapSense or ADC middleware is used, interrupt service routine is managed
 * by middleware. When using CSD driver for custom implementation or other
-* middleware, application must manage interrupt service routine. 
+* middleware, the application program must manage interrupt service routine. 
 *
 * Implement an interrupt routine and assign it to the CSD interrupt. Use the
-* pre-defined enumeration as the interrupt source of the CSD HW block. The CSD interrupt
-* to the NVIC is raised any time the intersection (logic and) of the interrupt flags
-* and the corresponding interrupt masks are non-zero. The peripheral interrupt status
-* register should be read in the ISR to detect which condition generated the interrupt.
-* The appropriate interrupt registers should be cleared so that subsequent interrupts
-* can be handled.
+* pre-defined enumeration as the interrupt source of the CSD HW block. 
+* The CSD interrupt to the NVIC is raised any time the intersection 
+* (logic and) of the interrupt flags and the corresponding interrupt 
+* masks are non-zero. The peripheral interrupt status register should be 
+* read in the ISR to detect which condition generated the interrupt.
+* The appropriate interrupt registers should be cleared so that 
+* subsequent interrupts can be handled.
 * 
 * The following code snippet demonstrates how to implement a routine to handle
 * the interrupt. The routine is called when a CSD interrupt is triggered.
@@ -206,7 +210,7 @@
 *
 * Alternatively, instead of handling the interrupts, the 
 * \ref Cy_CSD_GetConversionStatus() function allows for firmware 
-* polling of the block status.
+* polling of the CSD block status.
 *
 ********************************************************************************
 * \section group_csd_config_power_modes Power Modes
@@ -215,28 +219,28 @@
 * The CSD HW block can operate in Active and Sleep CPU power modes. It is also 
 * possible to switch between Low power and Ultra Low power system modes.
 * In Deep Sleep and in Hibernate power modes the CSD HW block is powered off.
-* When device wakes up from Deep Sleep the CSD HW block resumes operation without
-* need for re-initialization. In case of wake up from Hibernate power mode,
-* the CSD HW block does not retain configuration and block requires
+* When device wakes up from Deep Sleep the CSD HW block resumes operation 
+* without need for re-initialization. In case of wake up from Hibernate power 
+* mode, the CSD HW block does not retain configuration and it requires
 * re-initialization.
 *
 * \note
-* * The CSD driver does not provide a callback function to facilitate the
-*   low-power mode transitions. The responsibility belongs to an upper level that
-*   uses the CSD HW block to ensure the CSD HW block is not busy prior a power mode
-*   transition.
-* * A power mode transition is not recommended while the CSD HW block is busy
-*   and the CSD HW block status must be checked using Cy_CSD_GetStatus() function
-*   prior power mode transition. Instead, use the same power mode
-*   for active operation of the block. This restriction is not applicable to
-*   Sleep mode and the device can seamlessly enter and exit Sleep mode while the
-*   CSD HW block is busy.
+* 1. The CSD driver does not provide a callback function to facilitate the
+*    low-power mode transitions. The responsibility belongs to an upper 
+*    level that uses the CSD HW block to ensure the CSD HW block is not 
+*    busy prior a power mode transition.
+* 2. A power mode transition is not recommended while the CSD HW block is busy
+*    and the CSD HW block status must be checked using the Cy_CSD_GetStatus() 
+*    function prior power mode transition. Instead, use the same power mode
+*    for active operation of the CSD HW block. This restriction is not 
+*    applicable to Sleep mode and the device can seamlessly enter and exit 
+*    Sleep mode while the CSD HW block is busy.
 *
 * \warning
-* * Do not enter Deep Sleep power mode if the CSD HW block conversion is in progress.
-*   Unexpected behavior may occur.
-* * Analog start up time for the CSD HW block is 25 us. Initiate
-*   any kind of conversion only after 25 us from Deep Sleep / Hibernate exit.
+* 1. Do not enter Deep Sleep power mode if the CSD HW block conversion is in 
+*    progress. Unexpected behavior may occur.
+* 2. Analog start up time for the CSD HW block is 25 us. Initiate
+*    any kind of conversion only after 25 us from Deep Sleep / Hibernate exit.
 *
 * Refer to the \ref group_syspm driver for more information about
 * low-power mode transitions.
@@ -247,10 +251,7 @@
 *
 * For more information, refer to the following documents:
 *
-* * <a href="http://www.cypress.com/trm218176"><b>Technical Reference Manual
-* (TRM)</b></a>
-*
-* * <a href="..\..\pdl_user_guide.pdf"><b>PDL User Guide</b></a>
+* * <a href="http://www.cypress.com/trm218176"><b>Technical Reference Manual (TRM)</b></a>
 *
 * * <a href="..\..\capsense_api_reference_manual.html"><b>Cypress CapSense Middleware Library</b></a>
 *
@@ -260,14 +261,11 @@
 *
 * * \ref page_getting_started "Getting Started with the PDL"
 *
-* * <a href="http://www.cypress.com/ds218787"><b>PSoC 63 with BLE Datasheet
-* Programmable System-on-Chip datasheet</b></a>
+* * <a href="http://www.cypress.com/ds218787"><b>PSoC 63 with BLE Datasheet Programmable System-on-Chip datasheet</b></a>
 *
-* * <a href="http://www.cypress.com/an85951"><b>AN85951 PSoC 4 and PSoC 6
-* MCU CapSense Design Guide for more detail</b></a>
+* * <a href="http://www.cypress.com/an85951"><b>AN85951 PSoC 4 and PSoC 6 MCU CapSense Design Guide for more detail</b></a>
 *
-* * <a href="http://www.cypress.com/an210781"><b>AN210781 Getting Started
-* with PSoC 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a>
+* * <a href="http://www.cypress.com/an210781"><b>AN210781 Getting Started with PSoC 6 MCU with Bluetooth Low Energy (BLE) Connectivity</b></a>
 *
 ********************************************************************************
 * \section group_csd_MISRA MISRA-C Compliance
@@ -309,7 +307,7 @@
 *   <tr>
 *     <td>1.0.1</td>
 *     <td>Documentation updates.</td>
-*     <td></td>
+*     <td>Improve user's experience</td>
 *   </tr>
 * </table>
 */
@@ -384,7 +382,7 @@ extern "C" {
 #define CY_CSDADC_VREF_GAIN_MAX             (32u)
 
 /*******************************************************************************
-* HW CSD Block Registers Constants
+* The CSD HW Block Registers Constants
 *******************************************************************************/
 
 /**
@@ -415,34 +413,46 @@ typedef enum
     /** One or more invalid parameters */
     CY_CSD_BAD_PARAM = CY_CSD_ID | CY_PDL_STATUS_ERROR | 0x01U,
 
-    /** CSD HW block performs conversion */
+    /** The CSD HW block performs conversion */
     CY_CSD_BUSY =  CY_CSD_ID | CY_PDL_STATUS_ERROR | 0x02U,
 
-    /** CSD HW block is captured by another middleware */
+    /** The CSD HW block is captured by another middleware */
     CY_CSD_LOCKED =  CY_CSD_ID | CY_PDL_STATUS_ERROR | 0x03U
 
 } cy_en_csd_status_t;
 
 
-/** Key definition of upper level that use the driver */
+/** 
+* Definitions of keys of upper level that use the driver. 
+* 
+* Each middleware has assigned a unique key. When middleware successfully 
+* captures the CSD HW block, this key is placed into CSD driver context 
+* structure. All attempts to capture the CSD HW block by other middleware 
+* is rejected. When the first middleware releases the CSD HW block
+* CY_CSD_NONE_KEY is written to lockKey variable of the CSD driver context 
+* structure and any other middleware can capture the CSD HW block.
+*/
 typedef enum
 {
-    /** HW block is unused and not captured by any middleware */
+    /** The CSD HW block is unused and not captured by any middleware */
     CY_CSD_NONE_KEY = 0U,
 
-    /** HW block is captured by a user */
+    /** 
+    * The CSD HW block is captured by the application program 
+    * directly to implement a customer's specific case 
+    */
     CY_CSD_USER_DEFINED_KEY = 1U,
 
-    /** HW block is captured by a CapSense middleware */
+    /** The CSD HW block is captured by a CapSense middleware */
     CY_CSD_CAPSENSE_KEY = 2U,
 
-    /** HW block is captured by a ADC composite driver */
+    /** The CSD HW block is captured by a ADC middleware */
     CY_CSD_ADC_KEY = 3U,
 
-    /** HW block is captured by a IDAC composite driver */
+    /** The CSD HW block is captured by a IDAC middleware */
     CY_CSD_IDAC_KEY = 4U,
 
-    /** HW block is captured by a CMP composite driver */
+    /** The CSD HW block is captured by a CMP middleware */
     CY_CSD_CMP_KEY = 5U
 
 }cy_en_csd_key_t;
@@ -459,7 +469,14 @@ typedef enum
 * \{
 */
 
-/** CSD configuration structure */
+/** 
+* CSD configuration structure.
+* 
+* This structure contains all register values of the CSD HW block. This 
+* structure is provided by middleware through the Cy_CSD_Init() and 
+* Cy_CSD_Configure() function to implement supported by the CSD HW block 
+* sensing modes like self-cap / mutual-cap scanning, ADC measurement, etc.
+*/
 typedef struct
 {
     uint32_t config;       /**< Stores the CSD.CONFIG register value */
@@ -504,7 +521,11 @@ typedef struct
 } cy_stc_csd_config_t;
 
 
-/** CSD context structure */
+/** 
+* CSD driver context structure.
+* This structure is interal structure of the CSD driver and should not be 
+* accessed directly by the application program.
+*/
 typedef struct
 {
     /** Middleware ID that currently captured CSD */
@@ -627,7 +648,7 @@ __STATIC_INLINE void Cy_CSD_WriteBits(CSD_Type* base, uint32_t offset, uint32_t 
 * Function Name: Cy_CSD_ReadReg
 ****************************************************************************//**
 *
-* Reads value from the specified CSD HW block register.
+* Reads value from the specified the CSD HW block register.
 *
 * \param base
 * Pointer to a CSD HW block base address.
@@ -636,7 +657,8 @@ __STATIC_INLINE void Cy_CSD_WriteBits(CSD_Type* base, uint32_t offset, uint32_t 
 * Register offset relative to base address.
 *
 * \return 
-* Returns a value of CSD HW block register, specified by the offset parameter.
+* Returns a value of the CSD HW block register, specified by the offset 
+* parameter.
 *
 *******************************************************************************/
 __STATIC_INLINE uint32_t Cy_CSD_ReadReg(const CSD_Type * base, uint32_t offset)
@@ -719,8 +741,8 @@ __STATIC_INLINE void Cy_CSD_ClrBits(CSD_Type * base, uint32_t offset, uint32_t m
 * Function Name: Cy_CSD_WriteBits
 ****************************************************************************//**
 *
-* Writes field, specified by the Mask parameter with the value, specified by
-* the Value parameter.
+* Writes field, specified by the mask parameter with the value, specified by
+* the value parameter.
 *
 * \param base
 * Pointer to a CSD HW block base address.
@@ -746,8 +768,8 @@ __STATIC_INLINE void Cy_CSD_WriteBits(CSD_Type * base, uint32_t offset, uint32_t
 * Function Name: Cy_CSD_GetLockStatus
 ****************************************************************************//**
 *
-* Verifies whether specified CSD HW block is acquired and locked by a higher-level
-* firmware. 
+* Verifies whether the specified CSD HW block is acquired and locked by a 
+* higher-level firmware. 
 *
 * \param base
 * Pointer to a CSD HW block base address.
@@ -774,7 +796,8 @@ __STATIC_INLINE cy_en_csd_key_t Cy_CSD_GetLockStatus(const CSD_Type * base, cons
 * Function Name: Cy_CSD_GetConversionStatus
 ****************************************************************************//**
 *
-* Verifies whether the specified CSD HW block is busy (performing scan or conversion).
+* Verifies whether the specified CSD HW block is busy 
+* (performing scan or conversion).
 *
 * \param base
 * Pointer to a CSD HW block base address.
