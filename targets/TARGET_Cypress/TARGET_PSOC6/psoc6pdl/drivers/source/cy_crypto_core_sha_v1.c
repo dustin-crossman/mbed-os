@@ -340,9 +340,19 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Start(CRYPTO_Type *base, cy_stc_cryp
     hashState->blockIdx = 0u;
     hashState->messageSize = 0u;
 
-    Cy_Crypto_Core_V1_MemCpy(base, hashState->hash, hashState->initialHash, (uint16_t)hashState->hashSize);
+    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
 
-    return (CY_CRYPTO_SUCCESS);
+    if (hashState != NULL)
+    {
+        if (hashState->hashSize != 0)
+        {
+            Cy_Crypto_Core_V1_MemCpy(base, hashState->hash, hashState->initialHash, (uint16_t)hashState->hashSize);
+
+            myResult = CY_CRYPTO_SUCCESS;
+        }
+    }
+
+    return (myResult);
 }
 
 /*******************************************************************************
@@ -370,30 +380,48 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Start(CRYPTO_Type *base, cy_stc_cryp
 * \return
 * A Crypto status \ref cy_en_crypto_status_t.
 *
+* \note
+* This function can be called several times only with message lengths dividable
+* by block size. Only the last call to the function can process a message with
+* the not dividable size.
+*
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Update(CRYPTO_Type *base,
                                cy_stc_crypto_sha_state_t *hashState,
                                uint8_t const *message,
                                uint32_t  messageSize)
 {
-    uint32_t blockSizeTmp = hashState->blockSize;
-    hashState->messageSize += messageSize;
+    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
 
-    while (messageSize >= blockSizeTmp)
+    if ((hashState != NULL) && (message != NULL))
     {
-        Cy_Crypto_Core_V1_Sha_ProcessBlock(base, hashState, message);
+        if (hashState->blockSize != 0)
+        {
+            if (messageSize > 0)
+            {
+                uint32_t blockSizeTmp = hashState->blockSize;
+                hashState->messageSize += messageSize;
 
-        message += blockSizeTmp;
-        messageSize -= blockSizeTmp;
+                while (messageSize >= blockSizeTmp)
+                {
+                    Cy_Crypto_Core_V1_Sha_ProcessBlock(base, hashState, message);
+
+                    message += blockSizeTmp;
+                    messageSize -= blockSizeTmp;
+                }
+
+                /* Remaining block will be calculated in Finish function */
+                hashState->blockIdx = messageSize;
+
+                /* Copy the end of the message to the block */
+                Cy_Crypto_Core_V1_MemCpy(base, hashState->block, message, (uint16_t)(messageSize & (blockSizeTmp - 1u)));
+            }
+
+            myResult = CY_CRYPTO_SUCCESS;
+        }
     }
 
-    /* Remaining block will be calculated in Finish function */
-    hashState->blockIdx = messageSize;
-
-    /* Copy the end of the message to the block */
-    Cy_Crypto_Core_V1_MemCpy(base, hashState->block, message, (uint16_t)(messageSize & (blockSizeTmp - 1u)));
-
-    return (CY_CRYPTO_SUCCESS);
+    return (myResult);
 }
 
 /*******************************************************************************
@@ -423,60 +451,67 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Finish(CRYPTO_Type *base,
                                cy_stc_crypto_sha_state_t *hashState,
                                uint8_t *digest)
 {
-    uint8_t *hashTmp = hashState->hash;
-    uint8_t *blockTmp = hashState->block;
-    uint32_t blockSizeTmp = hashState->blockSize;
-    uint32_t blockIdxTmp = hashState->blockIdx;
-    uint64_t finalMessageSizeInBits = (uint64_t)hashState->messageSize * 8u;
-    uint32_t size;
+    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
 
-    if (CY_CRYPTO_SHA512_BLOCK_SIZE == blockSizeTmp)
+    if ((hashState != NULL) && (digest != NULL))
     {
-        size = CY_CRYPTO_SHA512_PAD_SIZE; /* Pad size = 112 */
-    }
-    else
-    {
-        size = CY_CRYPTO_SHA256_PAD_SIZE; /* Pad size = 56 */
-    }
+        uint8_t *hashTmp = hashState->hash;
+        uint8_t *blockTmp = hashState->block;
+        uint32_t blockSizeTmp = hashState->blockSize;
+        uint32_t blockIdxTmp = hashState->blockIdx;
+        uint64_t finalMessageSizeInBits = (uint64_t)hashState->messageSize * 8u;
+        uint32_t size;
 
-    /* Append 1 bit to the end of the message */
-    blockTmp[blockIdxTmp] = 0x80u;
+        if (CY_CRYPTO_SHA512_BLOCK_SIZE == blockSizeTmp)
+        {
+            size = CY_CRYPTO_SHA512_PAD_SIZE; /* Pad size = 112 */
+        }
+        else
+        {
+            size = CY_CRYPTO_SHA256_PAD_SIZE; /* Pad size = 56 */
+        }
 
-    /* Clear the rest of the block */
-    Cy_Crypto_Core_V1_MemSet(base, (void* )&blockTmp[blockIdxTmp + 1u], 0x00u, (uint16_t)(blockSizeTmp - blockIdxTmp - 1u));
+        /* Append 1 bit to the end of the message */
+        blockTmp[blockIdxTmp] = 0x80u;
 
-    if (blockIdxTmp >= size)
-    {
-        /* Here we need one additional last block to calculate SHA, prepare it: */
+        /* Clear the rest of the block */
+        Cy_Crypto_Core_V1_MemSet(base, (void* )&blockTmp[blockIdxTmp + 1u], 0x00u, (uint16_t)(blockSizeTmp - blockIdxTmp - 1u));
+
+        if (blockIdxTmp >= size)
+        {
+            /* Here we need one additional last block to calculate SHA, prepare it: */
+            Cy_Crypto_Core_V1_Sha_ProcessBlock(base, hashState, (uint8_t*)blockTmp);
+
+            /* Clear the last block */
+            Cy_Crypto_Core_V1_MemSet(base, blockTmp, 0x00u, (uint16_t)blockSizeTmp);
+        }
+
+        blockTmp[blockSizeTmp - 4u] = (uint8_t)((finalMessageSizeInBits) >> 24u);
+        blockTmp[blockSizeTmp - 3u] = (uint8_t)((finalMessageSizeInBits) >> 16u);
+        blockTmp[blockSizeTmp - 2u] = (uint8_t)((finalMessageSizeInBits) >> 8u);
+        blockTmp[blockSizeTmp - 1u] = (uint8_t)(finalMessageSizeInBits);
+
+        /* Process the last block */
         Cy_Crypto_Core_V1_Sha_ProcessBlock(base, hashState, (uint8_t*)blockTmp);
 
-        /* Clear the last block */
-        Cy_Crypto_Core_V1_MemSet(base, blockTmp, 0x00u, (uint16_t)blockSizeTmp);
+        /* Invert endians of the hash and copy it to digest, re-use the size variable */
+        size = (uint32_t)(hashState->digestSize / 4u);
+
+        for(; size != 0u; size--)
+        {
+            *(digest)   = *(hashTmp+3);
+            *(digest+1) = *(hashTmp+2);
+            *(digest+2) = *(hashTmp+1);
+            *(digest+3) = *(hashTmp);
+
+            digest += 4;
+            hashTmp += 4;
+        }
+
+        myResult = CY_CRYPTO_SUCCESS;
     }
 
-    blockTmp[blockSizeTmp - 4u] = (uint8_t)((finalMessageSizeInBits) >> 24u);
-    blockTmp[blockSizeTmp - 3u] = (uint8_t)((finalMessageSizeInBits) >> 16u);
-    blockTmp[blockSizeTmp - 2u] = (uint8_t)((finalMessageSizeInBits) >> 8u);
-    blockTmp[blockSizeTmp - 1u] = (uint8_t)(finalMessageSizeInBits);
-
-    /* Process the last block */
-    Cy_Crypto_Core_V1_Sha_ProcessBlock(base, hashState, (uint8_t*)blockTmp);
-
-    /* Invert endians of the hash and copy it to digest, re-use the size variable */
-    size = (uint32_t)(hashState->digestSize / 4u);
-
-    for(; size != 0u; size--)
-    {
-        *(digest)   = *(hashTmp+3);
-        *(digest+1) = *(hashTmp+2);
-        *(digest+2) = *(hashTmp+1);
-        *(digest+3) = *(hashTmp);
-
-        digest += 4;
-        hashTmp += 4;
-    }
-
-    return (CY_CRYPTO_SUCCESS);
+    return (myResult);
 }
 
 /*******************************************************************************
@@ -500,13 +535,21 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Finish(CRYPTO_Type *base,
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Free(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
 {
-    /* Clears the memory buffer. */
-    Cy_Crypto_Core_V1_MemSet(base, hashState->block,    0x00u, (uint16_t)hashState->blockSize);
-    Cy_Crypto_Core_V1_MemSet(base, hashState->hash,     0x00u, (uint16_t)hashState->hashSize);
-    Cy_Crypto_Core_V1_MemSet(base, hashState->roundMem, 0x00u, (uint16_t)hashState->roundMemSize);
+    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
 
-    return (CY_CRYPTO_SUCCESS);
+    if (hashState != NULL)
+    {
+        /* Clears the memory buffer. */
+        Cy_Crypto_Core_V1_MemSet(base, hashState->block,    0x00u, (uint16_t)hashState->blockSize);
+        Cy_Crypto_Core_V1_MemSet(base, hashState->hash,     0x00u, (uint16_t)hashState->hashSize);
+        Cy_Crypto_Core_V1_MemSet(base, hashState->roundMem, 0x00u, (uint16_t)hashState->roundMemSize);
+
+        myResult = CY_CRYPTO_SUCCESS;
+    }
+
+    return (myResult);
 }
+
 
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_V1_Sha
@@ -542,16 +585,31 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha(CRYPTO_Type *base,
                                 uint8_t *digest,
                                 cy_en_crypto_sha_mode_t mode)
 {
+    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
+
     void *shaBuffers = (void *)REG_CRYPTO_MEM_BUFF(base);
     cy_stc_crypto_sha_state_t      myHashState;
 
-    (void)Cy_Crypto_Core_V1_Sha_Init   (base, &myHashState, mode, shaBuffers);
-    (void)Cy_Crypto_Core_V1_Sha_Start  (base, &myHashState);
-    (void)Cy_Crypto_Core_V1_Sha_Update (base, &myHashState, message, messageSize);
-    (void)Cy_Crypto_Core_V1_Sha_Finish (base, &myHashState, digest);
-    (void)Cy_Crypto_Core_V1_Sha_Free   (base, &myHashState);
+    myResult = Cy_Crypto_Core_V1_Sha_Init   (base, &myHashState, mode, shaBuffers);
 
-    return (CY_CRYPTO_SUCCESS);
+    if (CY_CRYPTO_SUCCESS == myResult)
+    {
+        myResult = Cy_Crypto_Core_V1_Sha_Start  (base, &myHashState);
+    }
+    if (CY_CRYPTO_SUCCESS == myResult)
+    {
+        myResult = Cy_Crypto_Core_V1_Sha_Update (base, &myHashState, message, messageSize);
+    }
+    if (CY_CRYPTO_SUCCESS == myResult)
+    {
+        myResult = Cy_Crypto_Core_V1_Sha_Finish (base, &myHashState, digest);
+    }
+    if (CY_CRYPTO_SUCCESS == myResult)
+    {
+        myResult = Cy_Crypto_Core_V1_Sha_Free   (base, &myHashState);
+    }
+
+    return (myResult);
 }
 
 

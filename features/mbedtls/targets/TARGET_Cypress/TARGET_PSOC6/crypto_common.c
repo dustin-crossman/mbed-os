@@ -32,6 +32,9 @@
 
 int cy_hw_sha_start(uint32_t *currBlockLen, cy_stc_crypto_sha_state_t *hashState, cy_en_crypto_sha_mode_t shaMode, void *shaBuffers)
 {
+    if ((hashState == NULL) || (shaBuffers == NULL) || (currBlockLen == 0))
+        return (-1);
+
     *currBlockLen = 0;
 
     if (cy_reserve_crypto(CY_CRYPTO_COMMON_HW) != 0)
@@ -53,6 +56,13 @@ int cy_hw_sha_update(uint32_t *currBlockLen,
     uint32_t tmpBlockSize;
 	uint32_t shaUpdateLen;
     uint32_t n;
+
+    if ((hashState == NULL) || (in == NULL) || (shaTempBlock == NULL) ||
+        (currBlockLen == 0))
+        return (-1);
+
+    if (hashState->blockSize == 0)
+        return (-1);
 
     tmpBlockSize = hashState->blockSize;
 
@@ -96,6 +106,12 @@ int cy_hw_sha_finish(cy_stc_crypto_sha_state_t *hashState,
                      uint8_t *output,
                      uint8_t *shaTempBlock, uint32_t currBlockLen)
 {
+    if ((hashState == NULL) || (output == NULL) || (shaTempBlock == NULL))
+        return (-1);
+
+    if (hashState->blockSize == 0)
+        return (-1);
+
     Cy_Crypto_Core_Sha_Update(CRYPTO, hashState, shaTempBlock, currBlockLen);
     Cy_Crypto_Core_Sha_Finish(CRYPTO, hashState, output);
     Cy_Crypto_Core_Sha_Free  (CRYPTO, hashState);

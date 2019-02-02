@@ -376,6 +376,7 @@ int cy_reserve_crypto(cy_en_crypto_submodule_t module_num)
 
         if (cy_crypto_reserved_status() == 0)
         {
+            /* Enable Crypto IP on demand */
             Cy_Crypto_Core_Enable(CRYPTO);
         }
 
@@ -414,7 +415,8 @@ void cy_free_crypto(cy_en_crypto_submodule_t module_num)
 
             if (cy_crypto_reserved_status() == 0)
             {
-                Cy_Crypto_Core_Disable(CRYPTO);
+                /* Crypto hardware is still in enabled state; to disable:
+                   Cy_Crypto_Core_Disable(CRYPTO) */
             }
 
             result = 0;

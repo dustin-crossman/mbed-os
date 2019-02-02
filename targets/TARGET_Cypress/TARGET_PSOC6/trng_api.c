@@ -63,6 +63,7 @@ int trng_get_bytes(trng_t *obj, uint8_t *output, size_t length, size_t *output_l
             }
         }
     }
+    random = 0u;
 
     return (ret);
 }
