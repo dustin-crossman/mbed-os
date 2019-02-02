@@ -403,6 +403,11 @@ cy_status Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * context)
 * - CY_RET_INVALID_STATE - The specified widget is disabled
 * - CY_RET_BAD_DATA      - The processing is failed
 *
+* \funcusage
+* 
+* An example of pipeline implementation:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_ProcessWidget
+* 
 *******************************************************************************/
 cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t * context)
 {
@@ -467,11 +472,6 @@ cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t
 * 
 * For more details, refer to function usage example below.
 * 
-* The pipeline scan method (i.e. during scanning of a widget, processing 
-* of a previously scanned widget is performed) can be implemented using 
-* this function and it may reduce the total scan/process time, increase 
-* the refresh rate, and decrease the power consumption.
-* 
 * \param widgetId
 * Specifies the ID number of the widget. A macro for the widget ID can be found 
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
@@ -503,6 +503,11 @@ cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t
 * - CY_RET_BAD_PARAM    - The input parameter is invalid.
 * - CY_RET_BAD_DATA     - The processing failed.
 *
+* \funcusage
+* 
+* An example of customized data processing, changed processing order:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_ProcessWidgetExt
+* 
 *******************************************************************************/
 cy_status Cy_CapSense_ProcessWidgetExt(
                 uint32_t widgetId, 
@@ -654,7 +659,8 @@ cy_status Cy_CapSense_ProcessWidgetExt(
 * The pipeline scan method (i.e. during scanning of a sensor, processing
 * of a previously scanned sensor is performed) can be implemented using this
 * function and it may reduce the total scan/process time, increase the refresh
-* rate, and decrease the power consumption.
+* rate, and decrease the power consumption. For more details, refer to 
+* function usage example below.
 *
 * \param widgetId
 * Specifies the ID number of the widget. A macro for the widget ID can be found 
@@ -687,6 +693,12 @@ cy_status Cy_CapSense_ProcessWidgetExt(
 * - CY_RET_BAD_PARAM    - The input parameter is invalid.
 * - CY_RET_BAD_DATA     - The processing failed.
 *
+* \funcusage
+* 
+* An example demonstrates pipeline implementation of sensor scanning and 
+* processing:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_ProcessSensorExt
+* 
 *******************************************************************************/
 cy_status Cy_CapSense_ProcessSensorExt(
                 uint32_t widgetId, 
@@ -884,12 +896,14 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
 * Ballistic multiplier feature.
 *
 * The timestamp can be updated in one of the three methods:
-* - Register a periodic callback for the
-*   Cy_CapSense_IncrementGestureTimestamp() function.
-* - Periodically call the Cy_CapSense_IncrementGestureTimestamp() function
-*   from the application program.
-* - Directly modify the timestamp using the
-*   Cy_CapSense_SetGestureTimestamp() function.
+* 1. Register a periodic callback for the
+*    Cy_CapSense_IncrementGestureTimestamp() function.
+* 2. Periodically call the Cy_CapSense_IncrementGestureTimestamp() function
+*    from the application program.
+* 3. Directly modify the timestamp using the
+*    Cy_CapSense_SetGestureTimestamp() function.
+* 
+* See the function usage example below for more details.
 *
 * The interval at which this function is called should match with interval
 * defined in context->ptrCommonContext->timestampInterval register. Either the
@@ -904,6 +918,11 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
+* \funcusage
+* 
+* An example of timestamp updating:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Timestamp
+* 
 *******************************************************************************/
 void Cy_CapSense_IncrementGestureTimestamp(cy_stc_capsense_context_t * context)
 {
