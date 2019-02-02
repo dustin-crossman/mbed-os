@@ -689,26 +689,26 @@
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
 *     <td rowspan="3">4.10</td>
-*     <td>Updated Cy_SysPm_CpuEnterDeepSleep() function.</td>
+*     <td>Updated the \ref Cy_SysPm_CpuEnterDeepSleep() function.</td>
 *     <td> 
-*         Corrected mechanism for saving/restoring not retained UDB 
+*         Corrected the mechanism for saving/restoring not retained UDB
 *         registers in the Cy_SysPm_CpuEnterDeepSleep() function.
 *
-*         Now Cy_SysPm_CpuEnterDeepSleep() function does not put the CM0+ CPU 
+*         Now, the \ref Cy_SysPm_CpuEnterDeepSleep() function does not put CM0+ CPU
 *         into Deep Sleep and returns \ref CY_SYSPM_SYSCALL_PENDING status, if a 
 *         syscall operation is pending. This behavior is applicable on multi-CPU
 *         devices except CY8C6xx6 and CY8C6xx7.
 *     </td>
 *   </tr>
 *   <tr>
-*     <td>Updated Cy_SysPm_CpuEnterSleep() function.</td>
-*     <td>Removed redundant second call of WFE() instruction on CM4 CPU.
+*     <td>Updated the \ref Cy_SysPm_CpuEnterSleep() function.</td>
+*     <td>Removed the redundant second call of the WFE() instruction on CM4 CPU.
 *         This change is applicable for all devices except CY8C6xx6, 
 *         CY8C6xx7.
 *    </td>
 *   </tr>
 *   <tr>
-*     <td>Added new \ref CY_SYSPM_SYSCALL_PENDING return status. </td>
+*     <td>Added a new \ref CY_SYSPM_SYSCALL_PENDING return status. </td>
 *     <td>Expanded driver return statuses for indicating new possible events in 
 *         the driver.
 *     </td>

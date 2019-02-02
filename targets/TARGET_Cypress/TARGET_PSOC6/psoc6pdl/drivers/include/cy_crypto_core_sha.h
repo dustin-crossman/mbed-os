@@ -194,6 +194,11 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Start(CRYPTO_Type *base
 * \return
 * A Crypto status \ref cy_en_crypto_status_t.
 *
+* \note
+* This function can be called several times only with message lengths dividable
+* by block size. Only the last call to the function can process a message with
+* the not dividable size.
+*
 *******************************************************************************/
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Update(CRYPTO_Type *base,
                                cy_stc_crypto_sha_state_t *hashState,

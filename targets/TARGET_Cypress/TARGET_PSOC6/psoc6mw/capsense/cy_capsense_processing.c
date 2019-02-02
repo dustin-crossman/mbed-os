@@ -66,7 +66,7 @@ void Cy_CapSense_InitializeAllStatuses(const cy_stc_capsense_context_t * context
 * Function Name: Cy_CapSense_InitializeWidgetStatus
 ****************************************************************************//**
 *
-* Performs initialization of all statuses, debounce counters and touch positions
+* Performs initialization of all statuses, debounce counters, and touch positions
 * of the specified widget.
 *
 * The initialization includes:
@@ -76,13 +76,13 @@ void Cy_CapSense_InitializeAllStatuses(const cy_stc_capsense_context_t * context
 * * Clears widget and sensor statuses.
 * * Enables the widget.
 *
-* The Button and Matrix Button widgets have individual debounce counter per
+* The Button and Matrix Button widgets have individual debounce counters per
 * sensor for the CSD widgets and per node for the CSX widgets.
 *
 * The Slider and Touchpad widgets have a single debounce counter per widget.
 *
-* The Proximity widget has two debounce counters per sensor. One for the
-* proximity event and second for the touch event.
+* The Proximity widget has two debounce counters per sensor. One is for the
+* proximity event and the second is for the touch event.
 *
 * All debounce counters during initialization are set to the value of the
 * onDebounce widget parameter.
@@ -259,11 +259,11 @@ void Cy_CapSense_InitializeWidgetGestures(
 * This function should be called by application program only after all sensors
 * are scanned and all data processing is executed using 
 * Cy_CapSense_ProcessAllWidgets() or Cy_CapSense_ProcessWidget() functions 
-* for the widget. Calling this function multiple times without new sensor
+* for the widget. Calling this function multiple times without a new sensor
 * scan and process causes unexpected behavior.
 * 
 * \note The function (Gesture detection functionality) requires a timestamp 
-* for it's operation. The timestamp should be initialized and maintained 
+* for its operation. The timestamp should be initialized and maintained 
 * in the application program prior to calling this function. See the 
 * descriptions of the Cy_CapSense_SetGestureTimestamp() and 
 * Cy_CapSense_IncrementGestureTimestamp() functions for details.

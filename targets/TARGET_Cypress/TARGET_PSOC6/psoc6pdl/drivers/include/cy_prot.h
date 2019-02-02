@@ -366,7 +366,7 @@
 *
 * Refer to Technical Reference Manual (TRM) and the device datasheet.
 *
-* \section group_prot_MISRA MISRA-C Compliance]
+* \section group_prot_MISRA MISRA-C Compliance
 * The Prot driver has the following specific deviations:
 *
 * <table class="doxtable">
@@ -391,8 +391,8 @@
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
 *     <td>1.30</td>
-*     <td>Defect in Cy_Prot_GetPpuProgStruct() function due to faulty #defines is fixed.</td>
-*     <td>Defect fixes.</td>
+*     <td>Defect in \ref Cy_Prot_GetPpuProgStruct() function due to faulty defines is fixed.</td>
+*     <td>Defect fixing.</td>
 *   </tr>
 *   <tr>
 *     <td rowspan="3">1.20</td>

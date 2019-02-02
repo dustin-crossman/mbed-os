@@ -1,8 +1,7 @@
 /***************************************************************************//**
 * \file cy_csd.c
-* \version 1.0
+* \version 1.0.1
 *
-* \brief
 * The source file of the CSD driver.
 *
 ********************************************************************************
@@ -42,26 +41,28 @@ extern "C" {
 * Function Name: Cy_CSD_Init
 ****************************************************************************//**
 *
-* \brief
-* Configures HW CSD block and locks it to be used by specified middleware.
+* Acquires and locks the CSD HW block and configures it.
 *
-* \details
-* This function configures the HW CSD block and locks it. If the block is already
-* in use by other middleware or by the application layer, then the function returns
-* the corresponding status and does not configure the block.
+* If the CSD HW block is already in use by other middleware or by 
+* the application program, then the function
+* returns the CY_CSD_LOCKED status and does not configure the CSD HW block.
 * 
-* It is not possible to trigger any kind of conversion using this function. 
-* To do this, use the Cy_CSD_WriteReg() function.
+* In case of successful acquisition, this function writes configuration data 
+* into all CSD HW block registers (except read-only registers and SEQ_START 
+* register) at once. Since SEQ_START register is excluded from write, 
+* use the Cy_CSD_WriteReg() function to perform triggering state-machine 
+* for scan or conversion.
 * 
 * \param base
-* The pointer to a HW CSD instance.
+* Pointer to a CSD HW block base address.
 *
 * \param config
-* The pointer to a configuration structure that contains the initial configuration.
+* The pointer to a configuration structure that contains the initial 
+* configuration.
 *
 * \param key
 * An ID of middleware or user level function that is going to work with
-* the specified HW CSD block.
+* the specified HW CSD HW block.
 *
 * \param context
 * The pointer to the context structure allocated by a user or middleware.
@@ -96,16 +97,14 @@ cy_en_csd_status_t Cy_CSD_Init(CSD_Type * base, cy_stc_csd_config_t const * conf
 * Function Name: Cy_CSD_DeInit
 ****************************************************************************//**
 *
-* \brief
-* Releases the HW CSD block previously captured by middleware.
+* Releases the CSD HW block previously captured and locked by the caller.
 *
-* \details
-* Releases the HW CSD block previously captured by middleware. If the block is in 
-* use by another instance or if the block is performing any kind of conversion, the 
-* function returns the corresponding status and does not perform deinitialization.
+* If the CSD HW block is acquired by another caller or the block is in 
+* busy state, performing scan or conversion, de-initialization request 
+* is ignored and corresponding status is returned.
 *
 * \param base
-* The pointer to a CSD HW instance.
+* Pointer to a CSD HW block base address.
 *
 * \param key
 * An ID of middleware or user level function that is going to work with
@@ -144,24 +143,22 @@ cy_en_csd_status_t Cy_CSD_DeInit(const CSD_Type * base, cy_en_csd_key_t key,  cy
 * Function Name: Cy_CSD_Configure
 ****************************************************************************//**
 *
-* \brief
 * Sets configuration of all CSD HW block registers at once.
 * 
-* \details
-* Sets configuration of all CSD HW block registers at once. This includes only
-* write-enabled registers. It excludes the SEQ_START register. Therefore,
-* triggering any kind of conversion using this function is not possible. 
-* To do this, use the Cy_CSD_WriteReg() function.
+* This function writes configuration data into all CSD block registers 
+* (except read-only registers and SEQ_START register) at once. Since 
+* SEQ_START register is excluded from write, use the Cy_CSD_WriteReg() 
+* function to perform triggering state-machine for scan or conversion.
 *
 * \param base
-* The pointer to a CSD HW instance.
+* Pointer to a CSD HW block base address.
 *
 * \param config
 * The pointer to a configuration structure that contains initial configuration.
 *
 * \param key
-* An ID of middleware or user level function that is going to work with the
-* specified CSD HW block.
+* An ID of middleware or user level function that is going to work with 
+* the specified CSD HW block.
 *
 * \param context
 * The pointer to the context structure, allocated by a user or middleware.
@@ -228,7 +225,11 @@ cy_en_csd_status_t Cy_CSD_Configure(CSD_Type * base, const cy_stc_csd_config_t *
 * Function Name: Cy_CSD_GetVrefTrim
 ****************************************************************************//**
 *
-* Trims reference voltage per SFALSH Vref trim registers.
+* Adjusts the provided reference voltage based on factory trimmed 
+* SFALSH Vref trim registers.
+* 
+* This function mainly used by CSDADC middleware only to get as much as
+* possible accurate reference voltage.
 *
 * \param referenceVoltage
 * The reference voltage to trim.

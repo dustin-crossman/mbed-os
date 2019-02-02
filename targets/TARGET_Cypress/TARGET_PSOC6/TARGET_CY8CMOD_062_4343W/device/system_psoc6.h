@@ -250,7 +250,7 @@
 * \subsection group_system_config_default_handlers Default Interrupt Handlers Definition
 * The default interrupt handler functions are defined as weak functions to a dummy
 * handler in the startup file. The naming convention for the interrupt handler names
-* is <interrupt_name>_IRQHandler. A default interrupt handler can be overwritten in
+* is \<interrupt_name\>_IRQHandler. A default interrupt handler can be overwritten in
 * user code by defining the handler function using the same name. For example:
 * \code
 * void scb_0_interrupt_IRQHandler(void)
@@ -322,7 +322,7 @@
 *   <tr>
 *       <td rowspan="2">2.30</td>
 *       <td>Added assembler files, linker skripts for Mbed OS.</td>
-*       <td>Arm Mbed OS embedded operating system support.</td>
+*       <td>Added Arm Mbed OS embedded operating system support.</td>
 *   </tr>
 *   <tr>
 *       <td>Updated linker scripts to extend the Flash and Ram memories size available for the CM4 core.</td>

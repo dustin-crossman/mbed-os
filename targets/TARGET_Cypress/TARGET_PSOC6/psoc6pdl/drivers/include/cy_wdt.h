@@ -192,10 +192,10 @@
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
 *     <td>1.10.1</td>
-*     <td>Documentation updates</td>
-*     <td>Added info about that the WDT lock state is not retained during 
+*     <td>Added info that the WDT lock state is not retained during
 *        system Deep Sleep power mode.
 *     </td>
+*     <td>Documentation updates.</td>
 *   </tr>
 *   <tr>
 *     <td rowspan="4">1.10</td>

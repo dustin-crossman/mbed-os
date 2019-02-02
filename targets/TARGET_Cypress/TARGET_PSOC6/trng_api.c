@@ -50,7 +50,7 @@ int trng_get_bytes(trng_t *obj, uint8_t *output, size_t length, size_t *output_l
     *output_length = 0;
 
     /* temporary random data buffer */
-    volatile uint32_t random;
+    uint32_t random;
 
     (void)obj;
 
@@ -65,7 +65,7 @@ int trng_get_bytes(trng_t *obj, uint8_t *output, size_t length, size_t *output_l
             }
         }
     }
-    random = 0u;
+    random = 0uL;
 
     return (ret);
 }

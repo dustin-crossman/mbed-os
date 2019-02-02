@@ -41,13 +41,34 @@
 #endif
 #endif
 
-/**
-  Sign a message digest
-  @param hash      The message digest to sign
-  @param hashlen   The length of the digest in bytes
-  @param sig       [out] The destination for the signature, 'r' followed by 's'
-  @param key       Key used for signature generation
-*/
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_ECC_SignHash
+****************************************************************************//**
+*
+* Sign a message digest.
+*
+* \param base
+* The pointer to a Crypto instance.
+*
+* \param hash
+* The message digest to sign.
+*
+* \param hashlen
+* The length of the digest in bytes.
+*
+* \param sig
+* [out] The destination for the signature, 'r' followed by 's'.
+*
+* \param key
+* Key used for signature generation. See \ref cy_stc_crypto_ecc_key.
+*
+* \param messageKey
+* Message key.
+*
+* \return status code. See \ref cy_en_crypto_status_t.
+*
+*******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8_t *hash, uint32_t hashlen, uint8_t *sig,
         cy_stc_crypto_ecc_key *key, uint8_t *messageKey)
 {
@@ -170,7 +191,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
                         Cy_Crypto_Core_EC_NistP_SetRedAlg(CY_CRYPTO_NIST_P_BARRETT_RED_ALG);
 
                         /* d*r mod n */
-                        Cy_Crypto_Core_EC_MulMod(base, p_s, p_d, p_r, bitsize);    // z = a * b % mod
+                        Cy_Crypto_Core_EC_MulMod(base, p_s, p_d, p_r, bitsize);    /* z = a * b % mod */
 
                         /* load message hash, truncate it if needed */
                         CY_CRYPTO_VU_SET_TO_ZERO(base, p_d);
@@ -187,7 +208,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
                         Cy_Crypto_Core_Vu_SetMemValue (base, p_r, messageKey, bitsize);
 
                         /* e + d*r mod n */
-                        Cy_Crypto_Core_EC_AddMod (base, p_s, p_d, p_s);      // z = a + b % mod
+                        Cy_Crypto_Core_EC_AddMod (base, p_s, p_d, p_s);      /* z = a + b % mod */
 
                         /* (e + d*r)/k mod n */
                         CY_CRYPTO_VU_ALLOC_MEM (base, dividend, bitsize);
@@ -225,15 +246,34 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
     return (myResult);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/**
-  Verify an ECC signature
-   @param sig         The signature to verify, 'R' followed by 'S'
-   @param hash        The hash (message digest) that was signed
-   @param hashlen     The length of the hash (octets)
-   @param stat        Result of signature, 1==valid, 0==invalid
-   @param key         The corresponding public ECC key
-*/
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_ECC_VerifyHash
+****************************************************************************//**
+*
+* Verify an ECC signature.
+*
+* \param base
+* The pointer to a Crypto instance.
+*
+* \param sig
+* The signature to verify, 'R' followed by 'S'.
+*
+* \param hash
+* The hash (message digest) that was signed.
+*
+* \param hashlen
+* The length of the hash (octets).
+*
+* \param stat
+* Result of signature, 1==valid, 0==invalid.
+*
+* \param key
+* The corresponding public ECC key. See \ref cy_stc_crypto_ecc_key.
+*
+* \return status code. See \ref cy_en_crypto_status_t.
+*
+*******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
                             const uint8_t *sig, const uint8_t *hash, uint32_t hashlen,
                             uint8_t *stat, cy_stc_crypto_ecc_key *key)
@@ -280,7 +320,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
             Cy_Crypto_Core_EC_NistP_SetRedAlg(CY_CRYPTO_NIST_P_BARRETT_RED_ALG);
             Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
 
-            /*-----------------------------------------------------------------------------*/
+            /*******************************************************************************/
             /* load values needed for reduction modulo order of the base point             */
             CY_CRYPTO_VU_ALLOC_MEM (base, VR_P, bitsize);
             Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, (uint8_t *)eccDp->order, bitsize);
@@ -288,7 +328,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
             CY_CRYPTO_VU_ALLOC_MEM (base, VR_BARRETT, bitsize + 1);
             Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, (uint8_t *)eccDp->barrett_o, bitsize + 1);
 
-            /*-----------------------------------------------------------------------------*/
+            /*******************************************************************************/
             /* check that R and S are within the valid range, i.e. 0 < R < n and 0 < S < n */
             CY_CRYPTO_VU_ALLOC_MEM (base, p_r,  bitsize);
             CY_CRYPTO_VU_ALLOC_MEM (base, p_s,  bitsize);
@@ -444,3 +484,5 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
     return (myResult);
 }
 
+
+/* [] END OF FILE */

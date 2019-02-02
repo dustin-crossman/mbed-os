@@ -493,7 +493,7 @@ void Cy_CapSense_CSDCalculateScanDuration(cy_stc_capsense_context_t * context)
 * sensor clock, scan resolution) used by the widget.
 * 3. Disconnect all previously connected electrodes, if the electrodes
 * connected by the Cy_CapSense_CSDSetupWidgetExt(),
-* Cy_CapSense_CSXSetupWidgetExt() functions and not disconnected.
+* Cy_CapSense_CSXSetupWidgetExt() functions are not disconnected.
 *
 * This function does not start sensor scanning. The Cy_CapSense_CSDScan()
 * function must be called to start the scan sensors in the widget. If this
@@ -725,7 +725,7 @@ void Cy_CapSense_CSDScan(cy_stc_capsense_context_t * context)
 * Connects a ganged sensor port-pin to the CSD HW block via the AMUX bus.
 *
 * The function gets the IO configuration registers addresses, their shifts and
-* masks from the cy_stc_capsense_pin_config_t object. Basing on this data, it
+* masks from the cy_stc_capsense_pin_config_t object. Based on this data, it
 * updates the HSIOM and PC registers.
 *
 * \param context
@@ -757,8 +757,8 @@ void Cy_CapSense_CSDConnectSnsExt(cy_stc_capsense_context_t * context)
 * Sets the default state of the un-scanned sensor.
 *
 * The function gets the IO configuration registers addresses, their shifts and
-* masks from the cy_stc_capsense_pin_config_t object. Basing on this data and
-* Inactive sensor connection parameter, it updates the HSIOM, PC and DR registers.
+* masks from the cy_stc_capsense_pin_config_t object. Based on this data and
+* the Inactive sensor connection parameter, it updates the HSIOM, PC, and DR registers.
 * The HSIOM register is updated only when the Inactive sensor connection parameter
 * is set to Shield.
 *
@@ -790,30 +790,37 @@ void Cy_CapSense_CSDDisconnectSnsExt(cy_stc_capsense_context_t * context)
 *
 * Connects port pin to the CSD HW block using AMUX bus.
 * 
-* This function can be used to customize default sensor connection 
-* by connecting one or more pins to existing sensor prior to initiating 
+* This function can be used to customize the default sensor connection 
+* by connecting one or more pins to an existing sensor prior to initiating 
 * scan of the sensor.
 * 
-* The function ignores the fact if the sensor is a ganged sensor and 
+* The function ignores whether the sensor is a ganged sensor and 
 * connects only a specified port pin to the CSD HW block. This function can 
-* only use GPIOs that is already assigned to CapSense middleware.
+* only use GPIOs that are already assigned to CapSense middleware.
 * 
 * The functions that perform a setup and scan of a sensor/widget do not 
 * take into account changes in the design made by 
 * the Cy_CapSense_CSDConnectSns() function, hence all GPIOs connected 
 * using this function must be disconnected using 
 * the Cy_CapSense_CSDDisconnectSns() function prior to initializing 
-* new widgets.
+* new widgets. Use this function in StartSample 
+* callback (see the \ref group_capsense_callbacks section for details) 
+* or with low-level functions that perform a single-sensor scanning.
 * 
 * Scanning should be completed before calling this function.
 *
 * \param snsAddrPtr
 * Specifies the pointer to the cy_stc_capsense_pin_config_t object belonging to
-* a sensor which to be connected to the CSD HW block.
+* a sensor that is to be connected to the CSD HW block.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
+* \funcusage
+* 
+* An example of using the function to perform port pin re-connection: 
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSDConnect
+* 
 *******************************************************************************/
 void Cy_CapSense_CSDConnectSns(
                 const cy_stc_capsense_pin_config_t * snsAddrPtr, 
@@ -831,22 +838,27 @@ void Cy_CapSense_CSDConnectSns(
 * 
 * This function can be used to disconnect a sensor connected 
 * using the Cy_CapSense_CSDConnectSns() function. In addition, this 
-* function can be used to customize default sensor connection by 
+* function can be used to customize a default sensor connection by 
 * disconnecting one or more already connected sensors prior to 
-* initiating scan of the sensor.
+* initiating a scan of the sensor.
 * 
 * This function works identically to the Cy_CapSense_CSDConnectSns() function 
-* except it disconnects the specified port-pin used by the sensor.
+* except it disconnects the specified port pin used by the sensor.
 *
 * Scanning should be completed before calling this function.
 *
 * \param  snsAddrPtr
 * Specifies the pointer to the cy_stc_capsense_pin_config_t object belonging to
-* a sensor which should be disconnected from the CSD HW block.
+* a sensor that should be disconnected from the CSD HW block.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
+* \funcusage
+* 
+* An example of using the function to perform port pin re-connection: 
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_CSDConnect
+* 
 *******************************************************************************/
 void Cy_CapSense_CSDDisconnectSns(
                 const cy_stc_capsense_pin_config_t * snsAddrPtr, 
@@ -1493,7 +1505,7 @@ static void Cy_CapSense_CSDCalibrate(
 *
 * Performs a successive approximation search algorithm to find appropriate
 * modulator and compensation IDAC (if enabled) values for all sensors in 
-* the specified widget that provides the raw count to the level 
+* the specified widget that provide the raw count to the level 
 * specified by the target parameter.
 *
 * Calibration returns CYRET_BAD_DATA if the achieved raw count is outside 
@@ -1501,7 +1513,7 @@ static void Cy_CapSense_CSDCalibrate(
 * parameters.
 *
 * This function could be used when the CSD Enable IDAC auto-calibration
-* parameter is enabled. It is recommended not to use this function when 
+* parameter is enabled. Do not use this function when 
 * the SmartSense auto-tuning mode is configured.
 *
 * \param widgetId

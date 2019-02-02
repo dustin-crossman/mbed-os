@@ -30,14 +30,14 @@
 * Function Name: Cy_CapSense_Init
 ****************************************************************************//**
 *
-* Captures the CSD HW block and configures it to default state. This function is
+* Captures the CSD HW block and configures it to the default state. This function is
 * called by the application program prior to calling any other function of the
 * middleware.
 *
 * The following tasks are executed:
 * 1. Capturing the CSD HW block if it is not in use. If the CSD HW block is 
 *    already in use, then the function returns fail status. In this case,
-*    application program should perform corresponding actions like releasing
+*    the application program should perform corresponding actions like releasing
 *    the CSD HW block captured by other middleware.
 * 2. If the CSD HW block was captured this function configures it to the 
 *    default state.
@@ -51,7 +51,11 @@
 * When the middleware operation is stopped by the Cy_CapSense_DeInit()
 * function, subsequent call of the Cy_CapSense_Init() function repeats 
 * initialization process and it is not needed to call the Cy_CapSense_Enable() 
-* function second time.
+* function second time. However, to implement time-multiplexed mode 
+* (sharing the CSD HW Block between multiple middleware) 
+* the Cy_CapSense_Save()/Cy_CapSense_Restore() functions should be used 
+* instead of the Cy_CapSense_DeInit()/Cy_CapSense_Init() functions for 
+* further compatibility.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t
@@ -164,7 +168,7 @@ cy_status Cy_CapSense_Init(cy_stc_capsense_context_t * context)
 * 
 * The CapSense_HW is the pointer to the base register address of 
 * the CSD HW block. A macro for the pointer can be found in cycfg_peripherals.h 
-* file defined as \<Csd_Personality_Name\>_HW. If no name specified then 
+* file defined as \<Csd_Personality_Name\>_HW. If no name is specified then 
 * the default name is used csd_\<Block_Number\>_csd_\<Block_Number\>_HW.
 *
 *******************************************************************************/
@@ -282,8 +286,14 @@ cy_status Cy_CapSense_Initialize(cy_stc_capsense_context_t * context)
 * After it is stopped, the CSD HW block may be reconfigured by the 
 * application program or other middleware for any other usage. 
 * 
-* The middleware operation can be resumed by calling the Cy_CapSense_Init()
-* function.
+* When the middleware operation is stopped by the Cy_CapSense_DeInit()
+* function, subsequent call of the Cy_CapSense_Init() function repeats 
+* initialization process and it is not needed to call the Cy_CapSense_Enable() 
+* function second time. However, to implement time-multiplexed mode 
+* (sharing the CSD HW Block between multiple middleware) 
+* the Cy_CapSense_Save()/Cy_CapSense_Restore() functions should be used 
+* instead of the Cy_CapSense_DeInit()/Cy_CapSense_Init() functions for 
+* further compatibility.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -376,7 +386,7 @@ cy_status Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * context)
 * A pipeline scan method (i.e. during scanning of a current widget (N), 
 * perform processing of the previously scanned widget (N-1)) can be 
 * implemented using this function and it may reduce the total execution time, 
-* increase the refresh rate and decrease the average power consumption.
+* increase the refresh rate, and decrease the average power consumption.
 * See the function usage example below for details on usage.
 * 
 * \param widgetId
@@ -393,6 +403,11 @@ cy_status Cy_CapSense_ProcessAllWidgets(cy_stc_capsense_context_t * context)
 * - CY_RET_INVALID_STATE - The specified widget is disabled
 * - CY_RET_BAD_DATA      - The processing is failed
 *
+* \funcusage
+* 
+* An example of pipeline implementation:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_ProcessWidget
+* 
 *******************************************************************************/
 cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t * context)
 {
@@ -457,11 +472,6 @@ cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t
 * 
 * For more details, refer to function usage example below.
 * 
-* The pipeline scan method (i.e. during scanning of a widget, processing 
-* of a previously scanned widget is performed) can be implemented using 
-* this function and it may reduce the total scan/process time, increase 
-* the refresh rate, and decrease the power consumption.
-* 
 * \param widgetId
 * Specifies the ID number of the widget. A macro for the widget ID can be found 
 * in the cycfg_capsense.h file defined as CY_CAPSENSE_<WIDGET_NAME>_WDGT_ID.
@@ -493,6 +503,11 @@ cy_status Cy_CapSense_ProcessWidget(uint32_t widgetId, cy_stc_capsense_context_t
 * - CY_RET_BAD_PARAM    - The input parameter is invalid.
 * - CY_RET_BAD_DATA     - The processing failed.
 *
+* \funcusage
+* 
+* An example of customized data processing, changed processing order:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_ProcessWidgetExt
+* 
 *******************************************************************************/
 cy_status Cy_CapSense_ProcessWidgetExt(
                 uint32_t widgetId, 
@@ -637,14 +652,15 @@ cy_status Cy_CapSense_ProcessWidgetExt(
 * Performs customized data processing on the selected sensor.
 *
 * This function performs customized data processing specified by the mode 
-* parameter on a sensor. This function performs exact same task
-* of the Cy_CapSense_ProcessWidgetExt() function but only on specified 
+* parameter on a sensor. This function performs the exact same task
+* of the Cy_CapSense_ProcessWidgetExt() function but only on the specified 
 * sensor instead of all sensors in the widget.
 * 
 * The pipeline scan method (i.e. during scanning of a sensor, processing
 * of a previously scanned sensor is performed) can be implemented using this
 * function and it may reduce the total scan/process time, increase the refresh
-* rate, and decrease the power consumption.
+* rate, and decrease the power consumption. For more details, refer to 
+* function usage example below.
 *
 * \param widgetId
 * Specifies the ID number of the widget. A macro for the widget ID can be found 
@@ -656,7 +672,7 @@ cy_status Cy_CapSense_ProcessWidgetExt(
 * file defined as CY_CAPSENSE_<WIDGET_NAME>_SNS<SENSOR_NUMBER>_ID.
 *
 * \param mode
-* Specifies the type of the sensor processing that needs to be executed for the
+* Specifies the type of the sensor processing that must be executed for the
 * specified sensor:
 * 1. Bits [31..5] - Reserved
 * 2. Bits [4..0]  - CY_CAPSENSE_PROCESS_ALL - Executes all the tasks
@@ -677,6 +693,12 @@ cy_status Cy_CapSense_ProcessWidgetExt(
 * - CY_RET_BAD_PARAM    - The input parameter is invalid.
 * - CY_RET_BAD_DATA     - The processing failed.
 *
+* \funcusage
+* 
+* An example demonstrates pipeline implementation of sensor scanning and 
+* processing:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_ProcessSensorExt
+* 
 *******************************************************************************/
 cy_status Cy_CapSense_ProcessSensorExt(
                 uint32_t widgetId, 
@@ -859,27 +881,29 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
 *
 * Increments the timestamp register for the predefined timestamp interval.
 *
-* A timestamp is required for operation of Gesture and Ballistic multiplier
-* feature. Hence this function and timestamp is required only if Gesture 
+* A timestamp is required for operation of the Gesture and Ballistic multiplier
+* feature. Hence this function and timestamp is required only if the Gesture 
 * detection or Ballistic multiplier feature is enabled.
 *
 * This function increments the timestamp by the interval specified
 * in the context->ptrCommonContext->timestampInterval register. The unit for
-* timestamp and timestamp interval is milliseconds and default value of the 
+* the timestamp and timestamp interval is milliseconds and the default value of the 
 * interval is 1.
 *
 * The application program must periodically call this
 * function or register a periodic callback to this function to keep the
-* timestamp updated and operational for the operation of Gesture and 
+* timestamp updated and operational for the operation of the Gesture and 
 * Ballistic multiplier feature.
 *
 * The timestamp can be updated in one of the three methods:
-* - Register a periodic callback for the
-*   Cy_CapSense_IncrementGestureTimestamp() function.
-* - Periodically call the Cy_CapSense_IncrementGestureTimestamp() function
-*   from the application program.
-* - Directly modify the timestamp using the
-*   Cy_CapSense_SetGestureTimestamp() function.
+* 1. Register a periodic callback for the
+*    Cy_CapSense_IncrementGestureTimestamp() function.
+* 2. Periodically call the Cy_CapSense_IncrementGestureTimestamp() function
+*    from the application program.
+* 3. Directly modify the timestamp using the
+*    Cy_CapSense_SetGestureTimestamp() function.
+* 
+* See the function usage example below for more details.
 *
 * The interval at which this function is called should match with interval
 * defined in context->ptrCommonContext->timestampInterval register. Either the
@@ -894,6 +918,11 @@ cy_en_syspm_status_t Cy_CapSense_DeepSleepCallback(
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
+* \funcusage
+* 
+* An example of timestamp updating:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Timestamp
+* 
 *******************************************************************************/
 void Cy_CapSense_IncrementGestureTimestamp(cy_stc_capsense_context_t * context)
 {
@@ -916,7 +945,7 @@ void Cy_CapSense_IncrementGestureTimestamp(cy_stc_capsense_context_t * context)
 * instead of registering a callback.
 *
 * Do not modify the timestamp arbitrarily or simultaneously use with 
-* the Cy_CapSense_IncrementGestureTimestamp() function which may result in 
+* the Cy_CapSense_IncrementGestureTimestamp() function, which may result in 
 * unexpected result.
 *
 * \param value
@@ -941,23 +970,31 @@ void Cy_CapSense_SetGestureTimestamp(
 * Resumes the middleware operation if the Cy_CapSense_Save() function was
 * called previously.
 *
-* This function performs the same tasks as Cy_CapSense_Init() function and is 
-* kept for API consistency among middlewares.
-*
 * This function, along with the Cy_CapSense_Save() function is specifically 
-* designed for ease of use and support time multiplexing of the CSD HW block 
+* designed for ease of use and supports time multiplexing of the CSD HW block 
 * among multiple middlewares. When the CSD HW block is shared by two or more
-* middlewares, this function can be used to restore previous state of 
+* middlewares, this function can be used to restore the previous state of 
 * the CSD HW block and CapSense middleware saved using the 
 * Cy_CapSense_Save() function. See the function usage example below for 
 * details on usage.
 * 
+* This function performs the same tasks as Cy_CapSense_Init() function and is 
+* kept for API consistency among middlewares. It is recommended to use 
+* Cy_CapSense_Save()/Cy_CapSense_Restore() functions to implement 
+* time-multiplexed mode instead of Cy_CapSense_DeInit()/Cy_CapSense_Init()
+* functions for further compatibility.
+*
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
 *
 * \return
 * Returns the status of the resume process. If CY_RET_SUCCESS is not received,
 * the resume process fails and retries may be required.
+*
+* \funcusage
+* 
+* An example of sharing the CSD HW block by CapSense and CSDADC middleware:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_TimeMultiplex
 *
 *******************************************************************************/
 cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
@@ -1017,27 +1054,28 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 ****************************************************************************//**
 *
 * Saves the state of CapSense so the functionality can be restored
-* using Cy_CapSense_Restore() function.
+* using the Cy_CapSense_Restore() function.
 *
-* This function performs the same tasks as Cy_CapSense_DeInit() function and is 
-* kept for API consistency among middlewares.
-*
-* This function, along with the Cy_CapSense_Restore() function is specifically 
-* designed for ease of use and support time multiplexing of the CSD HW block 
+* This function, along with the Cy_CapSense_Restore() function, is specifically 
+* designed for ease of use and supports time multiplexing of the CSD HW block 
 * among multiple middlewares. When the CSD HW block is shared by two or more 
-* middlewares, this function can be used to save current state of 
+* middlewares, this function can be used to save the current state of 
 * the CSD HW block and CapSense middleware prior to releasing the CSD HW block 
 * for use by other middleware. See the function usage example below for 
 * details on usage.
 * 
-* When different functionality of the CSD HW block is required, this function is  
-* used to switch the CSD HW block assignment between different middleware in 
-* time-multiplexed mode. 
+* This function performs the same tasks as Cy_CapSense_DeInit() function and is 
+* kept for API consistency among middlewares. It is recommended to use 
+* Cy_CapSense_Save()/Cy_CapSense_Restore() functions to implement 
+* time-multiplexed mode instead of Cy_CapSense_DeInit()/Cy_CapSense_Init()
+* functions for further compatibility.
+*
 * This function performs the following operations:
-* - Release the CSD HW block.
-* - Configure sensor pins to the default state and disconnect them from 
+* * Release the CSD HW block.
+* * Configure sensor pins to the default state and disconnect them from 
 *   analog buses.
-* - Disconnect external capacitors from analog buses.
+* * Disconnect external capacitors from analog buses.
+* * Set the middleware state to default.
 *
 * \param context
 * The pointer to the CapSense context structure \ref cy_stc_capsense_context_t.
@@ -1045,6 +1083,11 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 * \return
 * Returns the status of the process. If CY_RET_SUCCESS is not received,
 * the save process fails and retries may be required.
+*
+* \funcusage
+* 
+* An example of sharing the CSD HW block by CapSense and CSDADC middleware:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_TimeMultiplex
 *
 *******************************************************************************/
 cy_status Cy_CapSense_Save(cy_stc_capsense_context_t * context)
@@ -1081,7 +1124,7 @@ cy_status Cy_CapSense_Save(cy_stc_capsense_context_t * context)
 * Registers a callback function.
 * 
 * The registered function will be called by the CapSense middleware when 
-* specified event \ref cy_en_capsense_callback_event_t has occurred in 
+* the specified event \ref cy_en_capsense_callback_event_t has occurred in 
 * the CapSense middleware.
 *
 * \param callbackType

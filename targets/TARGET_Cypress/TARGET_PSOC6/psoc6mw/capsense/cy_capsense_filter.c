@@ -41,17 +41,17 @@
 *
 * Updates the baseline for all the sensors in all the widgets. 
 * 
-* Baseline needs to be updated after sensor scan to ignore low frequency 
+* Baselines must be updated after sensor scan to ignore low frequency 
 * changes in the sensor data caused by environment changes such as 
-* temperature from senor status decision. 
+* temperature from sensor status decision. 
 * 
 * This function ignores the widget enable bit in the widget status register.
-* Calling this function multiple time without new sensor scan leads to 
+* Calling this function multiple times without a new sensor scan leads to 
 * unexpected behavior and should be avoided. 
 * 
 * This function is called by Cy_CapSense_ProcessAllWidgets() and 
 * Cy_CapSense_ProcessWidget(), hence the application program need not use this  
-* function if any of the above function is already used. This function can be 
+* function if any of the above functions is already used. This function can be 
 * used for custom application implementation.
 * 
 * \param context
@@ -87,7 +87,7 @@ cy_status Cy_CapSense_UpdateAllBaselines(const cy_stc_capsense_context_t * conte
 * This function performs exactly the same tasks as 
 * Cy_CapSense_UpdateAllBaselines() but only for a specified widget.
 * 
-* Calling this function multiple time without new sensor scan leads to 
+* Calling this function multiple times without a new sensor scan leads to 
 * unexpected behavior and should be avoided. The application program need 
 * not use this function if the Cy_CapSense_UpdateAllBaselines(), 
 * Cy_CapSense_ProcessAllWidgets() or Cy_CapSense_ProcessWidget() functions 
@@ -133,10 +133,10 @@ cy_status Cy_CapSense_UpdateWidgetBaseline(
 * Cy_CapSense_UpdateAllBaselines() and Cy_CapSense_UpdateWidgetBaseline() 
 * but only for a specified sensor.
 * 
-* Calling this function multiple time without new sensor scan leads to 
+* Calling this function multiple times without a new sensor scan leads to 
 * unexpected behavior and should be avoided. The application need not use 
 * this function if the Cy_CapSense_UpdateWidgetBaseline (), 
-* Cy_CapSense_UpdateAllBaselines (), Cy_CapSense_ProcessAllWidgets() 
+* Cy_CapSense_UpdateAllBaselines (), Cy_CapSense_ProcessAllWidgets(), 
 * or Cy_CapSense_ProcessWidget() functions are already used.
 *
 * \param widgetId
@@ -255,7 +255,7 @@ uint32_t Cy_CapSense_FtUpdateBaseline(
 *
 * Initializes the baselines of all the sensors of all the widgets.
 * 
-* This function initializes baseline for all sensors and widgets in the project. 
+* This function initializes baselines for all sensors and widgets in the project. 
 * It can also be used to re-initialize baselines at any time, however, note 
 * that all sensor data history information and sensor status shall be reset 
 * along with re-initialization of baseline.
@@ -290,13 +290,13 @@ void Cy_CapSense_InitializeAllBaselines(cy_stc_capsense_context_t * context)
 *
 * Initializes the baselines of all the sensors in a specific widget. 
 * 
-* This function initializes baseline for all sensors in a specific widget 
+* This function initializes baselines for all sensors in a specific widget 
 * in the project. It can also be used to re-initialize baselines at any time, 
 * however, note that all sensor data history information and sensor status 
 * should be reset along with re-initialization of baseline.
 * 
-* Following functions to initialize sensor and widgets and filter history 
-* should be called after initializing baseline for proper operation of 
+* The following functions to initialize sensor and widgets and filter history 
+* should be called after initializing baselines for proper operation of 
 * middleware.
 * * Cy_CapSense_InitializeWidgetStatus()
 * * Cy_CapSense_InitializeWidgetFilter()

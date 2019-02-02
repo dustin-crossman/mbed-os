@@ -131,6 +131,8 @@ void Cy_MCWDT_DeInit(MCWDT_STRUCT_Type *base)
 *  a delay less than two lf_clk cycles. The recommended waitUs parameter 
 *  value is 100 us.
 *
+* \return  The value of combined C1-C0 cascaded counters.
+*
 *******************************************************************************/
 uint32_t Cy_MCWDT_GetCountCascaded(MCWDT_STRUCT_Type const *base)
 {
@@ -162,7 +164,7 @@ uint32_t Cy_MCWDT_GetCountCascaded(MCWDT_STRUCT_Type const *base)
         */
         countVal = match0 + 1UL;
         
-        if (0UL < counter1) 
+        if (0UL != counter1) 
         {
             /* Set match to the maximum value */
             match0 = MCWDT_STRUCT_MCWDT_CNTLOW_WDT_CTR0_Msk; 
@@ -187,7 +189,12 @@ uint32_t Cy_MCWDT_GetCountCascaded(MCWDT_STRUCT_Type const *base)
     /* Check for overflow */
     if (match1 < counter1)
     {
+        /* Reset counter0 to disable the added correction of the counter1 value */
         counter0 = 0UL;
+        
+        /* Reset counter1 to prevent the wrong cascaded value calculation 
+         * because counter1 is updated only on the following clock edge after clearing counter0 
+         */
         counter1 = 0UL;
     }
 

@@ -605,10 +605,31 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
+*     <td>2.20</td>
+*     <td>
+*         <ul>
+*         <li>Moved from pre-compiled library to Open Source under
+*             Apache 2.0 license.</li>
+*         <li>Added ECP and ECDSA support for NIST P curves:
+*             SECP192R1, SECP224R1, SECP256R1, SECP384R1, SECP521R1.</li>
+*         <li>ECP and ECDSA only supported with direct calls to Crypto APIs,
+*             no client interface functions present.</li>
+*         <li>Added chunk mode for CRC.</li>
+*         <li>Added chunk mode for SHA, chunk size is limited to
+*             SHA block size.</li>
+*         </ul>
+*     </td>
+*     <td>ECC support added.<br>
+*         Integration with mbedOS/mbedTLS, restructured the implementation of
+*         SHA and CRC for the Crypto ALT interface.
+*     </td>
+*   </tr>
+*   <tr>
 *     <td>2.11b</td>
 *     <td>Same as production 2.10; only newly added Elliptic Curve point
 *     multiplication functionality (NIST P256) is pre-production.
 *     Open source under Apache version 2.0 license.</td>
+*     <td></td>
 *   </tr>
 *   <tr>
 *     <td>2.11</td>
@@ -621,6 +642,7 @@
 *   <tr>
 *     <td>2.10b</td>
 *     <td>Same as production 2.10. Open source under Apache version 2.0 license.</td>
+*     <td></td>
 *   </tr>
 *   <tr>
 *     <td rowspan="4">2.10</td>
@@ -651,6 +673,7 @@
 *   <tr>
 *     <td>2.0b</td>
 *     <td>Same as production 2.0. Open source under Apache version 2.0 license.</td>
+*     <td></td>
 *   </tr>
 *   <tr>
 *     <td rowspan="2">2.0</td>

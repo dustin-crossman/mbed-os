@@ -27,8 +27,8 @@
 * performance.
 * 
 * CapSense has become a popular technology to replace conventional 
-* mechanical- and optical- based user interfaces. There are fewer parts 
-* involved, which saves cost and increases reliability, with no wear-and-tear. 
+* mechanical- and optical-based user interfaces. There are fewer parts 
+* involved, which saves cost and increases reliability with no wear-and-tear. 
 * The main advantages of CapSense compared with other solutions are:  
 * robust performance in harsh environmental conditions and rejection of a 
 * wide range of external noise sources. 
@@ -46,14 +46,14 @@
 *
 * The CSD HW block enables multiple sensing capabilities on PSoC devices 
 * including self-cap and mutual-cap capacitive touch sensing solution, 
-* a 10-bit ADC, IDAC and Comparator. The CSD driver is a low-level 
+* a 10-bit ADC, IDAC, and Comparator. The CSD driver is a low-level 
 * peripheral driver, a wrapper to manage access to the CSD HW block. 
-* Each middleware access to the CSD HW block through the CSD Driver. 
+* Each middleware access to the CSD HW block is through the CSD Driver. 
 * 
 * The CSD HW block can support only one function at a time. However, all  
 * supported functionality (like CapSense, ADC, etc.) can be 
-* time-multiplexed in a design. I.e. it is possible to save existing state 
-* of the CapSense middleware, restore state of the ADC middleware, perform 
+* time-multiplexed in a design. I.e. you can save the existing state 
+* of the CapSense middleware, restore the state of the ADC middleware, perform 
 * ADC measurements, and then switch back to the CapSense functionality.
 * For more details and code examples refer to the description of the 
 * Cy_CapSense_Save() and Cy_CapSense_Restore() functions.
@@ -65,11 +65,11 @@
 * sections for documentation of other middleware supported by the CSD HW block.
 * 
 * A CapSense solution includes: 
-* * The CapSense Configurator tool which is a configuration wizard to create 
+* * The CapSense Configurator tool, which is a configuration wizard to create 
 *   and configure CapSense widgets. It could be launched in ModusToolbox 
 *   from the CSD personality as well as in standalone mode. 
-*   It contains a separate documentation of how to create and 
-*   configure widgets, parameters and algorithms descriptions.
+*   It contains a separate document about how to create and 
+*   configure widgets, parameters and algorithm descriptions.
 * * API to control the design from the application program. This documentation 
 *   describes API with code snippets of how to use them.
 * * The CapSense Tuner tool for real-time tuning, testing, and debugging,
@@ -111,7 +111,7 @@
 * Refer to the PDL API Reference Manual.
 *
 * This document provides descriptions of the functions in the CapSense 
-* middleware library, and descriptions of the data structures (Register map) 
+* middleware library, and descriptions of the data structures (register map) 
 * used by the middleware library.
 * 
 * The Application Programming Interface (API) routines allow controlling and 
@@ -217,17 +217,17 @@
 *         * Added two new functions:
 *           * Cy_CapSense_SetupWidgetExt()
 *           * Cy_CapSense_ScanExt()
-*         * Fixed shield operation when Csh is disabled.
+*         * Fixed the shield operation when Csh is disabled.
 *         * Fixed implementation of position filtering for Radial Slider widget.
-*         * Fixed Cy_CapSense_DeInit() implementation by restoring hardware to the 
-*           default state.
-*         * Added possibility to enable shield with no dedicated electrodes.
+*         * Fixed Cy_CapSense_DeInit() implementation by restoring hardware to  
+*           its default state.
+*         * Added the possibility to enable the shield with no dedicated electrodes.
 *         * Added support of protocol-agnostic tuning (UART, SPI, etc.).
 *     </td>
 *     <td>
-*         * Improved user's experience with API.
+*         * Improved user's experience with an API.
 *         * Improved documentation.
-*         * Fixed defects.
+*         * Defect fixing.
 *         * Enhanced functionality.
 *     </td>
 *   </tr>
@@ -414,7 +414,7 @@
 *     <td>End Of Scan</td>
 *     <td>ptrEOSCallback</td>
 *     <td>It is called after when sensor scan is finished and there is no other 
-*         sensors in queue to be scanned.</td>
+*         sensor in queue to be scanned.</td>
 *   </tr>
 * </table>
 *

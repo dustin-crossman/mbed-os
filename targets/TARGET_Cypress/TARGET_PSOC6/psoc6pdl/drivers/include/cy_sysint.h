@@ -46,7 +46,7 @@
 * section for the implementation details.
 *
 * The default interrupt handler functions are defined as weak functions to a dummy handler
-* in the startup file. The naming convention is <interrupt_name>_IRQHandler.
+* in the startup file. The naming convention is \<interrupt_name\>_IRQHandler.
 * Defining these in the user application allows the linker to place them in 
 * the vector table in flash. For example:
 * \code
