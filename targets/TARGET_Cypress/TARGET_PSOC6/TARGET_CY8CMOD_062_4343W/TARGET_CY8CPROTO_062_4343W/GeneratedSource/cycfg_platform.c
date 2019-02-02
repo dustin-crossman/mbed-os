@@ -129,7 +129,7 @@ __STATIC_INLINE void Cy_SysClk_IloInit()
 __STATIC_INLINE void Cy_SysClk_ClkLfInit()
 {
     /* The WDT is unlocked in the default startup code */
-    Cy_SysClk_ClkLfSetSource(CY_SYSCLK_CLKLF_IN_WCO);
+    Cy_SysClk_ClkLfSetSource(CY_SYSCLK_CLKLF_IN_ILO);
 }
 __STATIC_INLINE void Cy_SysClk_ClkPath0Init()
 {
@@ -175,7 +175,12 @@ void init_cycfg_platform(void)
 	/* Set worst case memory wait states (! ultra low power, 150 MHz), will update at the end */
 	Cy_SysLib_SetWaitStates(false, 150UL);
 	#if (CY_CFG_PWR_VBAC_SUPPLY == CY_CFG_PWR_VBAC_SUPPLY_VDD)
-	if (0u == Cy_SysLib_GetResetReason() /* POR, XRES, or BOD */){ Cy_SysLib_ResetBackupDomain(); }
+	if (0u == Cy_SysLib_GetResetReason() /* POR, XRES, or BOD */)
+	{
+	    Cy_SysLib_ResetBackupDomain();
+	    Cy_SysClk_IloDisable();
+	    Cy_SysClk_IloInit();
+	}
 	#endif
 	#ifdef CY_CFG_PWR_ENABLED
 	/* Configure power mode */
@@ -210,6 +215,9 @@ void init_cycfg_platform(void)
 	Cy_SysClk_FllDisable();
 	Cy_SysClk_ClkPathSetSource(CY_SYSCLK_CLKHF_IN_CLKPATH0, CY_SYSCLK_CLKPATH_IN_IMO);
 	Cy_SysClk_ClkHfSetSource(0UL, CY_SYSCLK_CLKHF_IN_CLKPATH0);
+	#ifdef CY_IP_MXBLESS
+	(void)Cy_BLE_EcoReset();
+	#endif
 	
 	#ifdef CY_CFG_SYSCLK_PLL1_AVAILABLE
 	(void)Cy_SysClk_PllDisable(CY_SYSCLK_CLKHF_IN_CLKPATH2);
