@@ -106,14 +106,15 @@
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
 *     <td>1.30</td>
-*     <td>The \ref Cy_MCWDT_GetCountCascaded() function is corrected. Now
-*         the function returns the correct value.
+*     <td>In version 1.20 the Cy_MCWDT_GetCountCascaded() function 
+*         returned the wrong value when counter#1 overflowed.
+*         This bug is corrected in version 1.30.
 *     </td>
-*     <td>Defect fixing.
+*     <td>Defect fixes.
 *     </td>
 *   </tr>
 *   <tr>
-*     <td rowspan="2">1.20</td>
+*     <td>1.20</td>
 *     <td>Flattened the organization of the driver source code into the single 
 *         source directory and the single include directory.
 *     </td>
