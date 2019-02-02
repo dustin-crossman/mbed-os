@@ -19,7 +19,8 @@
 #include "wwd_rtos_interface.h"
 #include "wiced_utilities.h"
 #include "rtos.h"
-#include "ticker_api.h"
+#include "us_ticker_api.h"
+#include "platform/mbed_wait_api.h"
 
 
 extern "C" wwd_result_t host_rtos_create_thread(
@@ -46,7 +47,7 @@ extern "C" wwd_result_t host_rtos_create_thread_with_arg(
             "host_thread_type_t must fit Thread type");
     Thread *thread = new (p) Thread(osPriorityNormal,
             stack_size, (unsigned char*)stack);
-    int err = thread->start(callback(
+    int err = thread->start(mbed::callback(
             reinterpret_cast<void (*)(void*)>(entry_function),
             reinterpret_cast<void*>(arg)));
 
