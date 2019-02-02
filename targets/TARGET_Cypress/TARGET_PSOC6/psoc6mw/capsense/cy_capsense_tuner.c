@@ -48,7 +48,7 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 * and before next scanning.
 * 
 * If a user changes some parameters in the Tuner tool, a re-initialization 
-* of the middleware is required, in such cases, tuner issues a re-initialize 
+* of the middleware is required. In such cases, the tuner issues a re-initialize 
 * command and which is executed by this function.
 * 
 * If this function is not called by the application program, the middleware 
@@ -67,14 +67,14 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 * * Displaying detected gestures may be missed.
 *
 * \note 
-* Calling this function is not mandatory and required only to 
-* synchronize the communication with the CapSense Tuner tool when the Tuner 
+* Calling this function is not mandatory and required only  
+* synchronizing the communication with the CapSense Tuner tool when the Tuner 
 * is used.
 *
 * \warning 
 * This function executes received commands. Two commands 
 * CY_CAPSENSE_TU_CMD_ONE_SCAN_E and CY_CAPSENSE_TU_CMD_SUSPEND_E change the 
-* FW tuner module state to suspend. In this state the function waits until 
+* FW tuner module state to suspend. In this state, the function waits until 
 * CY_CAPSENSE_TU_CMD_RESUME_E is received. A callback mechanism of command 
 * receiving should be used to avoid FW hang.
 * 
@@ -249,7 +249,7 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
 *
 * Checks command format, header, tail, CRC, etc.
 *
-* This function checks if the specified packet with the size
+* This function checks whether the specified packet with the size
 * CY_CAPSENSE_COMMAND_PACKET_SIZE could be represented as a
 * command received from the CapSense Tuner tool.
 * The verification includes the following items:

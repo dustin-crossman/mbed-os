@@ -158,7 +158,7 @@ uint32_t Cy_CapSense_IsSensorActive(
 * Reports the status of the specified proximity widget/sensor.
 *
 * This function reports whether the specified proximity sensor has detected 
-* touch or proximity event by extracting information from the widget 
+* a touch or proximity event by extracting information from the widget 
 * status register. This function is used only with proximity widgets. 
 * This function does not process widget data but extracts previously processed 
 * results from the \ref group_capsense_structures.

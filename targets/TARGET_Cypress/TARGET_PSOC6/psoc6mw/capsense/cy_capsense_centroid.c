@@ -71,12 +71,12 @@ __STATIC_INLINE uint8_t Cy_CapSense_GetLowestId(uint8_t idMask);
 *
 * Finds touch position of a Linear slider widget with enabled diplexing.
 *
-* In scope of position searching this function finds local maximum with the
-* highest raw count. If such maximums are more than one then the maximum with 
-* bigger sum of neighbor sensors is taken for further processing. Then position
-* is calculated using centroid algorithm with 3 sensors.
+* In scope of position searching this function finds the local maximum with the
+* highest raw count. If such maximums are more than one, then the maximum with the
+* bigger sum of neighboring sensors is taken for further processing. Then the position
+* is calculated using centroid algorithm with three sensors.
 *
-* At least two neighbor sensor should cross finger threshold, then the algorithm 
+* At least two neighboring sensors should cross finger threshold. Then the algorithm 
 * is able to distinguish where real touch is located (direct part of slider or
 * diplex part of slider) and corresponding position is reported. Otherwise no 
 * touch is reported.
@@ -185,10 +185,10 @@ void Cy_CapSense_DpCentroidDiplex(
 *
 * Finds touch position of a Linear slider widget.
 *
-* In scope of position searching this function finds local maximum with the
-* highest raw count. If such maximums are more than one then the maximum with 
-* bigger sum of neighbor sensors is taken for further processing. Then position
-* is calculated using centroid algorithm with 3 sensors.
+* In scope of position searching this function finds the local maximum with the
+* highest raw count. If such maximums are more than one, then the maximum with 
+* bigger sum of neighboring sensors is taken for further processing. Then the position
+* is calculated using centroid algorithm with three sensors.
 *
 * This function does not detect two or more touches.
 * 
@@ -286,10 +286,10 @@ void Cy_CapSense_DpCentroidLinear(
 *
 * Finds touch position of a Radial slider widget.
 *
-* In scope of position searching this function finds local maximum with the
+* In scope of position searching this function finds the local maximum with the
 * highest raw count. If such maximums are more than one, then the maximum with 
-* bigger sum of neighbor sensors is taken for further processing. Then position
-* is calculated using centroid algorithm with 3 sensors.
+* bigger sum of neighboring sensors is taken for further processing. Then the position
+* is calculated using centroid algorithm with three sensors.
 *
 * This function does not detect two or more touches.
 * 
@@ -379,10 +379,10 @@ void Cy_CapSense_DpCentroidRadial(
 *
 * Finds touch position of a CSD Touchpad widget.
 *
-* In scope of position searching this function finds local maximum with the
+* In scope of position searching this function finds the local maximum with the
 * highest raw count. If such maximums are more than one, then the maximum with 
-* bigger sum of neighbor sensors is taken for further processing. Then position
-* is calculated using centroid algorithm with 3 sensors.
+* bigger sum of neighboring sensors is taken for further processing. Then the position
+* is calculated using centroid algorithm with three sensors.
 *
 * This function does not detect two or more touches.
 * 
@@ -555,7 +555,7 @@ void Cy_CapSense_DpCentroidTouchpad(
 * with matrix 5*5 of sensors and virtual sensors on the edges. 
 *
 * \param newTouch
-* The pointer to the touch structure where found position is stored.
+* The pointer to the touch structure where the found position is stored.
 *
 * \param ptrWdConfig
 * The pointer to the widget configuration structure.
@@ -605,7 +605,7 @@ void Cy_CapSense_DpAdvancedCentroidTouchpad(
 * Function Name: Cy_CapSense_DpFindLocalMaxDd
 ****************************************************************************//**
 *
-* Finds up to 5 local maximums for CSX Touchpad.
+* Finds up to five local maximums for CSX Touchpad.
 *
 * This function takes an array of differences of the specified widget and 
 * finds up to five local maximums. The found maximums are stored in the CSX buffer
@@ -1112,7 +1112,7 @@ static void Cy_CapSense_TransferTouch(
 * Function Name: Cy_CapSense_NewTouch
 ****************************************************************************//**
 *
-* Set ID, age and on debounce parameters for a new touch.
+* Set ID, age, and on debounce parameters for a new touch.
 *
 * If raw count is lower than the finger-On-Threshold,
 * then the corresponding touch is marked with CY_CAPSENSE_CSX_TOUCHPAD_ID_ON_FAIL
@@ -1197,8 +1197,8 @@ __STATIC_INLINE uint8_t Cy_CapSense_GetLowestId(uint8_t idMask)
 *
 * Handles touchdown debouncing.
 *
-* Even if a new touch is detected, it is not considered as active until 
-* debounce counter has not reached zero. If debounce counter has reached zero,
+* Even if a new touch is detected, it is not considered as active until the
+* debounce counter has not reached zero. If the debounce counter has reached zero,
 * the touchdown mask is cleared. Otherwise the age of the new finger is cleared
 * (it is considered as not active).
 *
@@ -1269,7 +1269,7 @@ static uint32_t Cy_CapSense_CalcDistance(
 * Function Name: Cy_CapSense_Hungarian
 ****************************************************************************//**
 *
-* Executes the Hungarian Method on a distance map to track motion of two 
+* Executes the Hungarian method on a distance map to track motion of two 
 * touch sets (old touches vs new touches).
 *
 * This function uses the Hungarian method described in specification 001-63362.
@@ -1558,7 +1558,7 @@ static void Cy_CapSense_CopyTouchRecord(
 * public touch array.
 *
 * This function checks every touch in the new touch structure. If the touch is 
-* valid (valid id and age > 0), then touch is filtered if filter is enabled. 
+* valid (valid id and age > 0), then touch is filtered if the filter is enabled. 
 * At the end, the corresponding fields are updated in the public touch structure.
 *
 * \param ptrWdConfig 

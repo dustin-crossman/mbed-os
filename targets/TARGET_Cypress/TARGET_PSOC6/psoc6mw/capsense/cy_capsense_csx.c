@@ -215,7 +215,7 @@ void Cy_CapSense_CSXDisableMode(cy_stc_capsense_context_t * context)
 * sensor clock, scan resolution) used by the widget.
 * 3. Disconnect all previously connected electrodes, if the electrodes
 * connected by the Cy_CapSense_CSDSetupWidgetExt(),
-* Cy_CapSense_CSXSetupWidgetExt() functions and not disconnected.
+* Cy_CapSense_CSXSetupWidgetExt() functions are not disconnected.
 *
 * This function does not start sensor scanning. The Cy_CapSense_CSXScan()
 * function must be called to start the scan sensors in the widget. If this
@@ -287,9 +287,9 @@ void Cy_CapSense_CSXSetupWidget(uint32_t widgetId, cy_stc_capsense_context_t * c
 * function, along with Cy_CapSense_CSXScanExt() function, can be used to 
 * scan a specific sensor in the widget.
 * 
-* This function should be called for widget that is configured to use 
-* CSX sensing method, using this function on a non-CSX sensing widget 
-* would cause unexpected result.
+* This function should be called for a widget that is configured to use 
+* CSX sensing method. Using this function on a non-CSX sensing widget 
+* would cause an unexpected result.
 * 
 * This function requires using the Cy_CapSense_CSXScanExt() function to 
 * initiate a scan.
@@ -396,7 +396,7 @@ void Cy_CapSense_CSXScan(cy_stc_capsense_context_t * context)
 * 
 * This function does not disconnect sensor GPIOs from CSD HW block at the 
 * end of a scan, therefore making subsequent scan of the same sensor is faster. 
-* If sensor needs to be disconnected after the scan, 
+* If sensor must be disconnected after the scan, 
 * the Cy_CapSense_CSXDisconnectTx() or Cy_CapSense_CSXDisconnectRx() functions
 * can be used.
 * 
@@ -439,7 +439,7 @@ void Cy_CapSense_CSXScanExt(cy_stc_capsense_context_t * context)
 * The Cy_CapSense_CalibrateWidget() function should be used instead.
 *
 * Performs a successive approximation search algorithm to find appropriate
-* IDAC values for all sensors in the specified widget that provides 
+* IDAC values for all sensors in the specified widget that provide 
 * the raw count to the level specified by the target parameter.
 *
 * Calibration returns CYRET_BAD_DATA if the achieved raw count is outside 
@@ -671,17 +671,17 @@ static void Cy_CapSense_CSXStartSample(cy_stc_capsense_context_t * context)
 *
 * Connects port pin (an Rx electrode) to the CSD HW block using AMUX bus.
 * 
-* This function can be used to customize default sensor connection 
-* by connecting one or more pins to existing sensor as an Rx electrode
+* This function can be used to customize the default sensor connection 
+* by connecting one or more pins to an existing sensor as an Rx electrode
 * prior to initiating scan of the sensor.
 * 
-* The function ignores the fact if the sensor is a ganged sensor and 
+* The function ignores whether the sensor is a ganged sensor and 
 * connects only a specified port pin to the CSD HW block. This function can 
 * only use GPIOs that is already assigned to CapSense middleware.
 * 
 * The functions that perform a setup and scan of a sensor/widget do not 
 * take into account changes in the design made by 
-* the Cy_CapSense_CSXConnectRx() function, hence all GPIOs connected 
+* the Cy_CapSense_CSXConnectRx() function. Hence all GPIOs connected 
 * using this function must be disconnected using 
 * the Cy_CapSense_CSXDisconnectRx() function prior to initializing 
 * new widgets. Use this function in StartSample 
@@ -717,17 +717,17 @@ void Cy_CapSense_CSXConnectRx(
 *
 * Connects port pin (a Tx electrode) to the CSD HW block.
 * 
-* This function can be used to customize default sensor connection 
-* by connecting one or more pins to existing sensor as an Tx electrode
+* This function can be used to customize the default sensor connection 
+* by connecting one or more pins to an existing sensor as a Tx electrode
 * prior to initiating scan of the sensor.
 * 
-* The function ignores the fact if the sensor is a ganged sensor and 
+* The function ignores whether the sensor is a ganged sensor and 
 * connects only a specified port pin to the CSD HW block. This function can 
 * only use GPIOs that is already assigned to CapSense middleware.
 * 
 * The functions that perform a setup and scan of a sensor/widget do not 
 * take into account changes in the design made by 
-* the Cy_CapSense_CSXConnectTx() function, hence all GPIOs connected 
+* the Cy_CapSense_CSXConnectTx() function. Hence all GPIOs connected 
 * using this function must be disconnected using 
 * the Cy_CapSense_CSXDisconnectTx() function prior to initializing 
 * new widgets. Use this function in StartSample 
@@ -762,7 +762,7 @@ void Cy_CapSense_CSXConnectTx(
 ****************************************************************************//**
 * 
 * Disconnects port pin (an Rx electrode) from the CSD HW block by disconnecting 
-* it from AMUX bus.
+* it from the AMUX bus.
 * 
 * This function can be used to disconnect a sensor connected 
 * using the Cy_CapSense_CSXConnectRx() function. In addition, this 
@@ -771,7 +771,7 @@ void Cy_CapSense_CSXConnectTx(
 * initiating scan of the sensor.
 * 
 * This function works identically to the Cy_CapSense_CSDConnectRx() function 
-* except it disconnects the specified port-pin used by the sensor.
+* except it disconnects the specified port pin used by the sensor.
 *
 * Scanning should be completed before calling this function.
 *
@@ -815,7 +815,7 @@ void Cy_CapSense_CSXDisconnectRx(
 * initiating scan of the sensor.
 * 
 * This function works identically to the Cy_CapSense_CSDConnectTx() function 
-* except it disconnects the specified port-pin used by the sensor.
+* except it disconnects the specified port pin used by the sensor.
 *
 * Scanning should be completed before calling this function.
 *
