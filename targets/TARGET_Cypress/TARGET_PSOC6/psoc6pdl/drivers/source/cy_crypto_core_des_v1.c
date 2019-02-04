@@ -90,10 +90,6 @@ static void Cy_Crypto_Core_V1_Des_ProcessBlock(CRYPTO_Type *base,
 * All addresses must be 4Byte aligned,
 * srcBlock could overlap dstBlock.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -147,10 +143,6 @@ static void Cy_Crypto_Core_V1_Des_ProcessBlock(CRYPTO_Type *base,
 * Performs DES operation on a Single Block. All addresses must be 4-Byte aligned.
 * Ciphertext (dstBlock) may overlap with plaintext (srcBlock)
 * This function is independent from the previous Crypto state.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -211,10 +203,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Des(CRYPTO_Type *base,
 * Performs TDES operation on a Single Block. All addresses must be 4-Byte aligned.
 * Ciphertext (dstBlock) may overlap with plaintext (srcBlock)
 * This function is independent from the previous Crypto state.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

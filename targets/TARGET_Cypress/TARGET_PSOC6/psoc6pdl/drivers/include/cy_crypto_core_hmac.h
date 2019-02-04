@@ -50,10 +50,6 @@ typedef cy_en_crypto_status_t (*cy_crypto_hmac_func_t)(CRYPTO_Type *base,
 *
 * Performs HMAC calculation.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *

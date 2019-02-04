@@ -55,10 +55,6 @@ typedef cy_en_crypto_status_t (*cy_crypto_crc_func_t)(CRYPTO_Type *base,
 *
 * Initializes CRC calculation.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -108,10 +104,6 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_Init(CRYPTO_Type *base,
 *
 * Performs CRC calculation on a message.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -156,10 +148,6 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc(CRYPTO_Type *base,
 ****************************************************************************//**
 *
 * Initializes CRC calculation.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -220,10 +208,6 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_CalcInit(CRYPTO_Type *b
 *
 * Prepares CRC calculation by setting an initial seeds value.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -259,10 +243,6 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_CalcStart(CRYPTO_Type *
 ****************************************************************************//**
 *
 * Performs CRC calculation of a message part.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -300,10 +280,6 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_CalcPartial(CRYPTO_Type
 *
 * Finalizes CRC calculation.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -338,10 +314,6 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_CalcFinish(CRYPTO_Type 
 ****************************************************************************//**
 *
 * Performs CRC calculation on a message.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

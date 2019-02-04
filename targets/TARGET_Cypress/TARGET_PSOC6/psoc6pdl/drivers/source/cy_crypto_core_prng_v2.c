@@ -42,10 +42,6 @@
 * Initializes the PRND parameters.
 * Invoking this function causes a restart of the pseudo-random sequence.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -81,10 +77,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Prng_Init(CRYPTO_Type *base,
 ****************************************************************************//**
 *
 * Generates a Pseudo Random Number.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

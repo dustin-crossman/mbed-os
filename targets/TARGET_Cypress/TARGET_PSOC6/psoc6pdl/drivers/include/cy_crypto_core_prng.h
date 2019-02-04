@@ -45,6 +45,85 @@ typedef cy_en_crypto_status_t (*cy_crypto_prng_func_t)(CRYPTO_Type *base,
                                              uint32_t max,
                                              uint32_t *randomNum);
 
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_Prng_Init
+****************************************************************************//**
+*
+* Initializes the PRND parameters.
+* Invoking this function causes a restart of the pseudo-random sequence.
+*
+* \param base
+* The pointer to the CRYPTO instance address.
+*
+* \param lfsr32InitState
+* A non-zero seed value for the first LFSR.
+
+* \param lfsr31InitState
+* A non-zero seed value for the second LFSR.
+
+* \param lfsr29InitState
+* A non-zero seed value for the third LFSR.
+*
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
+*******************************************************************************/
+__STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Prng_Init(CRYPTO_Type *base,
+                                                  uint32_t lfsr32InitState,
+                                                  uint32_t lfsr31InitState,
+                                                  uint32_t lfsr29InitState)
+{
+    cy_en_crypto_status_t myResult;
+
+    if (cy_device->cryptoVersion == 1u)
+    {
+        myResult = Cy_Crypto_Core_V1_Prng_Init(base, lfsr32InitState, lfsr31InitState, lfsr29InitState);
+    }
+    else
+    {
+        myResult = Cy_Crypto_Core_V2_Prng_Init(base, lfsr32InitState, lfsr31InitState, lfsr29InitState);
+    }
+
+    return myResult;
+}
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_Prng
+****************************************************************************//**
+*
+* Generates a Pseudo Random Number.
+*
+* \param base
+* The pointer to the CRYPTO instance address.
+*
+* \param max
+* The maximum value of a random number.
+*
+* \param randomNum
+* The pointer to a variable to store the generated pseudo random number.
+*
+* \return
+* A Crypto status \ref cy_en_crypto_status_t.
+*
+*******************************************************************************/
+__STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Prng(CRYPTO_Type *base,
+                                             uint32_t max,
+                                             uint32_t *randomNum)
+{
+    cy_en_crypto_status_t myResult;
+
+    if (cy_device->cryptoVersion == 1u)
+    {
+        myResult = Cy_Crypto_Core_V1_Prng(base, max, randomNum);
+    }
+    else
+    {
+        myResult = Cy_Crypto_Core_V2_Prng(base, max, randomNum);
+    }
+
+    return myResult;
+}
+
 #endif /* #if (CPUSS_CRYPTO_PR == 1) */
 
 #endif /* CY_IP_MXCRYPTO */

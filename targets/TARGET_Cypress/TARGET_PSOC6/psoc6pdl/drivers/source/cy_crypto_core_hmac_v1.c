@@ -84,10 +84,6 @@ static void Cy_Crypto_Core_V1_Hmac_Free(CRYPTO_Type *base,
 * Initializes HMAC (Hash-based Message Authentication Code) calculation.
 * User should allocate two buffers (ipad and opad) for HMAC calculation.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param hmacState
 * the pointer to the hmacState structure which stores internal variables
 * for HMAC calculation.
@@ -120,10 +116,6 @@ static void Cy_Crypto_Core_V1_Hmac_Init(cy_stc_crypto_v1_hmac_state_t *hmacState
 ****************************************************************************//**
 *
 * Starts HMAC (Hash-based Message Authentication Code) calculation.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -222,10 +214,6 @@ static void Cy_Crypto_Core_V1_Hmac_Calculate(CRYPTO_Type *base,
 *
 * Clears the used memory buffers.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -246,10 +234,6 @@ static void Cy_Crypto_Core_V1_Hmac_Free(CRYPTO_Type *base, cy_stc_crypto_v1_hmac
 ****************************************************************************//**
 *
 * Performs HMAC calculation.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
