@@ -47,6 +47,59 @@ typedef cy_en_crypto_status_t (*cy_crypto_cmac_func_t)(CRYPTO_Type *base,
                                           cy_stc_crypto_aes_state_t *aesState);
 /** \endcond */
 
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_Cmac
+****************************************************************************//**
+*
+* Performs CMAC(Cipher-based Message Authentication Code) operation
+* on a message to produce message authentication code using AES.
+*
+* \param base
+* The pointer to the CRYPTO instance address.
+*
+* \param message
+* The pointer to a source plain text. Must be 4-byte aligned.
+*
+* \param messageSize
+* The size of a source plain text.
+*
+* \param key
+* The pointer to the encryption key. Must be 4-byte aligned.
+*
+* \param keyLength
+* \ref cy_en_crypto_aes_key_length_t
+*
+* \param cmac
+* The pointer to the calculated CMAC.
+*
+* \param aesState
+* The pointer to the aesState structure which stores the AES context.
+*
+* \return
+* A Crypto status \ref en_crypto_status_t.
+*
+*******************************************************************************/
+__STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Cmac(CRYPTO_Type *base,
+                                          uint8_t  const *message,
+                                          uint32_t messageSize,
+                                          uint8_t  const *key,
+                                          cy_en_crypto_aes_key_length_t keyLength,
+                                          uint8_t *cmac,
+                                          cy_stc_crypto_aes_state_t *aesState)
+{
+    cy_en_crypto_status_t myResult;
+
+    if (cy_device->cryptoVersion == 1u)
+    {
+        myResult = Cy_Crypto_Core_V1_Cmac(base, message, messageSize, key, keyLength, cmac, aesState);
+    }
+    else
+    {
+        myResult = Cy_Crypto_Core_V2_Cmac(base, message, messageSize, key, keyLength, cmac, aesState);
+    }
+
+    return myResult;
+}
 
 #endif /* (CPUSS_CRYPTO_AES == 1) */
 
