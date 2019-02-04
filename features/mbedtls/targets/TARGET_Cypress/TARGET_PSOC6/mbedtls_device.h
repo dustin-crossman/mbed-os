@@ -19,18 +19,22 @@
 #define MBEDTLS_DEVICE_H
 
 /* SHA alternate implementations are disabled: concurrent hardware accelerated
-   operation of AES and SHA blocks is not currently supported */
-//#define MBEDTLS_SHA1_C
-//#define MBEDTLS_SHA1_ALT
-//#define MBEDTLS_SHA256_ALT
-//#define MBEDTLS_SHA512_ALT
+   operation of SHA block is not currently supported */
+// #define MBEDTLS_SHA1_C
+// #define MBEDTLS_SHA1_ALT
+// #define MBEDTLS_SHA256_ALT
+// #define MBEDTLS_SHA512_ALT
 
-#define MBEDTLS_AES_ALT
+/* AES alternate implementation is disabled: concurrent hardware accelerated
+   operation of AES block is not currently supported */
+// #define MBEDTLS_AES_ALT
 // #define MBEDTLS_CIPHER_MODE_CBC
 // #define MBEDTLS_CIPHER_MODE_CFB
 // #define MBEDTLS_CIPHER_MODE_CTR
 
-#define MBEDTLS_ECP_ALT
+/* ECP alternate implementation is disabled: only NIST-P curves
+   are currently supported, no software fallback for other curves */
+// #define MBEDTLS_ECP_ALT
 // #define MBEDTLS_ECP_DP_SECP192R1_ENABLED
 // #define MBEDTLS_ECP_DP_SECP224R1_ENABLED
 // #define MBEDTLS_ECP_DP_SECP256R1_ENABLED
