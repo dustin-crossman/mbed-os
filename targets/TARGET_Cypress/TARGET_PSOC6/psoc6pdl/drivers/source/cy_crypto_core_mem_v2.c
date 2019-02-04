@@ -41,10 +41,6 @@
 * Memory structures should not overlap!
 * There is no alignment restriction.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -84,10 +80,6 @@ void Cy_Crypto_Core_V2_MemCpy(CRYPTO_Type *base, void* dst, void const *src, uin
 * Function MemSet uses Crypto HW.
 * There is no alignment restriction.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -125,10 +117,6 @@ void Cy_Crypto_Core_V2_MemSet(CRYPTO_Type *base, void* dst, uint8_t data, uint16
 *
 * Function MemCmp uses Crypto HW.
 * There is no alignment restriction.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -176,10 +164,6 @@ uint32_t Cy_Crypto_Core_V2_MemCmp(CRYPTO_Type *base, void const *src0, void cons
 * Function MemXor uses Crypto HW.
 * Memory structures should not overlap!
 * There is no alignment restriction.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

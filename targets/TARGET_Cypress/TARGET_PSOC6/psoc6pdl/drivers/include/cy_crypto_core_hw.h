@@ -238,10 +238,6 @@ void Cy_Crypto_Core_InvertEndianness(void *inArrPtr, uint32_t byteSize);
 *
 * The function checks whether the Crypto hardware is enabled.
 *
-* This function available for CM0+ core only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -268,8 +264,6 @@ __STATIC_INLINE bool Cy_Crypto_Core_IsEnabled(CRYPTO_Type *base)
 * - from 0 to  8 for MXCRYPTO_ver1 IP block and
 * - from 0 to 16 for MXCRYPTO_ver2 IP block
 *
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -285,8 +279,6 @@ __STATIC_INLINE uint8_t Cy_Crypto_Core_GetFIFODepth(CRYPTO_Type *base)
 *
 * Returns the number of instructions in the instruction FIFO.
 * The value of this field ranges from 0 to 8
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -306,9 +298,6 @@ __STATIC_INLINE uint8_t Cy_Crypto_Core_GetFIFOUsed(CRYPTO_Type *base)
 * "event" = INSTR_FF_STATUS.USED < EVENT_LEVEL.
 * By default EVENT_LEVEL = 0;
 *
-* This function available for CM0+ core only.
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -325,9 +314,6 @@ __STATIC_INLINE void Cy_Crypto_Core_WaitForFifoAvailable(CRYPTO_Type *base)
 *****************************************************************************//**
 *
 * Waits until all instruction in FIFO will be completed
-*
-* This function available for CM0+ core only.
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

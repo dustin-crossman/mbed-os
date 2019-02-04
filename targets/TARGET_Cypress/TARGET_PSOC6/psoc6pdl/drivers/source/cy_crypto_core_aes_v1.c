@@ -43,10 +43,6 @@ static void Cy_Crypto_Core_V1_Aes_InvKey(CRYPTO_Type *base, cy_stc_crypto_aes_st
 *
 * Performs the AES block cipher.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -92,10 +88,6 @@ void Cy_Crypto_Core_V1_Aes_ProcessBlock(CRYPTO_Type *base,
 *
 * Perform the XOR of two 16-Byte memory structures.
 * All addresses must be 4-Byte aligned!
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -143,10 +135,6 @@ void Cy_Crypto_Core_V1_Aes_Xor(CRYPTO_Type *base,
 *
 * Calculates an inverse block cipher key from the block cipher key.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -175,10 +163,6 @@ static void Cy_Crypto_Core_V1_Aes_InvKey(CRYPTO_Type *base, cy_stc_crypto_aes_st
 ****************************************************************************//**
 *
 * Sets Aes mode and prepare inversed key.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -230,10 +214,6 @@ void Cy_Crypto_Core_V1_Aes_Free(CRYPTO_Type *base)
 *
 * Performs AES operation on one Block.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -276,10 +256,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Ecb(CRYPTO_Type *base,
 ****************************************************************************//**
 *
 * Performs AES operation on a plain text with Cipher Block Chaining (CBC).
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -385,10 +361,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Cbc(CRYPTO_Type *base,
 *
 * Performs AES operation on a plain text with the Cipher Feedback Block method (CFB).
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -474,10 +446,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Cfb(CRYPTO_Type *base,
 ********************************************************************************
 *
 * Performs AES operation on a plain text using the counter method (CTR).
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

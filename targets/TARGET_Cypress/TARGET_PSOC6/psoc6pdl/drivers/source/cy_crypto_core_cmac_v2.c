@@ -58,10 +58,6 @@ static void Cy_Crypto_Core_V2_Cmac_CalcSubKey(uint8_t *srcDstPtr);
 * Calculates the sub-key for the CMAC algorithm
 * according to the NIST publication 800-38B, page 7.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param srcDstPtr
 * The pointer to the source data for sub-key calculation, see 800-38B.
 *
@@ -93,10 +89,6 @@ static void Cy_Crypto_Core_V2_Cmac_CalcSubKey(uint8_t *srcDstPtr)
 *
 * The function for initialization of CMAC operation.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param k
 * The pointer to the sub-key.
 
@@ -111,10 +103,6 @@ void Cy_Crypto_Core_V2_Cmac_Init(cy_stc_crypto_v2_cmac_state_t* cmacState, uint8
 ****************************************************************************//**
 *
 * Starts CMAC calculation.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -147,10 +135,6 @@ void Cy_Crypto_Core_V2_Cmac_Start(CRYPTO_Type *base,
 ****************************************************************************//**
 *
 * Calculates CMAC on a message.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -191,10 +175,6 @@ void Cy_Crypto_Core_V2_Cmac_Update(CRYPTO_Type *base,
 ****************************************************************************//**
 *
 * Completes CMAC calculation.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -244,10 +224,6 @@ void Cy_Crypto_Core_V2_Cmac_Finish(CRYPTO_Type *base,
 *
 * Performs CMAC(Cipher-based Message Authentication Code) operation
 * on a message to produce message authentication code using AES.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

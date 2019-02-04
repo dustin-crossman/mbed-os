@@ -77,10 +77,6 @@ static uint8_t const cy_desWeakKeys[CY_CRYPTO_DES_WEAK_KEY_COUNT][CY_CRYPTO_DES_
 * Ciphertext (dst) may overlap with plaintext (src)
 * This function is independent from the previous Crypto state.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -141,10 +137,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Des(CRYPTO_Type *base,
 * Performs TDES operation on a Single Block. All addresses must be 4-Byte aligned.
 * Ciphertext (dstBlock) may overlap with plaintext (srcBlock)
 * This function is independent from the previous Crypto state.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

@@ -126,9 +126,6 @@ static const uint8_t sha512_256EncStr[CY_CRYPTO_SHA256_512_PADDING_SIZE] =
 *
 * Returns the verification result \ref cy_en_crypto_rsa_ver_result_t.
 *
-* This function available for Server side only.
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -299,9 +296,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Verify(CRYPTO_Type *base,
 * Outputs: R^-1 and n' which allows equation: R*R^-1 - n*n' = 1,
 * where R = 1 << size.
 *
-* This function available for Server side only.
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -397,10 +391,6 @@ static void Cy_Crypto_Core_Rsa_MontCoeff(CRYPTO_Type *base, uint32_t modDerReg, 
 *
 * barrett = (1 << (2 * size)) / mod      NO!!! leading '1' Barrett bit.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -455,10 +445,6 @@ static void Cy_Crypto_Core_Rsa_BarrettGetU(CRYPTO_Type *base, uint32_t barrettUR
 * \brief Conversion to Montgomery representation.
 *
 * z = (a << size) % mod
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -533,10 +519,6 @@ static void Cy_Crypto_Core_Rsa_MontTransform(CRYPTO_Type *base, uint32_t z, uint
 * u = u + t
 * u = u >> size
 * u = IF (u >= mod) u = u - mod
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -621,10 +603,6 @@ static void Cy_Crypto_Core_Rsa_MontMul(CRYPTO_Type *base,
 *
 * Perform y = x^e mod n using Montgomery reduction technique to speed-up
 * calculation. Suitable for cases with short e.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -751,10 +729,6 @@ static void Cy_Crypto_Core_Rsa_expModByMont(CRYPTO_Type *base,
 *
 * https://en.wikipedia.org/wiki/RSA_%28cryptosystem%29
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -880,10 +854,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Proc(CRYPTO_Type *base,
 *                         coefficient for Barrett reduction,
 *                         binary inverse of the modulo,
 *                         result of (2^moduloLength mod modulo)
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

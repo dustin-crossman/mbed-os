@@ -38,10 +38,6 @@
 *
 * Writes one 32-Bit data word into Crypto FIFO.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -68,10 +64,6 @@ void Cy_Crypto_SetReg1Instr(CRYPTO_Type *base, uint32_t data0)
 ****************************************************************************//**
 *
 * Writes two 32-Bit data words into Crypto FIFO.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -105,10 +97,6 @@ void Cy_Crypto_SetReg2Instr(CRYPTO_Type *base, uint32_t data0, uint32_t data1)
 ****************************************************************************//**
 *
 * Writes three 32-Bit data words into Crypto FIFO.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -148,10 +136,6 @@ void Cy_Crypto_SetReg3Instr(CRYPTO_Type *base, uint32_t data0, uint32_t data1, u
 ****************************************************************************//**
 *
 * Writes four 32-Bit data words into Crypto FIFO.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -198,10 +182,6 @@ void Cy_Crypto_SetReg4Instr(CRYPTO_Type *base, uint32_t data0, uint32_t data1, u
 *
 * Run the Crypto instruction without parameters.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -225,10 +205,6 @@ void Cy_Crypto_Run0ParamInstr(CRYPTO_Type *base, uint8_t instr)
 *
 * Run the Crypto instruction with one parameter.
 * The parameter must be placed into register 0
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -258,10 +234,6 @@ void Cy_Crypto_Run1ParamInstr(CRYPTO_Type *base, uint8_t instr, uint32_t rdst0Sh
 * Run the Crypto instruction with two parameters.
 * The zero parameter must be placed into register 0,
 * the first parameter must be placed into register 1.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -299,10 +271,6 @@ void Cy_Crypto_Run2ParamInstr(CRYPTO_Type *base,
 * The zero parameter must be placed into register 0,
 * the first parameter must be placed into register 1,
 * the second parameter must be placed into register 2.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -346,10 +314,6 @@ void Cy_Crypto_Run3ParamInstr(CRYPTO_Type *base,
 * the first parameter must be placed into register 1,
 * the second parameter must be placed into register 2,
 * the third parameter must be placed into register 3.
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

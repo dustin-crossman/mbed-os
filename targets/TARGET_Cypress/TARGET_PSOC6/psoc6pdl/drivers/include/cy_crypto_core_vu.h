@@ -165,10 +165,6 @@ bool Cy_Crypto_Core_Vu_IsRegLess(CRYPTO_Type *base, uint32_t srcReg0, uint32_t s
 *
 * Returns the data pointed in given register
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -187,10 +183,6 @@ __STATIC_INLINE uint32_t Cy_Crypto_Core_Vu_RegRead(CRYPTO_Type *base, uint32_t s
 *
 * Returns size of the data pointed in given register,
 * it is lower 12Bit of the 32Bit word
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -211,10 +203,6 @@ __STATIC_INLINE uint16_t Cy_Crypto_Core_Vu_RegSizeRead(CRYPTO_Type *base, uint32
 * Returns size of the data pointed in given register, in Bits.
 * It is lower 12Bit of the 32Bit word
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -233,10 +221,6 @@ __STATIC_INLINE uint16_t Cy_Crypto_Core_Vu_RegBitSizeRead(CRYPTO_Type *base, uin
 *
 * Returns size of the data pointed in given register, in Bytes.
 * It is lower 12Bit of the 32Bit word
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -257,10 +241,6 @@ __STATIC_INLINE uint16_t Cy_Crypto_Core_Vu_RegByteSizeRead(CRYPTO_Type *base, ui
 * Returns size of the data pointed in given register, in words (uint32_t).
 * It is lower 12Bit of the 32Bit word
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -279,10 +259,6 @@ __STATIC_INLINE uint16_t Cy_Crypto_Core_Vu_RegWordSizeRead(CRYPTO_Type *base, ui
 *
 * Returns the data pointer, in 14-bit format of the data pointed in given register,
 * it is upper 16Bit of the 32Bir word. Pointer is in words (uint32_t).
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -303,10 +279,6 @@ __STATIC_INLINE uint16_t Cy_Crypto_Core_Vu_RegDataPtrRead(CRYPTO_Type *base, uin
 *
 * Returns the memory address of the data pointed in given register.
 *
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -324,10 +296,6 @@ __STATIC_INLINE uint32_t * Cy_Crypto_Core_Vu_RegMemPointer(CRYPTO_Type *base, ui
 ****************************************************************************//**
 *
 * Waits until VU instruction will be completed
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -355,10 +323,6 @@ __STATIC_INLINE void Cy_Crypto_Core_Vu_WaitForComplete(CRYPTO_Type *base)
 ****************************************************************************//**
 *
 * Returns value of the VU status register
-*
-* This function available for Server side only.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.

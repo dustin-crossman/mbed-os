@@ -52,8 +52,6 @@ typedef void (*cy_crypto_memxor_func_t)(CRYPTO_Type *base, void* dst,
 * Memory structures should not overlap!
 * There is no alignment restriction.
 *
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -86,8 +84,6 @@ __STATIC_INLINE void Cy_Crypto_Core_MemCpy(CRYPTO_Type *base, void* dst, void co
 * Function MemSet uses Crypto HW.
 * There is no alignment restriction.
 *
-* This function is internal and should not to be called directly by user software
-*
 * \param base
 * The pointer to the CRYPTO instance address.
 *
@@ -119,8 +115,6 @@ __STATIC_INLINE void Cy_Crypto_Core_MemSet(CRYPTO_Type *base, void* dst, uint8_t
 *
 * Function MemCmp uses Crypto HW.
 * There is no alignment restriction.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
@@ -160,8 +154,6 @@ __STATIC_INLINE uint32_t Cy_Crypto_Core_MemCmp(CRYPTO_Type *base, void const *sr
 * Function MemXor uses Crypto HW.
 * Memory structures should not overlap!
 * There is no alignment restriction.
-*
-* This function is internal and should not to be called directly by user software
 *
 * \param base
 * The pointer to the CRYPTO instance address.
