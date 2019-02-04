@@ -25,25 +25,333 @@
 /**
 * \addtogroup group_crypto
 * \{
-*
 * The Crypto driver provides a public API to perform cryptographic and hash
 * operations, as well as generate both true and pseudo random numbers
 * (TRNG, PRNG).
 *
 * It uses a hardware IP block to accelerate operations.
 *
-* The functions and other declarations used in this driver are in cy_crypto.h
-* and cy_crypto_server.h. You can also include cy_pdl.h (ModusToolbox only)
-* to get access to all functions and declarations in the PDL.
+* The functions and other declarations used in this driver are in cy_crypto.h,
+* cy_crypto_core.h, and cy_crypto_server.h. You can also include cy_pdl.h 
+* (ModusToolbox only) to get access to all functions and declarations in the PDL.
 *
 * The driver
 * supports these standards: DES, TDES, AES (128, 192, 256 bits), CMAC-AES, SHA,
 * HMAC, PRNG, TRNG, CRC, and RSA.
 *
-* The \ref group_crypto_definitions section provides more information on
-* cryptographic terms of art, and the particular supported encryption standards.
+* \section group_crypto_definitions Definitions
 *
-* Header files define the API and required data structures.
+* <table class="doxtable">
+*   <tr>
+*     <th>Term</th>
+*     <th>Definition</th>
+*   </tr>
+*
+*   <tr>
+*     <td>Plaintext</td>
+*     <td>An unencrypted message</td>
+*   </tr>
+*
+*   <tr>
+*     <td>Ciphertext</td>
+*     <td>An encrypted message</td>
+*   </tr>
+*
+*   <tr>
+*     <td>Block Cipher</td>
+*     <td>An encryption function for fixed-size blocks of data.
+*     This function takes a fixed-size key and a block of plaintext data from
+*     the message and encrypts it to generate ciphertext. Block ciphers are
+*     reversible. The function performed on a block of encrypted data will
+*     decrypt it.</td>
+*   </tr>
+*
+*   <tr>
+*     <td>Block Cipher Mode</td>
+*     <td>A mode of encrypting a message using block ciphers for messages of
+*     arbitrary length. The message is padded so that its length is an integer
+*     multiple of the block size. ECB (Electronic Code Book), CBC (Cipher Block
+*     Chaining), and CFB (Cipher Feedback) are all modes of using block ciphers
+*     to create an encrypted message of arbitrary length.
+*     </td>
+*   </tr>
+*
+*   <tr>
+*     <td>Data Encryption Standard (DES)</td>
+*     <td>The [DES standard]
+*     (https://csrc.nist.gov/csrc/media/publications/fips/46/3/archive/1999-10-25/documents/fips46-3.pdf)
+*     specifies a symmetric-key algorithm for the encryption of electronic data.
+*     It uses a 56-bit key and a 64-bit message block size.
+*     </td>
+*   </tr>
+*
+*   <tr>
+*     <td>Triple DES (3DES or TDES)</td>
+*     <td>The [TDES standard]
+*     (https://csrc.nist.gov/csrc/media/publications/fips/46/3/archive/1999-10-25/documents/fips46-3.pdf)
+*     specifies a symmetric-key block cipher, which applies the Data Encryption
+*     Standard (DES) cipher algorithm three times to each data block.
+*     It uses three 56-bit keys. The block size is 64-bits.
+*     </td>
+*   </tr>
+*
+*   <tr>
+*     <td>Advanced Encryption Standard (AES)</td>
+*     <td>The [AES standard] (https://nvlpubs.nist.gov/nistpubs/fips/nist.fips.197.pdf)
+*     specifies the Rijndael algorithm, a symmetric block
+*     cipher that can process data blocks of 128 bits, using cipher keys with
+*     lengths of 128, 192, and 256 bits. Rijndael was designed to handle
+*     additional block sizes and key lengths, however they are not adopted in
+*     this standard. AES is also used for message authentication.
+*     </td>
+*   </tr>
+*
+*   <tr>
+*     <td>Secure Hash Algorithm (SHA)</td>
+*     <td>Is a cryptographic hash function.
+*     This function takes a message of the arbitrary length and reduces it to a
+*     fixed-length residue or message digest after performing a series of
+*     mathematically defined operations that practically guarantee that any
+*     change in the message will change the hash value. It is used for message
+*     authentication by transmitting a message with a hash value appended to it
+*     and recalculating the message hash value using the same algorithm at the
+*     recipient's end. If the hashes differ, then the message is corrupted.
+*     For more information see [Secure Hash standard description]
+*     (https://csrc.nist.gov/csrc/media/publications/fips/180/2/archive/2002-08-01/documents/fips180-2.pdf).
+*     </td>
+*   </tr>
+*
+*   <tr>
+*     <td>Message Authentication Code (MAC)</td>
+*     <td>MACs are used to verify that a received message has not been altered.
+*     This is done by first computing a MAC value at the sender's end and
+*     appending it to the transmitted message. When the message is received,
+*     the MAC is computed again and checked against the MAC value transmitted
+*     with the message. If they do not match, the message has been altered.
+*     Either a Hash algorithm (such as SHA) or a block cipher (such as AES) can
+*     be used to produce the MAC value. Keyed MAC schemes use a Secret Key
+*     along with the message, thus the Key value must be known to be able to
+*     compute the MAC value.</td>
+*   </tr>
+*
+*   <tr>
+*     <td>Cipher-based Message Authentication Code (CMAC)</td>
+*     <td>This is a block cipher-based message authentication code algorithm.
+*     It computes the MAC value using the AES block cipher algorithm.</td>
+*     For more information see [Recommendation for Block Cipher Modes of Operation]
+*     (https://nvlpubs.nist.gov/nistpubs/specialpublications/nist.sp.800-38b.pdf).
+*   </tr>
+*
+*   <tr>
+*     <td>Hash Message Authentication Code (HMAC)</td>
+*     <td>Is a specific type of message authentication code (MAC) involving a
+*     cryptographic hash function and a secret cryptographic key.
+*     It computes the MAC value using a Hash algorithm.
+*     For more information see [The Keyed-Hash Message Authentication Code standard]
+*     (https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf)
+*     </td>
+*   </tr>
+*
+*   <tr>
+*     <td>Pseudo Random Number Generator (PRNG)</td>
+*     <td>Is a Linear Feedback Shift Registers-based algorithm for generating a
+*     sequence of numbers starting from a non-zero seed.</td>
+*   </tr>
+*
+*   <tr>
+*     <td>True Random Number Generator (TRNG)</td>
+*     <td>A block that generates a number that is statistically random and based
+*     on some physical random variation. The number cannot be duplicated by
+*     running the process again.</td>
+*   </tr>
+*
+*   <tr>
+*     <td>Symmetric Key Cryptography</td>
+*     <td>Uses a common, known key to encrypt and decrypt messages (a shared
+*     secret between sender and receiver). An efficient method used for
+*     encrypting and decrypting messages after the authenticity of the other
+*     party has been established. DES (now obsolete), 3DES, and AES (currently
+*     used) are well-known symmetric cryptography methods.</td>
+*   </tr>
+*
+*   <tr>
+*     <td>Asymmetric Key Cryptography</td>
+*     <td>Also referred to as Public Key encryption. Someone who wishes to
+*     receive a message, publishes a very large public key (up to 4096 bits
+*     currently), which is one of two prime factors of a very large number. The
+*     other prime factor is the private key of the recipient and a secret.
+*     Someone wishing to send a message to the publisher of the public key
+*     encrypts the message with the public key. This message can now be
+*     decrypted only with the private key (the other prime factor held secret by
+*     the recipient). The message is now sent over any channel to the recipient
+*     who can decrypt it with the private, secret, key. The same process is used
+*     to send messages to the sender of the original message. The asymmetric
+*     cryptography relies on the mathematical impracticality (usually related to
+*     the processing power available at any given time) of factoring the keys.
+*     Common, computationally intensive, asymmetric algorithms are RSA and ECC.
+*     The public key is described by the pair (n, e) where n is a product of two
+*     randomly chosen primes p and q. The exponent e is a random integer
+*     1 < e < Q where Q = (p-1) (q-1). The private key d is uniquely defined
+*     by the integer 1 < d < Q such that ed congruent to 1 (mod Q ).
+*     </td>
+*   </tr>
+* </table>
+*
+* \section group_crypto_more_information More Information
+*
+* RSASSA-PKCS1-v1_5 described here, page 31:
+* http://www.emc.com/collateral/white-papers/h11300-pkcs-1v2-2-rsa-cryptography-standard-wp.pdf
+*
+* See the Cryptographic Function Block chapter of the Technical Reference Manual.
+*
+* \section group_crypto_MISRA MISRA-C Compliance
+* This driver does not contains any driver-specific MISRA violations.
+*
+* \section group_crypto_changelog Changelog
+* <table class="doxtable">
+*   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td>2.20</td>
+*     <td>
+*         <ul>
+*         <li>Moved from pre-compiled library to Open Source under
+*             Apache 2.0 license.</li>
+*         <li>Added ECP and ECDSA support for NIST P curves:
+*             SECP192R1, SECP224R1, SECP256R1, SECP384R1, SECP521R1.</li>
+*         <li>ECP and ECDSA only supported with direct calls to Crypto APIs,
+*             no client interface functions present.</li>
+*         <li>Added chunk mode for CRC.</li>
+*         <li>Added chunk mode for SHA, chunk size is limited to
+*             SHA block size.</li>
+*         </ul>
+*     </td>
+*     <td>ECC support added.<br>
+*         Integration with mbedOS/mbedTLS, restructured the implementation of
+*         SHA and CRC for the Crypto ALT interface.
+*     </td>
+*   </tr>
+*   <tr>
+*     <td>2.11b</td>
+*     <td>Same as production 2.10; only newly added Elliptic Curve point
+*     multiplication functionality (NIST P256) is pre-production.
+*     Open source under Apache version 2.0 license.</td>
+*     <td></td>
+*   </tr>
+*   <tr>
+*     <td>2.11</td>
+*     <td>Based on pre-production 2.10, except newly added Elliptic Curve point
+*     multiplication functionality (NIST P256).
+*     Does not incorporate production level documentation.
+*     Open source under Apache version 2.0 license.</td>
+*     <td>ECC support.</td>
+*   </tr>
+*   <tr>
+*     <td>2.10b</td>
+*     <td>Same as production 2.10. Open source under Apache version 2.0 license.</td>
+*     <td></td>
+*   </tr>
+*   <tr>
+*     <td rowspan="4">2.10</td>
+*     <td>Flattened the organization of the driver source code into the single
+*         source directory and the single include directory.
+*     </td>
+*     <td>Driver library directory-structure simplification.</td>
+*   </tr>
+*   <tr>
+*     <td>Removed files with the default driver configuration. \n
+*     Added API functions to start different server functionality:
+*         - \ref Cy_Crypto_Server_Start_Base
+*         - \ref Cy_Crypto_Server_Start_Extra
+*         - \ref Cy_Crypto_Server_Start_Full
+*     </td>
+*     <td></td>
+*   </tr>
+*   <tr>
+*     <td>Added register access layer. Use register access macros instead
+*         of direct register access using dereferenced pointers.</td>
+*     <td>Makes register access device-independent, so that the PDL does
+*         not need to be recompiled for each supported part number.</td>
+*   </tr>
+*   <tr>
+*     <td>Added precompiled libraries for the IAR toolchain.</td>
+*     <td>IAR toolchain support in ModusToolbox.</td>
+*   </tr>
+*   <tr>
+*     <td>2.0b</td>
+*     <td>Same as production 2.0. Open source under Apache version 2.0 license.</td>
+*     <td></td>
+*   </tr>
+*   <tr>
+*     <td rowspan="2">2.0</td>
+*     <td>Clarified what parameters must be 4-byte aligned for the functions:
+*         \ref Cy_Crypto_Aes_Cmac_Run, \ref Cy_Crypto_Sha_Run,
+*         \ref Cy_Crypto_Hmac_Run, \ref Cy_Crypto_Str_MemCmp,
+*         \ref Cy_Crypto_Trng_Generate, \ref Cy_Crypto_Des_Run,
+*         \ref Cy_Crypto_Tdes_Run, \ref Cy_Crypto_Rsa_Proc
+*     </td>
+*     <td>Documentation update and clarification</td>
+*   </tr>
+*   <tr>
+*     <td>
+*         Changed crypto IP power control<br>
+*         Enhanced Vector Unit functionality for RSA crypto algorithm<br>
+*         Added support of the single-core devices
+*     </td>
+*     <td>New device support</td>
+*   </tr>
+*   <tr>
+*     <td>1.0</td>
+*     <td>Initial version</td>
+*     <td></td>
+*   </tr>
+* </table>
+*
+* \defgroup group_crypto_cli_srv Client-Server API
+* \{
+*   \defgroup group_crypto_client Client
+*   \{
+*    Client part of the Crypto.
+*     \defgroup group_crypto_macros Macros
+*     \defgroup group_crypto_cli_functions Functions
+*     \defgroup group_crypto_cli_data_structures Data Structures
+*     \defgroup group_crypto_enums Enumerated Types
+*   \}
+*   \defgroup group_crypto_server Server
+*   \{
+*    Server part of the Crypto.
+*     \defgroup group_crypto_srv_functions Functions
+*     \defgroup group_crypto_srv_data_structures Data Structures
+*   \}
+*   \defgroup group_crypto_config_structure Configuration Structure
+*   \{
+*    Crypto initialization configuration.
+*    \note Should be the same for Crypto Server and Crypto Client initializations.
+*   \}
+* \}
+* \defgroup group_crypto_lld_api Low-Level API
+*/
+
+/**
+* \addtogroup group_crypto_cli_srv
+* \{
+*   Use the client-server API to isolate the Crypto hardware from non-secure
+*   application access.
+*
+*   The functions and other declarations used in this part of the driver are in
+*   cy_crypto.h and cy_crypto_server.h. You can also include cy_pdl.h
+*   (ModusToolbox only) to get access to all functions and declarations in the 
+*   PDL.
+*
+*   Firmware initializes and starts the Crypto server. The server can run on any
+*   core and works with the Crypto hardware. The Crypto server is implemented as
+*   a secure block. It performs all cryptographic operations for the client.
+*   Access to the server is through the Inter Process Communication (IPC) driver.
+*   Direct access is not allowed.
+*
+*   The Crypto client can run on any core too. Firmware initializes and starts
+*   the client. The firmware then provides the configuration data required for
+*   the desired cryptographic technique, and requests that the server run the
+*   cryptographic operation.
 *
 * This document contains the following topics:
 *   - \ref group_crypto_architecture
@@ -58,9 +366,7 @@
 *   - \ref group_crypto_more_information
 *
 * \section group_crypto_architecture Architectural model
-* The Crypto driver uses a client-server architecture.
-*
-* The Crypto driver uses:
+* The client-server implementation uses:
 *   - one IPC channel for data exchange between client and server applications;
 *   - three interrupts: an IPC notify interrupt, an IPC release interrupt, and
 *     an interrupt for error handling.
@@ -432,333 +738,8 @@
 *
 * Your ISR must call \ref Cy_Crypto_Server_ErrorHandler, and can perform any
 * additional tasks required by your application logic.
-*
-* \section group_crypto_definitions Definitions
-*
-* <table class="doxtable">
-*   <tr>
-*     <th>Term</th>
-*     <th>Definition</th>
-*   </tr>
-*
-*   <tr>
-*     <td>Plaintext</td>
-*     <td>An unencrypted message</td>
-*   </tr>
-*
-*   <tr>
-*     <td>Ciphertext</td>
-*     <td>An encrypted message</td>
-*   </tr>
-*
-*   <tr>
-*     <td>Block Cipher</td>
-*     <td>An encryption function for fixed-size blocks of data.
-*     This function takes a fixed-size key and a block of plaintext data from
-*     the message and encrypts it to generate ciphertext. Block ciphers are
-*     reversible. The function performed on a block of encrypted data will
-*     decrypt it.</td>
-*   </tr>
-*
-*   <tr>
-*     <td>Block Cipher Mode</td>
-*     <td>A mode of encrypting a message using block ciphers for messages of
-*     arbitrary length. The message is padded so that its length is an integer
-*     multiple of the block size. ECB (Electronic Code Book), CBC (Cipher Block
-*     Chaining), and CFB (Cipher Feedback) are all modes of using block ciphers
-*     to create an encrypted message of arbitrary length.
-*     </td>
-*   </tr>
-*
-*   <tr>
-*     <td>Data Encryption Standard (DES)</td>
-*     <td>The [DES standard]
-*     (https://csrc.nist.gov/csrc/media/publications/fips/46/3/archive/1999-10-25/documents/fips46-3.pdf)
-*     specifies a symmetric-key algorithm for the encryption of electronic data.
-*     It uses a 56-bit key and a 64-bit message block size.
-*     </td>
-*   </tr>
-*
-*   <tr>
-*     <td>Triple DES (3DES or TDES)</td>
-*     <td>The [TDES standard]
-*     (https://csrc.nist.gov/csrc/media/publications/fips/46/3/archive/1999-10-25/documents/fips46-3.pdf)
-*     specifies a symmetric-key block cipher, which applies the Data Encryption
-*     Standard (DES) cipher algorithm three times to each data block.
-*     It uses three 56-bit keys. The block size is 64-bits.
-*     </td>
-*   </tr>
-*
-*   <tr>
-*     <td>Advanced Encryption Standard (AES)</td>
-*     <td>The [AES standard] (https://nvlpubs.nist.gov/nistpubs/fips/nist.fips.197.pdf)
-*     specifies the Rijndael algorithm, a symmetric block
-*     cipher that can process data blocks of 128 bits, using cipher keys with
-*     lengths of 128, 192, and 256 bits. Rijndael was designed to handle
-*     additional block sizes and key lengths, however they are not adopted in
-*     this standard. AES is also used for message authentication.
-*     </td>
-*   </tr>
-*
-*   <tr>
-*     <td>Secure Hash Algorithm (SHA)</td>
-*     <td>Is a cryptographic hash function.
-*     This function takes a message of the arbitrary length and reduces it to a
-*     fixed-length residue or message digest after performing a series of
-*     mathematically defined operations that practically guarantee that any
-*     change in the message will change the hash value. It is used for message
-*     authentication by transmitting a message with a hash value appended to it
-*     and recalculating the message hash value using the same algorithm at the
-*     recipient's end. If the hashes differ, then the message is corrupted.
-*     For more information see [Secure Hash standard description]
-*     (https://csrc.nist.gov/csrc/media/publications/fips/180/2/archive/2002-08-01/documents/fips180-2.pdf).
-*     </td>
-*   </tr>
-*
-*   <tr>
-*     <td>Message Authentication Code (MAC)</td>
-*     <td>MACs are used to verify that a received message has not been altered.
-*     This is done by first computing a MAC value at the sender's end and
-*     appending it to the transmitted message. When the message is received,
-*     the MAC is computed again and checked against the MAC value transmitted
-*     with the message. If they do not match, the message has been altered.
-*     Either a Hash algorithm (such as SHA) or a block cipher (such as AES) can
-*     be used to produce the MAC value. Keyed MAC schemes use a Secret Key
-*     along with the message, thus the Key value must be known to be able to
-*     compute the MAC value.</td>
-*   </tr>
-*
-*   <tr>
-*     <td>Cipher-based Message Authentication Code (CMAC)</td>
-*     <td>This is a block cipher-based message authentication code algorithm.
-*     It computes the MAC value using the AES block cipher algorithm.</td>
-*     For more information see [Recommendation for Block Cipher Modes of Operation]
-*     (https://nvlpubs.nist.gov/nistpubs/specialpublications/nist.sp.800-38b.pdf).
-*   </tr>
-*
-*   <tr>
-*     <td>Hash Message Authentication Code (HMAC)</td>
-*     <td>Is a specific type of message authentication code (MAC) involving a
-*     cryptographic hash function and a secret cryptographic key.
-*     It computes the MAC value using a Hash algorithm.
-*     For more information see [The Keyed-Hash Message Authentication Code standard]
-*     (https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf)
-*     </td>
-*   </tr>
-*
-*   <tr>
-*     <td>Pseudo Random Number Generator (PRNG)</td>
-*     <td>Is a Linear Feedback Shift Registers-based algorithm for generating a
-*     sequence of numbers starting from a non-zero seed.</td>
-*   </tr>
-*
-*   <tr>
-*     <td>True Random Number Generator (TRNG)</td>
-*     <td>A block that generates a number that is statistically random and based
-*     on some physical random variation. The number cannot be duplicated by
-*     running the process again.</td>
-*   </tr>
-*
-*   <tr>
-*     <td>Symmetric Key Cryptography</td>
-*     <td>Uses a common, known key to encrypt and decrypt messages (a shared
-*     secret between sender and receiver). An efficient method used for
-*     encrypting and decrypting messages after the authenticity of the other
-*     party has been established. DES (now obsolete), 3DES, and AES (currently
-*     used) are well-known symmetric cryptography methods.</td>
-*   </tr>
-*
-*   <tr>
-*     <td>Asymmetric Key Cryptography</td>
-*     <td>Also referred to as Public Key encryption. Someone who wishes to
-*     receive a message, publishes a very large public key (up to 4096 bits
-*     currently), which is one of two prime factors of a very large number. The
-*     other prime factor is the private key of the recipient and a secret.
-*     Someone wishing to send a message to the publisher of the public key
-*     encrypts the message with the public key. This message can now be
-*     decrypted only with the private key (the other prime factor held secret by
-*     the recipient). The message is now sent over any channel to the recipient
-*     who can decrypt it with the private, secret, key. The same process is used
-*     to send messages to the sender of the original message. The asymmetric
-*     cryptography relies on the mathematical impracticality (usually related to
-*     the processing power available at any given time) of factoring the keys.
-*     Common, computationally intensive, asymmetric algorithms are RSA and ECC.
-*     The public key is described by the pair (n, e) where n is a product of two
-*     randomly chosen primes p and q. The exponent e is a random integer
-*     1 < e < Q where Q = (p-1) (q-1). The private key d is uniquely defined
-*     by the integer 1 < d < Q such that ed congruent to 1 (mod Q ).
-*     </td>
-*   </tr>
-* </table>
-*
-* \section group_crypto_more_information More Information
-*
-* RSASSA-PKCS1-v1_5 described here, page 31:
-* http://www.emc.com/collateral/white-papers/h11300-pkcs-1v2-2-rsa-cryptography-standard-wp.pdf
-*
-* See the Cryptographic Function Block chapter of the Technical Reference Manual.
-*
-* \section group_crypto_MISRA MISRA-C Compliance
-* This driver does not contains any driver-specific MISRA violations.
-*
-* \section group_crypto_changelog Changelog
-* <table class="doxtable">
-*   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
-*   <tr>
-*     <td>2.20</td>
-*     <td>
-*         <ul>
-*         <li>Moved from pre-compiled library to Open Source under
-*             Apache 2.0 license.</li>
-*         <li>Added ECP and ECDSA support for NIST P curves:
-*             SECP192R1, SECP224R1, SECP256R1, SECP384R1, SECP521R1.</li>
-*         <li>ECP and ECDSA only supported with direct calls to Crypto APIs,
-*             no client interface functions present.</li>
-*         <li>Added chunk mode for CRC.</li>
-*         <li>Added chunk mode for SHA, chunk size is limited to
-*             SHA block size.</li>
-*         </ul>
-*     </td>
-*     <td>ECC support added.<br>
-*         Integration with mbedOS/mbedTLS, restructured the implementation of
-*         SHA and CRC for the Crypto ALT interface.
-*     </td>
-*   </tr>
-*   <tr>
-*     <td>2.11b</td>
-*     <td>Same as production 2.10; only newly added Elliptic Curve point
-*     multiplication functionality (NIST P256) is pre-production.
-*     Open source under Apache version 2.0 license.</td>
-*     <td></td>
-*   </tr>
-*   <tr>
-*     <td>2.11</td>
-*     <td>Based on pre-production 2.10, except newly added Elliptic Curve point
-*     multiplication functionality (NIST P256).
-*     Does not incorporate production level documentation.
-*     Open source under Apache version 2.0 license.</td>
-*     <td>ECC support.</td>
-*   </tr>
-*   <tr>
-*     <td>2.10b</td>
-*     <td>Same as production 2.10. Open source under Apache version 2.0 license.</td>
-*     <td></td>
-*   </tr>
-*   <tr>
-*     <td rowspan="4">2.10</td>
-*     <td>Flattened the organization of the driver source code into the single
-*         source directory and the single include directory.
-*     </td>
-*     <td>Driver library directory-structure simplification.</td>
-*   </tr>
-*   <tr>
-*     <td>Removed files with the default driver configuration. \n
-*     Added API functions to start different server functionality:
-*         - \ref Cy_Crypto_Server_Start_Base
-*         - \ref Cy_Crypto_Server_Start_Extra
-*         - \ref Cy_Crypto_Server_Start_Full
-*     </td>
-*     <td></td>
-*   </tr>
-*   <tr>
-*     <td>Added register access layer. Use register access macros instead
-*         of direct register access using dereferenced pointers.</td>
-*     <td>Makes register access device-independent, so that the PDL does
-*         not need to be recompiled for each supported part number.</td>
-*   </tr>
-*   <tr>
-*     <td>Added precompiled libraries for the IAR toolchain.</td>
-*     <td>IAR toolchain support in ModusToolbox.</td>
-*   </tr>
-*   <tr>
-*     <td>2.0b</td>
-*     <td>Same as production 2.0. Open source under Apache version 2.0 license.</td>
-*     <td></td>
-*   </tr>
-*   <tr>
-*     <td rowspan="2">2.0</td>
-*     <td>Clarified what parameters must be 4-byte aligned for the functions:
-*         \ref Cy_Crypto_Aes_Cmac_Run, \ref Cy_Crypto_Sha_Run,
-*         \ref Cy_Crypto_Hmac_Run, \ref Cy_Crypto_Str_MemCmp,
-*         \ref Cy_Crypto_Trng_Generate, \ref Cy_Crypto_Des_Run,
-*         \ref Cy_Crypto_Tdes_Run, \ref Cy_Crypto_Rsa_Proc
-*     </td>
-*     <td>Documentation update and clarification</td>
-*   </tr>
-*   <tr>
-*     <td>
-*         Changed crypto IP power control<br>
-*         Enhanced Vector Unit functionality for RSA crypto algorithm<br>
-*         Added support of the single-core devices
-*     </td>
-*     <td>New device support</td>
-*   </tr>
-*   <tr>
-*     <td>1.0</td>
-*     <td>Initial version</td>
-*     <td></td>
-*   </tr>
-* </table>
-*
-*
-* \defgroup group_crypto_client Crypto Client
-* \{
-*   The Crypto driver uses a client-server architecture. This is the client part
-*   of the Crypto.
-*
-*   The functions and other declarations used in this part of the driver are in
-*   cy_crypto.h. You can also include cy_pdl.h  (ModusToolbox only) to get
-*   access to all functions and declarations in the PDL.
-*
-*   Firmware initializes and starts the Crypto server. The server can run on any
-*   core and works with the Crypto hardware. The Crypto server is implemented as
-*   a secure block. It performs all cryptographic operations for the client.
-*   Access to the server is through the Inter Process Communication (IPC) driver.
-*   Direct access is not allowed.
-*
-*   The Crypto client can run on any core too. Firmware initializes and starts
-*   the client. The firmware then provides the configuration data required for
-*   the desired cryptographic technique, and requests that the server run the
-*   cryptographic operation.
-*
-*   \defgroup group_crypto_macros Macros
-*   \defgroup group_crypto_cli_functions Functions
-*   \defgroup group_crypto_cli_data_structures Data Structures
-*   \defgroup group_crypto_enums Enumerated Types
-* \}
-*
-* \defgroup group_crypto_server Crypto Server
-* \{
-*   The Crypto driver uses a client-server architecture. This is the server part
-*   of the Crypto.
-*
-*   The functions and other declarations used in this part of the driver are in
-*   cy_crypto_server.h. You can also include cy_pdl.h (ModusToolbox only) to get
-*   access to all functions and declarations in the PDL.
-*
-*   Firmware initializes and starts the Crypto server. The server can run on any
-*   core and works with the Crypto hardware. The Crypto server is implemented as
-*   a secure block. It performs all cryptographic operations for the client.
-*   Access to the server is through the Inter Process Communication (IPC) driver.
-*   Direct access is not allowed.
-*
-*   The Crypto client can run on any core too. Firmware initializes and starts
-*   the client. The firmware then provides the configuration data required for
-*   the desired cryptographic technique, and requests that the server run the
-*   cryptographic operation.
-*
-*   \defgroup group_crypto_srv_functions Functions
-*   \defgroup group_crypto_srv_data_structures Data Structures
-* \}
-*
-* \defgroup group_crypto_config_structure Crypto Configuration Structure
-* \{
-*    Crypto initialization configuration.
-*    \note Should be the same for Crypto Server and Crypto Client initializations.
-* \}
-*
 */
-
+/** \} group_crypto_cli_srv */
 
 #if !defined(CY_CRYPTO_H)
 #define CY_CRYPTO_H
@@ -1871,7 +1852,6 @@ cy_en_crypto_status_t Cy_Crypto_Rsa_Verify(cy_en_crypto_rsa_ver_result_t *verRes
 *
 *******************************************************************************/
 void Cy_Crypto_Rsa_InvertEndianness(void *inArrPtr, uint32_t byteSize);
-
 
 /** \} group_crypto_cli_functions */
 

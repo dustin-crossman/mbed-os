@@ -23,6 +23,24 @@
 * limitations under the License.
 *******************************************************************************/
 
+/**
+* \addtogroup group_crypto_lld_api
+* \{
+*   Use the low-level API for direct access to the Crypto hardware.
+*
+*   The functions and other declarations used in this part of the driver are in
+*   cy_crypto_core.h. You can also include cy_pdl.h  (ModusToolbox only) to get
+*   access to all functions and declarations in the PDL.
+*
+*   Firmware initializes and starts the Crypto operations. The firmware then
+*   provides the configuration data required for the desired cryptographic
+*   technique.
+*
+*   \defgroup group_crypto_llc_macros Macros
+*   \defgroup group_crypto_llc_functions Functions
+*   \defgroup group_crypto_llc_data_structures Data Structures
+*   \defgroup group_crypto_llc_enums Enumerated Types
+* \} */
 
 #if !defined(CY_CRYPTO_CORE_H)
 #define CY_CRYPTO_CORE_H
