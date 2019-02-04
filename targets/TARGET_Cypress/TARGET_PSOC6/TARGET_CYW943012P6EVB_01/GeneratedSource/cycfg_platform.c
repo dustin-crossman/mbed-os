@@ -104,7 +104,7 @@ __STATIC_INLINE void Cy_SysClk_ClkAltSysTickInit()
 }
 __STATIC_INLINE void Cy_SysClk_ClkBakInit()
 {
-    Cy_SysClk_ClkBakSetSource(CY_SYSCLK_BAK_IN_WCO);
+    Cy_SysClk_ClkBakSetSource(CY_SYSCLK_BAK_IN_CLKLF);
 }
 __STATIC_INLINE void Cy_SysClk_EcoInit()
 {
