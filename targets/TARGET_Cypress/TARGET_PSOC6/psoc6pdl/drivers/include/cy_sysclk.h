@@ -62,8 +62,8 @@
 * resources that support those functions. Consult the device TRM before
 * attempting to use these functions.
 *
-* LPActive and LPSleep power modes limit the maximum clock frequency allowed
-* on the device. Refer to the SysPm driver and the TRM for details.
+* PSoC 6 power modes limit the maximum clock frequency.
+* Refer to the SysPm driver and the TRM for details.
 *
 * \section group_sysclk_more_information More Information
 * Refer to the technical reference manual (TRM) and the device datasheet.
@@ -109,9 +109,11 @@
 *     <td>Math library dependency is removed, the floating-point math is replaced with integer math.</td>
 *   </tr>
 *   <tr>
-*     <td>Updated the following functions implementation: \ref Cy_SysClk_EcoEnable, \ref Cy_SysClk_EcoGetStatus<br>
-          \ref Cy_SysClk_FllGetConfiguration and \ref Cy_SysClk_DeepSleepCallback.</td>
-*     <td>Minor defect fixing.</td>
+*     <td>Updated the following functions implementation: \ref Cy_SysClk_EcoEnable, \ref Cy_SysClk_EcoGetStatus, \ref Cy_SysClk_FllGetConfiguration \n
+*         and \ref Cy_SysClk_DeepSleepCallback. \n
+*         The \ref Cy_SysClk_DeepSleepCallback now implements all four SysPm callback modes \ref cy_en_syspm_callback_mode_t. \n
+*         So the \ref cy_stc_syspm_callback_t::skipMode must be set to 0UL.</td>
+*     <td>Defect fixing.</td>
 *   </tr>
 *   <tr>
 *     <td rowspan="4">1.20</td>
@@ -211,7 +213,7 @@
 *   Clock paths are a series of multiplexers that allow a source clock
 *   to drive multiple clocking resources down the chain. These paths are
 *   used for active domain clocks that are not operational during chip 
-*   deep-sleep, hibernate and off modes. Illustrated below is a diagram
+*   Deep Sleep, hibernate and off modes. Illustrated below is a diagram
 *   of the clock paths for the PSoC 63 series, showing the first three
 *   clock paths. The source clocks for these paths are highlighted in
 *   the red box.
@@ -370,7 +372,7 @@
 *   Entering and exiting low power modes require compatible clock configurations
 *   to be set before entering low power and restored upon wake-up and exit. The
 *   SysClk driver provides a Cy_SysClk_DeepSleepCallback() function to support
-*   deep-sleep mode entry. 
+*   Deep Sleep mode entry.
 *
 *   This function can be called either by itself before initiating low-power mode
 *   entry or it can be used in conjunction with the SysPm driver as a registered 
@@ -682,8 +684,8 @@ __STATIC_INLINE void Cy_SysClk_EcoDisable(void)
 * Reports the current status of the external crystal oscillator (ECO).
 *
 * \return
-* CY_SYSCLK_ECOSTAT_AMPLITUDE = ECO does not have sufficient amplitude<br>
-* CY_SYSCLK_ECOSTAT_INACCURATE = ECO has sufficient amplitude but may not be meeting accuracy and duty cycle specifications<br>
+* CY_SYSCLK_ECOSTAT_AMPLITUDE = ECO does not have sufficient amplitude \n
+* CY_SYSCLK_ECOSTAT_INACCURATE = ECO has sufficient amplitude but may not be meeting accuracy and duty cycle specifications \n
 * CY_SYSCLK_ECOSTAT_STABLE = ECO has fully stabilized
 *
 * \funcusage
@@ -812,7 +814,7 @@ __STATIC_INLINE cy_en_sysclk_status_t Cy_SysClk_FllDisable(void);
 * Intended to be used with \ref Cy_SysClk_FllEnable with zero timeout.
 *
 * \return 
-* false = not locked<br>
+* false = not locked \n
 * true = locked
 *
 * \note
@@ -909,7 +911,7 @@ __STATIC_INLINE cy_en_sysclk_status_t Cy_SysClk_PllDisable(uint32_t clkPath);
 * \param clkPath Selects which PLL to check. 1 is the first PLL; 0 is invalid.
 *
 * \return 
-* false = not locked<br>
+* false = not locked \n
 * true = locked
 *
 * \funcusage
@@ -933,7 +935,7 @@ __STATIC_INLINE bool Cy_SysClk_PllLocked(uint32_t clkPath)
 * \param clkPath Selects which PLL to check. 1 is the first PLL; 0 is invalid.
 *
 * \return 
-* false = did not lose lock<br>
+* false = did not lose lock \n
 * true = lost lock
 *
 * \funcusage
@@ -958,8 +960,8 @@ __STATIC_INLINE bool Cy_SysClk_PllLostLock(uint32_t clkPath)
 *
 * \param clkPath Selects which PLL to disable. 1 is the first PLL; 0 is invalid.
 *
-* \return Error / status code:<br>
-* CY_SYSCLK_SUCCESS - PLL successfully disabled<br>
+* \return Error / status code: \n
+* CY_SYSCLK_SUCCESS - PLL successfully disabled \n
 * CY_SYSCLK_BAD_PARAM - invalid clock path number
 *
 * \note 
@@ -1031,8 +1033,8 @@ __STATIC_INLINE void Cy_SysClk_IloEnable(void)
 *
 * Disables the ILO. ILO can't be disabled if WDT is enabled.
 *
-* \return Error / status code:<br>
-* CY_SYSCLK_SUCCESS - ILO successfully disabled<br>
+* \return Error / status code: \n
+* CY_SYSCLK_SUCCESS - ILO successfully disabled \n
 * CY_SYSCLK_INVALID_STATE - Cannot disable the ILO if the WDT is enabled.
 *
 * \note The watchdog timer (WDT) must be unlocked before calling this function.
@@ -1062,7 +1064,7 @@ __STATIC_INLINE cy_en_sysclk_status_t Cy_SysClk_IloDisable(void)
 * brown-out detect (BOD) event.
 *
 * \param on
-* true = ILO stays on during hibernate or across XRES/BOD.<br> 
+* true = ILO stays on during hibernate or across XRES/BOD. \n 
 * false = ILO turns off for hibernate or XRES/BOD.
 *
 * \note Writes to the register/bit are ignored if the watchdog (WDT) is locked.
@@ -1240,8 +1242,8 @@ uint32_t Cy_SysClk_ClkMeasurementCountersGetFreq(bool measuredClock, uint32_t re
 * Checks if clock measurement counting is done, that is, counter1 has counted down
 * to zero. Call \ref Cy_SysClk_StartClkMeasurementCounters() before calling this function.
 *
-* \return Status of calibration counters:<br>
-* true = done<br>
+* \return Status of calibration counters: \n
+* true = done \n
 * false = not done
 *
 * \funcusage
@@ -1365,8 +1367,8 @@ __STATIC_INLINE void Cy_SysClk_WcoBypass(cy_en_wco_bypass_modes_t bypass);
 * If WCO is not ready, WCO is stopped. To avoid waiting for WCO ready set this to 0,
 * and manually check if WCO is okay using \ref Cy_SysClk_WcoOkay.
 *
-* \return Error / status code:<br>
-* CY_SYSCLK_SUCCESS - WCO successfully enabled<br>
+* \return Error / status code: \n
+* CY_SYSCLK_SUCCESS - WCO successfully enabled \n
 * CY_SYSCLK_TIMEOUT - Timeout waiting for WCO to stabilize
 *
 * \funcusage
@@ -1401,7 +1403,7 @@ __STATIC_INLINE cy_en_sysclk_status_t Cy_SysClk_WcoEnable(uint32_t timeoutus)
 * Reports the status of the WCO_OK bit.
 *
 * \return 
-* true = okay<br>
+* true = okay \n
 * false = not okay
 *
 * \funcusage
@@ -2253,8 +2255,8 @@ __STATIC_INLINE cy_en_sysclk_status_t
 *
 * \param dividerNum specifies which divider of the selected type to configure.
 *
-* \return The enabled/disabled state;<br>
-* false = disabled<br>
+* \return The enabled/disabled state; \n
+* false = disabled \n
 * true = enabled
 *
 * \funcusage
