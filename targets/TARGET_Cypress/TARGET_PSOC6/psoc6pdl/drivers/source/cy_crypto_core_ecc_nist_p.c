@@ -76,8 +76,8 @@ const uint8_t P384_ShMul_COEFF[] = {
 * Collection of multiplication reduction algorithms
 * Method 1 (Crypto_EC_CS_MUL_Red_Pxxx): curve specific 
 *          reduction as proposed by NIST
-* Method 2 (Crypto_EC_SM_MUL_Red_Pxxx): curve specific r
-*          eduction based on Mersenne prime reduction approach
+* Method 2 (Crypto_EC_SM_MUL_Red_Pxxx): curve specific
+*          reduction based on Mersenne prime reduction approach
 * Method 3: generic Barrett reduction
 ***************************************************************/
 

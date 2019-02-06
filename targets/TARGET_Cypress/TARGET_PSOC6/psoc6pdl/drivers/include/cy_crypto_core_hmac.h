@@ -44,6 +44,11 @@ typedef cy_en_crypto_status_t (*cy_crypto_hmac_func_t)(CRYPTO_Type *base,
                                           uint32_t keyLength,
                                           cy_en_crypto_sha_mode_t mode);
 
+/**
+* \addtogroup group_crypto_lld_mac_functions
+* \{
+*/
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Hmac
 ****************************************************************************//**
@@ -96,6 +101,8 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Hmac(CRYPTO_Type *base,
 
     return myResult;
 }
+
+/** \} group_crypto_lld_mac_functions */
 
 #endif /* #if (CPUSS_CRYPTO_SHA == 1) */
 

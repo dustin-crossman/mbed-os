@@ -42,6 +42,11 @@ typedef cy_en_crypto_status_t (*cy_crypto_sha_func_t)(CRYPTO_Type *base,
                                          uint8_t *digest,
                                          cy_en_crypto_sha_mode_t mode);
 
+/**
+* \addtogroup group_crypto_lld_sha_functions
+* \{
+*/
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Sha
 ****************************************************************************//**
@@ -276,6 +281,7 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Free(CRYPTO_Type *base,
     return myResult;
 }
 
+/** \} group_crypto_lld_sha_functions */
 
 #endif /* #if (CPUSS_CRYPTO_SHA == 1) */
 

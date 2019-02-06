@@ -41,6 +41,11 @@
 #define CY_CRYPTO_VU_DATA_FLD_MASK    (0x00003fffuL)
 #define CY_CRYPTO_VU_DATA_FLD_POS     (16u)
 
+/**
+* \addtogroup group_crypto_lld_vu_functions
+* \{
+*/
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Cleanup
 ****************************************************************************//**
@@ -335,6 +340,7 @@ __STATIC_INLINE uint16_t Cy_Crypto_Core_Vu_StatusRead(CRYPTO_Type *base)
     return((uint16_t)REG_CRYPTO_VU_STATUS(base));
 }
 
+/** \} group_crypto_lld_vu_functions */
 
 #endif /* #if (CPUSS_CRYPTO_VU == 1) */
 

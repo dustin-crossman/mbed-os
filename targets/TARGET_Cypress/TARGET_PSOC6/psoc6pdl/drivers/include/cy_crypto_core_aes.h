@@ -72,6 +72,10 @@ typedef cy_en_crypto_status_t (*cy_crypto_aes_ctr_func_t)(CRYPTO_Type *base,
                                                 uint8_t const *src,
                                                 cy_stc_crypto_aes_state_t *aesState);
 
+/**
+* \addtogroup group_crypto_lld_symmetric_functions
+* \{
+*/
 
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Aes_Init
@@ -216,7 +220,7 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Cbc(CRYPTO_Type *base,
 
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Aes_Cfb
-********************************************************************************
+****************************************************************************//**
 *
 * Performs AES operation on a plain text with the Cipher Feedback Block method (CFB).
 *
@@ -270,7 +274,7 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Cfb(CRYPTO_Type *base,
 
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Aes_Ctr
-********************************************************************************
+****************************************************************************//**
 *
 * Performs AES operation on a plain text using the counter method (CTR).
 *
@@ -325,6 +329,8 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Ctr(CRYPTO_Type *base,
 
     return myResult;
 }
+
+/** \} group_crypto_lld_symmetric_functions */
 
 #endif /* #if (CPUSS_CRYPTO_AES == 1) */
 

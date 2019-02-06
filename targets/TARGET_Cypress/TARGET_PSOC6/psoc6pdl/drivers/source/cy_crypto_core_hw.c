@@ -104,6 +104,12 @@ const cy_stc_cryptoIP_t cy_cryptoIpBlockCfgPSoC6_02 =
 #define CY_CRYPTO_PWR_MODE_RETAINED          (2UL)
 #define CY_CRYPTO_PWR_MODE_ENABLED           (3UL)
 
+
+/**
+* \addtogroup group_crypto_lld_hw_functions
+* \{
+*/
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_ClearVuRegisters
 ****************************************************************************//**
@@ -322,6 +328,7 @@ void Cy_Crypto_Core_InvertEndianness(void *inArrPtr, uint32_t byteSize)
     }
 }
 
+/** \} group_crypto_lld_hw_functions */
 
 #endif /* CY_IP_MXCRYPTO */
 

@@ -44,6 +44,11 @@ typedef uint32_t (*cy_crypto_memcmp_func_t)(CRYPTO_Type *base,
 typedef void (*cy_crypto_memxor_func_t)(CRYPTO_Type *base, void* dst,
                                void const *src0, void const *src1, uint16_t size);
 
+/**
+* \addtogroup group_crypto_lld_mem_functions
+* \{
+*/
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_MemCpy
 ****************************************************************************//**
@@ -184,6 +189,7 @@ __STATIC_INLINE void Cy_Crypto_Core_MemXor(CRYPTO_Type *base, void* dst,
     }
 }
 
+/** \} group_crypto_lld_mem_functions */
 
 #endif /* CY_IP_MXCRYPTO */
 

@@ -45,6 +45,11 @@ typedef cy_en_crypto_status_t (*cy_crypto_prng_func_t)(CRYPTO_Type *base,
                                              uint32_t max,
                                              uint32_t *randomNum);
 
+/**
+* \addtogroup group_crypto_lld_rng_functions
+* \{
+*/
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Prng_Init
 ****************************************************************************//**
@@ -123,6 +128,8 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Prng(CRYPTO_Type *base,
 
     return myResult;
 }
+
+/** \} group_crypto_lld_rng_functions */
 
 #endif /* #if (CPUSS_CRYPTO_PR == 1) */
 

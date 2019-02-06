@@ -49,6 +49,11 @@ typedef cy_en_crypto_status_t (*cy_crypto_crc_func_t)(CRYPTO_Type *base,
                                         uint32_t  dataSize,
                                         uint32_t  lfsrInitState);
 
+/**
+* \addtogroup group_crypto_lld_crc_functions
+* \{
+*/
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Crc_Init
 ****************************************************************************//**
@@ -351,6 +356,8 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_Calc(CRYPTO_Type *base,
 
     return myResult;
 }
+
+/** \} group_crypto_lld_crc_functions */
 
 #endif /* #if (CPUSS_CRYPTO_CRC == 1) */
 

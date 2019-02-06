@@ -306,7 +306,7 @@
 *   </tr>
 * </table>
 *
-* \defgroup group_crypto_cli_srv Client-Server API
+* \defgroup group_crypto_cli_srv Client-Server Functions
 * \{
 *   \defgroup group_crypto_client Client
 *   \{
@@ -314,7 +314,6 @@
 *     \defgroup group_crypto_macros Macros
 *     \defgroup group_crypto_cli_functions Functions
 *     \defgroup group_crypto_cli_data_structures Data Structures
-*     \defgroup group_crypto_enums Enumerated Types
 *   \}
 *   \defgroup group_crypto_server Server
 *   \{
@@ -328,7 +327,8 @@
 *    \note Should be the same for Crypto Server and Crypto Client initializations.
 *   \}
 * \}
-* \defgroup group_crypto_lld_api Low-Level API
+* \defgroup group_crypto_lld_api Low-Level Functions
+* \defgroup group_crypto_enums General Enumerated Types
 */
 
 /**

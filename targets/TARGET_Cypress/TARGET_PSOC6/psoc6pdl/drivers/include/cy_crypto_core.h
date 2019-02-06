@@ -36,10 +36,43 @@
 *   provides the configuration data required for the desired cryptographic
 *   technique.
 *
-*   \defgroup group_crypto_llc_macros Macros
-*   \defgroup group_crypto_llc_functions Functions
-*   \defgroup group_crypto_llc_data_structures Data Structures
-*   \defgroup group_crypto_llc_enums Enumerated Types
+*   \defgroup group_crypto_lld_symmetric Symmetric Key Functions (AES, DES, TDES)
+*   \{
+*     \defgroup group_crypto_lld_symmetric_functions Functions
+*   \}
+*   \defgroup group_crypto_lld_asymmetric Asymmetric Key Functions (RSA, ECP, ECDSA)
+*   \{
+*     \defgroup group_crypto_lld_rsa_functions RSA Functions
+*     \defgroup group_crypto_lld_ecc_functions Elliptic Curve Functions
+*   \}
+*   \defgroup group_crypto_lld_sha Hash Functions (SHA)
+*   \{
+*     \defgroup group_crypto_lld_sha_functions Functions
+*   \}
+*   \defgroup group_crypto_lld_mac Message Authentication Code Functions (CMAC, HMAC)
+*   \{
+*     \defgroup group_crypto_lld_mac_functions Functions
+*   \}
+*   \defgroup group_crypto_lld_crc Cyclic Redundancy Code Functions (CRC)
+*   \{
+*     \defgroup group_crypto_lld_crc_functions Functions
+*   \}
+*   \defgroup group_crypto_lld_rng Random Number Generation Functions (TRNG, PRNG)
+*   \{
+*     \defgroup group_crypto_lld_rng_functions Functions
+*   \}
+*   \defgroup group_crypto_lld_vu Vector Unit (VU) Functions
+*   \{
+*     \defgroup group_crypto_lld_vu_functions Functions
+*   \}
+*   \defgroup group_crypto_lld_mem Memory Streaming Functions
+*   \{
+*     \defgroup group_crypto_lld_mem_functions Functions
+*   \}
+*   \defgroup group_crypto_lld_hw Miscellaneous Hardware Functions
+*   \{
+*     \defgroup group_crypto_lld_hw_functions Functions
+*   \}
 * \} */
 
 #if !defined(CY_CRYPTO_CORE_H)

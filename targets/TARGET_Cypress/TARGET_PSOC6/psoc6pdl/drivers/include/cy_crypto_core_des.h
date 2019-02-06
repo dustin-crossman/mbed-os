@@ -42,6 +42,11 @@ typedef cy_en_crypto_status_t (*cy_crypto_des_func_t)(CRYPTO_Type *base,
                                         uint8_t *dst,
                                         uint8_t const *src);
 
+/**
+* \addtogroup group_crypto_lld_symmetric_functions
+* \{
+*/
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Des
 ****************************************************************************//**
@@ -137,6 +142,8 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Tdes(CRYPTO_Type *base,
 
     return myResult;
 }
+
+/** \} group_crypto_lld_symmetric_functions */
 
 #endif /* #if (CPUSS_CRYPTO_DES == 1) */
 

@@ -47,6 +47,11 @@ typedef cy_en_crypto_status_t (*cy_crypto_cmac_func_t)(CRYPTO_Type *base,
                                           cy_stc_crypto_aes_state_t *aesState);
 /** \endcond */
 
+/**
+* \addtogroup group_crypto_lld_mac_functions
+* \{
+*/
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Cmac
 ****************************************************************************//**
@@ -100,6 +105,8 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Cmac(CRYPTO_Type *base,
 
     return myResult;
 }
+
+/** \} group_crypto_lld_mac_functions */
 
 #endif /* (CPUSS_CRYPTO_AES == 1) */
 

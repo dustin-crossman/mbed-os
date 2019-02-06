@@ -220,6 +220,11 @@ typedef enum
 
 /** \endcond */
 
+/**
+* \addtogroup group_crypto_lld_hw_functions
+* \{
+*/
+
 void Cy_Crypto_Core_HwInit(void);
 
 cy_en_crypto_status_t Cy_Crypto_Core_Enable(CRYPTO_Type *base);
@@ -435,6 +440,7 @@ __STATIC_INLINE void  Cy_Crypto_Core_ClearInterrupt(CRYPTO_Type *base, uint32_t 
     (void) REG_CRYPTO_INTR(base);
 }
 
+/** \} group_crypto_lld_hw_functions */
 
 #endif /* CY_IP_MXCRYPTO */
 

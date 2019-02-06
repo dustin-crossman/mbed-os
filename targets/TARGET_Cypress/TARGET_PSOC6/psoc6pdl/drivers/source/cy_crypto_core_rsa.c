@@ -113,6 +113,11 @@ static const uint8_t sha512_256EncStr[CY_CRYPTO_SHA256_512_PADDING_SIZE] =
 };
 #endif /* #if (CPUSS_CRYPTO_SHA512 == 1) */
 
+/**
+* \addtogroup group_crypto_lld_rsa_functions
+* \{
+*/
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Rsa_Verify
 ****************************************************************************//**
@@ -918,6 +923,8 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Coef(CRYPTO_Type *base,
 
     return (myResult);
 }
+
+/** \} group_crypto_lld_rsa_functions */
 
 #endif /* #if (CPUSS_CRYPTO_VU == 1) */
 
