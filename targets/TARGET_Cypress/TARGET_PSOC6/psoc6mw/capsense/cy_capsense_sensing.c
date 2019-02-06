@@ -352,14 +352,10 @@ cy_status Cy_CapSense_SetupWidgetExt(
             }
             widgetStatus = CY_RET_SUCCESS;
         }
-        else
-        {
-            widgetStatus = CY_RET_BAD_PARAM;
-        }
     }
     else
     {
-        widgetStatus = CY_RET_BAD_PARAM;
+        /* Do nothing */
     }
 
     return (widgetStatus);

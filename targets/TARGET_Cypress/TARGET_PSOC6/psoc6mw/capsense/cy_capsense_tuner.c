@@ -325,10 +325,6 @@ uint32_t Cy_CapSense_CheckCommandIntegrity(const uint8_t * commandPacket)
         {
             cmdCheckStatus = CY_CAPSENSE_WRONG_CRC;
         }
-        else
-        {
-            cmdCheckStatus = CY_CAPSENSE_COMMAND_OK;
-        }
     }
 
     return cmdCheckStatus;
