@@ -17,7 +17,7 @@
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *******************************************************************************/
@@ -49,8 +49,8 @@ extern "C" {
 * 
 * In case of successful acquisition, this function writes configuration data 
 * into all CSD HW block registers (except read-only registers and SEQ_START 
-* register) at once. Since SEQ_START register is excluded from write, 
-* use the Cy_CSD_WriteReg() function to perform triggering state-machine 
+* register) at once. Because the SEQ_START register is excluded from write, 
+* use the Cy_CSD_WriteReg() function to trigger the state machine 
 * for scan or conversion.
 * 
 * \param base
@@ -61,8 +61,8 @@ extern "C" {
 * configuration.
 *
 * \param key
-* An ID of middleware or user level function that is going to work with
-* the specified HW CSD HW block.
+* An ID of middleware or user-level function that is going to work with
+* the specified CSD HW block.
 *
 * \param context
 * The pointer to the context structure allocated by a user or middleware.
@@ -99,19 +99,19 @@ cy_en_csd_status_t Cy_CSD_Init(CSD_Type * base, cy_stc_csd_config_t const * conf
 *
 * Releases the CSD HW block previously captured and locked by the caller.
 *
-* If the CSD HW block is acquired by another caller or the block is in 
-* busy state, performing scan or conversion, de-initialization request 
-* is ignored and corresponding status is returned.
+* If the CSD HW block is acquired by another caller or the block is in the
+* busy state (performing scan or conversion), the de-initialization request 
+* is ignored and the corresponding status is returned.
 *
 * \param base
 * Pointer to a CSD HW block base address.
 *
 * \param key
-* An ID of middleware or user level function that is going to work with
+* An ID of middleware or user-level function that is going to work with
 * a specified CSD HW block.
 *
 * \param context
-* The pointer to the context structure allocated by user or middleware.
+* The pointer to the context structure allocated by a user or middleware.
 *
 * \return
 * Returns an operation result status (CSD status code).
@@ -146,9 +146,9 @@ cy_en_csd_status_t Cy_CSD_DeInit(const CSD_Type * base, cy_en_csd_key_t key,  cy
 * Sets configuration of all CSD HW block registers at once.
 * 
 * This function writes configuration data into all CSD block registers 
-* (except read-only registers and SEQ_START register) at once. Since 
+* (except read-only registers and the SEQ_START register) at once. Because the 
 * SEQ_START register is excluded from write, use the Cy_CSD_WriteReg() 
-* function to perform triggering state-machine for scan or conversion.
+* function to perform triggering state machine for scan or conversion.
 *
 * \param base
 * Pointer to a CSD HW block base address.
@@ -157,11 +157,11 @@ cy_en_csd_status_t Cy_CSD_DeInit(const CSD_Type * base, cy_en_csd_key_t key,  cy
 * The pointer to a configuration structure that contains initial configuration.
 *
 * \param key
-* An ID of middleware or user level function that is going to work with 
+* An ID of middleware or user-level function that is going to work with 
 * the specified CSD HW block.
 *
 * \param context
-* The pointer to the context structure, allocated by a user or middleware.
+* The pointer to the context structure allocated by a user or middleware.
 *
 * \return
 * Returns an operation result status (CSD status code).
@@ -228,8 +228,8 @@ cy_en_csd_status_t Cy_CSD_Configure(CSD_Type * base, const cy_stc_csd_config_t *
 * Adjusts the provided reference voltage based on factory trimmed 
 * SFALSH Vref trim registers.
 * 
-* This function mainly used by CSDADC middleware only to get as much as
-* possible accurate reference voltage.
+* This function is mainly used by CSDADC middleware only to get the most
+* accurate reference voltage possible.
 *
 * \param referenceVoltage
 * The reference voltage to trim.
@@ -279,7 +279,7 @@ uint32_t Cy_CSD_GetVrefTrim(uint32_t referenceVoltage)
 
     vRef = (referenceVoltage * registerVoltage) / nominalVoltage;
 
-    /* Calculate deviation of trim register */
+    /* Calculate deviation of the trim register */
     if (vRef > referenceVoltage)
     {
         vRefTrimDelta = vRef - referenceVoltage;
