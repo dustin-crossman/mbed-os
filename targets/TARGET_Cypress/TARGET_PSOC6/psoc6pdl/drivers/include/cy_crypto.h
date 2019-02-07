@@ -26,8 +26,7 @@
 * \addtogroup group_crypto
 * \{
 * The Crypto driver provides a public API to perform cryptographic and hash
-* operations, as well as generate both true and pseudo random numbers
-* (TRNG, PRNG).
+* operations, as well as generate both true and pseudo random numbers.
 *
 * It uses a hardware IP block to accelerate operations.
 *
@@ -35,9 +34,43 @@
 * cy_crypto_core.h, and cy_crypto_server.h. You can also include cy_pdl.h 
 * (ModusToolbox only) to get access to all functions and declarations in the PDL.
 *
-* The driver
-* supports these standards: DES, TDES, AES (128, 192, 256 bits), CMAC-AES, SHA,
-* HMAC, PRNG, TRNG, CRC, and RSA.
+* The driver implements two usage models:
+* * \ref group_crypto_cli_srv
+* * \ref group_crypto_lld_api
+*
+* Mixing these usage model will result in undefined behaviour.
+*
+* The Crypto driver supports these standards: DES, TDES, AES (128, 192, 256 bits), CMAC-AES, SHA,
+* HMAC, PRNG, TRNG, CRC, RSA, ECP, and ECDSA.
+* \note ECP and ECDSA are only implemented for \ref group_crypto_lld_api model.
+*
+* \section group_crypto_configuration_considerations Configuration Considerations
+*
+* Firmware sets up a cryptographic operation by passing in required data as
+* parameters in function calls.
+*
+* All Crypto functions require a context. A context is a data
+* structure that the driver uses for its operations. Firmware declares the
+* context (allocates memory) but does not write or read the values in the
+* context. In effect the context is a scratch pad you provide to the driver.
+* The driver uses the context to store and manipulate data during cryptographic
+* operations.
+*
+* Several methods require an additional context unique to the particular
+* cryptographic technique.
+* The Crypto driver header files declare all the required structures for both
+* configuration and context.
+*
+* Some encryption techniques require additional initialization specific to the
+* technique. If there is an Init function, you must call it before using any
+* other function for that technique, and reinitialize after you use a different
+* encryption technique.
+*
+* For example, use \ref Cy_Crypto_Aes_Init to configure an AES encryption
+* operation with the encryption key, and key length.
+* Provide pointers to two context structures. You can then call AES Run functions.
+* If later on you use DES, you must re-initialize AES encryption before using
+* it again.
 *
 * \section group_crypto_definitions Definitions
 *
@@ -306,29 +339,24 @@
 *   </tr>
 * </table>
 *
-* \defgroup group_crypto_cli_srv Client-Server Functions
+* \defgroup group_crypto_cli_srv Client-Server Model
 * \{
-*   \defgroup group_crypto_client Client
+*   \defgroup group_crypto_cli_srv_macros Macros
+*   \defgroup group_crypto_cli_srv_functions Functions
 *   \{
-*    Client part of the Crypto.
-*     \defgroup group_crypto_macros Macros
-*     \defgroup group_crypto_cli_functions Functions
-*     \defgroup group_crypto_cli_data_structures Data Structures
+*     \defgroup group_crypto_cli_functions Client Functions
+*     \defgroup group_crypto_srv_functions Server Functions
 *   \}
-*   \defgroup group_crypto_server Server
+*   \defgroup group_crypto_cli_srv_data_structures Data Structures
 *   \{
-*    Server part of the Crypto.
-*     \defgroup group_crypto_srv_functions Functions
-*     \defgroup group_crypto_srv_data_structures Data Structures
-*   \}
-*   \defgroup group_crypto_config_structure Configuration Structure
-*   \{
-*    Crypto initialization configuration.
-*    \note Should be the same for Crypto Server and Crypto Client initializations.
+*     \defgroup group_crypto_config_structure Common Data Structures
+*     \defgroup group_crypto_cli_data_structures Client Data Structures
+*     \defgroup group_crypto_srv_data_structures Server Data Structures
 *   \}
 * \}
-* \defgroup group_crypto_lld_api Low-Level Functions
-* \defgroup group_crypto_enums General Enumerated Types
+* \defgroup group_crypto_lld_api Direct Crypto Core Access
+* \defgroup group_crypto_data_structures Common Data Structures
+* \defgroup group_crypto_enums Common Enumerated Types
 */
 
 /**
@@ -355,7 +383,6 @@
 *
 * This document contains the following topics:
 *   - \ref group_crypto_architecture
-*   - \ref group_crypto_configuration_considerations
 *   - \ref group_crypto_configuration_structure
 *   - \ref group_crypto_server_init
 *   - \ref group_crypto_client_init
@@ -395,23 +422,6 @@
 * IPC communication between the client and server is completely transparent.
 * Using IPC for communication provides a simple synchronization mechanism to
 * handle concurrent requests from different cores.
-*
-* \section group_crypto_configuration_considerations Configuration Considerations
-*
-* Firmware sets up a cryptographic operation by passing in required data as
-* parameters in function calls.
-*
-* All Crypto functions require a context. A context is a data
-* structure that the driver uses for its operations. Firmware declares the
-* context (allocates memory) but does not write or read the values in the
-* context. In effect the context is a scratch pad you provide to the driver.
-* The driver uses the context to store and manipulate data during cryptographic
-* operations.
-*
-* Several methods require an additional context unique to the particular
-* cryptographic technique.
-* The Crypto driver header files declare all the required structures for both
-* configuration and context.
 *
 * \section group_crypto_configuration_structure Configuration Structure
 *
@@ -526,17 +536,6 @@
 * Firmware can implement the client on either core.
 *
 * \snippet crypto/2.10/snippet/main.c snippet_myCryptoInit
-*
-* Some encryption techniques require additional initialization specific to the
-* technique. If there is an Init function, you must call it before using any
-* other function for that technique, and reinitialize after you use a different
-* encryption technique.
-*
-* For example, use \ref Cy_Crypto_Aes_Init to configure an AES encryption
-* operation with the encryption key, and key length.
-* Provide pointers to two context structures. You can then call AES Run functions.
-* If later on you use DES, you must re-initialize AES encryption before using
-* it again.
 *
 * \section group_crypto_common_use_cases Common Use Cases
 *
@@ -786,7 +785,7 @@ cy_en_crypto_status_t Cy_Crypto_GetLibraryInfo(cy_en_crypto_lib_info_t *cryptoIn
 * that stores the Crypto driver common context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 * \funcusage
 * \snippet crypto/2.10/snippet/main.c snippet_myCryptoInit
@@ -801,7 +800,7 @@ cy_en_crypto_status_t Cy_Crypto_Init(cy_stc_crypto_config_t const *config, cy_st
 * This function de-initializes the Crypto driver.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_DeInit(void);
@@ -813,7 +812,7 @@ cy_en_crypto_status_t Cy_Crypto_DeInit(void);
 * This function enables (turns on) the Crypto hardware.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Enable(void);
@@ -825,7 +824,7 @@ cy_en_crypto_status_t Cy_Crypto_Enable(void);
 * This function disables (turns off) the Crypto hardware.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Disable(void);
@@ -843,7 +842,7 @@ cy_en_crypto_status_t Cy_Crypto_Disable(void);
 * False - is not blocking.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Sync(bool isBlocking);
@@ -859,7 +858,7 @@ cy_en_crypto_status_t Cy_Crypto_Sync(bool isBlocking);
 * \ref cy_stc_crypto_hw_error_t.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_GetErrorStatus(cy_stc_crypto_hw_error_t *hwErrorCause);
@@ -890,7 +889,7 @@ cy_en_crypto_status_t Cy_Crypto_GetErrorStatus(cy_stc_crypto_hw_error_t *hwError
 * the Crypto function context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 * \funcusage
 * \snippet crypto/2.10/snippet/main.c snippet_myCryptoPrngUse
@@ -920,7 +919,7 @@ cy_en_crypto_status_t Cy_Crypto_Prng_Init(uint32_t lfsr32InitState,
 * the Crypto function context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 * \funcusage
 * \snippet crypto/2.10/snippet/main.c snippet_myCryptoPrngUse
@@ -953,7 +952,7 @@ cy_en_crypto_status_t Cy_Crypto_Prng_Generate(uint32_t max,
 * internal variables the Crypto driver requires.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 * \funcusage
 * \snippet crypto/2.10/snippet/main.c snippet_myCryptoAesEcbUse
@@ -986,7 +985,7 @@ cy_en_crypto_status_t Cy_Crypto_Aes_Init(uint32_t *key,
 * that stores all AES internal variables.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 * \funcusage
 * \snippet crypto/2.10/snippet/main.c snippet_myCryptoAesEcbUse
@@ -1025,7 +1024,7 @@ cy_en_crypto_status_t Cy_Crypto_Aes_Ecb_Run(cy_en_crypto_dir_mode_t dirMode,
 * internal variables the Crypto driver requires.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Aes_Cbc_Run(cy_en_crypto_dir_mode_t dirMode,
@@ -1063,7 +1062,7 @@ cy_en_crypto_status_t Cy_Crypto_Aes_Cbc_Run(cy_en_crypto_dir_mode_t dirMode,
 * internal variables the Crypto driver requires.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Aes_Cfb_Run(cy_en_crypto_dir_mode_t dirMode,
@@ -1112,7 +1111,7 @@ cy_en_crypto_status_t Cy_Crypto_Aes_Cfb_Run(cy_en_crypto_dir_mode_t dirMode,
 * internal variables the Crypto driver requires.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Aes_Ctr_Run(cy_en_crypto_dir_mode_t dirMode,
@@ -1153,7 +1152,7 @@ cy_en_crypto_status_t Cy_Crypto_Aes_Ctr_Run(cy_en_crypto_dir_mode_t dirMode,
 * internal variables the Crypto driver requires.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 * \funcusage
 * \snippet crypto/2.10/snippet/main.c snippet_myCryptoCmacUse
@@ -1198,7 +1197,7 @@ cy_en_crypto_status_t Cy_Crypto_Aes_Cmac_Run(uint32_t *src,
 * internal variables for Crypto driver.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 * \funcusage
 * \snippet crypto/2.10/snippet/main.c snippet_myCryptoSha256Use
@@ -1246,7 +1245,7 @@ cy_en_crypto_status_t Cy_Crypto_Sha_Run(uint32_t *message,
 * internal variables for the Crypto driver.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 * \funcusage
 * \snippet crypto/2.10/snippet/main.c snippet_myCryptoHmacUse
@@ -1288,7 +1287,7 @@ cy_en_crypto_status_t Cy_Crypto_Hmac_Run(uint32_t *hmac,
 * internal variables for the Crypto driver.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Str_MemCpy(void *dst,
@@ -1320,7 +1319,7 @@ cy_en_crypto_status_t Cy_Crypto_Str_MemCpy(void *dst,
 * internal variables for the Crypto driver.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Str_MemSet(void *dst,
@@ -1357,7 +1356,7 @@ cy_en_crypto_status_t Cy_Crypto_Str_MemSet(void *dst,
 * internal variables for the Crypto driver.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Str_MemCmp(void const *src0,
@@ -1395,7 +1394,7 @@ cy_en_crypto_status_t Cy_Crypto_Str_MemCmp(void const *src0,
 * internal variables for the Crypto driver.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Str_MemXor(void const *src0,
@@ -1508,7 +1507,7 @@ cy_en_crypto_status_t Cy_Crypto_Str_MemXor(void const *src0,
 * the Crypto driver context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t
+* \ref cy_en_crypto_status_t
 *
 * \note
 * The polynomial, initial seed and remainder XOR values are <b>always</b>
@@ -1551,7 +1550,7 @@ cy_en_crypto_status_t Cy_Crypto_Crc_Init(uint32_t polynomial,
 * the Crypto driver context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 * \note
 * The polynomial, initial seed and remainder XOR values are <b>always</b>
@@ -1594,7 +1593,7 @@ cy_en_crypto_status_t Cy_Crypto_Crc_Run(void     *data,
 * the Crypto driver context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 * \funcusage
 * \snippet crypto/2.10/snippet/main.c snippet_myCryptoTrngUse
@@ -1636,7 +1635,7 @@ cy_en_crypto_status_t Cy_Crypto_Trng_Generate(uint32_t  GAROPol,
 * the Crypto driver context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Des_Run(cy_en_crypto_dir_mode_t dirMode,
@@ -1673,7 +1672,7 @@ cy_en_crypto_status_t Cy_Crypto_Des_Run(cy_en_crypto_dir_mode_t dirMode,
 * the Crypto driver context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 * \funcusage
 * \snippet crypto/2.10/snippet/main.c snippet_myCryptoTdesUse
@@ -1735,7 +1734,7 @@ cy_en_crypto_status_t Cy_Crypto_Tdes_Run(cy_en_crypto_dir_mode_t dirMode,
 * the RSA context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Rsa_Proc(cy_stc_crypto_rsa_pub_key_t const *pubKey,
@@ -1774,7 +1773,7 @@ cy_en_crypto_status_t Cy_Crypto_Rsa_Proc(cy_stc_crypto_rsa_pub_key_t const *pubK
 * the RSA context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Rsa_CalcCoefs(cy_stc_crypto_rsa_pub_key_t const *pubKey,
@@ -1818,7 +1817,7 @@ cy_en_crypto_status_t Cy_Crypto_Rsa_CalcCoefs(cy_stc_crypto_rsa_pub_key_t const 
 * the RSA context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Rsa_Verify(cy_en_crypto_rsa_ver_result_t *verResult,

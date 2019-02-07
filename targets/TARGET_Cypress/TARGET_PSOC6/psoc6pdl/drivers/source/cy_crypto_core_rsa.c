@@ -132,7 +132,7 @@ static const uint8_t sha512_256EncStr[CY_CRYPTO_SHA256_512_PADDING_SIZE] =
 * Returns the verification result \ref cy_en_crypto_rsa_ver_result_t.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param verResult
 * The pointer to the verification result \ref cy_en_crypto_rsa_ver_result_t.
@@ -150,7 +150,7 @@ static const uint8_t sha512_256EncStr[CY_CRYPTO_SHA256_512_PADDING_SIZE] =
 * The length of the decrypted signature to be verified (in bytes)
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Verify(CRYPTO_Type *base,
@@ -282,6 +282,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Verify(CRYPTO_Type *base,
     return (myResult);
 }
 
+/** \} group_crypto_lld_rsa_functions */
 
 #if (CPUSS_CRYPTO_VU == 1)
 
@@ -302,7 +303,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Verify(CRYPTO_Type *base,
 * where R = 1 << size.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param modDerReg
 * Register index for Montgomery coefficient value.
@@ -311,7 +312,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Verify(CRYPTO_Type *base,
 * Register index for modulo value.
 *
 * \param size
-* Size of modulo, in Bits.
+* Modulo size in bits.
 *
 *******************************************************************************/
 static void Cy_Crypto_Core_Rsa_MontCoeff(CRYPTO_Type *base, uint32_t modDerReg, uint32_t modReg, uint32_t size)
@@ -397,7 +398,7 @@ static void Cy_Crypto_Core_Rsa_MontCoeff(CRYPTO_Type *base, uint32_t modDerReg, 
 * barrett = (1 << (2 * size)) / mod      NO!!! leading '1' Barrett bit.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param barrettUReg
 * Register index for Barrett reduction value.
@@ -405,8 +406,8 @@ static void Cy_Crypto_Core_Rsa_MontCoeff(CRYPTO_Type *base, uint32_t modDerReg, 
 * \param modReg
 * Register index for modulo value.
 *
-* \param
-* Size modulo size in Bits.
+* \param size
+* Modulo size in bits.
 *
 *******************************************************************************/
 static void Cy_Crypto_Core_Rsa_BarrettGetU(CRYPTO_Type *base, uint32_t barrettUReg, uint32_t modReg, uint32_t size)
@@ -452,7 +453,7 @@ static void Cy_Crypto_Core_Rsa_BarrettGetU(CRYPTO_Type *base, uint32_t barrettUR
 * z = (a << size) % mod
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param z
 * Register index for Montgomery representation value.
@@ -526,7 +527,7 @@ static void Cy_Crypto_Core_Rsa_MontTransform(CRYPTO_Type *base, uint32_t z, uint
 * u = IF (u >= mod) u = u - mod
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param z
 * Register index for product value.
@@ -610,7 +611,7 @@ static void Cy_Crypto_Core_Rsa_MontMul(CRYPTO_Type *base,
 * calculation. Suitable for cases with short e.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param y
 * Register index for calculated value.
@@ -624,8 +625,17 @@ static void Cy_Crypto_Core_Rsa_MontMul(CRYPTO_Type *base,
 * \param n
 * Register index for modulo value.
 *
+* \param barretCoef
+* Barrett coefficient.
+*
+* \param inverseModulo
+* Binary inverse of the modulo.
+* 
+* \param rBar
+* Values of (2^moduloLength mod modulo).
+*
 * \param size
-* modulo size, in Bits
+* Modulo size in bits
 *
 *******************************************************************************/
 static void Cy_Crypto_Core_Rsa_expModByMont(CRYPTO_Type *base,
@@ -725,6 +735,11 @@ static void Cy_Crypto_Core_Rsa_expModByMont(CRYPTO_Type *base,
     CY_CRYPTO_VU_POP_REG(base);
 }
 
+/**
+* \addtogroup group_crypto_lld_rsa_functions
+* \{
+*/
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_Rsa_Proc
 ****************************************************************************//**
@@ -735,7 +750,7 @@ static void Cy_Crypto_Core_Rsa_expModByMont(CRYPTO_Type *base,
 * https://en.wikipedia.org/wiki/RSA_%28cryptosystem%29
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param key
 * The pointer to the \ref cy_stc_crypto_rsa_pub_key_t structure that stores
@@ -751,7 +766,7 @@ static void Cy_Crypto_Core_Rsa_expModByMont(CRYPTO_Type *base,
 * The pointer to processed message.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Proc(CRYPTO_Type *base,
@@ -861,14 +876,14 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Proc(CRYPTO_Type *base,
 *                         result of (2^moduloLength mod modulo)
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param key
 * The pointer to the \ref cy_stc_crypto_rsa_pub_key_t structure that stores a
 * public key.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Coef(CRYPTO_Type *base,

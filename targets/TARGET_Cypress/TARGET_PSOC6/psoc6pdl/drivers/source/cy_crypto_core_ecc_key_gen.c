@@ -56,7 +56,7 @@
 *
 * \param randomDataInfo
 *
-* \return status code. See \ref cy_en_crypto_status_t.
+* \return status code. See \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
@@ -98,7 +98,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
     /***************************************************************
     *               Apply domain parameters
     ***************************************************************/
-    /* load prime and order defining the curve as well as the barrett coefficient. */
+    /* load prime and order defining the curve as well as the Barrett coefficient. */
 
     /* P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h  */
     Cy_Crypto_Core_Vu_SetMemValue (base, VR_P,       eccDp->prime,      bitsize);
@@ -177,7 +177,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
 
         Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)key->k, p_d, bitsize);
 
-        /*  restore previous prime and barrett values */
+        /*  restore previous prime and Barrett values */
         CY_CRYPTO_VU_POP_REG(base);
 
 #if ECC_KEY_GEN_DEBUG
@@ -234,7 +234,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
 *
 * \param randomDataInfo
 *
-* \return status code. See \ref cy_en_crypto_status_t.
+* \return status code. See \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
@@ -317,7 +317,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
     {
         /* private key (random data) >= order, needs reduction */
 
-        /* use barrett reduction algorithm for operations modulo n (order of the base point) */
+        /* use Barrett reduction algorithm for operations modulo n (order of the base point) */
         Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
         Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
 
@@ -362,7 +362,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
 * \param publicKey
 * See \ref cy_stc_crypto_ecc_key.
 *
-* \return status code. See \ref cy_en_crypto_status_t.
+* \return status code. See \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,

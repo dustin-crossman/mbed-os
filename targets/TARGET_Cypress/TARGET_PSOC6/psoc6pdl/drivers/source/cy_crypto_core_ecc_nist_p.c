@@ -2111,7 +2111,7 @@ void Cy_Crypto_Core_EC_NistP_PointMul(CRYPTO_Type *base, int p_x, int p_y, int p
 * \param ecpQY
 * Register index for order value.
 *
-* \return status code. See \ref cy_en_crypto_status_t.
+* \return status code. See \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_EC_NistP_PointMultiplication(CRYPTO_Type *base,

@@ -110,7 +110,7 @@ void Cy_Crypto_Core_V1_Cmac_Init(cy_stc_crypto_v1_cmac_state_t* cmacState,
 * Starts CMAC calculation.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param aesState
 * The pointer to the structure which stores the AES context.
@@ -141,7 +141,7 @@ void Cy_Crypto_Core_V1_Cmac_Start(CRYPTO_Type *base,
 * Calculates CMAC on a message.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param aesState
 * The pointer to the structure which stores the AES context.
@@ -197,7 +197,7 @@ void Cy_Crypto_Core_V1_Cmac_Update(CRYPTO_Type *base,
 * Completes CMAC calculation.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param aesState
 * the pointer to the structure which stores the AES context.
@@ -250,7 +250,7 @@ void Cy_Crypto_Core_V1_Cmac_Finish(CRYPTO_Type *base,
 * on a message to produce message authentication code using AES.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param message
 * The pointer to a source plain text. Must be 4-byte aligned.
@@ -268,7 +268,8 @@ void Cy_Crypto_Core_V1_Cmac_Finish(CRYPTO_Type *base,
 * The pointer to the calculated CMAC.
 *
 * \param aesState
-* The pointer to the aesState structure which stores the AES context.
+* The pointer to the AES state structure allocated by the user. The user must
+* must not modify anything in this structure.
 *
 * \return
 * A Crypto status \ref en_crypto_status_t.

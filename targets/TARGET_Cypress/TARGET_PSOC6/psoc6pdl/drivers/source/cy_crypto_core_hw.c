@@ -117,7 +117,7 @@ const cy_stc_cryptoIP_t cy_cryptoIpBlockCfgPSoC6_02 =
 * The function to initialize the Crypto VU registers.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 *******************************************************************************/
 void Cy_Crypto_Core_ClearVuRegisters(CRYPTO_Type *base)
@@ -146,8 +146,6 @@ void Cy_Crypto_Core_ClearVuRegisters(CRYPTO_Type *base)
 *
 * The function to initialize the Crypto hardware.
 *
-* This function is internal and should not to be called directly by user software
-*
 *******************************************************************************/
 void Cy_Crypto_Core_HwInit(void)
 {
@@ -161,10 +159,10 @@ void Cy_Crypto_Core_HwInit(void)
 * The function to enable the Crypto hardware.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \return
-* Crypto status \ref cy_en_crypto_status_t.
+* Crypto status \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_Enable(CRYPTO_Type *base)
@@ -238,7 +236,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Enable(CRYPTO_Type *base)
 * The pointer to a variable to store gathered crypto library information.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_GetLibInfo(cy_en_crypto_lib_info_t *libInfo)
@@ -255,10 +253,10 @@ cy_en_crypto_status_t Cy_Crypto_Core_GetLibInfo(cy_en_crypto_lib_info_t *libInfo
 * Disables the operation of the CRYPTO block.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_Disable(CRYPTO_Type *base)

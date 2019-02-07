@@ -56,17 +56,17 @@ typedef cy_en_crypto_status_t (*cy_crypto_cmac_func_t)(CRYPTO_Type *base,
 * Function Name: Cy_Crypto_Core_Cmac
 ****************************************************************************//**
 *
-* Performs CMAC(Cipher-based Message Authentication Code) operation
-* on a message to produce message authentication code using AES.
+* Calculates AES Cipher-based Message Authentication Code (CMAC) on the input
+* message with the provided key.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param message
 * The pointer to a source plain text. Must be 4-byte aligned.
 *
 * \param messageSize
-* The size of a source plain text.
+* The size of a source plain text in bytes.
 *
 * \param key
 * The pointer to the encryption key. Must be 4-byte aligned.
@@ -78,10 +78,11 @@ typedef cy_en_crypto_status_t (*cy_crypto_cmac_func_t)(CRYPTO_Type *base,
 * The pointer to the calculated CMAC.
 *
 * \param aesState
-* The pointer to the aesState structure which stores the AES context.
+* The pointer to the AES state structure allocated by the user. The user must
+* must not modify anything in this structure.
 *
 * \return
-* A Crypto status \ref en_crypto_status_t.
+* \ref en_crypto_status_t
 *
 *******************************************************************************/
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Cmac(CRYPTO_Type *base,

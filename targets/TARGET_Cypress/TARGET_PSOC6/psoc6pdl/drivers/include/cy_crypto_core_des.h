@@ -51,12 +51,12 @@ typedef cy_en_crypto_status_t (*cy_crypto_des_func_t)(CRYPTO_Type *base,
 * Function Name: Cy_Crypto_Core_Des
 ****************************************************************************//**
 *
-* Performs DES operation on a Single Block. All addresses must be 4-Byte aligned.
-* Ciphertext (dstBlock) may overlap with plaintext (srcBlock)
+* Performs DES operation on a single block. All addresses must be 4-Byte aligned.
+* Ciphertext (dst) may overlap with plaintext (src).
 * This function is independent from the previous Crypto state.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param dirMode
 * Can be \ref CY_CRYPTO_ENCRYPT or \ref CY_CRYPTO_DECRYPT
@@ -72,7 +72,7 @@ typedef cy_en_crypto_status_t (*cy_crypto_des_func_t)(CRYPTO_Type *base,
 * The pointer to a source block.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Des(CRYPTO_Type *base,
@@ -99,12 +99,12 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Des(CRYPTO_Type *base,
 * Function Name: Cy_Crypto_Core_Tdes
 ****************************************************************************//**
 *
-* Performs TDES operation on a Single Block. All addresses must be 4-Byte aligned.
-* Ciphertext (dstBlock) may overlap with plaintext (srcBlock)
+* Performs TDES operation on a single block. All addresses must be 4-Byte aligned.
+* Ciphertext (dst) may overlap with plaintext (src)
 * This function is independent from the previous Crypto state.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param dirMode
 * Can be \ref CY_CRYPTO_ENCRYPT or \ref CY_CRYPTO_DECRYPT
@@ -120,7 +120,7 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Des(CRYPTO_Type *base,
 * The pointer to a source data block.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Tdes(CRYPTO_Type *base,

@@ -56,7 +56,7 @@ typedef cy_en_crypto_status_t (*cy_crypto_hmac_func_t)(CRYPTO_Type *base,
 * Performs HMAC calculation.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param hmac
 * The pointer to the calculated HMAC. Must be 4-byte aligned.

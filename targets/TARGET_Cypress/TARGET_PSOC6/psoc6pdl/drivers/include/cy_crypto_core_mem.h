@@ -58,7 +58,7 @@ typedef void (*cy_crypto_memxor_func_t)(CRYPTO_Type *base, void* dst,
 * There is no alignment restriction.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param dst
 * The pointer to the destination of MemCpy.
@@ -90,7 +90,7 @@ __STATIC_INLINE void Cy_Crypto_Core_MemCpy(CRYPTO_Type *base, void* dst, void co
 * There is no alignment restriction.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param dst
 * The pointer to the destination of MemSet.
@@ -122,7 +122,7 @@ __STATIC_INLINE void Cy_Crypto_Core_MemSet(CRYPTO_Type *base, void* dst, uint8_t
 * There is no alignment restriction.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param src0
 * The pointer to the first source of MemCmp.
@@ -161,7 +161,7 @@ __STATIC_INLINE uint32_t Cy_Crypto_Core_MemCmp(CRYPTO_Type *base, void const *sr
 * There is no alignment restriction.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param dst
 * The pointer to the destination of MemXor.

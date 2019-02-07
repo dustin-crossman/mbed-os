@@ -66,7 +66,7 @@
 * \param messageKey
 * Message key.
 *
-* \return status code. See \ref cy_en_crypto_status_t.
+* \return status code. See \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8_t *hash, uint32_t hashlen, uint8_t *sig,
@@ -187,7 +187,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
                         /* load signing private key */
                         Cy_Crypto_Core_Vu_SetMemValue (base, p_d, (uint8_t *)key->k, bitsize);
 
-                        /* use barrett reduction algorithm for operations modulo n (order of the base point) */
+                        /* use Barrett reduction algorithm for operations modulo n (order of the base point) */
                         Cy_Crypto_Core_EC_NistP_SetRedAlg(CY_CRYPTO_NIST_P_BARRETT_RED_ALG);
 
                         /* d*r mod n */
@@ -271,7 +271,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
 * \param key
 * The corresponding public ECC key. See \ref cy_stc_crypto_ecc_key.
 *
-* \return status code. See \ref cy_en_crypto_status_t.
+* \return status code. See \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
@@ -316,7 +316,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
             int p_qx = 11;
             int p_qy = 12;
 
-            /* use barrett reduction algorithm for operations modulo n (order of the base point) */
+            /* use Barrett reduction algorithm for operations modulo n (order of the base point) */
             Cy_Crypto_Core_EC_NistP_SetRedAlg(CY_CRYPTO_NIST_P_BARRETT_RED_ALG);
             Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
 
@@ -417,7 +417,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
                 /* Initialize point multiplication */
                 Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
 
-                /* load prime, order and barrett coefficient */
+                /* load prime, order and Barrett coefficient */
                 Cy_Crypto_Core_Vu_SetMemValue (base, VR_P,       (uint8_t *)eccDp->prime,     bitsize);
                 Cy_Crypto_Core_Vu_SetMemValue (base, p_o,        (uint8_t *)eccDp->order,     bitsize);
                 Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, (uint8_t *)eccDp->barrett_p, bitsize + 1);

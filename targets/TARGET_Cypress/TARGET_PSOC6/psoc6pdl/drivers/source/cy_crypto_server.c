@@ -46,7 +46,7 @@
 
 #if defined(CY_IP_MXCRYPTO)
 
-/* The pointer to the CRYPTO instance address. */
+/* The pointer to the CRYPTO instance. */
 #define CY_CRYPTO_BASE           ((CRYPTO_Type *)cy_device->cryptoBase)
 
 typedef struct
@@ -724,14 +724,14 @@ void Cy_Crypto_Server_GetDataHandler(void)
 * This function is internal and should not to be called directly by user software
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param cryptoContext
 * The pointer to cy_stc_crypto_context_t structure which stores
 * the Crypto driver context.
 *
 * \return
-* A Crypto status \ref cy_en_crypto_status_t.
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 static cy_en_crypto_status_t Cy_Crypto_Core_CheckHwForErrors(cy_stc_crypto_context_t *cryptoContext)

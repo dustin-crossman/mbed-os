@@ -116,7 +116,7 @@ static void Cy_Crypto_Core_V2_Hmac_Init(cy_stc_crypto_v2_hmac_state_t *hmacState
 * Starts HMAC (Hash-based Message Authentication Code) calculation.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param hmacState
 * The pointer to the hmacState structure which stores internal variables
@@ -216,7 +216,7 @@ static void Cy_Crypto_Core_V2_Hmac_Calculate(CRYPTO_Type *base,
 * Clears the used memory buffers.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param hmacState
 * The pointer to the HMAC context.
@@ -235,7 +235,7 @@ static void Cy_Crypto_Core_V2_Hmac_Free(CRYPTO_Type *base, cy_stc_crypto_v2_hmac
 * Performs HMAC calculation.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param hmac
 * The pointer to the calculated HMAC. Must be 4-byte aligned.

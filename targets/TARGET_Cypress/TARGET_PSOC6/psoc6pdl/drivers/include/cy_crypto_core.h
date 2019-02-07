@@ -36,42 +36,21 @@
 *   provides the configuration data required for the desired cryptographic
 *   technique.
 *
-*   \defgroup group_crypto_lld_symmetric Symmetric Key Functions (AES, DES, TDES)
+*   \defgroup group_crypto_lld_functions Functions
 *   \{
-*     \defgroup group_crypto_lld_symmetric_functions Functions
-*   \}
-*   \defgroup group_crypto_lld_asymmetric Asymmetric Key Functions (RSA, ECP, ECDSA)
-*   \{
-*     \defgroup group_crypto_lld_rsa_functions RSA Functions
-*     \defgroup group_crypto_lld_ecc_functions Elliptic Curve Functions
-*   \}
-*   \defgroup group_crypto_lld_sha Hash Functions (SHA)
-*   \{
-*     \defgroup group_crypto_lld_sha_functions Functions
-*   \}
-*   \defgroup group_crypto_lld_mac Message Authentication Code Functions (CMAC, HMAC)
-*   \{
-*     \defgroup group_crypto_lld_mac_functions Functions
-*   \}
-*   \defgroup group_crypto_lld_crc Cyclic Redundancy Code Functions (CRC)
-*   \{
-*     \defgroup group_crypto_lld_crc_functions Functions
-*   \}
-*   \defgroup group_crypto_lld_rng Random Number Generation Functions (TRNG, PRNG)
-*   \{
-*     \defgroup group_crypto_lld_rng_functions Functions
-*   \}
-*   \defgroup group_crypto_lld_vu Vector Unit (VU) Functions
-*   \{
-*     \defgroup group_crypto_lld_vu_functions Functions
-*   \}
-*   \defgroup group_crypto_lld_mem Memory Streaming Functions
-*   \{
-*     \defgroup group_crypto_lld_mem_functions Functions
-*   \}
-*   \defgroup group_crypto_lld_hw Miscellaneous Hardware Functions
-*   \{
-*     \defgroup group_crypto_lld_hw_functions Functions
+*     \defgroup group_crypto_lld_hw_functions Control and Status Functions
+*     \defgroup group_crypto_lld_symmetric_functions Symmetric Key Functions (AES, DES, TDES)
+*     \defgroup group_crypto_lld_asymmetric_functions Asymmetric Key Functions (RSA, ECP, ECDSA)
+*     \{
+*       \defgroup group_crypto_lld_rsa_functions RSA Functions
+*       \defgroup group_crypto_lld_ecc_functions Elliptic Curve Functions
+*     \}
+*     \defgroup group_crypto_lld_sha_functions Hash Functions (SHA)
+*     \defgroup group_crypto_lld_mac_functions Message Authentication Code Functions (CMAC, HMAC)
+*     \defgroup group_crypto_lld_crc_functions Redundancy Code Functions (CRC)
+*     \defgroup group_crypto_lld_rng_functions Random Number Generation Functions (TRNG, PRNG)
+*     \defgroup group_crypto_lld_vu_functions Vector Unit (VU) Functions
+*     \defgroup group_crypto_lld_mem_functions Memory Streaming Functions
 *   \}
 * \} */
 

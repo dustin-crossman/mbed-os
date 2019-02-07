@@ -44,7 +44,7 @@ static void Cy_Crypto_Core_V1_Trng_Init(CRYPTO_Type *base);
 * Initializes the TRND parameters.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 *******************************************************************************/
 static void Cy_Crypto_Core_V1_Trng_Init(CRYPTO_Type *base)
@@ -65,7 +65,7 @@ static void Cy_Crypto_Core_V1_Trng_Init(CRYPTO_Type *base)
 * cfContext->trngNumPtr.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \param GAROPol
 * The polynomial for the programmable Galois ring oscillator.

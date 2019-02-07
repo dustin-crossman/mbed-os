@@ -244,10 +244,10 @@ void Cy_Crypto_Core_InvertEndianness(void *inArrPtr, uint32_t byteSize);
 * The function checks whether the Crypto hardware is enabled.
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 * \return
-* Crypto status \ref cy_en_crypto_status_t.
+* Crypto status \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_Crypto_Core_IsEnabled(CRYPTO_Type *base)
@@ -270,7 +270,7 @@ __STATIC_INLINE bool Cy_Crypto_Core_IsEnabled(CRYPTO_Type *base)
 * - from 0 to 16 for MXCRYPTO_ver2 IP block
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 *******************************************************************************/
 __STATIC_INLINE uint8_t Cy_Crypto_Core_GetFIFODepth(CRYPTO_Type *base)
@@ -286,7 +286,7 @@ __STATIC_INLINE uint8_t Cy_Crypto_Core_GetFIFODepth(CRYPTO_Type *base)
 * The value of this field ranges from 0 to 8
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 *******************************************************************************/
 __STATIC_INLINE uint8_t Cy_Crypto_Core_GetFIFOUsed(CRYPTO_Type *base)
@@ -304,7 +304,7 @@ __STATIC_INLINE uint8_t Cy_Crypto_Core_GetFIFOUsed(CRYPTO_Type *base)
 * By default EVENT_LEVEL = 0;
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_Crypto_Core_WaitForFifoAvailable(CRYPTO_Type *base)
@@ -321,7 +321,7 @@ __STATIC_INLINE void Cy_Crypto_Core_WaitForFifoAvailable(CRYPTO_Type *base)
 * Waits until all instruction in FIFO will be completed
 *
 * \param base
-* The pointer to the CRYPTO instance address.
+* The pointer to the CRYPTO instance.
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_Crypto_Core_WaitForReady(CRYPTO_Type *base)
@@ -338,7 +338,7 @@ __STATIC_INLINE void Cy_Crypto_Core_WaitForReady(CRYPTO_Type *base)
 * Masks / unmasks multiple interrupt sources.
 *
 * \param base
-* Pointer to Crypto instance address
+* Pointer to CRYPTO instance
 *
 * \param interrupts
 * Mask bits. See definitions above.
@@ -356,7 +356,7 @@ __STATIC_INLINE void Cy_Crypto_Core_SetInterruptMask(CRYPTO_Type *base, uint32_t
 * Reports mask / unmask multiple interrupt sources.
 *
 * \param base
-* Pointer to Crypto instance address
+* Pointer to CRYPTO instance
 *
 * \return
 * Mask bits. See definitions above.
@@ -374,7 +374,7 @@ __STATIC_INLINE uint32_t Cy_Crypto_Core_GetInterruptMask(CRYPTO_Type const *base
 * Reports states of multiple enabled interrupt sources.
 *
 * \param base
-* Pointer to Crypto instance address
+* Pointer to CRYPTO instance
 *
 * \return
 * Source bits. See definitions above.
@@ -392,7 +392,7 @@ __STATIC_INLINE uint32_t Cy_Crypto_Core_GetInterruptStatusMasked(CRYPTO_Type con
 * Reports states of multiple interrupt sources.
 *
 * \param base
-* Pointer to Crypto instance address
+* Pointer to CRYPTO instance
 *
 * \return
 * Source bits. See definitions above.
@@ -410,7 +410,7 @@ __STATIC_INLINE uint32_t Cy_Crypto_Core_GetInterruptStatus(CRYPTO_Type *base)
 * Sets one of more interrupt sources
 *
 * \param base
-* Pointer to Crypto instance address
+* Pointer to CRYPTO instance
 *
 * \param interrupts
 * Source bit(s)
@@ -428,7 +428,7 @@ __STATIC_INLINE void  Cy_Crypto_Core_SetInterrupt(CRYPTO_Type *base, uint32_t in
 * Clears multiple interrupt sources.
 *
 * \param base
-* Pointer to Crypto instance address
+* Pointer to CRYPTO instance
 *
 * \param interrupts
 * Source bit(s). See definitions above.

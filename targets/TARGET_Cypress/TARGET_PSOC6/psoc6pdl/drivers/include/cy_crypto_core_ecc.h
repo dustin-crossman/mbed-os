@@ -119,6 +119,13 @@ typedef struct {
 
 
 typedef int (*cy_func_get_random_data_t)(void *, unsigned char *, size_t);
+
+
+/**
+* \addtogroup group_crypto_lld_ecc_functions
+* \{
+*/
+
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
                                    cy_en_crypto_ecc_curve_id_t curveID,
                                    cy_stc_crypto_ecc_key *key,
@@ -142,6 +149,8 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
         cy_en_crypto_ecc_curve_id_t curveID,
         uint8_t *privateKey,
         cy_stc_crypto_ecc_key *publicKey);
+
+/** \} group_crypto_lld_ecc_functions */
 
 /** Calculates the actual size in bytes of the bits value */
 #define CY_CRYPTO_BYTE_SIZE_OF_BITS(x)     (uint32_t)(((x) + 7u) >> 3u)
