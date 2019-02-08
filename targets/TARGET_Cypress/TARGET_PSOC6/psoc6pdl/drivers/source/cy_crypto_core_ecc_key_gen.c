@@ -101,9 +101,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
     /* load prime and order defining the curve as well as the Barrett coefficient. */
 
     /* P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h  */
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_P,       eccDp->prime,      bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, p_order,    eccDp->order,      bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p,  bitsize + 1);
+    Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->prime, bitsize);
+    Cy_Crypto_Core_Vu_SetMemValue (base, p_order, eccDp->order, bitsize);
+    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p, bitsize + 1);
 
     /* Base Point, G = (p_x, p_y) */
     Cy_Crypto_Core_Vu_SetMemValue (base, p_x, eccDp->Gx, bitsize);
@@ -292,8 +292,8 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
     /* P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h */
     CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
     CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1);
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_P,       eccDp->order,      bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_o,  bitsize + 1);
+    Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->order, bitsize);
+    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_o, bitsize + 1);
 
     /* Load random data into VU */
     CY_CRYPTO_VU_ALLOC_MEM(base, p_d, bitsize);
@@ -405,9 +405,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
     /* load prime and order defining the curve as well as the barrett coefficient. */
 
     /*  P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h */
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_P,       eccDp->prime,      bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, p_order,    eccDp->order,      bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p,  bitsize + 1);
+    Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->prime, bitsize);
+    Cy_Crypto_Core_Vu_SetMemValue (base, p_order, eccDp->order, bitsize);
+    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p, bitsize + 1);
 
     /*Base Point, G = (p_x, p_y) */
     Cy_Crypto_Core_Vu_SetMemValue (base, p_x, eccDp->Gx, bitsize);
