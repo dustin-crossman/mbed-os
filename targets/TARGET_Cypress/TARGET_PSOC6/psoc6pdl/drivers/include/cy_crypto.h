@@ -31,7 +31,7 @@
 * It uses a hardware IP block to accelerate operations.
 *
 * The functions and other declarations used in this driver are in cy_crypto.h,
-* cy_crypto_core.h, and cy_crypto_server.h. You can also include cy_pdl.h 
+* cy_crypto_core.h, and cy_crypto_server.h. You can also include cy_pdl.h
 * (ModusToolbox only) to get access to all functions and declarations in the PDL.
 *
 * The driver implements two usage models:
@@ -249,6 +249,7 @@
 *         <ul>
 *         <li>Moved from pre-compiled library to Open Source under
 *             Apache 2.0 license.</li>
+*         <li>Core (server) API is now available.</li>
 *         <li>Added ECP and ECDSA support for NIST P curves:
 *             SECP192R1, SECP224R1, SECP256R1, SECP384R1, SECP521R1.</li>
 *         <li>ECP and ECDSA only supported with direct calls to Crypto APIs,
@@ -367,7 +368,7 @@
 *
 *   The functions and other declarations used in this part of the driver are in
 *   cy_crypto.h and cy_crypto_server.h. You can also include cy_pdl.h
-*   (ModusToolbox only) to get access to all functions and declarations in the 
+*   (ModusToolbox only) to get access to all functions and declarations in the
 *   PDL.
 *
 *   Firmware initializes and starts the Crypto server. The server can run on any
