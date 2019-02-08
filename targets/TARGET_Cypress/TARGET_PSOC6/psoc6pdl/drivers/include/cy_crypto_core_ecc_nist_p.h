@@ -38,7 +38,7 @@ void Cy_Crypto_Core_EC_NistP_SetRedAlg(cy_en_crypto_ecc_red_mul_algs_t alg);
 void Cy_Crypto_Core_EC_NistP_PointMul(CRYPTO_Type *base, int p_x, int p_y, int p_d, int p_order, int bitsize);
 
 /**
-* \addtogroup group_crypto_lld_ecc_functions
+* \addtogroup group_crypto_lld_asymmetric_functions
 * \{
 */
 cy_en_crypto_status_t Cy_Crypto_Core_EC_NistP_PointMultiplication(CRYPTO_Type *base,
@@ -48,7 +48,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_EC_NistP_PointMultiplication(CRYPTO_Type *b
     uint8_t* ecpD,
     uint8_t* ecpQX,
     uint8_t* ecpQY);
-/** \} group_crypto_lld_ecc_functions */
+/** \} group_crypto_lld_asymmetric_functions */
 
 void Cy_Crypto_Core_EC_MulMod( CRYPTO_Type *base,
     int z,

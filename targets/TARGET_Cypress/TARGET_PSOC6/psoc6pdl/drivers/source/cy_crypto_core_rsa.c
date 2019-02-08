@@ -114,7 +114,7 @@ static const uint8_t sha512_256EncStr[CY_CRYPTO_SHA256_512_PADDING_SIZE] =
 #endif /* #if (CPUSS_CRYPTO_SHA512 == 1) */
 
 /**
-* \addtogroup group_crypto_lld_rsa_functions
+* \addtogroup group_crypto_lld_asymmetric_functions
 * \{
 */
 
@@ -282,7 +282,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Verify(CRYPTO_Type *base,
     return (myResult);
 }
 
-/** \} group_crypto_lld_rsa_functions */
+/** \} group_crypto_lld_asymmetric_functions */
 
 #if (CPUSS_CRYPTO_VU == 1)
 
@@ -736,7 +736,7 @@ static void Cy_Crypto_Core_Rsa_expModByMont(CRYPTO_Type *base,
 }
 
 /**
-* \addtogroup group_crypto_lld_rsa_functions
+* \addtogroup group_crypto_lld_asymmetric_functions
 * \{
 */
 
@@ -939,7 +939,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Coef(CRYPTO_Type *base,
     return (myResult);
 }
 
-/** \} group_crypto_lld_rsa_functions */
+/** \} group_crypto_lld_asymmetric_functions */
 
 #endif /* #if (CPUSS_CRYPTO_VU == 1) */
 

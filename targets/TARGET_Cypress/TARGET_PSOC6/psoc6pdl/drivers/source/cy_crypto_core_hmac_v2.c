@@ -256,7 +256,7 @@ static void Cy_Crypto_Core_V2_Hmac_Free(CRYPTO_Type *base, cy_stc_crypto_v2_hmac
 * \ref cy_en_crypto_sha_mode_t
 *
 * \return
-* A Crypto status \ref en_crypto_status_t.
+\ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V2_Hmac(CRYPTO_Type *base,

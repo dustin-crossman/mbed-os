@@ -80,7 +80,7 @@ static void Cy_Crypto_Core_V1_Trng_Init(CRYPTO_Type *base)
 * The pointer to a generated true random number. Must be 4-byte aligned.
 *
 * \return
-* A Crypto status \ref en_crypto_status_t.
+\ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Trng(CRYPTO_Type *base,

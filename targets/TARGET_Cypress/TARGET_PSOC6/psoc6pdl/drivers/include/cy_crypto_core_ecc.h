@@ -34,6 +34,12 @@
 
 #if (CPUSS_CRYPTO_VU == 1)
 
+/**
+* \addtogroup group_crypto_lld_asymmetric_enums
+* \{
+*/
+
+/** List of supported elliptic curve IDs */
 typedef enum {
     CY_CRYPTO_ECC_ECP_NONE = 0,
     CY_CRYPTO_ECC_ECP_SECP192R1,
@@ -44,6 +50,8 @@ typedef enum {
     /* Count of supported curves */
     CY_CRYPTO_ECC_ECP_CURVES_CNT
 } cy_en_crypto_ecc_curve_id_t;
+
+/** \} group_crypto_lld_asymmetric_enums */
 
 typedef enum cy_en_red_mul_algs {
     CY_CRYPTO_NIST_P_CURVE_SPECIFIC_RED_ALG = 0,
@@ -118,13 +126,13 @@ typedef struct {
 } cy_stc_crypto_ecc_key;
 
 
-typedef int (*cy_func_get_random_data_t)(void *, unsigned char *, size_t);
-
-
 /**
-* \addtogroup group_crypto_lld_ecc_functions
+* \addtogroup group_crypto_lld_asymmetric_functions
 * \{
 */
+
+/** Pointer to a random number supplier function */
+typedef int (*cy_func_get_random_data_t)(void *, unsigned char *, size_t);
 
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
                                    cy_en_crypto_ecc_curve_id_t curveID,
@@ -150,7 +158,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
         uint8_t *privateKey,
         cy_stc_crypto_ecc_key *publicKey);
 
-/** \} group_crypto_lld_ecc_functions */
+/** \} group_crypto_lld_asymmetric_functions */
 
 /** Calculates the actual size in bytes of the bits value */
 #define CY_CRYPTO_BYTE_SIZE_OF_BITS(x)     (uint32_t)(((x) + 7u) >> 3u)

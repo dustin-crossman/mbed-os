@@ -77,7 +77,7 @@ typedef cy_en_crypto_status_t (*cy_crypto_hmac_func_t)(CRYPTO_Type *base,
 * \ref cy_en_crypto_sha_mode_t
 *
 * \return
-* A Crypto status \ref en_crypto_status_t.
+\ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Hmac(CRYPTO_Type *base,
