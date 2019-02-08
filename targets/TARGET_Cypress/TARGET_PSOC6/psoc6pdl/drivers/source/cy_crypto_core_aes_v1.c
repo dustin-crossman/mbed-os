@@ -47,7 +47,7 @@ static void Cy_Crypto_Core_V1_Aes_InvKey(CRYPTO_Type *base, cy_stc_crypto_aes_st
 * The pointer to the CRYPTO instance.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \param dirMode
@@ -94,7 +94,7 @@ void Cy_Crypto_Core_V1_Aes_ProcessBlock(CRYPTO_Type *base,
 * The pointer to the CRYPTO instance.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \param dstBlock
@@ -141,7 +141,7 @@ void Cy_Crypto_Core_V1_Aes_Xor(CRYPTO_Type *base,
 * The pointer to the CRYPTO instance.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 *******************************************************************************/
@@ -177,7 +177,7 @@ static void Cy_Crypto_Core_V1_Aes_InvKey(CRYPTO_Type *base, cy_stc_crypto_aes_st
 * \ref cy_en_crypto_aes_key_length_t
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return
@@ -232,7 +232,7 @@ void Cy_Crypto_Core_V1_Aes_Free(CRYPTO_Type *base)
 * The pointer to a source block.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return
@@ -282,7 +282,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Ecb(CRYPTO_Type *base,
 * The pointer to a source plain text.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return

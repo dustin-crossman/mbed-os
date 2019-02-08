@@ -293,7 +293,7 @@ __STATIC_INLINE uint16_t Cy_Crypto_Core_Vu_RegDataPtrRead(CRYPTO_Type *base, uin
 *******************************************************************************/
 __STATIC_INLINE uint32_t * Cy_Crypto_Core_Vu_RegMemPointer(CRYPTO_Type *base, uint32_t srcReg)
 {
-    return (uint32_t *)((uint32_t)REG_CRYPTO_MEM_BUFF(base) + 4u * (uint32_t)Cy_Crypto_Core_Vu_RegDataPtrRead(base, srcReg));
+    return (uint32_t *)((uint32_t)REG_CRYPTO_MEM_BUFF(base) + (4u * (uint32_t)Cy_Crypto_Core_Vu_RegDataPtrRead(base, srcReg)));
 }
 
 /*******************************************************************************
@@ -333,11 +333,11 @@ __STATIC_INLINE void Cy_Crypto_Core_Vu_WaitForComplete(CRYPTO_Type *base)
 * The pointer to the CRYPTO instance.
 *
 *******************************************************************************/
-__STATIC_INLINE uint16_t Cy_Crypto_Core_Vu_StatusRead(CRYPTO_Type *base)
+__STATIC_INLINE uint32_t Cy_Crypto_Core_Vu_StatusRead(CRYPTO_Type *base)
 {
     Cy_Crypto_Core_Vu_WaitForComplete(base);
 
-    return((uint16_t)REG_CRYPTO_VU_STATUS(base));
+    return((uint32_t)REG_CRYPTO_VU_STATUS(base));
 }
 
 /** \} group_crypto_lld_vu_functions */

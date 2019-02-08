@@ -61,7 +61,7 @@ void Cy_Crypto_Core_Vu_SetMemValue(CRYPTO_Type *base, uint32_t dstReg, uint8_t c
 
     CY_ASSERT_L1(size <= Cy_Crypto_Core_Vu_RegBitSizeRead(base, dstReg));
 
-    CY_ASSERT_L1(((uint32_t)Cy_Crypto_Core_Vu_RegMemPointer(base, dstReg) + byteSize - 1) < ((uint32_t)REG_CRYPTO_MEM_BUFF(base) + CY_CRYPTO_MEM_BUFF_SIZE) );
+    CY_ASSERT_L1( (((uint32_t)Cy_Crypto_Core_Vu_RegMemPointer(base, dstReg) + byteSize) - 1u) < ((uint32_t)REG_CRYPTO_MEM_BUFF(base) + CY_CRYPTO_MEM_BUFF_SIZE));
     Cy_Crypto_Core_MemCpy(base, (void*)Cy_Crypto_Core_Vu_RegMemPointer(base, dstReg), (const void*)src, byteSize);
 
     if (cy_device->cryptoVersion == 1u)
@@ -92,7 +92,7 @@ void Cy_Crypto_Core_Vu_GetMemValue(CRYPTO_Type *base, uint8_t *dst, uint32_t src
     }
 
     CY_ASSERT_L1(size <= Cy_Crypto_Core_Vu_RegBitSizeRead(base, srcReg));
-    CY_ASSERT_L1(((uint32_t)Cy_Crypto_Core_Vu_RegMemPointer(base, srcReg) + byteSize - 1) < ((uint32_t)REG_CRYPTO_MEM_BUFF(base) + CY_CRYPTO_MEM_BUFF_SIZE) );
+    CY_ASSERT_L1((((uint32_t)Cy_Crypto_Core_Vu_RegMemPointer(base, srcReg) + byteSize) - 1u) < ((uint32_t)REG_CRYPTO_MEM_BUFF(base) + CY_CRYPTO_MEM_BUFF_SIZE) );
 
     Cy_Crypto_Core_MemCpy(base, (void*)dst, (void*)Cy_Crypto_Core_Vu_RegMemPointer(base, srcReg), byteSize);
 
@@ -145,69 +145,69 @@ cy_en_crypto_status_t Cy_Crypto_Core_Cleanup(CRYPTO_Type *base)
         Cy_Crypto_Core_V2_RBClear(base);
     }
 
-    Cy_Crypto_Core_MemSet(base, (void *)REG_CRYPTO_MEM_BUFF(base), 0u, CY_CRYPTO_MEM_BUFF_SIZE);
+    Cy_Crypto_Core_MemSet(base, (void *)REG_CRYPTO_MEM_BUFF(base), 0u, (uint16_t)CY_CRYPTO_MEM_BUFF_SIZE);
 
     return (CY_CRYPTO_SUCCESS);
 }
 
 bool Cy_Crypto_Core_Vu_IsRegZero(CRYPTO_Type *base, uint32_t srcReg)
 {
-    bool result;
+    bool myResult;
     uint16_t status;
 
     CY_CRYPTO_VU_TST(base, srcReg);
     status = Cy_Crypto_Core_Vu_StatusRead(base);
 
-    if (status & CY_CRYPTO_VU_STATUS_ZERO_BIT)
+    if (0u != (status & CY_CRYPTO_VU_STATUS_ZERO_BIT))
     {
-        result = true;
+        myResult = true;
     }
     else
     {
-        result = false;
+        myResult = false;
     }
 
-    return result;
+    return myResult;
 }
 
 bool Cy_Crypto_Core_Vu_IsRegEqual(CRYPTO_Type *base, uint32_t srcReg0, uint32_t srcReg1)
 {
-    bool result;
+    bool myResult;
     uint16_t status;
 
     CY_CRYPTO_VU_CMP_SUB (base, srcReg1, srcReg0);                /* C = (a >= b) */
     status = Cy_Crypto_Core_Vu_StatusRead(base);
 
-    if (status &  CY_CRYPTO_VU_STATUS_ZERO_BIT)
+    if (0u != (status &  CY_CRYPTO_VU_STATUS_ZERO_BIT))
     {
-        result = true;
+        myResult = true;
     }
     else
     {
-        result = false;
+        myResult = false;
     }
 
-    return result;
+    return myResult;
 }
 
 bool Cy_Crypto_Core_Vu_IsRegLess(CRYPTO_Type *base, uint32_t srcReg0, uint32_t srcReg1)
 {
-    bool result;
+    bool myResult;
     uint16_t status;
 
     CY_CRYPTO_VU_CMP_SUB (base, srcReg1, srcReg0);                /* C = (a >= b) */
     status = Cy_Crypto_Core_Vu_StatusRead(base);
 
-    if (status &  CY_CRYPTO_VU_STATUS_CARRY_BIT)
+    if (0u != (status &  CY_CRYPTO_VU_STATUS_CARRY_BIT))
     {
-        result = true;
+        myResult = true;
     }
     else
     {
-        result = false;
+        myResult = false;
     }
 
-    return result;
+    return myResult;
 }
 
 

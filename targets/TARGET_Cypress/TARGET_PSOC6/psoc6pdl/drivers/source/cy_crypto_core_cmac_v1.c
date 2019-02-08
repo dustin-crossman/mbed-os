@@ -268,7 +268,7 @@ void Cy_Crypto_Core_V1_Cmac_Finish(CRYPTO_Type *base,
 * The pointer to the calculated CMAC.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return

@@ -325,13 +325,13 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Init(CRYPTO_Type *base,
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
 {
-    hashState->blockIdx = 0u;
-    hashState->messageSize = 0u;
-
     cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
 
     if (hashState != NULL)
     {
+        hashState->blockIdx = 0u;
+        hashState->messageSize = 0u;
+
         if (hashState->hashSize != 0)
         {
             Cy_Crypto_Core_V1_MemCpy(base, hashState->hash, hashState->initialHash, (uint16_t)hashState->hashSize);
@@ -562,9 +562,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha(CRYPTO_Type *base,
     cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
 
     void *shaBuffers = (void *)REG_CRYPTO_MEM_BUFF(base);
-    cy_stc_crypto_sha_state_t      myHashState;
+    cy_stc_crypto_sha_state_t myHashState;
 
-    myResult = Cy_Crypto_Core_V1_Sha_Init   (base, &myHashState, mode, shaBuffers);
+    myResult = Cy_Crypto_Core_V1_Sha_Init (base, &myHashState, mode, shaBuffers);
 
     if (CY_CRYPTO_SUCCESS == myResult)
     {

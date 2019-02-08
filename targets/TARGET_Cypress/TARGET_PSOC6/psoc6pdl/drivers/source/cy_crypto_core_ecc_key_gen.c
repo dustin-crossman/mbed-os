@@ -29,12 +29,11 @@
 #include "cy_crypto_core_vu.h"
 #include "cy_crypto_core_trng.h"
 
-#define CY_ECC_CONFIG_TR_GARO_CTL      0x6C740B8Du
-#define CY_ECC_CONFIG_TR_FIRO_CTL      0x52D246E1u
+#define CY_ECC_CONFIG_TR_GARO_CTL      0x6C740B8DuL
+#define CY_ECC_CONFIG_TR_FIRO_CTL      0x52D246E1uL
 
 /* print some debug information. enabling this will render meaningless all time measurements */
 #define ECC_KEY_GEN_DEBUG               0
-
 
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_ECC_MakeKeyPair
@@ -56,7 +55,7 @@
 *
 * \param randomDataInfo
 *
-* \return status code. See \ref cy_en_crypto_status_t
+* \return status code. See \ref cy_en_crypto_status_t.
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
@@ -67,7 +66,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
 {
     cy_stc_crypto_ecc_dp_type *eccDp = Cy_Crypto_Core_ECC_GetCurveParams(curveID);
 
-    if (eccDp == NULL || key == NULL)
+    if ((eccDp == NULL) || (key == NULL))
     {
         /* NULL parameter detected in Cy_Crypto_Core_ECC_MakeKeyPair()!!! */
         return CY_CRYPTO_NOT_SUPPORTED;
@@ -79,18 +78,18 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
     Tb_PrintStr("\n");
 #endif  /* ECC_KEY_GEN_DEBUG */
 
-    int bitsize = eccDp->size;
+    uint32_t bitsize = eccDp->size;
 
     /* used VU registers. Same values as in crypto_NIST_P.c */
-    int p_temp = 8;     /* temporal values */
-    int p_order = 9;    /* order of the curve */
-    int p_d = 10;       /* private key */
-    int p_x = 11;       /* x coordinate */
-    int p_y = 12;       /* y coordinate */
+    uint32_t p_temp = 8u;     /* temporal values */
+    uint32_t p_order = 9u;    /* order of the curve */
+    uint32_t p_d = 10u;       /* private key */
+    uint32_t p_x = 11u;       /* x coordinate */
+    uint32_t p_y = 12u;       /* y coordinate */
 
     CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
     CY_CRYPTO_VU_ALLOC_MEM(base, p_order, bitsize);
-    CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1);
+    CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1u);
     CY_CRYPTO_VU_ALLOC_MEM(base, p_x, bitsize);
     CY_CRYPTO_VU_ALLOC_MEM(base, p_y, bitsize);
 
@@ -103,7 +102,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
     /* P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h  */
     Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->prime, bitsize);
     Cy_Crypto_Core_Vu_SetMemValue (base, p_order, eccDp->order, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p, bitsize + 1);
+    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p, bitsize + 1u);
 
     /* Base Point, G = (p_x, p_y) */
     Cy_Crypto_Core_Vu_SetMemValue (base, p_x, eccDp->Gx, bitsize);
@@ -118,16 +117,24 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
     ***************************************************************/
     if (GetRandomDataFunc != NULL)
     {
-         GetRandomDataFunc( randomDataInfo, key->k, (bitsize + 7u) >> 3u );
+        (void)GetRandomDataFunc( randomDataInfo, (uint8_t*)key->k, ((bitsize + 7u) >> 3u) );
     }
     else
     {
-        for (int i = 0, randomsize = bitsize; randomsize > 0; randomsize-=32, i++)
-        {
-            int randombits = CY_CRYPTO_MIN(randomsize, 32);
+        uint32_t i = 0u;
+        int32_t randomsize = bitsize;
 
-            cy_en_crypto_status_t error = Cy_Crypto_Core_Trng(base, CY_ECC_CONFIG_TR_GARO_CTL, CY_ECC_CONFIG_TR_FIRO_CTL,
-                                                              randombits, &((uint32_t *)key->k)[i]);
+        while (randomsize > 0u)
+        {
+            uint32_t randombits = CY_CRYPTO_MIN(randomsize, 32u);
+
+            cy_en_crypto_status_t error = Cy_Crypto_Core_Trng(base,
+                                                              CY_ECC_CONFIG_TR_GARO_CTL,
+                                                              CY_ECC_CONFIG_TR_FIRO_CTL,
+                                                              randombits,
+                                                              &((uint32_t *)key->k)[i]);
+            randomsize -= 32u;
+            i++;
 
             if (CY_CRYPTO_SUCCESS != error)
             {
@@ -135,7 +142,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
             }
         }
     }
-
 
     /***************************************************************
     *               Load random data into VU
@@ -152,9 +158,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
 
     /* check that the key is smaller than the order of base point */
     CY_CRYPTO_VU_CMP_SUB (base, p_d, p_order);                    /*  C = (a >= b) */
-    uint16_t status = Cy_Crypto_Core_Vu_StatusRead(base);
+    uint32_t status = Cy_Crypto_Core_Vu_StatusRead(base);
 
-    if (status &  CY_CRYPTO_VU_STATUS_CARRY_BIT)
+    if (0u != (status &  CY_CRYPTO_VU_STATUS_CARRY_BIT))
     {
         /*  random data >= order, needs reduction */
 
@@ -185,10 +191,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
         Crypto_RegMemNumberPrint(p_d);
 #endif /*  ECC_KEY_GEN_DEBUG */
 
-    }
-    else
-    {
-        /*  carry is clear, i. e. p_d < p_order */
     }
 
     /* make the public key
@@ -234,7 +236,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
 *
 * \param randomDataInfo
 *
-* \return status code. See \ref cy_en_crypto_status_t
+* \return status code. See \ref cy_en_crypto_status_t.
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
@@ -244,7 +246,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
 {
     const cy_stc_crypto_ecc_dp_type *eccDp = Cy_Crypto_Core_ECC_GetCurveParams(curveID);
 
-    if (eccDp == NULL || key == NULL)
+    if ((eccDp == NULL) || (key == NULL))
     {
         /* NULL parameter detected in Cy_Crypto_Core_ECC_MakeKey()!!! */
         return CY_CRYPTO_NOT_SUPPORTED;
@@ -256,24 +258,27 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
     Tb_PrintStr("\n");
 #endif  /* ECC_KEY_GEN_DEBUG */
 
-    int bitsize = eccDp->size;
+    uint32_t bitsize = eccDp->size;
 
-    int p_temp = 8;     /* temporal values */
-    int p_d = 10;       /* private key */
+    uint32_t p_temp = 8u;     /* temporal values */
+    uint32_t p_d = 10u;       /* private key */
 
     /* generate random string */
     if (GetRandomDataFunc != NULL)
     {
-         GetRandomDataFunc( randomDataInfo, key, (bitsize + 7u) >> 3u );
+         (void)GetRandomDataFunc( randomDataInfo, key, (bitsize + 7u) >> 3u );
     }
     else
     {
-        for (int i = 0, randomsize = bitsize; randomsize > 0; randomsize-=32, i++)
+        for (int32_t i = 0, randomsize = bitsize; randomsize > 0; randomsize-=32u, i++)
         {
-            int randombits = CY_CRYPTO_MIN(randomsize, 32);
+            uint32_t randombits = CY_CRYPTO_MIN(randomsize, 32u);
 
-            cy_en_crypto_status_t error = Cy_Crypto_Core_Trng(base, CY_ECC_CONFIG_TR_GARO_CTL, CY_ECC_CONFIG_TR_FIRO_CTL,
-                                                              randombits, &((uint32_t *)key)[i]);
+            cy_en_crypto_status_t error = Cy_Crypto_Core_Trng(base,
+                                                              CY_ECC_CONFIG_TR_GARO_CTL,
+                                                              CY_ECC_CONFIG_TR_FIRO_CTL,
+                                                              randombits,
+                                                              &((uint32_t *)key)[i]);
 
             if (CY_CRYPTO_SUCCESS != error)
             {
@@ -291,9 +296,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
     /* load prime and order defining the curve as well as the barrett coefficient. */
     /* P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h */
     CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
-    CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1);
+    CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1u);
     Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->order, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_o, bitsize + 1);
+    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_o, bitsize + 1u);
 
     /* Load random data into VU */
     CY_CRYPTO_VU_ALLOC_MEM(base, p_d, bitsize);
@@ -311,9 +316,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
 
     /* check that the key is smaller than the order of base point */
     CY_CRYPTO_VU_CMP_SUB (base, p_d, VR_P);                    /* C = (a >= b) */
-    uint16_t status = Cy_Crypto_Core_Vu_StatusRead(base);
+    uint32_t status = Cy_Crypto_Core_Vu_StatusRead(base);
 
-    if (status & CY_CRYPTO_VU_STATUS_CARRY_BIT)
+    if (0u != (status & CY_CRYPTO_VU_STATUS_CARRY_BIT))
     {
         /* private key (random data) >= order, needs reduction */
 
@@ -362,17 +367,17 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
 * \param publicKey
 * See \ref cy_stc_crypto_ecc_key.
 *
-* \return status code. See \ref cy_en_crypto_status_t
+* \return status code. See \ref cy_en_crypto_status_t.
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
         cy_en_crypto_ecc_curve_id_t curveID,
-        uint8_t *privateKey,
+        const uint8_t *privateKey,
         cy_stc_crypto_ecc_key *publicKey)
 {
     cy_stc_crypto_ecc_dp_type *eccDp = Cy_Crypto_Core_ECC_GetCurveParams(curveID);
 
-    if (eccDp == NULL || privateKey == NULL || publicKey == NULL)
+    if ((eccDp == NULL) || (privateKey == NULL) || (publicKey == NULL))
     {
         /* NULL parameter detected in Cy_Crypto_Core_ECC_MakeKey()!!! */
         return CY_CRYPTO_NOT_SUPPORTED;
@@ -384,19 +389,19 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
     Tb_PrintStr("\n");
 #endif  /* ECC_KEY_GEN_DEBUG */
 
-    int bitsize = eccDp->size;
+    uint32_t bitsize = eccDp->size;
 
-    int p_order = 9;    /* order of the curve */
-    int p_d = 10;       /* private key */
-    int p_x = 11;       /* x coordinate */
-    int p_y = 12;       /* y coordinate */
+    uint32_t p_order = 9u;    /* order of the curve */
+    uint32_t p_d = 10u;       /* private key */
+    uint32_t p_x = 11u;       /* x coordinate */
+    uint32_t p_y = 12u;       /* y coordinate */
 
     /* make the public key
     * EC scalar multiplication - X,Y-only co-Z arithmetic
     */
     CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
     CY_CRYPTO_VU_ALLOC_MEM(base, p_order, bitsize);
-    CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1);
+    CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1u);
     CY_CRYPTO_VU_ALLOC_MEM(base, p_x, bitsize);
     CY_CRYPTO_VU_ALLOC_MEM(base, p_y, bitsize);
 
@@ -407,7 +412,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
     /*  P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h */
     Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->prime, bitsize);
     Cy_Crypto_Core_Vu_SetMemValue (base, p_order, eccDp->order, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p, bitsize + 1);
+    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p, bitsize + 1u);
 
     /*Base Point, G = (p_x, p_y) */
     Cy_Crypto_Core_Vu_SetMemValue (base, p_x, eccDp->Gx, bitsize);

@@ -48,7 +48,7 @@
 * The pointer to the CRYPTO instance.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 *******************************************************************************/
@@ -81,7 +81,7 @@ void Cy_Crypto_Core_V2_Aes_LoadEncKey(CRYPTO_Type *base,
 * The pointer to the CRYPTO instance.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 *******************************************************************************/
@@ -123,7 +123,7 @@ void Cy_Crypto_Core_V2_Aes_LoadDecKey(CRYPTO_Type *base,
 * \ref cy_en_crypto_aes_key_length_t
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return
@@ -169,7 +169,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Init(CRYPTO_Type *base,
 * The pointer to a source block.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return
@@ -225,7 +225,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Ecb(CRYPTO_Type *base,
 * The pointer to a source plain text. Must be 4-Byte aligned.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return
@@ -319,7 +319,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Cbc(CRYPTO_Type *base,
 * The pointer to a source plain text. Must be 4-Byte aligned.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return
@@ -411,7 +411,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Cfb(CRYPTO_Type *base,
 * The pointer to a source plain text. Must be 4-Byte aligned.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return

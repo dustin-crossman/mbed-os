@@ -142,20 +142,20 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base,
                                     const uint8_t *hash,
                                     uint32_t hashlen,
                                     uint8_t *sig,
-                                    cy_stc_crypto_ecc_key *key,
+                                    const cy_stc_crypto_ecc_key *key,
                                     uint8_t *messageKey);
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
-                                      const uint8_t *sig,
-                                      const uint8_t *hash,
-                                      uint32_t hashlen,
-                                      uint8_t *status,
-                                      cy_stc_crypto_ecc_key *key);
+                                    const uint8_t *sig,
+                                    const uint8_t *hash,
+                                    uint32_t hashlen,
+                                    uint8_t *stat,
+                                    const cy_stc_crypto_ecc_key *key);
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
         cy_en_crypto_ecc_curve_id_t curveID, uint8_t *key,
         cy_func_get_random_data_t GetRandomDataFunc, void *randomDataInfo);
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
         cy_en_crypto_ecc_curve_id_t curveID,
-        uint8_t *privateKey,
+        const uint8_t *privateKey,
         cy_stc_crypto_ecc_key *publicKey);
 
 /** \} group_crypto_lld_asymmetric_functions */
@@ -183,11 +183,11 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
 #define CY_CRYPTO_ECC_MAX_BYTE_SIZE        (CY_CRYPTO_ECC_P521_BYTE_SIZE)
 
 /* "Global" vector unit registers. */
-#define VR_D                               10
-#define VR_S_X                             11
-#define VR_S_Y                             12
-#define VR_BARRETT                         13
-#define VR_P                               14          /* polynomial */
+#define VR_D                               10u
+#define VR_S_X                             11u
+#define VR_S_Y                             12u
+#define VR_BARRETT                         13u
+#define VR_P                               14u         /* polynomial */
 
 
 #endif /* #if (CPUSS_CRYPTO_VU == 1) */

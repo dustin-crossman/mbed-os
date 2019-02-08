@@ -139,17 +139,17 @@ __STATIC_INLINE void Cy_Crypto_Core_MemSet(CRYPTO_Type *base, void* dst, uint8_t
 *******************************************************************************/
 __STATIC_INLINE uint32_t Cy_Crypto_Core_MemCmp(CRYPTO_Type *base, void const *src0, void const *src1, uint16_t size)
 {
-    uint32_t result;
+    uint32_t myResult;
     if (cy_device->cryptoVersion == 1u)
     {
-        result = Cy_Crypto_Core_V1_MemCmp(base, src0, src1, size);
+        myResult = Cy_Crypto_Core_V1_MemCmp(base, src0, src1, size);
     }
     else
     {
-        result = Cy_Crypto_Core_V2_MemCmp(base, src0, src1, size);
+        myResult = Cy_Crypto_Core_V2_MemCmp(base, src0, src1, size);
     }
 
-    return (result);
+    return (myResult);
 }
 
 /*******************************************************************************

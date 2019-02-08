@@ -233,13 +233,13 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
 {
-    hashState->blockIdx = 0u;
-    hashState->messageSize = 0u;
-
     cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
 
     if (hashState != NULL)
     {
+        hashState->blockIdx = 0u;
+        hashState->messageSize = 0u;
+
         if (hashState->hashSize != 0)
         {
             Cy_Crypto_Core_V2_RBClear(base);
