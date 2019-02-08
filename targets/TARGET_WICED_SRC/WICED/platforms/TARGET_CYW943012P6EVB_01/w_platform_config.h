@@ -29,11 +29,12 @@ extern "C" {
 /*  WiFi GPIO pin used for out-of-band interrupt */
 //#define WICED_WIFI_OOB_IRQ_GPIO_PIN  ( 0 )    /* WiFi chip is not configured for GPIO OOB IRQ in CYW943012P6EVB_01 board */
 
+/* The wifi power and reset pin are configured in wwd_sdio.c */
 /* WiFi power pin is present */
-#define WICED_USE_WIFI_POWER_PIN    /* WiFi chip is powered by external source and be controlled by CYW943012P6EVB_01 board */
+//#define WICED_USE_WIFI_POWER_PIN    /* WiFi chip is powered by external source and be controlled by CYW943012P6EVB_01 board */
 
 /* WiFi reset pin is present */
-#define WICED_USE_WIFI_RESET_PIN
+//#define WICED_USE_WIFI_RESET_PIN
 
 /* WiFi power pin is active high */
 //#define WICED_USE_WIFI_POWER_PIN_ACTIVE_HIGH    /* WiFi chip is powered by external power source in CYW943012P6EVB_01 board */

@@ -451,6 +451,11 @@
             "value": "",
             "help": "Internally used configuration"
         },
+        "wwd-logging-stdout-enable": {
+            "macro_name": "WWD_LOGGING_STDOUT_ENABLE",
+            "value": null,
+            "help": "Enable WWD_LOG in console output"
+        },
         "wwd-direct-resources": {
             "macro_name": "WWD_DIRECT_RESOURCES",
             "value": "",

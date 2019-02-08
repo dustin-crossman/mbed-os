@@ -39,8 +39,7 @@ extern "C"
 #endif
 
 /*
-#define WWD_LOGGING_STDOUT_ENABLE
-#define WWD_LOGGING_BUFFER_ENABLE
+    Enable logging in mbed_lib.json
 */
 
 #if defined( WWD_LOGGING_STDOUT_ENABLE )
@@ -48,14 +47,6 @@ extern "C"
 #include <stdio.h>
 
 #define WWD_LOG( x ) printf x
-
-#elif defined( WWD_LOGGING_BUFFER_ENABLE )
-extern int wwd_logging_enabled;
-
-extern int wwd_logging_printf(const char *format, ...);
-
-#define WWD_LOG( x ) if (wwd_logging_enabled) {wwd_logging_printf x; }
-
 
 #else /* if defined( WWD_LOGGING_BUFFER_ENABLE ) */
 
