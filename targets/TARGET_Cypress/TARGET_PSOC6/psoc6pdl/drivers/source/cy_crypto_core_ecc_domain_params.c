@@ -45,14 +45,14 @@ static const cy_stc_crypto_ecc_dp_type eccDomainParams[CY_CRYPTO_ECC_ECP_CURVES_
 *******************************************************************************/
 cy_stc_crypto_ecc_dp_type *Cy_Crypto_Core_ECC_GetCurveParams(cy_en_crypto_ecc_curve_id_t curveId)
 {
-    cy_stc_crypto_ecc_dp_type *myResult = NULL;
+    cy_stc_crypto_ecc_dp_type *tmpResult = NULL;
 
     if ((curveId > CY_CRYPTO_ECC_ECP_NONE) && (curveId < CY_CRYPTO_ECC_ECP_CURVES_CNT))
     {
-        myResult = (cy_stc_crypto_ecc_dp_type *)&eccDomainParams[curveId];
+        tmpResult = (cy_stc_crypto_ecc_dp_type *)&eccDomainParams[curveId];
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /* P192 CURVE PARAMETERS */

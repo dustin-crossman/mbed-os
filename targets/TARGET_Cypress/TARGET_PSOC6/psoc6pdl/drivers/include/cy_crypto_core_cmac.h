@@ -93,18 +93,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Cmac(CRYPTO_Type *base,
                                           uint8_t *cmac,
                                           cy_stc_crypto_aes_state_t *aesState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Cmac(base, message, messageSize, key, keyLength, cmac, aesState);
+        tmpResult = Cy_Crypto_Core_V1_Cmac(base, message, messageSize, key, keyLength, cmac, aesState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Cmac(base, message, messageSize, key, keyLength, cmac, aesState);
+        tmpResult = Cy_Crypto_Core_V2_Cmac(base, message, messageSize, key, keyLength, cmac, aesState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /** \} group_crypto_lld_mac_functions */

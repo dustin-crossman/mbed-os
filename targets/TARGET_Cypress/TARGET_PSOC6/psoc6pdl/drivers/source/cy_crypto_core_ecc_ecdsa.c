@@ -72,7 +72,7 @@
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8_t *hash, uint32_t hashlen, uint8_t *sig,
         const cy_stc_crypto_ecc_key *key, uint8_t *messageKey)
 {
-    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
 
     cy_stc_crypto_ecc_key ephKey;
     uint8_t myKGX[CY_CRYPTO_ECC_MAX_BYTE_SIZE];
@@ -85,7 +85,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
     /* NULL parameters checking */
     if ((hash != NULL) && (sig != NULL) && (key != NULL) && (messageKey != NULL))
     {
-        myResult = CY_CRYPTO_NOT_SUPPORTED;
+        tmpResult = CY_CRYPTO_NOT_SUPPORTED;
 
         eccDp = Cy_Crypto_Core_ECC_GetCurveParams(key->curveID);
 
@@ -103,11 +103,11 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
             ephKey.pubkey.x = myKGX;
             ephKey.pubkey.y = myKGY;
 
-            myResult = Cy_Crypto_Core_ECC_MakePublicKey(base, key->curveID, messageKey, &ephKey);
+            tmpResult = Cy_Crypto_Core_ECC_MakePublicKey(base, key->curveID, messageKey, &ephKey);
 
-            if (CY_CRYPTO_SUCCESS == myResult)
+            if (CY_CRYPTO_SUCCESS == tmpResult)
             {
-                myResult = CY_CRYPTO_BAD_PARAMS;
+                tmpResult = CY_CRYPTO_BAD_PARAMS;
 
                 uint32_t dividend =  0u;   /* for whatever reason Crypto_EC_DivMod only works if dividend is in register 0 */
                 uint32_t p_temp   =  8u;
@@ -140,7 +140,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
 
                 if (!Cy_Crypto_Core_Vu_IsRegZero(base, p_r))
                 {
-                    myResult = CY_CRYPTO_SUCCESS;
+                    tmpResult = CY_CRYPTO_SUCCESS;
 
                     CY_CRYPTO_VU_ALLOC_MEM (base, p_d, bitsize);
                     CY_CRYPTO_VU_ALLOC_MEM (base, p_s, bitsize);
@@ -170,7 +170,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
                         if (Cy_Crypto_Core_Vu_IsRegZero(base, p_r))
                         {
                             /* R is zero!!! */
-                            myResult = CY_CRYPTO_HW_ERROR;
+                            tmpResult = CY_CRYPTO_HW_ERROR;
                         }
                     }
                     else
@@ -180,7 +180,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
                         Cy_Crypto_Core_MemCpy(base, sig, ephKey.pubkey.x, (uint16_t)CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize));
                     }
 
-                    if (CY_CRYPTO_SUCCESS == myResult)
+                    if (CY_CRYPTO_SUCCESS == tmpResult)
                     {
                         /* find s = (e + d*r)/k */
 
@@ -226,7 +226,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
                         }
                         else
                         {
-                            myResult = CY_CRYPTO_HW_ERROR;
+                            tmpResult = CY_CRYPTO_HW_ERROR;
                         }
 
                     #if ECC_ECDSA_DEBUG
@@ -243,7 +243,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
         }
     }
 
-    return (myResult);
+    return (tmpResult);
 }
 
 
@@ -278,7 +278,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
                             const uint8_t *sig, const uint8_t *hash, uint32_t hashlen,
                             uint8_t *stat, const cy_stc_crypto_ecc_key *key)
 {
-    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
 
     const cy_stc_crypto_ecc_dp_type *eccDp;
 
@@ -288,7 +288,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
     /* NULL parameters checking */
     if ((sig != NULL) && (hash != NULL) && (stat != NULL) && (key != NULL))
     {
-        myResult = CY_CRYPTO_NOT_SUPPORTED;
+        tmpResult = CY_CRYPTO_NOT_SUPPORTED;
 
         eccDp = Cy_Crypto_Core_ECC_GetCurveParams(key->curveID);
 
@@ -303,7 +303,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
 
             bitsize = eccDp->size;
 
-            myResult = CY_CRYPTO_SUCCESS;
+            tmpResult = CY_CRYPTO_SUCCESS;
 
             uint32_t dividend = 0u;   /* for whatever reason Crypto_EC_DivMod only works if dividend is in register 0 */
             uint32_t p_r  = 4u;
@@ -342,25 +342,25 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
             if (Cy_Crypto_Core_Vu_IsRegZero(base, p_r))
             {
                 /* R is zero!!! */
-                myResult = CY_CRYPTO_BAD_PARAMS;
+                tmpResult = CY_CRYPTO_BAD_PARAMS;
             }
             if (!Cy_Crypto_Core_Vu_IsRegLess(base, p_r, VR_P))
             {
                 /* R is not less than n!!! */
-                myResult = CY_CRYPTO_BAD_PARAMS;
+                tmpResult = CY_CRYPTO_BAD_PARAMS;
             }
             if (Cy_Crypto_Core_Vu_IsRegZero(base, p_s))
             {
                 /* S is zero!!! */
-                myResult = CY_CRYPTO_BAD_PARAMS;
+                tmpResult = CY_CRYPTO_BAD_PARAMS;
             }
             if (!Cy_Crypto_Core_Vu_IsRegLess(base, p_s, VR_P))
             {
                 /* S is not less than n!!! */
-                myResult = CY_CRYPTO_BAD_PARAMS;
+                tmpResult = CY_CRYPTO_BAD_PARAMS;
             }
 
-            if (CY_CRYPTO_SUCCESS == myResult)
+            if (CY_CRYPTO_SUCCESS == tmpResult)
             {
                 CY_CRYPTO_VU_ALLOC_MEM (base, dividend, bitsize);
                 CY_CRYPTO_VU_ALLOC_MEM (base, p_o, bitsize);
@@ -481,7 +481,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
         }
     }
 
-    return (myResult);
+    return (tmpResult);
 }
 
 

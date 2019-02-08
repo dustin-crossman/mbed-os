@@ -88,18 +88,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Hmac(CRYPTO_Type *base,
                                           uint32_t keyLength,
                                           cy_en_crypto_sha_mode_t mode)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Hmac(base, hmac, message, messageSize, key, keyLength, mode);
+        tmpResult = Cy_Crypto_Core_V1_Hmac(base, hmac, message, messageSize, key, keyLength, mode);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Hmac(base, hmac, message, messageSize, key, keyLength, mode);
+        tmpResult = Cy_Crypto_Core_V2_Hmac(base, hmac, message, messageSize, key, keyLength, mode);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /** \} group_crypto_lld_mac_functions */

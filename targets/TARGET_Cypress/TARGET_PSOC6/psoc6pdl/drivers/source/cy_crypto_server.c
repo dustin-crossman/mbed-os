@@ -736,7 +736,7 @@ void Cy_Crypto_Server_GetDataHandler(void)
 *******************************************************************************/
 static cy_en_crypto_status_t Cy_Crypto_Core_CheckHwForErrors(cy_stc_crypto_context_t *cryptoContext)
 {
-    cy_en_crypto_status_t myResult = CY_CRYPTO_SUCCESS;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_SUCCESS;
     uint32_t myErrorStatus0;
     uint32_t myErrorStatus1;
 
@@ -750,7 +750,7 @@ static cy_en_crypto_status_t Cy_Crypto_Core_CheckHwForErrors(cy_stc_crypto_conte
 
         if (_FLD2VAL(CRYPTO_ERROR_STATUS1_VALID, myErrorStatus1) == 1u)
         {
-            myResult = CY_CRYPTO_HW_ERROR;
+            tmpResult = CY_CRYPTO_HW_ERROR;
 
             cy_crypto_serverContext->isHwErrorOccured = true;
         }
@@ -763,7 +763,7 @@ static cy_en_crypto_status_t Cy_Crypto_Core_CheckHwForErrors(cy_stc_crypto_conte
 
         if (_FLD2VAL(CRYPTO_ERROR_STATUS1_VALID, myErrorStatus1) == 1u)
         {
-            myResult = CY_CRYPTO_HW_ERROR;
+            tmpResult = CY_CRYPTO_HW_ERROR;
         }
 
         cy_crypto_serverContext->isHwErrorOccured = false;
@@ -772,7 +772,7 @@ static cy_en_crypto_status_t Cy_Crypto_Core_CheckHwForErrors(cy_stc_crypto_conte
     cryptoContext->hwErrorStatus.errorStatus0 = myErrorStatus0;
     cryptoContext->hwErrorStatus.errorStatus1 = myErrorStatus1;
 
-    return (myResult);
+    return (tmpResult);
 }
 
 #endif /* CY_IP_MXCRYPTO */

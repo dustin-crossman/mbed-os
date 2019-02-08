@@ -160,7 +160,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Verify(CRYPTO_Type *base,
                             uint8_t const *decryptedSignature,
                             uint32_t decryptedSignatureLength)
 {
-    cy_en_crypto_status_t myResult = CY_CRYPTO_SUCCESS;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_SUCCESS;
 
     uint8_t  const *encodingArr = NULL;
     uint32_t encodingArrSize = 0u;
@@ -279,7 +279,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Verify(CRYPTO_Type *base,
         *verResult = CY_CRYPTO_RSA_VERIFY_SUCCESS;
     }
 
-    return (myResult);
+    return (tmpResult);
 }
 
 /** \} group_crypto_lld_asymmetric_functions */
@@ -630,7 +630,7 @@ static void Cy_Crypto_Core_Rsa_MontMul(CRYPTO_Type *base,
 *
 * \param inverseModulo
 * Binary inverse of the modulo.
-* 
+*
 * \param rBar
 * Values of (2^moduloLength mod modulo).
 *
@@ -775,7 +775,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Proc(CRYPTO_Type *base,
                                               uint32_t messageSize,
                                               uint8_t *processedMessage)
 {
-    cy_en_crypto_status_t myResult = CY_CRYPTO_SUCCESS;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_SUCCESS;
 
     uint8_t *expPtr              = key->pubExpPtr;
     uint32_t expBitLength        = key->pubExpLength;
@@ -854,7 +854,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Proc(CRYPTO_Type *base,
 
     Cy_Crypto_Core_Vu_WaitForComplete(base);
 
-    /* Copy the myResult to output buffer */
+    /* Copy the tmpResult to output buffer */
     Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t*)processedMessage, yReg, nBitLength);
 
     CY_CRYPTO_VU_FREE_MEM(base, CY_CRYPTO_VU_REG_BIT(yReg) | CY_CRYPTO_VU_REG_BIT(xReg) |
@@ -862,7 +862,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Proc(CRYPTO_Type *base,
                                 CY_CRYPTO_VU_REG_BIT(inverseModuloReg) |
                                 CY_CRYPTO_VU_REG_BIT(barrettReg) | CY_CRYPTO_VU_REG_BIT(rBarReg));
 
-    return (myResult);
+    return (tmpResult);
 }
 
 /*******************************************************************************
@@ -889,7 +889,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Proc(CRYPTO_Type *base,
 cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Coef(CRYPTO_Type *base,
                                               cy_stc_crypto_rsa_pub_key_t const *key)
 {
-    cy_en_crypto_status_t myResult = CY_CRYPTO_SUCCESS;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_SUCCESS;
 
     uint8_t *nPtr               = key->moduloPtr;
     uint32_t nBitLength         = key->moduloLength;
@@ -936,7 +936,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Rsa_Coef(CRYPTO_Type *base,
 
     CY_CRYPTO_VU_FREE_MEM(base, CY_CRYPTO_VU_REG_BIT(modReg) | CY_CRYPTO_VU_REG_BIT(inverseModuloReg) | CY_CRYPTO_VU_REG_BIT(barrettReg) | CY_CRYPTO_VU_REG_BIT(rBarReg));
 
-    return (myResult);
+    return (tmpResult);
 }
 
 /** \} group_crypto_lld_asymmetric_functions */

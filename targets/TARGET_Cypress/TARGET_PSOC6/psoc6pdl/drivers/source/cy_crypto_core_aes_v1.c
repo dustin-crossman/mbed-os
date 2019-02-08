@@ -304,7 +304,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Cbc(CRYPTO_Type *base,
     uint32_t *srcBuff  = (uint32_t*)(&aesBuffers->block0);
     uint32_t *dstBuff  = (uint32_t*)(&aesBuffers->block1);
 
-    cy_en_crypto_status_t myResult = CY_CRYPTO_SIZE_NOT_X16;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_SIZE_NOT_X16;
 
     /* Check whether the data size is multiple of CY_CRYPTO_AES_BLOCK_SIZE */
     if (0uL == (uint32_t)(size & (CY_CRYPTO_AES_BLOCK_SIZE - 1u)))
@@ -355,10 +355,10 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Cbc(CRYPTO_Type *base,
             }
         }
 
-        myResult = CY_CRYPTO_SUCCESS;
+        tmpResult = CY_CRYPTO_SUCCESS;
     }
 
-    return (myResult);
+    return (tmpResult);
 }
 
 /*******************************************************************************
@@ -403,7 +403,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Cfb(CRYPTO_Type *base,
                                              cy_stc_crypto_aes_state_t *aesState)
 {
     uint32_t size = srcSize;
-    cy_en_crypto_status_t myResult = CY_CRYPTO_SIZE_NOT_X16;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_SIZE_NOT_X16;
 
     cy_stc_crypto_aes_buffers_t *aesBuffers = (cy_stc_crypto_aes_buffers_t*)aesState->buffers;
 
@@ -442,10 +442,10 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Cfb(CRYPTO_Type *base,
             size -= CY_CRYPTO_AES_BLOCK_SIZE;
         }
 
-        myResult = CY_CRYPTO_SUCCESS;
+        tmpResult = CY_CRYPTO_SUCCESS;
     }
 
-    return (myResult);
+    return (tmpResult);
 }
 
 /*******************************************************************************

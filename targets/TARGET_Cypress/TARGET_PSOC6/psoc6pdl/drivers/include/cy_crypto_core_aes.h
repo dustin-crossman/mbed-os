@@ -105,18 +105,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Init(CRYPTO_Type *base,
                                                  cy_en_crypto_aes_key_length_t keyLength,
                                                  cy_stc_crypto_aes_state_t *aesState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Aes_Init(base, key, keyLength, aesState);
+        tmpResult = Cy_Crypto_Core_V1_Aes_Init(base, key, keyLength, aesState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Aes_Init(base, key, keyLength, aesState);
+        tmpResult = Cy_Crypto_Core_V2_Aes_Init(base, key, keyLength, aesState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -152,18 +152,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Ecb(CRYPTO_Type *base,
                                                 uint8_t const *src,
                                                 cy_stc_crypto_aes_state_t *aesState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Aes_Ecb(base, dirMode, dst, src, aesState);
+        tmpResult = Cy_Crypto_Core_V1_Aes_Ecb(base, dirMode, dst, src, aesState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Aes_Ecb(base, dirMode, dst, src, aesState);
+        tmpResult = Cy_Crypto_Core_V2_Aes_Ecb(base, dirMode, dst, src, aesState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -208,18 +208,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Cbc(CRYPTO_Type *base,
                                                 uint8_t const *src,
                                                 cy_stc_crypto_aes_state_t *aesState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Aes_Cbc(base, dirMode, srcSize, ivPtr, dst, src, aesState);
+        tmpResult = Cy_Crypto_Core_V1_Aes_Cbc(base, dirMode, srcSize, ivPtr, dst, src, aesState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Aes_Cbc(base, dirMode, srcSize, ivPtr, dst, src, aesState);
+        tmpResult = Cy_Crypto_Core_V2_Aes_Cbc(base, dirMode, srcSize, ivPtr, dst, src, aesState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -264,18 +264,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Cfb(CRYPTO_Type *base,
                                                 uint8_t const *src,
                                                 cy_stc_crypto_aes_state_t *aesState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Aes_Cfb(base, dirMode, srcSize, ivPtr, dst, src, aesState);
+        tmpResult = Cy_Crypto_Core_V1_Aes_Cfb(base, dirMode, srcSize, ivPtr, dst, src, aesState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Aes_Cfb(base, dirMode, srcSize, ivPtr, dst, src, aesState);
+        tmpResult = Cy_Crypto_Core_V2_Aes_Cfb(base, dirMode, srcSize, ivPtr, dst, src, aesState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -323,18 +323,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Ctr(CRYPTO_Type *base,
                                                 uint8_t const *src,
                                                 cy_stc_crypto_aes_state_t *aesState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Aes_Ctr(base, srcSize, srcOffset, ivPtr, streamBlock, dst, src, aesState);
+        tmpResult = Cy_Crypto_Core_V1_Aes_Ctr(base, srcSize, srcOffset, ivPtr, streamBlock, dst, src, aesState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Aes_Ctr(base, srcSize, srcOffset, ivPtr, streamBlock, dst, src, aesState);
+        tmpResult = Cy_Crypto_Core_V2_Aes_Ctr(base, srcSize, srcOffset, ivPtr, streamBlock, dst, src, aesState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /** \} group_crypto_lld_symmetric_functions */

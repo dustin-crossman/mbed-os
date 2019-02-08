@@ -241,7 +241,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Cbc(CRYPTO_Type *base,
                                             cy_stc_crypto_aes_state_t *aesState)
 {
     uint32_t size = srcSize;
-    cy_en_crypto_status_t myResult = CY_CRYPTO_SIZE_NOT_X16;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_SIZE_NOT_X16;
 
     /* Check whether the data size is multiple of CY_CRYPTO_AES_BLOCK_SIZE */
     if (0uL == (uint32_t)(srcSize & (uint32_t)(CY_CRYPTO_AES_BLOCK_SIZE - 1u)))
@@ -285,12 +285,12 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Cbc(CRYPTO_Type *base,
             }
         }
 
-        myResult = CY_CRYPTO_SUCCESS;
+        tmpResult = CY_CRYPTO_SUCCESS;
     }
 
     Cy_Crypto_Core_WaitForReady(base);
 
-    return (myResult);
+    return (tmpResult);
 }
 
 /*******************************************************************************
@@ -336,7 +336,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Cfb(CRYPTO_Type *base,
 {
     uint32_t size = srcSize;
 
-    cy_en_crypto_status_t myResult = CY_CRYPTO_SIZE_NOT_X16;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_SIZE_NOT_X16;
 
     /* Check whether the data size is multiple of CY_CRYPTO_AES_BLOCK_SIZE */
     if (0uL == (uint32_t)(size & (uint32_t)(CY_CRYPTO_AES_BLOCK_SIZE - 1u)))
@@ -374,12 +374,12 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Cfb(CRYPTO_Type *base,
             }
         }
 
-        myResult = CY_CRYPTO_SUCCESS;
+        tmpResult = CY_CRYPTO_SUCCESS;
     }
 
     Cy_Crypto_Core_WaitForReady(base);
 
-    return (myResult);
+    return (tmpResult);
 }
 
 /*******************************************************************************

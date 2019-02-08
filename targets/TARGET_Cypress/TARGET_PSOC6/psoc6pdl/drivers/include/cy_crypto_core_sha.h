@@ -78,18 +78,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha(CRYPTO_Type *base,
                                 uint8_t *digest,
                                 cy_en_crypto_sha_mode_t mode)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Sha(base, message, messageSize, digest, mode);
+        tmpResult = Cy_Crypto_Core_V1_Sha(base, message, messageSize, digest, mode);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Sha(base, message, messageSize, digest, mode);
+        tmpResult = Cy_Crypto_Core_V2_Sha(base, message, messageSize, digest, mode);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -120,18 +120,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Init(CRYPTO_Type *base,
                              cy_en_crypto_sha_mode_t mode,
                              void *shaBuffers)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Sha_Init(base, shaHashState, mode, shaBuffers);
+        tmpResult = Cy_Crypto_Core_V1_Sha_Init(base, shaHashState, mode, shaBuffers);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Sha_Init(base, shaHashState, mode, shaBuffers);
+        tmpResult = Cy_Crypto_Core_V2_Sha_Init(base, shaHashState, mode, shaBuffers);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -152,18 +152,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Init(CRYPTO_Type *base,
 *******************************************************************************/
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Sha_Start(base, hashState);
+        tmpResult = Cy_Crypto_Core_V1_Sha_Start(base, hashState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Sha_Start(base, hashState);
+        tmpResult = Cy_Crypto_Core_V2_Sha_Start(base, hashState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -198,18 +198,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Update(CRYPTO_Type *bas
                                uint8_t const *message,
                                uint32_t  messageSize)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Sha_Update(base, hashState, message, messageSize);
+        tmpResult = Cy_Crypto_Core_V1_Sha_Update(base, hashState, message, messageSize);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Sha_Update(base, hashState, message, messageSize);
+        tmpResult = Cy_Crypto_Core_V2_Sha_Update(base, hashState, message, messageSize);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -235,18 +235,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Finish(CRYPTO_Type *bas
                                cy_stc_crypto_sha_state_t *hashState,
                                uint8_t *digest)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Sha_Finish(base, hashState, digest);
+        tmpResult = Cy_Crypto_Core_V1_Sha_Finish(base, hashState, digest);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Sha_Finish(base, hashState, digest);
+        tmpResult = Cy_Crypto_Core_V2_Sha_Finish(base, hashState, digest);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -267,18 +267,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Finish(CRYPTO_Type *bas
 *******************************************************************************/
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Sha_Free(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Sha_Free(base, hashState);
+        tmpResult = Cy_Crypto_Core_V1_Sha_Free(base, hashState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Sha_Free(base, hashState);
+        tmpResult = Cy_Crypto_Core_V2_Sha_Free(base, hashState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /** \} group_crypto_lld_sha_functions */

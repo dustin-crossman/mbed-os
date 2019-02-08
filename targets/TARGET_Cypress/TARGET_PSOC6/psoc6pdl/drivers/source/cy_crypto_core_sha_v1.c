@@ -325,7 +325,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Init(CRYPTO_Type *base,
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Start(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
 {
-    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
 
     if (hashState != NULL)
     {
@@ -336,11 +336,11 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Start(CRYPTO_Type *base, cy_stc_cryp
         {
             Cy_Crypto_Core_V1_MemCpy(base, hashState->hash, hashState->initialHash, (uint16_t)hashState->hashSize);
 
-            myResult = CY_CRYPTO_SUCCESS;
+            tmpResult = CY_CRYPTO_SUCCESS;
         }
     }
 
-    return (myResult);
+    return (tmpResult);
 }
 
 /*******************************************************************************
@@ -375,7 +375,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Update(CRYPTO_Type *base,
                                uint8_t const *message,
                                uint32_t  messageSize)
 {
-    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
 
     if ((hashState != NULL) && (message != NULL))
     {
@@ -401,11 +401,11 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Update(CRYPTO_Type *base,
                 Cy_Crypto_Core_V1_MemCpy(base, hashState->block, message, (uint16_t)(messageSize & (blockSizeTmp - 1u)));
             }
 
-            myResult = CY_CRYPTO_SUCCESS;
+            tmpResult = CY_CRYPTO_SUCCESS;
         }
     }
 
-    return (myResult);
+    return (tmpResult);
 }
 
 /*******************************************************************************
@@ -431,7 +431,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Finish(CRYPTO_Type *base,
                                cy_stc_crypto_sha_state_t *hashState,
                                uint8_t *digest)
 {
-    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
 
     if ((hashState != NULL) && (digest != NULL))
     {
@@ -488,10 +488,10 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Finish(CRYPTO_Type *base,
             hashTmp += 4;
         }
 
-        myResult = CY_CRYPTO_SUCCESS;
+        tmpResult = CY_CRYPTO_SUCCESS;
     }
 
-    return (myResult);
+    return (tmpResult);
 }
 
 /*******************************************************************************
@@ -512,7 +512,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Finish(CRYPTO_Type *base,
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Free(CRYPTO_Type *base, cy_stc_crypto_sha_state_t *hashState)
 {
-    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
 
     if (hashState != NULL)
     {
@@ -521,10 +521,10 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Free(CRYPTO_Type *base, cy_stc_crypt
         Cy_Crypto_Core_V1_MemSet(base, hashState->hash,     0x00u, (uint16_t)hashState->hashSize);
         Cy_Crypto_Core_V1_MemSet(base, hashState->roundMem, 0x00u, (uint16_t)hashState->roundMemSize);
 
-        myResult = CY_CRYPTO_SUCCESS;
+        tmpResult = CY_CRYPTO_SUCCESS;
     }
 
-    return (myResult);
+    return (tmpResult);
 }
 
 
@@ -559,31 +559,31 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha(CRYPTO_Type *base,
                                 uint8_t *digest,
                                 cy_en_crypto_sha_mode_t mode)
 {
-    cy_en_crypto_status_t myResult = CY_CRYPTO_BAD_PARAMS;
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
 
     void *shaBuffers = (void *)REG_CRYPTO_MEM_BUFF(base);
     cy_stc_crypto_sha_state_t myHashState;
 
-    myResult = Cy_Crypto_Core_V1_Sha_Init (base, &myHashState, mode, shaBuffers);
+    tmpResult = Cy_Crypto_Core_V1_Sha_Init (base, &myHashState, mode, shaBuffers);
 
-    if (CY_CRYPTO_SUCCESS == myResult)
+    if (CY_CRYPTO_SUCCESS == tmpResult)
     {
-        myResult = Cy_Crypto_Core_V1_Sha_Start  (base, &myHashState);
+        tmpResult = Cy_Crypto_Core_V1_Sha_Start  (base, &myHashState);
     }
-    if (CY_CRYPTO_SUCCESS == myResult)
+    if (CY_CRYPTO_SUCCESS == tmpResult)
     {
-        myResult = Cy_Crypto_Core_V1_Sha_Update (base, &myHashState, message, messageSize);
+        tmpResult = Cy_Crypto_Core_V1_Sha_Update (base, &myHashState, message, messageSize);
     }
-    if (CY_CRYPTO_SUCCESS == myResult)
+    if (CY_CRYPTO_SUCCESS == tmpResult)
     {
-        myResult = Cy_Crypto_Core_V1_Sha_Finish (base, &myHashState, digest);
+        tmpResult = Cy_Crypto_Core_V1_Sha_Finish (base, &myHashState, digest);
     }
-    if (CY_CRYPTO_SUCCESS == myResult)
+    if (CY_CRYPTO_SUCCESS == tmpResult)
     {
-        myResult = Cy_Crypto_Core_V1_Sha_Free   (base, &myHashState);
+        tmpResult = Cy_Crypto_Core_V1_Sha_Free   (base, &myHashState);
     }
 
-    return (myResult);
+    return (tmpResult);
 }
 
 

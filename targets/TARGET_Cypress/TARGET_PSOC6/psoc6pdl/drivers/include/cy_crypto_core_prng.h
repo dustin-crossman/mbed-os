@@ -78,18 +78,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Prng_Init(CRYPTO_Type *base
                                                   uint32_t lfsr31InitState,
                                                   uint32_t lfsr29InitState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Prng_Init(base, lfsr32InitState, lfsr31InitState, lfsr29InitState);
+        tmpResult = Cy_Crypto_Core_V1_Prng_Init(base, lfsr32InitState, lfsr31InitState, lfsr29InitState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Prng_Init(base, lfsr32InitState, lfsr31InitState, lfsr29InitState);
+        tmpResult = Cy_Crypto_Core_V2_Prng_Init(base, lfsr32InitState, lfsr31InitState, lfsr29InitState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -115,18 +115,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Prng(CRYPTO_Type *base,
                                              uint32_t max,
                                              uint32_t *randomNum)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Prng(base, max, randomNum);
+        tmpResult = Cy_Crypto_Core_V1_Prng(base, max, randomNum);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Prng(base, max, randomNum);
+        tmpResult = Cy_Crypto_Core_V2_Prng(base, max, randomNum);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /** \} group_crypto_lld_rng_functions */

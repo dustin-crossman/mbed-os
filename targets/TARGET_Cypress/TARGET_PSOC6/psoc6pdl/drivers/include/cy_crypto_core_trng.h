@@ -79,16 +79,16 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Trng(CRYPTO_Type *base,
                                              uint32_t  max,
                                              uint32_t *randomNum)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Trng(base, GAROPol, FIROPol, max, randomNum);
+        tmpResult = Cy_Crypto_Core_V1_Trng(base, GAROPol, FIROPol, max, randomNum);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Trng(base, GAROPol, FIROPol, max, randomNum);
+        tmpResult = Cy_Crypto_Core_V2_Trng(base, GAROPol, FIROPol, max, randomNum);
     }
-    return (myResult);
+    return (tmpResult);
 }
 
 /** \} group_crypto_lld_rng_functions */

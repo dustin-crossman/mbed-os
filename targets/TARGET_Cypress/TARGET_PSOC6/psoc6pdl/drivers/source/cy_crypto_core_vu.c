@@ -152,7 +152,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Cleanup(CRYPTO_Type *base)
 
 bool Cy_Crypto_Core_Vu_IsRegZero(CRYPTO_Type *base, uint32_t srcReg)
 {
-    bool myResult;
+    bool tmpResult;
     uint16_t status;
 
     CY_CRYPTO_VU_TST(base, srcReg);
@@ -160,19 +160,19 @@ bool Cy_Crypto_Core_Vu_IsRegZero(CRYPTO_Type *base, uint32_t srcReg)
 
     if (0u != (status & CY_CRYPTO_VU_STATUS_ZERO_BIT))
     {
-        myResult = true;
+        tmpResult = true;
     }
     else
     {
-        myResult = false;
+        tmpResult = false;
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 bool Cy_Crypto_Core_Vu_IsRegEqual(CRYPTO_Type *base, uint32_t srcReg0, uint32_t srcReg1)
 {
-    bool myResult;
+    bool tmpResult;
     uint16_t status;
 
     CY_CRYPTO_VU_CMP_SUB (base, srcReg1, srcReg0);                /* C = (a >= b) */
@@ -180,19 +180,19 @@ bool Cy_Crypto_Core_Vu_IsRegEqual(CRYPTO_Type *base, uint32_t srcReg0, uint32_t 
 
     if (0u != (status &  CY_CRYPTO_VU_STATUS_ZERO_BIT))
     {
-        myResult = true;
+        tmpResult = true;
     }
     else
     {
-        myResult = false;
+        tmpResult = false;
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 bool Cy_Crypto_Core_Vu_IsRegLess(CRYPTO_Type *base, uint32_t srcReg0, uint32_t srcReg1)
 {
-    bool myResult;
+    bool tmpResult;
     uint16_t status;
 
     CY_CRYPTO_VU_CMP_SUB (base, srcReg1, srcReg0);                /* C = (a >= b) */
@@ -200,14 +200,14 @@ bool Cy_Crypto_Core_Vu_IsRegLess(CRYPTO_Type *base, uint32_t srcReg0, uint32_t s
 
     if (0u != (status &  CY_CRYPTO_VU_STATUS_CARRY_BIT))
     {
-        myResult = true;
+        tmpResult = true;
     }
     else
     {
-        myResult = false;
+        tmpResult = false;
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 

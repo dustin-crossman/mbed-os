@@ -89,18 +89,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_Init(CRYPTO_Type *base,
                                         uint32_t remReverse,
                                         uint32_t remXor)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Crc_Init(base, polynomial, dataReverse, dataXor, remReverse, remXor);
+        tmpResult = Cy_Crypto_Core_V1_Crc_Init(base, polynomial, dataReverse, dataXor, remReverse, remXor);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Crc_Init(base, polynomial, dataReverse, dataXor, remReverse, remXor);
+        tmpResult = Cy_Crypto_Core_V2_Crc_Init(base, polynomial, dataReverse, dataXor, remReverse, remXor);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -134,18 +134,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc(CRYPTO_Type *base,
                                         uint32_t  dataSize,
                                         uint32_t  lfsrInitState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Crc(base, crc, data, dataSize, lfsrInitState);
+        tmpResult = Cy_Crypto_Core_V1_Crc(base, crc, data, dataSize, lfsrInitState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Crc(base, crc, data, dataSize, lfsrInitState);
+        tmpResult = Cy_Crypto_Core_V2_Crc(base, crc, data, dataSize, lfsrInitState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -191,20 +191,20 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_CalcInit(CRYPTO_Type *b
                                         uint32_t remXor,
                                         uint32_t lfsrInitState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Crc_CalcInit(base, width, polynomial, dataReverse, dataXor,
+        tmpResult = Cy_Crypto_Core_V1_Crc_CalcInit(base, width, polynomial, dataReverse, dataXor,
                                                  remReverse, remXor, lfsrInitState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Crc_CalcInit(base, width, polynomial, dataReverse, dataXor,
+        tmpResult = Cy_Crypto_Core_V2_Crc_CalcInit(base, width, polynomial, dataReverse, dataXor,
                                                  remReverse, remXor, lfsrInitState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -229,18 +229,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_CalcInit(CRYPTO_Type *b
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_CalcStart(CRYPTO_Type *base,
                                                                    uint32_t width, uint32_t  lfsrInitState)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Crc_CalcStart(base, width, lfsrInitState);
+        tmpResult = Cy_Crypto_Core_V1_Crc_CalcStart(base, width, lfsrInitState);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Crc_CalcStart(base, width, lfsrInitState);
+        tmpResult = Cy_Crypto_Core_V2_Crc_CalcStart(base, width, lfsrInitState);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -265,18 +265,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_CalcStart(CRYPTO_Type *
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_CalcPartial(CRYPTO_Type *base,
                                                                      void const *data, uint32_t  dataSize)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Crc_CalcPartial(base, data, dataSize);
+        tmpResult = Cy_Crypto_Core_V1_Crc_CalcPartial(base, data, dataSize);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Crc_CalcPartial(base, data, dataSize);
+        tmpResult = Cy_Crypto_Core_V2_Crc_CalcPartial(base, data, dataSize);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -300,18 +300,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_CalcPartial(CRYPTO_Type
 *******************************************************************************/
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_CalcFinish(CRYPTO_Type *base, uint32_t width, uint32_t *crc)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Crc_CalcFinish(base, width, crc);
+        tmpResult = Cy_Crypto_Core_V1_Crc_CalcFinish(base, width, crc);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Crc_CalcFinish(base, width, crc);
+        tmpResult = Cy_Crypto_Core_V2_Crc_CalcFinish(base, width, crc);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /*******************************************************************************
@@ -343,18 +343,18 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Crc_Calc(CRYPTO_Type *base,
                                                               uint32_t width, uint32_t *crc,
                                                               void const *data, uint32_t  dataSize)
 {
-    cy_en_crypto_status_t myResult;
+    cy_en_crypto_status_t tmpResult;
 
     if (cy_device->cryptoVersion == 1u)
     {
-        myResult = Cy_Crypto_Core_V1_Crc_Calc(base, width, crc, data, dataSize);
+        tmpResult = Cy_Crypto_Core_V1_Crc_Calc(base, width, crc, data, dataSize);
     }
     else
     {
-        myResult = Cy_Crypto_Core_V2_Crc_Calc(base, width, crc, data, dataSize);
+        tmpResult = Cy_Crypto_Core_V2_Crc_Calc(base, width, crc, data, dataSize);
     }
 
-    return myResult;
+    return tmpResult;
 }
 
 /** \} group_crypto_lld_crc_functions */
