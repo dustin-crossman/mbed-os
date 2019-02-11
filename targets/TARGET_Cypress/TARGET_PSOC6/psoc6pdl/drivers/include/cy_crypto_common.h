@@ -141,6 +141,9 @@
 #define CY_CRYPTO_SHA512_ROUND_MEM_SIZE     (640uL)
 #define CY_CRYPTO_SHA_MAX_ROUND_MEM_SIZE    (CY_CRYPTO_SHA512_ROUND_MEM_SIZE)
 
+/* Width of the Crypto hardware registers values, in bits */
+#define CY_CRYPTO_HW_REGS_WIDTH             (32UL)
+
 /** \endcond */
 
 #endif /* #if (CPUSS_CRYPTO_SHA == 1) */

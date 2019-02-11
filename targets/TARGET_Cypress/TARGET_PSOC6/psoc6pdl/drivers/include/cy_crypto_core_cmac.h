@@ -78,7 +78,7 @@ typedef cy_en_crypto_status_t (*cy_crypto_cmac_func_t)(CRYPTO_Type *base,
 * The pointer to the calculated CMAC.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return

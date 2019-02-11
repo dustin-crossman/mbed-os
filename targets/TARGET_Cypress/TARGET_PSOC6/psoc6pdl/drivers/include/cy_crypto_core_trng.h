@@ -51,8 +51,7 @@ typedef cy_en_crypto_status_t (*cy_crypto_trng_func_t)(CRYPTO_Type *base,
 * Function Name: Cy_Crypto_Core_Trng
 ****************************************************************************//**
 *
-* Generates a True Random Number and returns it in the
-* cfContext->trngNumPtr.
+* Generates a True Random Number.
 *
 * \param base
 * The pointer to the CRYPTO instance.

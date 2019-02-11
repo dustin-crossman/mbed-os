@@ -667,9 +667,9 @@
 * (2^moduloLength mod modulo). These fields are optional, and can be set to NULL.
 *
 * Calculate these coefficients with \ref Cy_Crypto_Rsa_CalcCoefs.
-* Pass in the address of the key structure with the modulus and exponent values
-* for the key. The function returns the coefficients for the key in the key
-* structure, replacing any previous values.
+* Pass them in the address of the key structure with the modulus and exponent
+* values for the key. The function returns the coefficients for the key in the
+* key structure, replacing any previous values.
 *
 * The RSA functionality also implements functions to decrypt a signature using
 * a public key. This signature must follow the RSASSA-PKCS-v1_5 standard.

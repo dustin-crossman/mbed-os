@@ -187,7 +187,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcInit(CRYPTO_Type *base,
                                         uint32_t remXor,
                                         uint32_t lfsrInitState)
 {
-    CY_ASSERT_L1((width >= 1u) && (width <= 32u));
+    CY_ASSERT_L1((width >= 1U) && (width <= CY_CRYPTO_HW_REGS_WIDTH));
 
     /* Specifies the bit order in which a data Byte is processed
      * (reversal is performed after XORing):
@@ -203,14 +203,17 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcInit(CRYPTO_Type *base,
     /* CRC polynomial. The polynomial is represented WITHOUT the high order bit
      * (this bit is always assumed '1').
      * CRC_POLYNOMIAL << (32 - CRC_BITLEN) */
-    REG_CRYPTO_CRC_POL_CTL(base) = (uint32_t)(_VAL2FLD(CRYPTO_CRC_POL_CTL_POLYNOMIAL, polynomial << (32u - width)));
+    REG_CRYPTO_CRC_POL_CTL(base) =
+        (uint32_t)(_VAL2FLD(CRYPTO_CRC_POL_CTL_POLYNOMIAL, polynomial << (CY_CRYPTO_HW_REGS_WIDTH - width)));
 
     /*Specifies a mask with which the CRC_LFSR_CTL.LFSR32 register is XORed to produce a remainder.
      * The XOR is performed before remainder reversal. */
-    REG_CRYPTO_CRC_REM_CTL(base) = (uint32_t)(_VAL2FLD(CRYPTO_CRC_REM_CTL_REM_XOR, remXor << (32u - width)));
+    REG_CRYPTO_CRC_REM_CTL(base) =
+        (uint32_t)(_VAL2FLD(CRYPTO_CRC_REM_CTL_REM_XOR, remXor << (CY_CRYPTO_HW_REGS_WIDTH - width)));
 
     /* A state of 32-bit Linear Feedback Shift Registers (LFSR) used to implement CRC. */
-    REG_CRYPTO_CRC_LFSR_CTL(base) = (uint32_t)(_VAL2FLD(CRYPTO_CRC_LFSR_CTL_LFSR32, lfsrInitState << (32u - width)));
+    REG_CRYPTO_CRC_LFSR_CTL(base) =
+        (uint32_t)(_VAL2FLD(CRYPTO_CRC_LFSR_CTL_LFSR32, lfsrInitState << (CY_CRYPTO_HW_REGS_WIDTH - width)));
 
     return (CY_CRYPTO_SUCCESS);
 }
@@ -236,10 +239,11 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcInit(CRYPTO_Type *base,
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcStart(CRYPTO_Type *base, uint32_t width, uint32_t  lfsrInitState)
 {
-    CY_ASSERT_L1((width >= 1u) && (width <= 32u));
+    CY_ASSERT_L1((width >= 1U) && (width <= CY_CRYPTO_HW_REGS_WIDTH));
 
     /* A state of 32-bit Linear Feedback Shift Registers (LFSR) used to implement CRC. */
-    REG_CRYPTO_CRC_LFSR_CTL(base) = (uint32_t)(_VAL2FLD(CRYPTO_CRC_LFSR_CTL_LFSR32, lfsrInitState << (32u - width)));
+    REG_CRYPTO_CRC_LFSR_CTL(base) =
+        (uint32_t)(_VAL2FLD(CRYPTO_CRC_LFSR_CTL_LFSR32, lfsrInitState << (CY_CRYPTO_HW_REGS_WIDTH - width)));
 
     return (CY_CRYPTO_SUCCESS);
 }
@@ -301,7 +305,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcPartial(CRYPTO_Type *base,
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcFinish(CRYPTO_Type *base, uint32_t width, uint32_t *crc)
 {
-    CY_ASSERT_L1((width >= 1u) && (width <= 32u));
+    CY_ASSERT_L1((width >= 1U) && (width <= CY_CRYPTO_HW_REGS_WIDTH));
 
     uint32_t calculatedCrc;
 
@@ -311,7 +315,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcFinish(CRYPTO_Type *base, uint32
     /* Note: Calculated CRC value is MSB aligned and should be shifted WHEN CRC_DATA_REVERSE is zero. */
     if (_FLD2VAL(CRYPTO_CRC_CTL_REM_REVERSE, REG_CRYPTO_CRC_CTL(base)) == 0u)
     {
-        calculatedCrc = calculatedCrc >> (32u - width);
+        calculatedCrc = calculatedCrc >> (CY_CRYPTO_HW_REGS_WIDTH - width);
     }
 
     *crc = calculatedCrc;
@@ -350,7 +354,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_Calc(CRYPTO_Type *base,
                                         void      const *data,
                                         uint32_t  dataSize)
 {
-    CY_ASSERT_L1((width >= 1) && (width <=32u));
+    CY_ASSERT_L1((width >= 1U) && (width <= CY_CRYPTO_HW_REGS_WIDTH));
 
     uint32_t calculatedCrc;
 
@@ -371,7 +375,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_Calc(CRYPTO_Type *base,
     /* Note: Calculated CRC value is MSB aligned and should be shifted WHEN CRC_DATA_REVERSE is zero. */
     if (_FLD2VAL(CRYPTO_CRC_CTL_REM_REVERSE, REG_CRYPTO_CRC_CTL(base)) == 0u)
     {
-        calculatedCrc = calculatedCrc >> (32u - width);
+        calculatedCrc = calculatedCrc >> (CY_CRYPTO_HW_REGS_WIDTH - width);
     }
 
     *crc = calculatedCrc;

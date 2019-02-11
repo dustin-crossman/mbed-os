@@ -50,7 +50,7 @@
 * Function Name: Cy_Crypto_Core_Cleanup
 ****************************************************************************//**
 *
-* Cleanup the the CRYPTO block.
+* Cleanups the the CRYPTO block.
 *
 * \param base
 * The pointer to the CRYPTO instance.

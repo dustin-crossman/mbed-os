@@ -164,7 +164,7 @@ static void Cy_Crypto_Core_V1_Hmac_Calculate(CRYPTO_Type *base,
         /* The key is larger than the block size. Do a hash on the key. */
         Cy_Crypto_Core_V1_Sha_Start  (base, hashState);
         Cy_Crypto_Core_V1_Sha_Update (base, hashState, key, keyLength);
-        Cy_Crypto_Core_V1_Sha_Finish (base, hashState, (uint8_t*)m0KeyPtrTmp/*, keyLength*/);
+        Cy_Crypto_Core_V1_Sha_Finish (base, hashState, (uint8_t*)m0KeyPtrTmp);
 
         /* Append zeros */
         Cy_Crypto_Core_V1_MemSet(base, (m0KeyPtrTmp + hashState->digestSize), 0x00u,

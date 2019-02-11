@@ -93,7 +93,7 @@ typedef cy_en_crypto_status_t (*cy_crypto_aes_ctr_func_t)(CRYPTO_Type *base,
 * \ref cy_en_crypto_aes_key_length_t
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return
@@ -139,7 +139,7 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Init(CRYPTO_Type *base,
 * The pointer to a source block.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return
@@ -193,7 +193,7 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Ecb(CRYPTO_Type *base,
 * The pointer to a source plain text.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return
@@ -249,7 +249,7 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Cbc(CRYPTO_Type *base,
 * The pointer to a source plain text.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return
@@ -307,7 +307,7 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Cfb(CRYPTO_Type *base,
 * The pointer to a source plain text. Must be 4-Byte aligned.
 *
 * \param aesState
-* The pointer to the AES state structure allocated by the user. The user must
+* The pointer to the AES state structure allocated by the user. The user
 * must not modify anything in this structure.
 *
 * \return

@@ -61,8 +61,7 @@ static void Cy_Crypto_Core_V1_Trng_Init(CRYPTO_Type *base)
 * Function Name: Cy_Crypto_Core_V1_Trng
 ****************************************************************************//**
 *
-* Generates a True Random Number and returns it in the
-* cfContext->trngNumPtr.
+* Generates a True Random Number.
 *
 * \param base
 * The pointer to the CRYPTO instance.

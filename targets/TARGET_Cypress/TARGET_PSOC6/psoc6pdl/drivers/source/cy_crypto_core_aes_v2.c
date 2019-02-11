@@ -111,7 +111,7 @@ void Cy_Crypto_Core_V2_Aes_LoadDecKey(CRYPTO_Type *base,
 * Function Name: Cy_Crypto_Core_V2_Aes_Init
 ****************************************************************************//**
 *
-* Sets AES mode and prepare inverse key.
+* Sets AES mode and prepares inverse key.
 *
 * \param base
 * The pointer to the CRYPTO instance.
