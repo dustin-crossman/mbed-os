@@ -272,7 +272,7 @@ void Cy_Crypto_Core_V1_Cmac_Finish(CRYPTO_Type *base,
 * must not modify anything in this structure.
 *
 * \return
-\ref cy_en_crypto_status_t
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Cmac(CRYPTO_Type *base,

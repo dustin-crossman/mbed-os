@@ -70,7 +70,7 @@ typedef cy_en_crypto_status_t (*cy_crypto_trng_func_t)(CRYPTO_Type *base,
 * The pointer to a generated true random number. Must be 4-byte aligned.
 *
 * \return
-\ref cy_en_crypto_status_t
+* \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
 __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Trng(CRYPTO_Type *base,

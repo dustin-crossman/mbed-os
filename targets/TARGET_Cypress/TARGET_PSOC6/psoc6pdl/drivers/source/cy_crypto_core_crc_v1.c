@@ -85,7 +85,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_Init(CRYPTO_Type *base,
      * (this bit is always assumed '1'). */
     REG_CRYPTO_CRC_POL_CTL(base) = (uint32_t)(_VAL2FLD(CRYPTO_CRC_POL_CTL_POLYNOMIAL, polynomial));
 
-    /*Specifies a mask with which the CRC_LFSR_CTL.LFSR32 register is XORed to produce a remainder.
+    /* Specifies a mask with which the CRC_LFSR_CTL.LFSR32 register is XORed to produce a remainder.
      * The XOR is performed before remainder reversal. */
     REG_CRYPTO_CRC_REM_CTL(base) = (uint32_t)(_VAL2FLD(CRYPTO_CRC_REM_CTL_REM_XOR, remXor));
 
@@ -187,7 +187,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcInit(CRYPTO_Type *base,
                                         uint32_t remXor,
                                         uint32_t lfsrInitState)
 {
-    CY_ASSERT_L1((width >= 1) && (width <=32u));
+    CY_ASSERT_L1((width >= 1u) && (width <= 32u));
 
     /* Specifies the bit order in which a data Byte is processed
      * (reversal is performed after XORing):
@@ -236,7 +236,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcInit(CRYPTO_Type *base,
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcStart(CRYPTO_Type *base, uint32_t width, uint32_t  lfsrInitState)
 {
-    CY_ASSERT_L1((width >= 1) && (width <=32u));
+    CY_ASSERT_L1((width >= 1u) && (width <= 32u));
 
     /* A state of 32-bit Linear Feedback Shift Registers (LFSR) used to implement CRC. */
     REG_CRYPTO_CRC_LFSR_CTL(base) = (uint32_t)(_VAL2FLD(CRYPTO_CRC_LFSR_CTL_LFSR32, lfsrInitState << (32u - width)));
@@ -301,7 +301,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcPartial(CRYPTO_Type *base,
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcFinish(CRYPTO_Type *base, uint32_t width, uint32_t *crc)
 {
-    CY_ASSERT_L1((width >= 1) && (width <=32u));
+    CY_ASSERT_L1((width >= 1u) && (width <= 32u));
 
     uint32_t calculatedCrc;
 
