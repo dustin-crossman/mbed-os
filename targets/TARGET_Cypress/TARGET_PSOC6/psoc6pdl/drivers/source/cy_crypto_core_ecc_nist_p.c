@@ -803,61 +803,6 @@ static void Cy_Crypto_Core_EC_SM_MUL_Red_P224(CRYPTO_Type *base, uint32_t z, uin
 
 
 /*******************************************************************************
-* Function Name: Cy_Crypto_Core_EC_P256_ShMulRed_Coeff
-****************************************************************************//**
-*
-* Generate multiplier for shift-multiply multiplication reduction P256.
-* Multiplier coeficient = (2^{224} - 2^{192} - 2^{96} + 1)
-* Multiplier coefficient = fffffffe ffffffff ffffffff ffffffff 00000000 00000000 00000001
-*
-* \param base
-* The pointer to a Crypto instance.
-*
-* \param z
-* Result = x mod P = a*b mod P [224 bits].
-*
-* \param x
-* Product = a*b [2*224 bits].
-*
-* \note Complicated swapping of t and coeff registers is to ensure coeff only
-* requires 224 bits, while t requires 225 bits. Hence, the externally used
-* register coeff requires one less bit.
-*
-*******************************************************************************/
-static void Cy_Crypto_Core_EC_P256_ShMulRed_Coeff(CRYPTO_Type *base, uint32_t coeff)
-{
-    uint32_t sh        = 0u;
-    uint32_t t         = 1u;
-    uint32_t my_coeff  = 2u;
-
-    CY_CRYPTO_VU_PUSH_REG (base);
-
-    CY_CRYPTO_VU_LD_REG (base, my_coeff, coeff);
-
-    CY_CRYPTO_VU_SET_REG (base, sh, 224u, 1u);           /* sh = 224 */
-    CY_CRYPTO_VU_ALLOC_MEM (base, t, 225u);             /* t [225 bits] */
-
-    CY_CRYPTO_VU_SET_TO_ONE (base, t);                  /* t = 1 */
-    CY_CRYPTO_VU_LSL (base, t, t, sh);                  /* t = 1<<224 */
-
-    CY_CRYPTO_VU_SET_REG (base, sh, 32u, 1u);            /* sh = 32 */
-    CY_CRYPTO_VU_LSR (base, my_coeff, t, sh);           /* coeff = 1<<192 */
-    CY_CRYPTO_VU_SUB (base, t, t, my_coeff);            /* t = 1<<224 - 1<<192 */
-
-    CY_CRYPTO_VU_SET_REG (base, sh, 96u, 1u);            /* sh = 96 */
-    CY_CRYPTO_VU_LSR (base, my_coeff, my_coeff, sh);    /* coeff = 1<<96 */
-    CY_CRYPTO_VU_SUB (base, t, t, my_coeff);            /* t = 1<<224 - 1<<192 - 1<<96 */
-
-    CY_CRYPTO_VU_LSR (base, my_coeff, my_coeff, sh);    /* coeff = 1 */
-    CY_CRYPTO_VU_ADD (base, my_coeff, my_coeff, t);     /* coeff = 1<<224 - 1<<192 - 1<<96 + 1 */
-
-    CY_CRYPTO_VU_FREE_MEM (base, CY_CRYPTO_VU_REG_BIT(t));
-    CY_CRYPTO_VU_POP_REG (base);
-
-}
-
-
-/*******************************************************************************
 * Function Name: Cy_Crypto_Core_EC_SM_MUL_Red_P256
 ****************************************************************************//**
 *
@@ -904,7 +849,6 @@ static void Cy_Crypto_Core_EC_SM_MUL_Red_P256(CRYPTO_Type *base, uint32_t z, uin
 
     CY_CRYPTO_VU_SET_REG (base, sh256, 256u, 1u);
 
-    /* Cy_Crypto_Core_EC_P256_ShMulRed_Coeff(coeff); */
     Cy_Crypto_Core_Vu_SetMemValue (base, coeff, P256_ShMul_COEFF, 224u);
 
     /* Step 2: 1st round of shift-multiply
@@ -917,7 +861,6 @@ static void Cy_Crypto_Core_EC_SM_MUL_Red_P256(CRYPTO_Type *base, uint32_t z, uin
     CY_CRYPTO_VU_UMUL (base, partial, hi, coeff);       /* partial = hi*coeff */
 
     CY_CRYPTO_VU_ADD (base, partial, partial, my_z);    /* partial = hi*coeff + lo */
-
 
     /* Step 3: 2nd round of shift-multiply */
     CY_CRYPTO_VU_LSR (base, hi, partial, sh256);        /* hi = partial>>CURVE_SIZE = partial[511:256] */
@@ -972,55 +915,6 @@ static void Cy_Crypto_Core_EC_SM_MUL_Red_P256(CRYPTO_Type *base, uint32_t z, uin
     CY_CRYPTO_VU_COND_SUB (base, CY_CRYPTO_VU_COND_CS, my_z, my_z, VR_P);
 
     CY_CRYPTO_VU_FREE_MEM (base, CY_CRYPTO_VU_REG_BIT(partial) | CY_CRYPTO_VU_REG_BIT(hi) | CY_CRYPTO_VU_REG_BIT(coeff));
-    CY_CRYPTO_VU_POP_REG (base);
-}
-
-
-/*******************************************************************************
-* Function Name: Cy_Crypto_Core_EC_P384_ShMulRed_Coeff
-****************************************************************************//**
-*
-* Generate multiplier for shift-multiply multiplication reduction P384.
-* Multiplier coefficient = (2^{128} + 2^{96} - 2^{32} + 1)
-* Multiplier coefficient = 1 00000000 FFFFFFFF FFFFFFFF 00000000
-*
-* \param base
-* The pointer to a Crypto instance.
-*
-* \param coeff
-* Coefficient.
-*
-*******************************************************************************/
-static void Cy_Crypto_Core_EC_P384_ShMulRed_Coeff(CRYPTO_Type *base, uint32_t coeff)
-{
-
-    uint32_t sh       = 0u;
-    uint32_t t        = 1u;
-    uint32_t my_coeff = 2u;
-
-    CY_CRYPTO_VU_PUSH_REG (base);
-
-    CY_CRYPTO_VU_LD_REG (base, my_coeff, coeff);
-
-    CY_CRYPTO_VU_SET_REG (base, sh, 128u, 1u);          /* sh = 128 */
-    CY_CRYPTO_VU_ALLOC_MEM (base, t, 97u);              /* t [96 bits] */
-
-    CY_CRYPTO_VU_SET_TO_ONE (base, my_coeff);           /* coeff = 1 */
-    CY_CRYPTO_VU_LSL (base, my_coeff, my_coeff, sh);    /* coeff = 1<<128 */
-
-    CY_CRYPTO_VU_SET_REG (base, sh, 32u, 1u);           /* sh = 32 */
-    CY_CRYPTO_VU_LSR (base, t, my_coeff, sh);           /* t = 1<<96 */
-    CY_CRYPTO_VU_ADD (base, my_coeff, my_coeff, t);     /* coeff = 1<<128 + 1<<96 */
-
-    CY_CRYPTO_VU_SET_REG (base, sh, 64u, 1u);           /* sh = 64 */
-    CY_CRYPTO_VU_LSR (base, t, t, sh);                  /* t = 1<<32 */
-    CY_CRYPTO_VU_SUB (base, my_coeff, my_coeff, t);     /* coeff = 1<<128 + 1<<96 - 1<<32 */
-
-    CY_CRYPTO_VU_SET_REG (base, sh, 32u, 1u);           /* sh = 32 */
-    CY_CRYPTO_VU_LSR (base, t, t, sh);                  /* t = 1 */
-    CY_CRYPTO_VU_ADD (base, my_coeff, my_coeff, t);     /* coeff = 1<<128 + 1<<96 - 1<<32 + 1 */
-
-    CY_CRYPTO_VU_FREE_MEM (base, CY_CRYPTO_VU_REG_BIT(t));
     CY_CRYPTO_VU_POP_REG (base);
 }
 
