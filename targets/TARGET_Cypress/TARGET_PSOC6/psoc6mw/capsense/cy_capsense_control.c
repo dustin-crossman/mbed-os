@@ -53,8 +53,8 @@
 * initialization process and it is not needed to call the Cy_CapSense_Enable() 
 * function second time. However, to implement time-multiplexed mode 
 * (sharing the CSD HW Block between multiple middleware) 
-* the Cy_CapSense_Save()/Cy_CapSense_Restore() functions should be used 
-* instead of the Cy_CapSense_DeInit()/Cy_CapSense_Init() functions for 
+* the Cy_CapSense_Save() and Cy_CapSense_Restore() functions should be used 
+* instead of the Cy_CapSense_DeInit() and Cy_CapSense_Init() functions for 
 * further compatibility.
 *
 * \param context
@@ -76,10 +76,10 @@
 * 
 * The CapSense_ISR_cfg variable should be declared by the application
 * program according to the examples below:<br>
-* For M0p core:
+* For CM0+ core:
 * \snippet capsense\1.1\snippet\main.c snippet_m0p_capsense_interrupt_source_declaration
 *
-* For M4 core:
+* For CM4 core:
 * \snippet capsense\1.1\snippet\main.c snippet_m4_capsense_interrupt_source_declaration
 * 
 * The CapSense interrupt handler should be declared by the application program
@@ -156,10 +156,10 @@ cy_status Cy_CapSense_Init(cy_stc_capsense_context_t * context)
 * 
 * The CapSense_ISR_cfg variable should be declared by the application
 * program according to the examples below:<br>
-* For M0p core:
+* For CM0+ core:
 * \snippet capsense\1.1\snippet\main.c snippet_m0p_capsense_interrupt_source_declaration
 *
-* For M4 core:
+* For CM4 core:
 * \snippet capsense\1.1\snippet\main.c snippet_m4_capsense_interrupt_source_declaration
 * 
 * The CapSense interrupt handler should be declared by the application program
@@ -291,8 +291,8 @@ cy_status Cy_CapSense_Initialize(cy_stc_capsense_context_t * context)
 * initialization process and it is not needed to call the Cy_CapSense_Enable() 
 * function second time. However, to implement time-multiplexed mode 
 * (sharing the CSD HW Block between multiple middleware) 
-* the Cy_CapSense_Save()/Cy_CapSense_Restore() functions should be used 
-* instead of the Cy_CapSense_DeInit()/Cy_CapSense_Init() functions for 
+* the Cy_CapSense_Save() and Cy_CapSense_Restore() functions should be used 
+* instead of the Cy_CapSense_DeInit() and Cy_CapSense_Init() functions for 
 * further compatibility.
 *
 * \param context
@@ -980,8 +980,8 @@ void Cy_CapSense_SetGestureTimestamp(
 * 
 * This function performs the same tasks as Cy_CapSense_Init() function and is 
 * kept for API consistency among middlewares. It is recommended to use 
-* Cy_CapSense_Save()/Cy_CapSense_Restore() functions to implement 
-* time-multiplexed mode instead of Cy_CapSense_DeInit()/Cy_CapSense_Init()
+* Cy_CapSense_Save() and Cy_CapSense_Restore() functions to implement 
+* time-multiplexed mode instead of Cy_CapSense_DeInit() and Cy_CapSense_Init()
 * functions for further compatibility.
 *
 * \param context
@@ -1064,10 +1064,10 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 * for use by other middleware. See the function usage example below for 
 * details on usage.
 * 
-* This function performs the same tasks as Cy_CapSense_DeInit() function and is 
+* This function performs the same tasks as the Cy_CapSense_DeInit() function and is 
 * kept for API consistency among middlewares. It is recommended to use 
-* Cy_CapSense_Save()/Cy_CapSense_Restore() functions to implement 
-* time-multiplexed mode instead of Cy_CapSense_DeInit()/Cy_CapSense_Init()
+* Cy_CapSense_Save() and Cy_CapSense_Restore() functions to implement 
+* Time-multiplexed mode instead of Cy_CapSense_DeInit() and Cy_CapSense_Init()
 * functions for further compatibility.
 *
 * This function performs the following operations:
@@ -1086,7 +1086,20 @@ cy_status Cy_CapSense_Restore(cy_stc_capsense_context_t * context)
 *
 * \funcusage
 * 
-* An example of sharing the CSD HW block by CapSense and CSDADC middleware:
+* An example of sharing the CSD HW block by the CapSense and CSDADC middleware.<br>
+* Declares the CapSense_ISR_cfg variable:
+* \snippet capsense\1.1\snippet\main.c snippet_m4_capsense_interrupt_source_declaration
+* 
+* Declares the CSDADC_ISR_cfg variable:
+* \snippet capsense\1.1\snippet\main.c snippet_m4_adc_interrupt_source_declaration
+* 
+* Defines the CapSense interrupt handler:
+* \snippet capsense\1.1\snippet\main.c snippet_CapSense_Interrupt
+* 
+* Defines the CSDADC interrupt handler:
+* \snippet capsense\1.1\snippet\main.c snippet_CSDADC_Interrupt
+* 
+* The part of the main.c FW flow:
 * \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_TimeMultiplex
 *
 *******************************************************************************/

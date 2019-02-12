@@ -394,59 +394,65 @@
 /** \addtogroup group_capsense_callbacks
 * \{
 *
-* Callbacks allow a user to execute custom code called from CapSense 
-* middleware when some events occur. CapSense supports two callbacks.
+* Callbacks allow the user to execute Custom code called from the CapSense 
+* middleware when an event occurs. CapSense supports two callbacks.
 *
 * <table>
 *   <tr>
+*     <th>#</th>
 *     <th >Callback Name</th>
 *     <th>Associated Register</th>
+*     <th>Callback Function Prototype</th>
 *     <th>Description</th>
 *   </tr>
 *   <tr>
+*     <td>1</td>
 *     <td>Start Sample</td>
 *     <td>ptrSSCallback</td>
-*     <td>It is called before each sensor scan triggering. This kind of callback 
-*         could be used to implement a user-specific use cases like changing scan 
+*     <td>\ref cy_capsense_callback_t</td>
+*     <td>This is called before each sensor scan triggering. Such a callback 
+*         can be used to implement user-specific use cases like changing scan 
 *         parameters depending on whether a sensor is going to be scanned.</td>
 *   </tr>
 *   <tr>
+*     <td>2</td>
 *     <td>End Of Scan</td>
 *     <td>ptrEOSCallback</td>
-*     <td>It is called after when sensor scan is finished and there is no other 
-*         sensor in queue to be scanned.</td>
+*     <td>\ref cy_capsense_callback_t</td>
+*     <td>This is called after sensor scan completion and there is no other 
+*         sensor in the queue to be scanned.</td>
+*   </tr>
+*   <tr>
+*     <td>3</td>
+*     <td>Tuner Send Callback</td>
+*     <td>ptrTunerSendCallback</td>
+*     <td>\ref cy_capsense_tuner_send_callback_t</td>
+*     <td>This is called by the Cy_CapSense_RunTuner() function to establish
+*         synchronus communication with the Tuner tool.</td>
+*   </tr>
+*   <tr>
+*     <td>4</td>
+*     <td>Tuner Receive Callback</td>
+*     <td>ptrTunerReceiveCallback</td>
+*     <td>\ref cy_capsense_tuner_receive_callback_t</td>
+*     <td>This is called by the Cy_CapSense_RunTuner() function to establish
+*         synchronus communication with the Tuner tool.</td>
 *   </tr>
 * </table>
 *
 * \note
-* These callbacks are called by the Cy_CapSense_InterruptHandler() function and
-* lengthen its execution. Usually, Cy_CapSense_InterruptHandler() is called inside the
-* CSD ISR. In such a case, the callbacks mentioned lengthen the execution of the CSD ISR as well.
+* 1. Callbacks 1 and 2 are called by the Cy_CapSense_InterruptHandler() function and
+*   lengthen this function execution. Usually, Cy_CapSense_InterruptHandler() is called inside the
+*   CSD ISR. In such a case, the callbacks mentioned lengthen the execution of the CSD ISR as well.
 *
-* To assign user's functions to these callbacks present in the middleware, 
-* perform the following:
-*   
-* * Write the function implementation (in any user file) using the following 
-*   function prototype:
-*   
-*   <tt>void CallbackFunction(cy_stc_active_scan_sns_t * ptrActiveScan);</tt>
-*   
-* * Use the \ref Cy_CapSense_RegisterCallback() API to register the callback
-*   function to be executed when the \ref cy_en_capsense_callback_event_t occurs, 
-*   or assign the function to a corresponding CapSense Data Structure register, 
-*   located in cy_stc_capsense_common_context_t:
-*   
+* 2. Callbacks 2 and 3 can only be registered by direct CapSense Data Structure assignment.
+*
+* All callbacks can be registered by direct assignment of the function pointers to the corresponding
+* CapSense Data Structure field as follows:
 *   <tt>context-\>ptrCommonContext-\>\<Associated Register\> = \&CallbackFunction;</tt>
-* 
-* To unassign user's functions from these callbacks present in the middleware, 
-* perform the following:
 *
-* * Use the \ref Cy_CapSense_UnRegisterCallback() API to unregister the callback
-*   function that was previously assigned to be the executer when the specified
-*   \ref cy_en_capsense_callback_event_t occurs, or assign NULL to a corresponding
-*   CapSense Data Structure register, located in cy_stc_capsense_common_context_t:
-*
-*   <tt>context-\>ptrCommonContext-\>\<Associated Register\> = NULL;</tt>
+* Callbacks 2 and 3 can be registered / unregistered using the Cy_CapSense_RegisterCallback() and 
+* Cy_CapSense_UnRegisterCallback() function.
 *
 * \} */
 

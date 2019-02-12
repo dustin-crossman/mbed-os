@@ -34,6 +34,7 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
     ptrCommonCxt->tunerSt = (uint8_t)CY_CAPSENSE_TU_FSM_RUNNING;
 }
 
+
 /*******************************************************************************
 * Function Name: Cy_CapSense_RunTuner
 ****************************************************************************//**
@@ -94,8 +95,17 @@ void Cy_CapSense_TuInitialize(cy_stc_capsense_context_t * context)
 * An example of synchronization with the Tuner tool using EzI2C:
 * \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Tuner_EzI2C
 * 
-* An example of synchronization with the Tuner tool using UART:
+* An example of synchronization with the Tuner tool using UART.<br>
+* Tuner Send callback implementation: Transmitting data through UART interface:
+* \snippet capsense\1.1\snippet\main.c snippet_TunerSend
+* 
+* Tuner Receive callback implementation: Receiving data from UART interface:
+* \snippet capsense\1.1\snippet\main.c snippet_TunerReceive
+* 
+* A part of the main.c FW flow with registering callbacks:
 * \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Tuner_UART
+* 
+* Refer to the \ref group_capsense_callbacks section for details.
 * 
 *******************************************************************************/
 uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)

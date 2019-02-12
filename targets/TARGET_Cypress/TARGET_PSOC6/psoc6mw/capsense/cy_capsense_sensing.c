@@ -1458,35 +1458,44 @@ void Cy_CapSense_SsPostAllWidgetsScan(cy_stc_capsense_context_t * context)
 *
 * \funcusage
 * 
-* An example of ISR initialization:
+* An example of the ISR initialization:
 * 
 * The CapSense_ISR_cfg variable should be declared by the application
 * program according to the examples below:<br>
-* For M0p core:
+* For Core CM0+:
 * \snippet capsense\1.1\snippet\main.c snippet_m0p_capsense_interrupt_source_declaration
 *
-* For M4 core:
+* For Core CM4:
 * \snippet capsense\1.1\snippet\main.c snippet_m4_capsense_interrupt_source_declaration
 * 
-* The CapSense interrupt handler should be declared by the application program
+* The CapSense interrupt handler should be defined by the application program
 * according to the example below:
 * \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_IntHandler
 * 
 * Then, the application program should configure and enable the CSD block interrupt 
-* between calls of Cy_CapSense_Init() and Cy_CapSense_Enable() functions: 
+* between calls of the Cy_CapSense_Init() and Cy_CapSense_Enable() functions: 
 * \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_Initialization
 * 
-* The CapSense_HW is the pointer to the base register address of 
-* the CSD HW block. A macro for the pointer can be found in cycfg_peripherals.h 
-* file defined as \<Csd_Personality_Name\>_HW. If no name specified then 
+* CapSense_HW is the pointer to the base register address of 
+* the CSD HW block. A macro for the pointer can be found in the cycfg_peripherals.h 
+* file defined as \<Csd_Personality_Name\>_HW. If no name specified, 
 * the default name is used csd_\<Block_Number\>_csd_\<Block_Number\>_HW.
-*
-* \funcusage
 * 
-* In case the CSD HW block is shared by more than one middleware, 
-* the CSD interrupt vector should be initialized to the interrupt handler 
-* function of the middleware that is active in the application program.
-* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_TimeMultiplex
+* An example of sharing the CSD HW block by the CapSense and CSDADC middleware.<br>
+* Declares the CapSense_ISR_cfg variable:
+* \snippet capsense\1.1\snippet\main.c snippet_m4_capsense_interrupt_source_declaration
+* 
+* Declares the CSDADC_ISR_cfg variable:
+* \snippet capsense\1.1\snippet\main.c snippet_m4_adc_interrupt_source_declaration
+* 
+* Defines the CapSense interrupt handler:
+* \snippet capsense\1.1\snippet\main.c snippet_CapSense_Interrupt
+* 
+* Defines the CSDADC interrupt handler:
+* \snippet capsense\1.1\snippet\main.c snippet_CSDADC_Interrupt
+* 
+* The part of the main.c FW flow:
+* \snippet capsense\1.1\snippet\main.c snippet_Cy_CapSense_TimeMultiplex   
 *
 *******************************************************************************/
 void Cy_CapSense_InterruptHandler(const CSD_Type * base, cy_stc_capsense_context_t * context)
