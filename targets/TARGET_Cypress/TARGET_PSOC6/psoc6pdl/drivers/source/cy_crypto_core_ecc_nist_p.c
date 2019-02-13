@@ -75,6 +75,10 @@ static void Cy_Crypto_Core_EC_SM_MUL_Red_P256(CRYPTO_Type *base, uint32_t z, uin
 static void Cy_Crypto_Core_EC_SM_MUL_Red_P384(CRYPTO_Type *base, uint32_t z, uint32_t x);
 static void Cy_Crypto_Core_EC_SM_MUL_Red_P521(CRYPTO_Type *base, uint32_t z, uint32_t x);
 
+static void Cy_Crypto_Core_EC_CS_MulRed(CRYPTO_Type *base, uint32_t z, uint32_t x, uint32_t size);
+static void Cy_Crypto_Core_EC_SM_MulRed(CRYPTO_Type *base, uint32_t z, uint32_t x, uint32_t size);
+static void Cy_Crypto_Core_EC_MulRed(CRYPTO_Type *base, uint32_t z, uint32_t x, uint32_t size);
+
 
 /***************************************************************
 *    Curve-specific multiplication reduction algorithms
@@ -632,7 +636,7 @@ static void Cy_Crypto_Core_EC_CS_MUL_Red_P521(CRYPTO_Type *base, uint32_t z, uin
 * Size.
 *
 *******************************************************************************/
-void Cy_Crypto_Core_EC_CS_MulRed(CRYPTO_Type *base, uint32_t z, uint32_t x, uint32_t size)
+static void Cy_Crypto_Core_EC_CS_MulRed(CRYPTO_Type *base, uint32_t z, uint32_t x, uint32_t size)
 {
     switch (eccMode)
     {
@@ -701,9 +705,9 @@ static void Cy_Crypto_Core_EC_SM_MUL_Red_P192(CRYPTO_Type *base, uint32_t z, uin
    CY_CRYPTO_VU_SET_REG (base, sh192, 192u, 1u);
 
    /* Step 2: 1st round of shift-multiply
-   * (Separate hi and lo (LSR hi>>CURVE_SIZE), multiply hi (LSL hi and add 1) and add shifted hi to lo)
-   * hi*(2^{64} + 1) + lo
-   */
+    * (Separate hi and lo (LSR hi>>CURVE_SIZE), multiply hi (LSL hi and add 1) and add shifted hi to lo)
+    * hi * (2^{64} + 1) + lo
+    */
    CY_CRYPTO_VU_LSR (base, hi, my_x, sh192);    /* hi = prod >> CURVE_SIZE = prod[383:192] */
    CY_CRYPTO_VU_MOV (base, my_z, my_x);         /* z == lo = prod[191:0] */
 
@@ -772,9 +776,9 @@ static void Cy_Crypto_Core_EC_SM_MUL_Red_P224(CRYPTO_Type *base, uint32_t z, uin
     CY_CRYPTO_VU_SET_REG (base, sh224, 224u, 1u);
 
     /* Step 2: 1st round of shift-multiply
-    * (Separate hi and lo (LSR hi>>CURVE_SIZE), multiply hi (LSL hi<<96 and subtract 1) and add shifted hi to lo)
-    * hi*(2^{96} + 1) + lo
-    */
+     * (Separate hi and lo (LSR hi>>CURVE_SIZE), multiply hi (LSL hi<<96 and subtract 1) and add shifted hi to lo)
+     * hi * (2^{96} + 1) + lo
+     */
     CY_CRYPTO_VU_LSR (base, hi, my_x, sh224);       /* hi = prod >> CURVE_SIZE = prod[447:224] */
     CY_CRYPTO_VU_MOV (base, my_z, my_x);            /* z == lo = prod[223:0] */
 
@@ -852,9 +856,9 @@ static void Cy_Crypto_Core_EC_SM_MUL_Red_P256(CRYPTO_Type *base, uint32_t z, uin
     Cy_Crypto_Core_Vu_SetMemValue (base, coeff, P256_ShMul_COEFF, 224u);
 
     /* Step 2: 1st round of shift-multiply
-    * (Separate hi and lo (LSR hi>>CURVE_SIZE), multiply hi*c and add hi*coeff + lo)
-    * hi*coeff + lo
-    */
+     * (Separate hi and lo (LSR hi>>CURVE_SIZE), multiply hi*c and add hi*coeff + lo)
+     * hi*coeff + lo
+     */
     CY_CRYPTO_VU_LSR (base, hi, my_x, sh256);           /* hi = prod >> CURVE_SIZE = prod[511:256] */
     CY_CRYPTO_VU_MOV (base, my_z, my_x);                /* z == lo = prod[255:0] */
 
@@ -1066,7 +1070,7 @@ static void Cy_Crypto_Core_EC_SM_MUL_Red_P521(CRYPTO_Type *base, uint32_t z, uin
 * Size.
 *
 *******************************************************************************/
-void Cy_Crypto_Core_EC_SM_MulRed(CRYPTO_Type *base, uint32_t z, uint32_t x, uint32_t size)
+static void Cy_Crypto_Core_EC_SM_MulRed(CRYPTO_Type *base, uint32_t z, uint32_t x, uint32_t size)
 {
     switch (eccMode) {
         case CY_CRYPTO_ECC_ECP_SECP192R1:
@@ -1202,10 +1206,7 @@ void Cy_Crypto_Core_EC_Bar_MulRed(CRYPTO_Type *base,
 * Bit size.
 *
 *******************************************************************************/
-void Cy_Crypto_Core_EC_MulRed(CRYPTO_Type *base,
-    uint32_t z,
-    uint32_t x,
-    uint32_t size)
+static void Cy_Crypto_Core_EC_MulRed(CRYPTO_Type *base, uint32_t z, uint32_t x, uint32_t size)
 {
     switch (mul_red_alg_select)
     {
@@ -1424,10 +1425,10 @@ void Cy_Crypto_Core_EC_DivMod( CRYPTO_Type *base,
     uint32_t my_u        = 11u;
     uint32_t my_v        = 12u;
 
-    uint16_t zero;
-    uint16_t carry;
-    uint16_t a_even;
-    uint16_t b_even;
+    uint32_t zero;
+    uint32_t carry;
+    uint32_t a_even;
+    uint32_t b_even;
 
     uint32_t status0;
     uint32_t status1;
@@ -1525,12 +1526,8 @@ void Cy_Crypto_Core_EC_DivMod( CRYPTO_Type *base,
 * Register index for Jacobian projective Z coordinate.
 *
 *******************************************************************************/
-void Cy_Crypto_Core_JacobianTransform(CRYPTO_Type *base,
-    uint32_t s_x,
-    uint32_t s_y,
-    uint32_t s_z)
+void Cy_Crypto_Core_JacobianTransform(CRYPTO_Type *base, uint32_t s_x, uint32_t s_y, uint32_t s_z)
 {
-
     CY_CRYPTO_VU_SET_TO_ONE (base, s_z);
 }
 
@@ -1558,11 +1555,7 @@ void Cy_Crypto_Core_JacobianTransform(CRYPTO_Type *base,
 * Bit size.
 *
 *******************************************************************************/
-void Cy_Crypto_Core_JacobianInvTransform(CRYPTO_Type *base,
-    uint32_t s_x,
-    uint32_t s_y,
-    uint32_t s_z,
-    uint32_t size)
+void Cy_Crypto_Core_JacobianInvTransform(CRYPTO_Type *base, uint32_t s_x, uint32_t s_y, uint32_t s_z, uint32_t size)
 {
 
     uint32_t t1     = 7u;
@@ -1598,7 +1591,7 @@ void Cy_Crypto_Core_JacobianInvTransform(CRYPTO_Type *base,
 
 
 /*******************************************************************************
-* Function Name: Cy_Crypto_Core_JacobianInvTransform
+* Function Name: Cy_Crypto_Core_JacobianEcAdd
 ****************************************************************************//**
 *
 * Elliptic curve point addition on mixed Jacobian projective (s) / affine (t) coordinates in GF(VR_P).
@@ -1711,7 +1704,7 @@ void Cy_Crypto_Core_JacobianEcAdd(CRYPTO_Type *base,
 * Bit size.
 *
 *******************************************************************************/
-static void Cy_Crypto_Core_JacobianEcDouble(CRYPTO_Type *base,
+void Cy_Crypto_Core_JacobianEcDouble(CRYPTO_Type *base,
     uint32_t s_x,
     uint32_t s_y,
     uint32_t s_z,
@@ -1789,16 +1782,11 @@ static void Cy_Crypto_Core_JacobianEcDouble(CRYPTO_Type *base,
 * Bit size.
 *
 *******************************************************************************/
-static void Cy_Crypto_Core_JacobianEcScalarMul(CRYPTO_Type *base,
-    uint32_t s_x,
-    uint32_t s_y,
-    uint32_t d,
-    uint32_t size
-)
+void Cy_Crypto_Core_JacobianEcScalarMul(CRYPTO_Type *base, uint32_t s_x, uint32_t s_y, uint32_t d, uint32_t size)
 {
     uint32_t i;
     uint32_t status;
-    uint16_t carry;
+    uint32_t carry;
     uint16_t clsame;
 
     uint32_t clr     = 5u;
@@ -1863,7 +1851,7 @@ static void Cy_Crypto_Core_JacobianEcScalarMul(CRYPTO_Type *base,
 
         Cy_Crypto_Core_JacobianEcDouble (base, my_s_x, my_s_y, my_s_z, size);
 
-        if (carry > 0)
+        if (carry != 0U)
         {
             Cy_Crypto_Core_JacobianEcAdd (base, my_s_x, my_s_y, my_s_z, my_t_x, my_t_y, size);
         }
@@ -2001,18 +1989,19 @@ void Cy_Crypto_Core_EC_NistP_PointMul(CRYPTO_Type *base, uint32_t p_x, uint32_t 
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_EC_NistP_PointMultiplication(CRYPTO_Type *base,
     cy_en_crypto_ecc_curve_id_t curveID,
-    uint8_t* ecpGX,
-    uint8_t* ecpGY,
-    uint8_t* ecpD,
-    uint8_t* ecpQX,
-    uint8_t* ecpQY)
+    const uint8_t *ecpGX,
+    const uint8_t *ecpGY,
+    const uint8_t *ecpD,
+    uint8_t *ecpQX,
+    uint8_t *ecpQY)
 {
     /* N.b. If using test vectors from "http://point-at-infinity.org/ecc/nisttv",
-    * the 'k' values on the website are in decimal form, while the (x,y) result
-    * coordinates are in hexadecimal form
-    * Input format for 'd' scalar multiplier in this test is in hexadecimal form.
-    * Hence, convert k_{dec} to d_{hex} for comparison of test values
-    */
+     * the 'k' values on the website are in decimal form, while the (x,y) result
+     * coordinates are in hexadecimal form
+     * Input format for 'd' scalar multiplier in this test is in hexadecimal form.
+     * Hence, convert k_{dec} to d_{hex} for comparison of test values
+     */
+
     /* Setup additional registers */
     uint32_t VR_ORDER = 9u;
 

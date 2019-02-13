@@ -64,155 +64,136 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
         cy_func_get_random_data_t GetRandomDataFunc,
         void *randomDataInfo)
 {
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_NOT_SUPPORTED;
+
     cy_stc_crypto_ecc_dp_type *eccDp = Cy_Crypto_Core_ECC_GetCurveParams(curveID);
 
-    if ((eccDp == NULL) || (key == NULL))
+    if ((eccDp != NULL) && (key != NULL))
     {
-        /* NULL parameter detected in Cy_Crypto_Core_ECC_MakeKeyPair()!!! */
-        return CY_CRYPTO_NOT_SUPPORTED;
-    }
 
-#if ECC_KEY_GEN_DEBUG
-    Tb_PrintStr("\necc_make_key() for ");
-    Tb_PrintStr((int8_t *)eccDp->name);
-    Tb_PrintStr("\n");
-#endif  /* ECC_KEY_GEN_DEBUG */
+        uint32_t bitsize = eccDp->size;
 
-    uint32_t bitsize = eccDp->size;
+        /* used VU registers. Same values as in crypto_NIST_P.c */
+        uint32_t p_temp = 8u;     /* temporal values */
+        uint32_t p_order = 9u;    /* order of the curve */
+        uint32_t p_d = 10u;       /* private key */
+        uint32_t p_x = 11u;       /* x coordinate */
+        uint32_t p_y = 12u;       /* y coordinate */
 
-    /* used VU registers. Same values as in crypto_NIST_P.c */
-    uint32_t p_temp = 8u;     /* temporal values */
-    uint32_t p_order = 9u;    /* order of the curve */
-    uint32_t p_d = 10u;       /* private key */
-    uint32_t p_x = 11u;       /* x coordinate */
-    uint32_t p_y = 12u;       /* y coordinate */
-
-    CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
-    CY_CRYPTO_VU_ALLOC_MEM(base, p_order, bitsize);
-    CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1u);
-    CY_CRYPTO_VU_ALLOC_MEM(base, p_x, bitsize);
-    CY_CRYPTO_VU_ALLOC_MEM(base, p_y, bitsize);
+        CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
+        CY_CRYPTO_VU_ALLOC_MEM(base, p_order, bitsize);
+        CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1u);
+        CY_CRYPTO_VU_ALLOC_MEM(base, p_x, bitsize);
+        CY_CRYPTO_VU_ALLOC_MEM(base, p_y, bitsize);
 
 
-    /***************************************************************
-    *               Apply domain parameters
-    ***************************************************************/
-    /* load prime and order defining the curve as well as the Barrett coefficient. */
+        /***************************************************************
+        *               Apply domain parameters
+        ***************************************************************/
+        /* load prime and order defining the curve as well as the Barrett coefficient. */
 
-    /* P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h  */
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->prime, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, p_order, eccDp->order, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p, bitsize + 1u);
+        /* P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h  */
+        Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->prime, bitsize);
+        Cy_Crypto_Core_Vu_SetMemValue (base, p_order, eccDp->order, bitsize);
+        Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p, bitsize + 1u);
 
-    /* Base Point, G = (p_x, p_y) */
-    Cy_Crypto_Core_Vu_SetMemValue (base, p_x, eccDp->Gx, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, p_y, eccDp->Gy, bitsize);
+        /* Base Point, G = (p_x, p_y) */
+        Cy_Crypto_Core_Vu_SetMemValue (base, p_x, eccDp->Gx, bitsize);
+        Cy_Crypto_Core_Vu_SetMemValue (base, p_y, eccDp->Gy, bitsize);
 
-    Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
-    Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
+        Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
+        Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
 
-
-    /***************************************************************
-    *               generate random string
-    ***************************************************************/
-    if (GetRandomDataFunc != NULL)
-    {
-        (void)GetRandomDataFunc( randomDataInfo, (uint8_t*)key->k, ((bitsize + 7u) >> 3u) );
-    }
-    else
-    {
-        uint32_t i = 0u;
-        int32_t randomsize = bitsize;
-
-        while (randomsize > 0u)
+        /***************************************************************
+        *               generate random string
+        ***************************************************************/
+        if (GetRandomDataFunc != NULL)
         {
-            uint32_t randombits = (uint32_t)CY_CRYPTO_MIN(randomsize, 32);
+            (void)GetRandomDataFunc( randomDataInfo, (uint8_t*)key->k, ((bitsize + 7u) >> 3u) );
+        }
+        else
+        {
+            uint32_t i = 0u;
+            int32_t randomsize = bitsize;
+            cy_en_crypto_status_t error = CY_CRYPTO_SUCCESS;
 
-            cy_en_crypto_status_t error = Cy_Crypto_Core_Trng(base,
-                                                              CY_ECC_CONFIG_TR_GARO_CTL,
-                                                              CY_ECC_CONFIG_TR_FIRO_CTL,
-                                                              randombits,
-                                                              &((uint32_t *)key->k)[i]);
-            randomsize -= 32;
-            i++;
-
-            if (CY_CRYPTO_SUCCESS != error)
+            while ((randomsize > 0u) && (CY_CRYPTO_SUCCESS == error))
             {
-                return CY_CRYPTO_HW_ERROR;
+                uint32_t randombits = (uint32_t)CY_CRYPTO_MIN(randomsize, 32);
+
+                error = Cy_Crypto_Core_Trng(base, CY_ECC_CONFIG_TR_GARO_CTL, CY_ECC_CONFIG_TR_FIRO_CTL,
+                                                  randombits, &((uint32_t *)key->k)[i]);
+                randomsize -= 32;
+                i++;
+
+                if (CY_CRYPTO_SUCCESS != error)
+                {
+                    tmpResult = CY_CRYPTO_HW_ERROR;
+                }
             }
+        }
+
+        if (CY_CRYPTO_SUCCESS == tmpResult)
+        {
+
+            /***************************************************************
+            *               Load random data into VU
+            ***************************************************************/
+            CY_CRYPTO_VU_ALLOC_MEM(base, p_d, bitsize);
+            Cy_Crypto_Core_Vu_SetMemValue(base, p_d, (uint8_t *)key->k, bitsize);
+
+            /* check that the key is smaller than the order of base point */
+            CY_CRYPTO_VU_CMP_SUB (base, p_d, p_order);                    /*  C = (a >= b) */
+            uint32_t status = Cy_Crypto_Core_Vu_StatusRead(base);
+
+            if (0u != (status &  CY_CRYPTO_VU_STATUS_CARRY_BIT))
+            {
+                /*  random data >= order, needs reduction */
+
+                CY_CRYPTO_VU_PUSH_REG(base);
+
+                /*  load values needed for reduction modulo curve order */
+                CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
+                Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->order, bitsize);
+
+                CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1u);
+                Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_o, bitsize + 1u);
+
+                CY_CRYPTO_VU_ALLOC_MEM(base, p_temp, bitsize);
+                CY_CRYPTO_VU_MOV(base, p_temp, p_d);
+
+                /*  z = x % mod */
+                Cy_Crypto_Core_EC_Bar_MulRed(base, p_d, p_temp, bitsize);
+
+                CY_CRYPTO_VU_FREE_MEM(base, CY_CRYPTO_VU_REG_BIT(p_temp) | CY_CRYPTO_VU_REG_BIT(VR_P) | CY_CRYPTO_VU_REG_BIT(VR_BARRETT));
+
+                Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)key->k, p_d, bitsize);
+
+                /*  restore previous prime and Barrett values */
+                CY_CRYPTO_VU_POP_REG(base);
+            }
+
+            /*
+             * Make the public key
+             * EC scalar multiplication - X,Y-only co-Z arithmetic
+             */
+            Cy_Crypto_Core_EC_NistP_PointMul(base, p_x, p_y, p_d, p_order, bitsize);
+
+            Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)key->pubkey.x, p_x, bitsize);
+            Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)key->pubkey.y, p_y, bitsize);
+
+            key->type = PK_PRIVATE;
+            key->curveID = curveID;
+
+            CY_CRYPTO_VU_FREE_MEM(base, CY_CRYPTO_VU_REG_BIT(VR_P) | CY_CRYPTO_VU_REG_BIT(VR_BARRETT) |
+                                        CY_CRYPTO_VU_REG_BIT(p_x)  | CY_CRYPTO_VU_REG_BIT(p_y) |
+                                        CY_CRYPTO_VU_REG_BIT(p_order) | CY_CRYPTO_VU_REG_BIT(p_d));
+
+            tmpResult = CY_CRYPTO_SUCCESS;
         }
     }
 
-    /***************************************************************
-    *               Load random data into VU
-    ***************************************************************/
-    CY_CRYPTO_VU_ALLOC_MEM(base, p_d, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue(base, p_d, (uint8_t *)key->k, bitsize);
-
-#if ECC_KEY_GEN_DEBUG
-    Tb_PrintStr("random data: ");
-    Crypto_RegMemNumberPrint(p_d);
-    Tb_PrintStr("p_order: ");
-    Crypto_RegMemNumberPrint(p_order);
-#endif /*ECC_KEY_GEN_DEBUG */
-
-    /* check that the key is smaller than the order of base point */
-    CY_CRYPTO_VU_CMP_SUB (base, p_d, p_order);                    /*  C = (a >= b) */
-    uint32_t status = Cy_Crypto_Core_Vu_StatusRead(base);
-
-    if (0u != (status &  CY_CRYPTO_VU_STATUS_CARRY_BIT))
-    {
-        /*  random data >= order, needs reduction */
-
-        CY_CRYPTO_VU_PUSH_REG(base);
-
-        /*  load values needed for reduction modulo curve order */
-        CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
-        Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->order, bitsize);
-
-        CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1u);
-        Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_o, bitsize + 1u);
-
-        CY_CRYPTO_VU_ALLOC_MEM(base, p_temp, bitsize);
-        CY_CRYPTO_VU_MOV(base, p_temp, p_d);
-
-        /*  z = x % mod */
-        Cy_Crypto_Core_EC_Bar_MulRed(base, p_d, p_temp, bitsize);
-
-        CY_CRYPTO_VU_FREE_MEM(base, CY_CRYPTO_VU_REG_BIT(p_temp) | CY_CRYPTO_VU_REG_BIT(VR_P) | CY_CRYPTO_VU_REG_BIT(VR_BARRETT));
-
-        Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)key->k, p_d, bitsize);
-
-        /*  restore previous prime and Barrett values */
-        CY_CRYPTO_VU_POP_REG(base);
-
-#if ECC_KEY_GEN_DEBUG
-        Tb_PrintStr("random data after reduction modulo order: ");
-        Crypto_RegMemNumberPrint(p_d);
-#endif /*  ECC_KEY_GEN_DEBUG */
-
-    }
-
-    /* make the public key
-    * EC scalar multiplication - X,Y-only co-Z arithmetic
-    */
-#if ECC_KEY_GEN_DEBUG
-    Tb_PrintStr("Doing scalar multiplication\n");
-#endif /* ECC_KEY_GEN_DEBUG */
-
-    Cy_Crypto_Core_EC_NistP_PointMul(base, p_x, p_y, p_d, p_order, bitsize);
-
-    Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)key->pubkey.x, p_x, bitsize);
-    Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)key->pubkey.y, p_y, bitsize);
-
-    key->type = PK_PRIVATE;
-    key->curveID = curveID;
-
-    CY_CRYPTO_VU_FREE_MEM(base, CY_CRYPTO_VU_REG_BIT(VR_P) | CY_CRYPTO_VU_REG_BIT(VR_BARRETT) |
-                                CY_CRYPTO_VU_REG_BIT(p_x)  | CY_CRYPTO_VU_REG_BIT(p_y) |
-                                CY_CRYPTO_VU_REG_BIT(p_order) | CY_CRYPTO_VU_REG_BIT(p_d));
-
-    return CY_CRYPTO_SUCCESS;
+    return (tmpResult);
 }
 
 
@@ -244,108 +225,88 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
         uint8_t *key,
         cy_func_get_random_data_t GetRandomDataFunc, void *randomDataInfo)
 {
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
+
     const cy_stc_crypto_ecc_dp_type *eccDp = Cy_Crypto_Core_ECC_GetCurveParams(curveID);
 
-    if ((eccDp == NULL) || (key == NULL))
+    if ((eccDp != NULL) && (key != NULL))
     {
-        /* NULL parameter detected in Cy_Crypto_Core_ECC_MakeKey()!!! */
-        return CY_CRYPTO_NOT_SUPPORTED;
-    }
 
-#if ECC_KEY_GEN_DEBUG
-    Tb_PrintStr("\necc_make_key() for ");
-    Tb_PrintStr((int8_t *)eccDp->name);
-    Tb_PrintStr("\n");
-#endif  /* ECC_KEY_GEN_DEBUG */
+        uint32_t bitsize = eccDp->size;
 
-    uint32_t bitsize = eccDp->size;
+        uint32_t p_temp = 8u;     /* temporal values */
+        uint32_t p_d = 10u;       /* private key */
 
-    uint32_t p_temp = 8u;     /* temporal values */
-    uint32_t p_d = 10u;       /* private key */
-
-    /* generate random string */
-    if (GetRandomDataFunc != NULL)
-    {
-         (void)GetRandomDataFunc( randomDataInfo, key, (bitsize + 7u) >> 3u );
-    }
-    else
-    {
-        for (int32_t i = 0, randomsize = bitsize; randomsize > 0; randomsize-=32, i++)
+        /* generate random string */
+        if (GetRandomDataFunc != NULL)
         {
-            uint32_t randombits = (uint32_t)CY_CRYPTO_MIN(randomsize, 32);
+             (void)GetRandomDataFunc( randomDataInfo, key, (bitsize + 7u) >> 3u );
+        }
+        else
+        {
+            cy_en_crypto_status_t error = CY_CRYPTO_SUCCESS;
 
-            cy_en_crypto_status_t error = Cy_Crypto_Core_Trng(base,
-                                                              CY_ECC_CONFIG_TR_GARO_CTL,
-                                                              CY_ECC_CONFIG_TR_FIRO_CTL,
-                                                              randombits,
-                                                              &((uint32_t *)key)[i]);
-
-            if (CY_CRYPTO_SUCCESS != error)
+            for (int32_t i = 0, randomsize = bitsize; (randomsize > 0) && (CY_CRYPTO_SUCCESS == error); randomsize-=32, i++)
             {
-                return CY_CRYPTO_HW_ERROR;
+                uint32_t randombits = (uint32_t)CY_CRYPTO_MIN(randomsize, 32);
+
+                error = Cy_Crypto_Core_Trng(base, CY_ECC_CONFIG_TR_GARO_CTL, CY_ECC_CONFIG_TR_FIRO_CTL,
+                                                  randombits, &((uint32_t *)key)[i]);
+
+                if (CY_CRYPTO_SUCCESS != error)
+                {
+                    tmpResult = CY_CRYPTO_HW_ERROR;
+                }
             }
+        }
+
+        if (CY_CRYPTO_SUCCESS == tmpResult)
+        {
+
+            /* load prime and order defining the curve as well as the barrett coefficient. */
+            /* P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h */
+            CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
+            CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1u);
+            Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->order, bitsize);
+            Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_o, bitsize + 1u);
+
+            /* Load random data into VU */
+            CY_CRYPTO_VU_ALLOC_MEM(base, p_d, bitsize);
+            Cy_Crypto_Core_Vu_SetMemValue(base, p_d, (uint8_t *)key, bitsize);
+
+            CY_CRYPTO_VU_ALLOC_MEM(base, p_temp, bitsize);
+            CY_CRYPTO_VU_MOV(base, p_temp, p_d);
+
+            /* check that the key is smaller than the order of base point */
+            CY_CRYPTO_VU_CMP_SUB (base, p_d, VR_P);                    /* C = (a >= b) */
+            uint32_t status = Cy_Crypto_Core_Vu_StatusRead(base);
+
+            if (0u != (status & CY_CRYPTO_VU_STATUS_CARRY_BIT))
+            {
+                /* private key (random data) >= order, needs reduction */
+
+                /* use Barrett reduction algorithm for operations modulo n (order of the base point) */
+                Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
+                Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
+
+                /* z = x % mod */
+                Cy_Crypto_Core_EC_Bar_MulRed(base, p_d, p_temp, bitsize);
+
+                Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)key, p_d, bitsize);
+            }
+            else
+            {
+                /* carry is clear, i. e. p_d < p_order */
+            }
+
+            CY_CRYPTO_VU_FREE_MEM(base, CY_CRYPTO_VU_REG_BIT(VR_P) | CY_CRYPTO_VU_REG_BIT(VR_BARRETT) |
+                                        CY_CRYPTO_VU_REG_BIT(p_d)  | CY_CRYPTO_VU_REG_BIT(p_temp));
+
+            tmpResult = CY_CRYPTO_SUCCESS;
         }
     }
 
-#if ECC_KEY_GEN_DEBUG
-    Tb_PrintStr("private key:   ");
-    Crypto_PrintNumber((uint8_t *)key, CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize));
-#endif /* ECC_KEY_GEN_DEBUG */
-
-
-    /* load prime and order defining the curve as well as the barrett coefficient. */
-    /* P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h */
-    CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
-    CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1u);
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->order, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_o, bitsize + 1u);
-
-    /* Load random data into VU */
-    CY_CRYPTO_VU_ALLOC_MEM(base, p_d, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue(base, p_d, (uint8_t *)key, bitsize);
-
-    CY_CRYPTO_VU_ALLOC_MEM(base, p_temp, bitsize);
-    CY_CRYPTO_VU_MOV(base, p_temp, p_d);
-
-#if ECC_KEY_GEN_DEBUG
-    Tb_PrintStr("random data: ");
-    Crypto_RegMemNumberPrint(p_d);
-    Tb_PrintStr("p_order: ");
-    Crypto_RegMemNumberPrint(VR_P);
-#endif /* ECC_KEY_GEN_DEBUG */
-
-    /* check that the key is smaller than the order of base point */
-    CY_CRYPTO_VU_CMP_SUB (base, p_d, VR_P);                    /* C = (a >= b) */
-    uint32_t status = Cy_Crypto_Core_Vu_StatusRead(base);
-
-    if (0u != (status & CY_CRYPTO_VU_STATUS_CARRY_BIT))
-    {
-        /* private key (random data) >= order, needs reduction */
-
-        /* use Barrett reduction algorithm for operations modulo n (order of the base point) */
-        Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
-        Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
-
-        /* z = x % mod */
-        Cy_Crypto_Core_EC_Bar_MulRed(base, p_d, p_temp, bitsize);
-
-        Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)key, p_d, bitsize);
-
-#if ECC_KEY_GEN_DEBUG
-        Tb_PrintStr("private key after reduction modulo order: ");
-        Crypto_RegMemNumberPrint(p_d);
-#endif /* ECC_KEY_GEN_DEBUG */
-
-    }
-    else
-    {
-        /* carry is clear, i. e. p_d < p_order */
-    }
-
-    CY_CRYPTO_VU_FREE_MEM(base, CY_CRYPTO_VU_REG_BIT(VR_P) | CY_CRYPTO_VU_REG_BIT(VR_BARRETT) |
-                                CY_CRYPTO_VU_REG_BIT(p_d)  | CY_CRYPTO_VU_REG_BIT(p_temp));
-
-    return CY_CRYPTO_SUCCESS;
+    return (tmpResult);
 }
 
 
@@ -375,68 +336,64 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
         const uint8_t *privateKey,
         cy_stc_crypto_ecc_key *publicKey)
 {
+    cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
+
     cy_stc_crypto_ecc_dp_type *eccDp = Cy_Crypto_Core_ECC_GetCurveParams(curveID);
 
-    if ((eccDp == NULL) || (privateKey == NULL) || (publicKey == NULL))
+    if ((eccDp != NULL) && (privateKey != NULL) && (publicKey != NULL))
     {
-        /* NULL parameter detected in Cy_Crypto_Core_ECC_MakeKey()!!! */
-        return CY_CRYPTO_NOT_SUPPORTED;
+
+        uint32_t bitsize = eccDp->size;
+
+        uint32_t p_order = 9u;    /* order of the curve */
+        uint32_t p_d = 10u;       /* private key */
+        uint32_t p_x = 11u;       /* x coordinate */
+        uint32_t p_y = 12u;       /* y coordinate */
+
+        /* make the public key
+        * EC scalar multiplication - X,Y-only co-Z arithmetic
+        */
+        CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
+        CY_CRYPTO_VU_ALLOC_MEM(base, p_order, bitsize);
+        CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1u);
+        CY_CRYPTO_VU_ALLOC_MEM(base, p_x, bitsize);
+        CY_CRYPTO_VU_ALLOC_MEM(base, p_y, bitsize);
+
+        /* Apply domain parameters */
+
+        /* load prime and order defining the curve as well as the barrett coefficient. */
+
+        /*  P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h */
+        Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->prime, bitsize);
+        Cy_Crypto_Core_Vu_SetMemValue (base, p_order, eccDp->order, bitsize);
+        Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p, bitsize + 1u);
+
+        /*Base Point, G = (p_x, p_y) */
+        Cy_Crypto_Core_Vu_SetMemValue (base, p_x, eccDp->Gx, bitsize);
+        Cy_Crypto_Core_Vu_SetMemValue (base, p_y, eccDp->Gy, bitsize);
+
+        Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
+        Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
+
+        /* Load random data into VU */
+        CY_CRYPTO_VU_ALLOC_MEM(base, p_d, bitsize);
+        Cy_Crypto_Core_Vu_SetMemValue(base, p_d, (uint8_t *)privateKey, bitsize);
+
+        Cy_Crypto_Core_EC_NistP_PointMul(base, p_x, p_y, p_d, p_order, bitsize);
+
+        Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)publicKey->pubkey.x, p_x, bitsize);
+        Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)publicKey->pubkey.y, p_y, bitsize);
+
+        publicKey->type = PK_PUBLIC;
+        publicKey->curveID   = curveID;
+
+        CY_CRYPTO_VU_FREE_MEM(base, CY_CRYPTO_VU_REG_BIT(VR_P) | CY_CRYPTO_VU_REG_BIT(p_order) | CY_CRYPTO_VU_REG_BIT(VR_BARRETT) |
+                                    CY_CRYPTO_VU_REG_BIT(p_x) | CY_CRYPTO_VU_REG_BIT(p_y) | CY_CRYPTO_VU_REG_BIT(p_d));
+
+        tmpResult = CY_CRYPTO_SUCCESS;
     }
 
-#if ECC_KEY_GEN_DEBUG
-    Tb_PrintStr("\necc_make public key() for ");
-    Tb_PrintStr((int8_t *)eccDp->name);
-    Tb_PrintStr("\n");
-#endif  /* ECC_KEY_GEN_DEBUG */
-
-    uint32_t bitsize = eccDp->size;
-
-    uint32_t p_order = 9u;    /* order of the curve */
-    uint32_t p_d = 10u;       /* private key */
-    uint32_t p_x = 11u;       /* x coordinate */
-    uint32_t p_y = 12u;       /* y coordinate */
-
-    /* make the public key
-    * EC scalar multiplication - X,Y-only co-Z arithmetic
-    */
-    CY_CRYPTO_VU_ALLOC_MEM(base, VR_P, bitsize);
-    CY_CRYPTO_VU_ALLOC_MEM(base, p_order, bitsize);
-    CY_CRYPTO_VU_ALLOC_MEM(base, VR_BARRETT, bitsize + 1u);
-    CY_CRYPTO_VU_ALLOC_MEM(base, p_x, bitsize);
-    CY_CRYPTO_VU_ALLOC_MEM(base, p_y, bitsize);
-
-    /* Apply domain parameters */
-
-    /* load prime and order defining the curve as well as the barrett coefficient. */
-
-    /*  P and BARRETT_U are "globally" defined in cy_crypto_core_ecc.h */
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_P, eccDp->prime, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, p_order, eccDp->order, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, VR_BARRETT, eccDp->barrett_p, bitsize + 1u);
-
-    /*Base Point, G = (p_x, p_y) */
-    Cy_Crypto_Core_Vu_SetMemValue (base, p_x, eccDp->Gx, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue (base, p_y, eccDp->Gy, bitsize);
-
-    Cy_Crypto_Core_EC_NistP_SetMode(bitsize);
-    Cy_Crypto_Core_EC_NistP_SetRedAlg(eccDp->algo);
-
-    /* Load random data into VU */
-    CY_CRYPTO_VU_ALLOC_MEM(base, p_d, bitsize);
-    Cy_Crypto_Core_Vu_SetMemValue(base, p_d, (uint8_t *)privateKey, bitsize);
-
-    Cy_Crypto_Core_EC_NistP_PointMul(base, p_x, p_y, p_d, p_order, bitsize);
-
-    Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)publicKey->pubkey.x, p_x, bitsize);
-    Cy_Crypto_Core_Vu_GetMemValue(base, (uint8_t *)publicKey->pubkey.y, p_y, bitsize);
-
-    publicKey->type = PK_PUBLIC;
-    publicKey->curveID   = curveID;
-
-    CY_CRYPTO_VU_FREE_MEM(base, CY_CRYPTO_VU_REG_BIT(VR_P) | CY_CRYPTO_VU_REG_BIT(p_order) | CY_CRYPTO_VU_REG_BIT(VR_BARRETT) |
-                                CY_CRYPTO_VU_REG_BIT(p_x) | CY_CRYPTO_VU_REG_BIT(p_y) | CY_CRYPTO_VU_REG_BIT(p_d));
-
-    return CY_CRYPTO_SUCCESS;
+    return (tmpResult);
 }
 
 

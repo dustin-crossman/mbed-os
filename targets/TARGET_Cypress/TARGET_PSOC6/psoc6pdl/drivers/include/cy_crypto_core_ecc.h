@@ -132,7 +132,7 @@ typedef struct {
 */
 
 /** Pointer to a random number supplier function */
-typedef int (*cy_func_get_random_data_t)(void *, unsigned char *, size_t);
+typedef int (*cy_func_get_random_data_t)(void *rndInfo, unsigned char *rndData, size_t rndSize);
 
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
                                    cy_en_crypto_ecc_curve_id_t curveID,
@@ -143,7 +143,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base,
                                     uint32_t hashlen,
                                     uint8_t *sig,
                                     const cy_stc_crypto_ecc_key *key,
-                                    uint8_t *messageKey);
+                                    const uint8_t *messageKey);
 cy_en_crypto_status_t Cy_Crypto_Core_ECC_VerifyHash(CRYPTO_Type *base,
                                     const uint8_t *sig,
                                     const uint8_t *hash,

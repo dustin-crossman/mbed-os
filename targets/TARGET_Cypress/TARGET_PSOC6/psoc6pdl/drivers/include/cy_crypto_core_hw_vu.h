@@ -230,6 +230,7 @@ __STATIC_INLINE void CY_CRYPTO_VU_COND_MOV_IMM_TO_STATUS (CRYPTO_Type *base, uin
 
         CY_CRYPTO_VU_SAVE_REG(base, tmpReg, &tmpData);
 
+        /* Load 4 bit immediate value */
         CY_CRYPTO_VU_SET_REG(base, tmpReg, imm4, 4u);
         CY_CRYPTO_VU_COND_MOV_REG_TO_STATUS(base, cc, tmpReg);
 
@@ -708,6 +709,7 @@ __STATIC_INLINE void CY_CRYPTO_VU_COND_SET_BIT_IMM (CRYPTO_Type *base, uint32_t 
         uint32_t tmpData;
         CY_CRYPTO_VU_SAVE_REG(base, tmpReg, &tmpData);
 
+        /* Load 13 bit immediate value */
         CY_CRYPTO_VU_SET_REG(base, tmpReg, imm13, 13u);
         CY_CRYPTO_VU_COND_SET_BIT(base, cc, rdst, tmpReg);
 
@@ -737,6 +739,7 @@ __STATIC_INLINE void CY_CRYPTO_VU_COND_CLR_BIT_IMM (CRYPTO_Type *base, uint32_t 
         uint32_t tmpData;
         CY_CRYPTO_VU_SAVE_REG(base, tmpReg, &tmpData);
 
+        /* Load 13 bit immediate value */
         CY_CRYPTO_VU_SET_REG(base, tmpReg, imm13, 13u);
         CY_CRYPTO_VU_COND_CLR_BIT(base, cc, rdst, tmpReg);
 
@@ -766,6 +769,7 @@ __STATIC_INLINE void CY_CRYPTO_VU_COND_INV_BIT_IMM (CRYPTO_Type *base, uint32_t 
         uint32_t tmpData;
         CY_CRYPTO_VU_SAVE_REG(base, tmpReg, &tmpData);
 
+        /* Load 13 bit immediate value */
         CY_CRYPTO_VU_SET_REG(base, tmpReg, imm13, 13u);
         CY_CRYPTO_VU_COND_INV_BIT(base, cc, rdst, tmpReg);
 
