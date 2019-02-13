@@ -46,7 +46,7 @@ void Cy_Crypto_Core_Vu_SetMemValue(CRYPTO_Type *base, uint32_t dstReg, uint8_t c
 
     Cy_Crypto_Core_Vu_WaitForComplete(base);
 
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_HW_V1)
     {
         CY_CRYPTO_VU_SAVE_REG(base, CY_CRYPTO_VU_HW_REG0, &reg0_data);
         CY_CRYPTO_VU_SAVE_REG(base, CY_CRYPTO_VU_HW_REG1, &reg1_data);
@@ -64,7 +64,7 @@ void Cy_Crypto_Core_Vu_SetMemValue(CRYPTO_Type *base, uint32_t dstReg, uint8_t c
     CY_ASSERT_L1( (((uint32_t)Cy_Crypto_Core_Vu_RegMemPointer(base, dstReg) + byteSize) - 1u) < ((uint32_t)REG_CRYPTO_MEM_BUFF(base) + CY_CRYPTO_MEM_BUFF_SIZE));
     Cy_Crypto_Core_MemCpy(base, (void*)Cy_Crypto_Core_Vu_RegMemPointer(base, dstReg), (const void*)src, byteSize);
 
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_HW_V1)
     {
         CY_CRYPTO_VU_RESTORE_REG(base, CY_CRYPTO_VU_HW_REG0, reg0_data);
         CY_CRYPTO_VU_RESTORE_REG(base, CY_CRYPTO_VU_HW_REG1, reg1_data);
@@ -78,7 +78,7 @@ void Cy_Crypto_Core_Vu_GetMemValue(CRYPTO_Type *base, uint8_t *dst, uint32_t src
 
     Cy_Crypto_Core_Vu_WaitForComplete(base);
 
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_HW_V1)
     {
         CY_CRYPTO_VU_SAVE_REG(base, CY_CRYPTO_VU_HW_REG0, &reg0_data);
         CY_CRYPTO_VU_SAVE_REG(base, CY_CRYPTO_VU_HW_REG1, &reg1_data);
@@ -96,7 +96,7 @@ void Cy_Crypto_Core_Vu_GetMemValue(CRYPTO_Type *base, uint8_t *dst, uint32_t src
 
     Cy_Crypto_Core_MemCpy(base, (void*)dst, (void*)Cy_Crypto_Core_Vu_RegMemPointer(base, srcReg), byteSize);
 
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_HW_V1)
     {
         CY_CRYPTO_VU_RESTORE_REG(base, CY_CRYPTO_VU_HW_REG0, reg0_data);
         CY_CRYPTO_VU_RESTORE_REG(base, CY_CRYPTO_VU_HW_REG1, reg1_data);
@@ -129,7 +129,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Cleanup(CRYPTO_Type *base)
     /* AES */
     REG_CRYPTO_AES_CTL(base)      = 0u;
 
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_HW_V1)
     {
         REG_CRYPTO_CRC_LFSR_CTL(base) = 0u;
         REG_CRYPTO_SHA_CTL(base)  = 0u;

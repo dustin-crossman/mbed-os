@@ -268,11 +268,11 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Hmac(CRYPTO_Type *base,
                                           cy_en_crypto_sha_mode_t mode)
 {
     /* Allocating internal variables into the CRYPTO SRAM Buffer */
-    cy_stc_crypto_v2_hmac_buffers_t  hmacBuffersData;
+    cy_stc_crypto_v2_hmac_buffers_t  hmacBuffersData = { 0 };
     cy_stc_crypto_v2_hmac_buffers_t *hmacBuffers = &hmacBuffersData;
 
     cy_stc_crypto_v2_hmac_state_t   *hmacStateTmp = &hmacBuffers->hmacState;
-    cy_stc_crypto_sha_state_t        hashState;
+    cy_stc_crypto_sha_state_t        hashState = { 0 };
 
     uint8_t *ipadTmp      = (uint8_t*)&hmacBuffers->ipad;
     uint8_t *opadTmp      = (uint8_t*)&hmacBuffers->opad;

@@ -238,7 +238,38 @@
 * See the Cryptographic Function Block chapter of the Technical Reference Manual.
 *
 * \section group_crypto_MISRA MISRA-C Compliance
-* This driver does not contains any driver-specific MISRA violations.
+* The Crypto driver has the following specific deviations:
+*
+* <table class="doxtable">
+*   <tr>
+*     <th>MISRA Rule</th>
+*     <th>Rule Class (Required/Advisory)</th>
+*     <th>Rule Description</th>
+*     <th>Description of Deviation(s)</th>
+*   </tr>
+*   <tr>
+*     <td>11.4</td>
+*     <td>A</td>
+*     <td>A cast should not be performed between a pointer to object type and
+*         a different pointer to object type.</td>
+*     <td>The pointers to the context memory are void to allow handling of
+*         different data types for different operations.
+*         The cast operation is safe because the configuration is verified
+*         before operation is performed.
+*         </td>
+*   </tr>
+*   <tr>
+*     <td>16.7</td>
+*     <td>A</td>
+*     <td>A pointer parameter in a function prototype should be declared as
+*         pointer to const if the pointer is not used to modify the addressed
+*         object.</td>
+*     <td>The objects pointed to by the base addresses of the CRYPTO are not
+*         always modified. While a const qualifier can be used in select
+*         scenarios, it brings little benefit in adding this to the affected
+*         functions. </td>
+*   </tr>
+* </table>
 *
 * \section group_crypto_changelog Changelog
 * <table class="doxtable">

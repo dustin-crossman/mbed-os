@@ -79,7 +79,7 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Trng(CRYPTO_Type *base,
                                              uint32_t *randomNum)
 {
     cy_en_crypto_status_t tmpResult;
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_HW_V1)
     {
         tmpResult = Cy_Crypto_Core_V1_Trng(base, GAROPol, FIROPol, max, randomNum);
     }

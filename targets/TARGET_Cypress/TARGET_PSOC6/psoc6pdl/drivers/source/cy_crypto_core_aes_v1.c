@@ -307,14 +307,14 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Cbc(CRYPTO_Type *base,
     cy_en_crypto_status_t tmpResult = CY_CRYPTO_SIZE_NOT_X16;
 
     /* Check whether the data size is multiple of CY_CRYPTO_AES_BLOCK_SIZE */
-    if (0uL == (uint32_t)(size & (CY_CRYPTO_AES_BLOCK_SIZE - 1u)))
+    if (0UL == (uint32_t)(size & (CY_CRYPTO_AES_BLOCK_SIZE - 1U)))
     {
         /* Copy the Initialization Vector to the local buffer because it changes during calculation */
         Cy_Crypto_Core_V1_MemCpy(base, tempBuff, ivPtr, CY_CRYPTO_AES_BLOCK_SIZE);
 
         if (CY_CRYPTO_DECRYPT == dirMode)
         {
-            while (size > 0uL)
+            while (size != 0UL)
             {
                 /* source message block */
                 Cy_Crypto_Core_V1_MemCpy(base, srcBuff, src, CY_CRYPTO_AES_BLOCK_SIZE);
@@ -335,7 +335,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Cbc(CRYPTO_Type *base,
         }
         else
         {
-            while (size > 0uL)
+            while (size != 0UL)
             {
                 /* source message block */
                 Cy_Crypto_Core_V1_MemCpy(base, srcBuff, src, CY_CRYPTO_AES_BLOCK_SIZE);
@@ -413,7 +413,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Cfb(CRYPTO_Type *base,
     uint32_t *encBuff = dstBuff;   /* Default operation is ENCRYPT */
 
     /* Check whether the data size is multiple of CY_CRYPTO_AES_BLOCK_SIZE */
-    if (0uL == (size & (CY_CRYPTO_AES_BLOCK_SIZE - 1u)))
+    if (0UL == (size & (CY_CRYPTO_AES_BLOCK_SIZE - 1U)))
     {
         if (CY_CRYPTO_DECRYPT == dirMode)
         {
@@ -423,7 +423,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Cfb(CRYPTO_Type *base,
         /* Copy the Initialization Vector to local encode buffer */
         Cy_Crypto_Core_V1_MemCpy(base, encBuff, ivPtr, CY_CRYPTO_AES_BLOCK_SIZE);
 
-        while (size > 0uL)
+        while (size != 0UL)
         {
             /* In this mode, (CFB) is always an encryption! */
             Cy_Crypto_Core_V1_Aes_ProcessBlock(base, aesState, CY_CRYPTO_ENCRYPT, dstBuff, encBuff);
@@ -484,7 +484,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Cfb(CRYPTO_Type *base,
 * \ref cy_en_crypto_status_t
 *
 *******************************************************************************/
-#define CY_CRYPTO_AES_CTR_CNT_POS          (0x02u)
+#define CY_CRYPTO_AES_CTR_CNT_POS          (0x02U)
 cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Ctr(CRYPTO_Type *base,
                                             uint32_t srcSize,
                                             uint32_t *srcOffset,
@@ -510,7 +510,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Ctr(CRYPTO_Type *base,
 
     cnt = (uint32_t)(srcSize / CY_CRYPTO_AES_BLOCK_SIZE);
 
-    for (i = 0uL; i < cnt; i++)
+    for (i = 0UL; i < cnt; i++)
     {
         /* source message block */
         Cy_Crypto_Core_V1_MemCpy(base, srcBuff, src, CY_CRYPTO_AES_BLOCK_SIZE);

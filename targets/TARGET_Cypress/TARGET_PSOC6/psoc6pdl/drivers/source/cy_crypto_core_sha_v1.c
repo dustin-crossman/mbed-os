@@ -562,7 +562,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha(CRYPTO_Type *base,
     cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
 
     void *shaBuffers = (void *)REG_CRYPTO_MEM_BUFF(base);
-    cy_stc_crypto_sha_state_t myHashState;
+    cy_stc_crypto_sha_state_t myHashState = { 0 };
 
     tmpResult = Cy_Crypto_Core_V1_Sha_Init (base, &myHashState, mode, shaBuffers);
 

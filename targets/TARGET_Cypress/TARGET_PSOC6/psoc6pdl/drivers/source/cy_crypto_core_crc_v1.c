@@ -313,7 +313,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_CalcFinish(CRYPTO_Type *base, uint32
     calculatedCrc = (uint32_t)_FLD2VAL(CRYPTO_CRC_REM_RESULT_REM, REG_CRYPTO_CRC_REM_RESULT(base));
 
     /* Note: Calculated CRC value is MSB aligned and should be shifted WHEN CRC_DATA_REVERSE is zero. */
-    if (_FLD2VAL(CRYPTO_CRC_CTL_REM_REVERSE, REG_CRYPTO_CRC_CTL(base)) == 0u)
+    if (_FLD2VAL(CRYPTO_CRC_CTL_REM_REVERSE, REG_CRYPTO_CRC_CTL(base)) == 0U)
     {
         calculatedCrc = calculatedCrc >> (CY_CRYPTO_HW_REGS_WIDTH - width);
     }
@@ -373,7 +373,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Crc_Calc(CRYPTO_Type *base,
     calculatedCrc = (uint32_t)_FLD2VAL(CRYPTO_CRC_REM_RESULT_REM, REG_CRYPTO_CRC_REM_RESULT(base));
 
     /* Note: Calculated CRC value is MSB aligned and should be shifted WHEN CRC_DATA_REVERSE is zero. */
-    if (_FLD2VAL(CRYPTO_CRC_CTL_REM_REVERSE, REG_CRYPTO_CRC_CTL(base)) == 0u)
+    if (_FLD2VAL(CRYPTO_CRC_CTL_REM_REVERSE, REG_CRYPTO_CRC_CTL(base)) == 0U)
     {
         calculatedCrc = calculatedCrc >> (CY_CRYPTO_HW_REGS_WIDTH - width);
     }

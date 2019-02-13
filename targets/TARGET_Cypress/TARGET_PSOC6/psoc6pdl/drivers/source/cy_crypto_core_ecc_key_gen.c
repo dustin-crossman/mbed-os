@@ -126,14 +126,14 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
 
         while (randomsize > 0u)
         {
-            uint32_t randombits = CY_CRYPTO_MIN(randomsize, 32u);
+            uint32_t randombits = (uint32_t)CY_CRYPTO_MIN(randomsize, 32);
 
             cy_en_crypto_status_t error = Cy_Crypto_Core_Trng(base,
                                                               CY_ECC_CONFIG_TR_GARO_CTL,
                                                               CY_ECC_CONFIG_TR_FIRO_CTL,
                                                               randombits,
                                                               &((uint32_t *)key->k)[i]);
-            randomsize -= 32u;
+            randomsize -= 32;
             i++;
 
             if (CY_CRYPTO_SUCCESS != error)
@@ -270,9 +270,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
     }
     else
     {
-        for (int32_t i = 0, randomsize = bitsize; randomsize > 0; randomsize-=32u, i++)
+        for (int32_t i = 0, randomsize = bitsize; randomsize > 0; randomsize-=32, i++)
         {
-            uint32_t randombits = CY_CRYPTO_MIN(randomsize, 32u);
+            uint32_t randombits = (uint32_t)CY_CRYPTO_MIN(randomsize, 32);
 
             cy_en_crypto_status_t error = Cy_Crypto_Core_Trng(base,
                                                               CY_ECC_CONFIG_TR_GARO_CTL,

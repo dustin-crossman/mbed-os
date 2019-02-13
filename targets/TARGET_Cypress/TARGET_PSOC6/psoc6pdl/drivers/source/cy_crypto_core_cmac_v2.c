@@ -260,7 +260,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Cmac(CRYPTO_Type *base,
                                           cy_stc_crypto_aes_state_t *aesState)
 {
     /* Allocate space for the structure which stores the CMAC context */
-    cy_stc_crypto_v2_cmac_buffers_t  cmacBuffersData;
+    cy_stc_crypto_v2_cmac_buffers_t  cmacBuffersData = { 0 };
     cy_stc_crypto_v2_cmac_buffers_t *cmacBuffers = &cmacBuffersData;
 
     uint8_t *myK = cmacBuffers->k;

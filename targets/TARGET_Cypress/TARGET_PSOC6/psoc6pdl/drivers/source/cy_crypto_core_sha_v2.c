@@ -472,7 +472,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha(CRYPTO_Type *base,
     cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
 
     /* Allocate space for the structure which stores the SHA context */
-    cy_stc_crypto_sha_state_t     hashState;
+    cy_stc_crypto_sha_state_t     hashState = { 0 };
 
     /* No any buffers needed for Crypto_ver2 IP block */
     tmpResult = Cy_Crypto_Core_V2_Sha_Init   (base, &hashState, mode, NULL);
