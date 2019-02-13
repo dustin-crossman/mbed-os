@@ -245,7 +245,6 @@ uint32_t Cy_CapSense_RunTuner(cy_stc_capsense_context_t * context)
             Cy_SysLib_ExitCriticalSection(interruptState);
             updateFlag = 0uL;
         }
-        tunerStatus = 0u;
 
     } while ((uint8_t)CY_CAPSENSE_TU_FSM_SUSPENDED == tunerState);
         
