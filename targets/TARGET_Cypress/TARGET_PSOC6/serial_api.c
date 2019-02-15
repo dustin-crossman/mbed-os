@@ -666,9 +666,10 @@ void serial_set_flow_control(serial_t *obj_in, FlowControl type, PinName rxflow,
 {
     serial_obj_t *obj = OBJ_P(obj_in);
 
-    /* Do not perform pins reservation second time for the same pins */ 
-    if ((obj->pin_rts == rxflow) && (obj->pin_cts == txflow))
+    /* Do not perform pins reservation second time for the same pins */
+    if ((obj->pin_rts == rxflow) && (obj->pin_cts == txflow)) {
         return;
+    }
 
     Cy_SCB_UART_Disable(obj->base, NULL);
 
