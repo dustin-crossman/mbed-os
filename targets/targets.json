@@ -7802,7 +7802,10 @@
     },
     "MCU_PSOC6": {
         "inherits": ["Target"],
-        "macros": ["MBED_MPU_CUSTOM"],
+        "macros": [
+             "MBED_MPU_CUSTOM",
+             "MBED_TICKLESS"
+        ],
         "default_toolchain": "GCC_ARM",
         "supported_toolchains": ["GCC_ARM", "IAR", "ARM"],
         "core": "Cortex-M4F",
