@@ -42,6 +42,8 @@
 #define UART_RX_INTR_MASK   (CY_SCB_UART_RX_TRIGGER   | CY_SCB_UART_RX_OVERFLOW  | \
                              CY_SCB_UART_RX_ERR_FRAME | CY_SCB_UART_RX_ERR_PARITY)
 
+#define SERIAL_PM_CALLBACK_ENABLED 1
+
 typedef struct serial_s serial_obj_t;
 #if DEVICE_SERIAL_ASYNCH
 #define OBJ_P(in)     (&(in->serial))
@@ -384,12 +386,12 @@ static void serial_init_peripheral(serial_obj_t *obj)
 
 
 #if DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED
-static cy_en_syspm_status_t serial_pm_callback(cy_stc_syspm_callback_params_t *params)
+static cy_en_syspm_status_t serial_pm_callback(cy_stc_syspm_callback_params_t *params, cy_en_syspm_callback_mode_t mode)
 {
     serial_obj_t *obj = (serial_obj_t *)params->context;
     cy_en_syspm_status_t status = CY_SYSPM_FAIL;
 
-    switch (params->mode) {
+    switch (mode) {
         case CY_SYSPM_CHECK_READY:
             /* If all data elements are transmitted from the TX FIFO and
             * shifter and the RX FIFO is empty: the UART is ready to enter
