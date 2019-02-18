@@ -383,13 +383,16 @@ static void serial_init_peripheral(serial_obj_t *obj)
 }
 
 
-#if DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED
-static cy_en_syspm_status_t serial_pm_callback(cy_stc_syspm_callback_params_t *params)
+/*
+ * Callback function to handle into and out of deep sleep state transitions.
+ */
+#if DEVICE_SLEEP && DEVICE_LPTICKER
+static cy_en_syspm_status_t serial_pm_callback(cy_stc_syspm_callback_params_t *callbackParams, cy_en_syspm_callback_mode_t mode)
 {
-    serial_obj_t *obj = (serial_obj_t *)params->context;
+    serial_obj_t *obj = (serial_obj_t *) callbackParams->context;
     cy_en_syspm_status_t status = CY_SYSPM_FAIL;
 
-    switch (params->mode) {
+    switch (mode) {
         case CY_SYSPM_CHECK_READY:
             /* If all data elements are transmitted from the TX FIFO and
             * shifter and the RX FIFO is empty: the UART is ready to enter
@@ -432,7 +435,7 @@ static cy_en_syspm_status_t serial_pm_callback(cy_stc_syspm_callback_params_t *p
 
     return status;
 }
-#endif /* (DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED) */
+#endif /* DEVICE_SLEEP && DEVICE_LPTICKER */
 
 
 void serial_init(serial_t *obj_in, PinName tx, PinName rx)
@@ -489,19 +492,19 @@ void serial_init(serial_t *obj_in, PinName tx, PinName rx)
                 obj->div_num  = _FLD2VAL(CY_PERI_CLOCK_CTL_DIV_SEL,  map);
                 obj->div_type = (cy_en_divider_types_t) _FLD2VAL(CY_PERI_CLOCK_CTL_TYPE_SEL, map);
             } else {
-#if DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED
+#if DEVICE_SLEEP && DEVICE_LPTICKER
                 /* Register callback once */
                 obj->pm_callback_handler.callback = serial_pm_callback;
-                obj->pm_callback_handler.type = CY_SYSPM_DEEPSLEEP;
+                obj->pm_callback_handler.type     = CY_SYSPM_DEEPSLEEP;
                 obj->pm_callback_handler.skipMode = 0;
                 obj->pm_callback_handler.callbackParams = &obj->pm_callback_params;
-                obj->pm_callback_params.base = obj->base;
+                obj->pm_callback_params.base    = obj->base;
                 obj->pm_callback_params.context = obj;
 
                 if (!Cy_SysPm_RegisterCallback(&obj->pm_callback_handler)) {
                     error("PM callback registration failed!");
                 }
-#endif /* (DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED) */
+#endif /* DEVICE_SLEEP && DEVICE_LPTICKER */
             }
 
             /* Configure hardware resources */
