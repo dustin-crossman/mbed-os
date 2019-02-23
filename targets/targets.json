@@ -7869,6 +7869,25 @@
             "network-default-interface-type": "WIFI"
         }
     },
+    "CY8CKIT_062_WIFI_BT_PSA": {
+        "inherits": ["NSPE_Target", "CY8CKIT_062_WIFI_BT"],
+        "extra_labels_add": ["PSA", "MBED_SPM"],
+        "components_add": ["SPM_MAILBOX"],
+        "macros_add": ["MBEDTLS_PSA_CRYPTO_C", "NO_GREENTEA"],
+        "hex_filename": "psa_release_1.0.hex",
+        "overrides": {
+            "secure-rom-start": "0x10000000",
+            "secure-rom-size": "0x80000",
+            "non-secure-rom-start": "0x10080000",
+            "non-secure-rom-size": "0x78000",
+            "secure-ram-start": "0x08000000",
+            "secure-ram-size": "0x10000",
+            "non-secure-ram-start": "0x08010000",
+            "non-secure-ram-size": "0x37700",
+            "shared-ram-start": "0x08047700",
+            "shared-ram-size": "0x100"
+        }
+    },
     "CY8CMOD_062_4343W": {
         "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
