@@ -47,7 +47,10 @@ cy_en_prot_status_t smpu_protect(cy_smpu_region_config_t smpu_config_arr[], uint
         }
         smpu_cfg.userPermission = smpu_config_arr[i].userMstPermission;
         smpu_cfg.privPermission = smpu_config_arr[i].privMstPermission;
+<<<<<<< HEAD
         smpu_cfg.pcMask = smpu_config_arr[i].pcMstMask;
+=======
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         ret = Cy_Prot_ConfigSmpuMasterStruct(smpu_config_arr[i].prot_region, &smpu_cfg);
         if (ret != CY_PROT_SUCCESS)
         {
@@ -68,6 +71,7 @@ cy_en_prot_status_t smpu_protect(cy_smpu_region_config_t smpu_config_arr[], uint
     return ret;
 }
 
+<<<<<<< HEAD
 /* protect all unconfigured SMPUs */
 cy_en_prot_status_t smpu_config_unprotected(const cy_stc_smpu_cfg_t *smpu_config)
 {
@@ -99,6 +103,8 @@ cy_en_prot_status_t smpu_config_unprotected(const cy_stc_smpu_cfg_t *smpu_config
     return ret;
 }
 
+=======
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
 /* configure PPU Fixed Region */
 cy_en_prot_status_t ppu_fixed_rg_protect(cy_ppu_fixed_rg_cfg_t ppu_config_arr[], uint32_t arr_length)
 {
