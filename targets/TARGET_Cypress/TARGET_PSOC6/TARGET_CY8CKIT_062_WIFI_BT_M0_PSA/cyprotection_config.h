@@ -26,6 +26,7 @@
 
 #include "cyprotection.h"
 
+<<<<<<< HEAD
 /* Add to M0_PSA target in targets.json:
  * - INITIAL_ROT_PROTECTION_AVAILABLE - to disable pc0 related protections
  *   enabling. They are enabled by ROT if availabe.
@@ -33,6 +34,8 @@
  *   enabling. They are enabled by a bootloader if availabe.
  */
 
+=======
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
 /* Only 7 protection contexts are available in PSoC6-BLE2 */
 #define ALL_PROTECTION_CONTEXTS_MASK (CY_PROT_PCMASK1 + CY_PROT_PCMASK2 +\
 CY_PROT_PCMASK3 + CY_PROT_PCMASK4 + CY_PROT_PCMASK5 + CY_PROT_PCMASK6 +\
@@ -43,32 +46,59 @@ CY_PROT_PCMASK3 + CY_PROT_PCMASK4)
 #define ALL_SUBREGIONS (0x0)
 
 const cy_smpu_region_config_t flash_spm_smpu_config[] = {
+<<<<<<< HEAD
     {   /* FLASH_PC1_SPM */
         .address = (uint32_t *)PSA_SECURE_ROM_START, /* 0x10000000 */
         .regionSize = CY_PROT_SIZE_512KB, /* 0x80000 */
         .subregions = ALL_SUBREGIONS,
         .userPermission = CY_PROT_PERM_RWX,
+=======
+    /* FLASH_PC1_SPM */
+    {
+        .address = (uint32_t *)(0x10000000),
+        .regionSize = CY_PROT_SIZE_512KB,
+        .subregions = ALL_SUBREGIONS,
+        .userPermission = CY_PROT_PERM_RX,
+        /*.privPermission = CY_PROT_PERM_RX,*/
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .privPermission = CY_PROT_PERM_RWX,
         .secure = true,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
+<<<<<<< HEAD
         .prot_region = PROT_SMPU_SMPU_STRUCT5,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
         .pcMstMask = CY_PROT_PCMASK1,
+=======
+        .prot_region = PROT_SMPU_SMPU_STRUCT7,
+        .userMstPermission = CY_PROT_PERM_R,
+        .privMstPermission = CY_PROT_PERM_R,
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
     }
 };
 
 const cy_smpu_region_config_t sram_spm_smpu_config[] = {
+<<<<<<< HEAD
     {   /* SRAM_SPM_PRIV - must include SRAM_SPM_PUB area */
         .address = (uint32_t *)PSA_SECURE_RAM_START, /* 0x08020000 */
         .regionSize = CY_PROT_SIZE_64KB, /* 0x10000 */
         .subregions = ALL_SUBREGIONS, /* 0xC0, /*Size 0xC000 ALL_SUBREGIONS,*/
         .userPermission = CY_PROT_PERM_DISABLED,
+=======
+    /* SRAM_SPM_PRIV */
+    {
+        .address = (uint32_t *)(0x08000000),
+        .regionSize = CY_PROT_SIZE_64KB,
+        .subregions = ALL_SUBREGIONS,
+        .userPermission = CY_PROT_PERM_DISABLED,
+        /*.privPermission = CY_PROT_PERM_RW,*/
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .privPermission = CY_PROT_PERM_RWX,
         .secure = true,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
+<<<<<<< HEAD
         .prot_region = PROT_SMPU_SMPU_STRUCT9,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
@@ -91,6 +121,17 @@ const cy_stc_smpu_cfg_t default_smpu_master_config = {
 const cy_ppu_fixed_rg_cfg_t fixed_rg_pc0_ppu_config[] = {
     {   /* CM0+ SysCall */
         .userPermission = CY_PROT_PERM_RW,
+=======
+        .prot_region = PROT_SMPU_SMPU_STRUCT12,
+        .userMstPermission = CY_PROT_PERM_R,
+        .privMstPermission = CY_PROT_PERM_R,
+    }
+};
+
+const cy_ppu_fixed_rg_cfg_t fixed_rg_pc0_ppu_config[] = {
+    {
+        .userPermission = CY_PROT_PERM_DISABLED,
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
         .pcMatch = false,
@@ -101,7 +142,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_pc0_ppu_config[] = {
         .pcMstMask = ALL_PROTECTION_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_STRUCT0,
     },
+<<<<<<< HEAD
     {   /* CM4 SysCall */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
@@ -113,19 +158,31 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_pc0_ppu_config[] = {
         .pcMstMask = ALL_PROTECTION_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_STRUCT1,
     },
+<<<<<<< HEAD
     {   /* DAP SysCall */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
         .pcMatch = false,
+<<<<<<< HEAD
         .pcMask = ALL_PROTECTION_CONTEXTS_MASK,
+=======
+        .pcMask = ALL_PROTECTION_CONTEXTS_MASK - CY_PROT_PCMASK7,
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_R,
         .secureMst = false,
         .pcMstMask = ALL_PROTECTION_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_STRUCT2,
     },
+<<<<<<< HEAD
     {   /* CM0+ NMI */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
@@ -140,7 +197,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_pc0_ppu_config[] = {
 };
 
 const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
+<<<<<<< HEAD
     {   /* IPC_STRUCT3 */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
@@ -152,7 +213,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_STRUCT3,
     },
+<<<<<<< HEAD
     {   /* IPC_STRUCT4 */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
@@ -165,7 +230,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_STRUCT4,
     },
+<<<<<<< HEAD
     {   /* IPC_STRUCT5 */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
@@ -177,7 +246,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_STRUCT5,
     },
+<<<<<<< HEAD
     {   /* IPC_STRUCT6 */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
@@ -190,7 +263,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_STRUCT6,
     },
+<<<<<<< HEAD
     {   /* IPC_INTR_STRUCT1 */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
@@ -202,6 +279,7 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_INTR_STRUCT1,
     },
+<<<<<<< HEAD
     {   /* IPC_INTR_STRUCT2 */
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
@@ -215,6 +293,21 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pPpuStr = PERI_GR_PPU_RG_IPC_INTR_STRUCT2,
     },
     {   /* CPUSS-M4.PROT.SMPU */
+=======
+    {
+        .userPermission = CY_PROT_PERM_DISABLED,
+        .privPermission = CY_PROT_PERM_RW,
+        .secure = true,
+        .pcMatch = false,
+        .pcMask = SECURE_CONTEXTS_MASK,
+        .userMstPermission = CY_PROT_PERM_RW,
+        .privMstPermission = CY_PROT_PERM_RW,
+        .secureMst = false,
+        .pcMstMask = ALL_PROTECTION_CONTEXTS_MASK - CY_PROT_PCMASK7,
+        .pPpuStr = PERI_GR_PPU_RG_IPC_INTR_STRUCT2,
+    },
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
@@ -226,7 +319,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_SMPU,
     },
+<<<<<<< HEAD
     {   /* CPUSS-M4.PROT.MPU_CM0P */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
@@ -238,7 +335,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_MPU_CM0P,
     },
+<<<<<<< HEAD
     {   /* CPUSS-M4.PROT.MPU_CRYPTO */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
@@ -250,7 +351,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_MPU_CRYPTO,
     },
+<<<<<<< HEAD
     {   /* CPUSS-M4.PROT.MPU_TC */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
@@ -262,7 +367,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_MPU_TC,
     },
+<<<<<<< HEAD
     {   /* DW1_DW_CH_STRUCT0 */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
@@ -274,7 +383,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_DW1_DW_CH_STRUCT0,
     },
+<<<<<<< HEAD
     {   /* DW1_DW_CH_STRUCT1 */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
@@ -286,7 +399,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_DW1_DW_CH_STRUCT1,
     },
+<<<<<<< HEAD
     {   /* DW1_DW_CH_STRUCT2 */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
@@ -298,7 +415,11 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_DW1_DW_CH_STRUCT2,
     },
+<<<<<<< HEAD
     {   /* DW1_DW_CH_STRUCT3 */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
@@ -472,7 +593,11 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_pc0_ppu_config[] = {
         .pcMstMask = ALL_PROTECTION_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_PERI_GR2,
     },
+<<<<<<< HEAD
     {   /* Flash controller */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         /*.userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_DISABLED,*/
         .userPermission = CY_PROT_PERM_RW,
@@ -561,7 +686,11 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_pc0_ppu_config[] = {
 };
 
 const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
+<<<<<<< HEAD
     {   /* CPUSS-M4.CRYPTO */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
         .secure = true,
@@ -573,8 +702,13 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_CRYPTO,
     },
+<<<<<<< HEAD
     {   /* CPUSS-M4.CPUSS */
         .userPermission = CY_PROT_PERM_DISABLED,
+=======
+    {
+        .userPermission = CY_PROT_PERM_RW,
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
         .pcMatch = false,
@@ -592,7 +726,11 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_CPUSS,
     },
+<<<<<<< HEAD
     {   /* CPUSS-M4.IPC */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
@@ -604,7 +742,11 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_IPC,
     },
+<<<<<<< HEAD
     {   /* CPUSS-M4.PROT */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
@@ -616,7 +758,11 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_PROT,
     },
+<<<<<<< HEAD
     {   /* SRSS.SRSS */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
@@ -634,7 +780,11 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
         .secureMst = true,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_SRSS,
+<<<<<<< HEAD
     },/* SRSS.BACKUP. SAS - Needs a secure driver to support secure time. Alternate option, no secure time
+=======
+    },
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
     {
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
@@ -646,7 +796,11 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
         .secureMst = true,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_BACKUP,
+<<<<<<< HEAD
     },*/
+=======
+    },
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
     {
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
@@ -1002,9 +1156,15 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_any_ppu_config[] = {
 
 const cy_ppu_prog_cfg_t prog_pc0_ppu_config[] = {
     {
+<<<<<<< HEAD
         .address = (uint32_t *)(CPUSS_BASE),
         .regionSize = CY_PROT_SIZE_2KB,/* 0x40210300 + 0x4FF */
         .subregions = 0x07,
+=======
+        .address = (uint32_t *)0x40210300,
+        .regionSize = CY_PROT_SIZE_2KB,/* 0x4FF */
+        .subregions = 0xE0,
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_R,
         .privPermission = CY_PROT_PERM_R,
         .secure = true,
@@ -1017,7 +1177,11 @@ const cy_ppu_prog_cfg_t prog_pc0_ppu_config[] = {
         .pPpuStr = PERI_PPU_PR0,
     },
     {
+<<<<<<< HEAD
         .address = (uint32_t *)(CPUSS_BASE + 0x8000),
+=======
+        .address = (uint32_t *)0x40218000,
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .regionSize = CY_PROT_SIZE_32KB,/* 0x08000 */
         .subregions = ALL_SUBREGIONS,
         .userPermission = CY_PROT_PERM_R,
@@ -1032,8 +1196,13 @@ const cy_ppu_prog_cfg_t prog_pc0_ppu_config[] = {
         .pPpuStr = PERI_PPU_PR1,
     },
     {
+<<<<<<< HEAD
         .address = (uint32_t *)EFUSE_BASE,
         .regionSize = CY_PROT_SIZE_2KB,/* 0x0800 */
+=======
+        .address = (uint32_t *)0x402C0000,
+        .regionSize = CY_PROT_SIZE_32KB,/* 0x08000 */
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .subregions = ALL_SUBREGIONS,
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_DISABLED,
@@ -1047,9 +1216,15 @@ const cy_ppu_prog_cfg_t prog_pc0_ppu_config[] = {
         .pPpuStr = PERI_PPU_PR2,
     },
     {
+<<<<<<< HEAD
         .address = (uint32_t *)(EFUSE_BASE + 0x0800),
         .regionSize = CY_PROT_SIZE_256B,/* 0x402C0840 + 0x00C0 */
         .subregions = 0x03,
+=======
+        .address = (uint32_t *)0x402C0840,
+        .regionSize = CY_PROT_SIZE_256B,/* 0x00C0 */
+        .subregions = 0xC0,
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_DISABLED,
         .secure = false,
@@ -1064,8 +1239,13 @@ const cy_ppu_prog_cfg_t prog_pc0_ppu_config[] = {
 };
 
 const cy_ppu_prog_cfg_t prog_spm_ppu_config[] = {
+<<<<<<< HEAD
     {   /* PERI.PERI_GROUP_STRUCT[] */
         .address = (uint32_t *)PERI_PPU_GR0,
+=======
+    {
+        .address = (uint32_t *)0x40010000,
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .regionSize = CY_PROT_SIZE_1KB,/* 0x00400 */
         .subregions = ALL_SUBREGIONS,
         .userPermission = CY_PROT_PERM_DISABLED,
@@ -1169,7 +1349,11 @@ const cy_ppu_fixed_gr_cfg_t fixed_gr_pc0_ppu_config[] = {
 };
 
 const cy_ppu_fixed_gr_cfg_t fixed_gr_spm_ppu_config[] = {
+<<<<<<< HEAD
     {   /* PERI.PERI */
+=======
+    {
+>>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
         .userPermission = CY_PROT_PERM_RW,
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
