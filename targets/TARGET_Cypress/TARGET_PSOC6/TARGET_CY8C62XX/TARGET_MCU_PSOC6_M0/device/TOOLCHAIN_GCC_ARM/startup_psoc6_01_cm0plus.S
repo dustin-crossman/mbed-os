@@ -164,11 +164,15 @@ Cy_OnResetUser:
 
 Reset_Handler:
     bl Cy_OnResetUser
+<<<<<<< HEAD
 /*
 #ifndef TARGET_MBED_SPM
     cpsid i
 #endif
 */
+=======
+    cpsid i
+>>>>>>> ed8323e54f... Copied and updated cm0p start files
 
 /*  Firstly it copies data from read only memory to RAM. There are two schemes
  *  to copy. One can copy more than one sections. Another can only copy
@@ -302,13 +306,18 @@ Reset_Handler:
     ldr r1, =CY_CPU_VTOR_ADDR
     str r0, [r1]
     dsb 0xF
+<<<<<<< HEAD
 
 /*
 #ifndef TARGET_MBED_SPM
+=======
+/*
+>>>>>>> ed8323e54f... Copied and updated cm0p start files
 #ifndef __NO_SYSTEM_INIT
     bl    SystemInit
 #endif
 
+<<<<<<< HEAD
     bl    main
 #elif
 */
@@ -316,6 +325,10 @@ Reset_Handler:
 /*
 #endif
 */
+=======
+    bl    main */
+    bl    _start
+>>>>>>> ed8323e54f... Copied and updated cm0p start files
 
     /* Should never get here */
     b   .
