@@ -55,6 +55,14 @@ ENTRY(Reset_Handler)
   #define MBED_RAM_SIZE     0x10000
 #endif
 
+#if !defined(MBED_SHARED_RAM_START)
+  #define MBED_SHARED_RAM_START    0x08047500
+#endif
+
+#if !defined(MBED_SHARED_RAM_SIZE)
+  #define MBED_SHARED_RAM_SIZE     0x300
+#endif
+
 #if !defined(MBED_BOOT_STACK_SIZE)
     #define MBED_BOOT_STACK_SIZE 0x400
 #endif
@@ -80,6 +88,7 @@ MEMORY
      * where 'xx' is the device group; for example, 'cy8c6xx7_cm4_dual.ld'.
      */
     ram               (rwx)   : ORIGIN = MBED_RAM_START, LENGTH = MBED_RAM_SIZE
+    shared_ram        (rwx)   : ORIGIN = MBED_SHARED_RAM_START, LENGTH = MBED_SHARED_RAM_SIZE
     flash             (rx)    : ORIGIN = MBED_ROM_START, LENGTH = (MBED_ROM_SIZE - 0x8000)
 
     /* This is a 32K flash region used for EEPROM emulation. This region can also be used as the general purpose flash.
@@ -327,6 +336,12 @@ SECTIONS
         KEEP(*(.stack*))
     } > ram
 
+    /* Shared public RAM */
+    .cy_pub_ram (NOLOAD):
+    {
+        . = ALIGN(4) + 0x100;
+        KEEP(*(.cy_pub_ram))
+    } > shared_ram
 
     /* Set stack top to end of RAM, and stack limit move down by
      * size of stack_dummy section */

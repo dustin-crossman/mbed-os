@@ -7899,9 +7899,9 @@
             "secure-ram-start": "0x08000000",
             "secure-ram-size": "0x10000",
             "non-secure-ram-start": "0x08010000",
-            "non-secure-ram-size": "0x37700",
-            "shared-ram-start": "0x08047700",
-            "shared-ram-size": "0x100"
+            "non-secure-ram-size": "0x37500",
+            "shared-ram-start": "0x08047500",
+            "shared-ram-size": "0x300"
         }
     },
     "CY8CKIT_062_WIFI_BT_PSA": {
@@ -7918,9 +7918,9 @@
             "secure-ram-start": "0x08000000",
             "secure-ram-size": "0x10000",
             "non-secure-ram-start": "0x08010000",
-            "non-secure-ram-size": "0x37700",
-            "shared-ram-start": "0x08047700",
-            "shared-ram-size": "0x100"
+            "non-secure-ram-size": "0x37500",
+            "shared-ram-start": "0x08047500",
+            "shared-ram-size": "0x300"
         }
     },
     "CY8CMOD_062_4343W": {
