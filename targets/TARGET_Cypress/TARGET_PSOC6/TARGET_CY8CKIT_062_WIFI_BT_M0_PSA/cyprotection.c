@@ -67,6 +67,37 @@ cy_en_prot_status_t smpu_protect(cy_smpu_region_config_t smpu_config_arr[], uint
     return ret;
 }
 
+/* protect all unconfigured SMPUs */
+cy_en_prot_status_t smpu_config_unprotected(cy_stc_smpu_cfg_t *smpu_config)
+{
+    cy_en_prot_status_t ret = CY_PROT_SUCCESS;
+    uint32_t i;
+    uint32_t att0, att1;
+
+    for (i = 0; i < CPUSS_PROT_SMPU_STRUCT_NR; i++)
+    {
+        att0 = PROT->SMPU.SMPU_STRUCT[i].ATT0;
+        att1 = PROT->SMPU.SMPU_STRUCT[i].ATT1;
+
+        if ((_FLD2VAL(PROT_SMPU_SMPU_STRUCT_ATT0_ENABLED, att0) == 0)
+            && (_FLD2VAL(PROT_SMPU_SMPU_STRUCT_ATT1_ENABLED, att1) == 0))
+        {
+            ret = Cy_Prot_ConfigSmpuMasterStruct(&PROT->SMPU.SMPU_STRUCT[i], smpu_config);
+            if (ret != CY_PROT_SUCCESS)
+            {
+                break;
+            }
+            ret = Cy_Prot_EnableSmpuMasterStruct(&PROT->SMPU.SMPU_STRUCT[i]);
+            if (ret != CY_PROT_SUCCESS)
+            {
+                break;
+            }
+        }
+    }
+
+    return ret;
+}
+
 /* configure PPU Fixed Region */
 cy_en_prot_status_t ppu_fixed_rg_protect(cy_ppu_fixed_rg_cfg_t ppu_config_arr[], uint32_t arr_length)
 {

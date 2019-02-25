@@ -150,6 +150,7 @@ typedef struct
 } cy_ppu_prog_cfg_t;
 
 cy_en_prot_status_t smpu_protect(cy_smpu_region_config_t smpu_config_arr[], uint32_t arr_length);
+cy_en_prot_status_t smpu_config_unprotected(cy_stc_smpu_cfg_t *smpu_config);
 cy_en_prot_status_t ppu_fixed_rg_protect(cy_ppu_fixed_rg_cfg_t ppu_config_arr[], uint32_t arr_length);
 cy_en_prot_status_t ppu_fixed_sl_protect(cy_ppu_fixed_sl_cfg_t ppu_config_arr[], uint32_t arr_length);
 cy_en_prot_status_t ppu_prog_protect(cy_ppu_prog_cfg_t ppu_config_arr[], uint32_t arr_length);
