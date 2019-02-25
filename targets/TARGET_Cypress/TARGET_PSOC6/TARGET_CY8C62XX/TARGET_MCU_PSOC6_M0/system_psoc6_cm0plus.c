@@ -28,6 +28,7 @@
 #include "cy_device_headers.h"
 #include "cy_syslib.h"
 #include "cy_wdt.h"
+#include "system_psoc6_cm0plus_flash_init.h"
 #include "psoc6_utils.h"
 
 #if !defined(CY_IPC_DEFAULT_CFG_DISABLE)
@@ -173,10 +174,7 @@ void mbed_sdk_init(void)
     /* Placed here as it must be done after proper LIBC initialization. */
     SystemInit();
     /* Allocate and initialize semaphores for the system operations. */
-    //Cy_IPC_SystemSemaInit();
-    //Cy_IPC_SystemPipeInit();
-    //Cy_Flash_Init();
-    //ipcrpc_init();
+    Cy_SemaIpcFlashInit();
 }
 
 #if defined(COMPONENT_SPM_MAILBOX)
