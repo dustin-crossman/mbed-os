@@ -73,10 +73,7 @@ typedef struct {
     PROT_SMPU_SMPU_STRUCT_Type* prot_region; /* protection region */
     cy_en_prot_perm_t userMstPermission;   /**< User permissions for the region */
     cy_en_prot_perm_t privMstPermission;   /**< Privileged permissions for the region */
-<<<<<<< HEAD
     uint16_t          pcMstMask;           /**< Master Mask of allowed protection context(s) */
-=======
->>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
 } cy_smpu_region_config_t;
 
 /*
@@ -154,10 +151,7 @@ typedef struct
 } cy_ppu_prog_cfg_t;
 
 cy_en_prot_status_t smpu_protect(cy_smpu_region_config_t smpu_config_arr[], uint32_t arr_length);
-<<<<<<< HEAD
 cy_en_prot_status_t smpu_config_unprotected(const cy_stc_smpu_cfg_t *smpu_config);
-=======
->>>>>>> 829c3e7865... Copied files for CY8CKIT_062_WIFI_BT_M0_PSA from FUTURE_SEQUANA
 cy_en_prot_status_t ppu_fixed_rg_protect(cy_ppu_fixed_rg_cfg_t ppu_config_arr[], uint32_t arr_length);
 cy_en_prot_status_t ppu_fixed_sl_protect(cy_ppu_fixed_sl_cfg_t ppu_config_arr[], uint32_t arr_length);
 cy_en_prot_status_t ppu_prog_protect(cy_ppu_prog_cfg_t ppu_config_arr[], uint32_t arr_length);
