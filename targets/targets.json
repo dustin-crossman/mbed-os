@@ -7887,7 +7887,8 @@
             "MBED_TICKLESS",
             "MBEDTLS_PSA_CRYPTO_SPM",
             "MBEDTLS_PSA_CRYPTO_C",
-            "MBEDTLS_ENTROPY_NV_SEED"
+            "MBEDTLS_ENTROPY_NV_SEED",
+            "CY_IPC_DEFAULT_CFG_DISABLE"
         ],
         "deliver_to_target": "CY8CKIT_062_WIFI_BT_PSA",
         "overrides": {
