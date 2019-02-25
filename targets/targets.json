@@ -7897,11 +7897,11 @@
             "secure-rom-size": "0x80000",
             "non-secure-rom-start": "0x10080000",
             "non-secure-rom-size": "0x78000",
-            "secure-ram-start": "0x08000000",
-            "secure-ram-size": "0x10000",
-            "non-secure-ram-start": "0x08010000",
-            "non-secure-ram-size": "0x37500",
-            "shared-ram-start": "0x08047500",
+            "secure-ram-start": "0x08020000",
+            "secure-ram-size": "0xC000",
+            "non-secure-ram-start": "0x08000000",
+            "non-secure-ram-size": "0x20000",
+            "shared-ram-start": "0x0802C000",
             "shared-ram-size": "0x300"
         }
     },
@@ -7916,11 +7916,11 @@
             "secure-rom-size": "0x80000",
             "non-secure-rom-start": "0x10080000",
             "non-secure-rom-size": "0x78000",
-            "secure-ram-start": "0x08000000",
-            "secure-ram-size": "0x10000",
-            "non-secure-ram-start": "0x08010000",
-            "non-secure-ram-size": "0x37500",
-            "shared-ram-start": "0x08047500",
+            "secure-ram-start": "0x08020000",
+            "secure-ram-size": "0xC000",
+            "non-secure-ram-start": "0x08000000",
+            "non-secure-ram-size": "0x20000",
+            "shared-ram-start": "0x0802C000",
             "shared-ram-size": "0x300"
         }
     },
