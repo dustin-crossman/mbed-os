@@ -45,6 +45,8 @@ void spm_hal_memory_protection_init(void)
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
     status = smpu_protect((cy_smpu_region_config_t *)sram_spm_smpu_config, sizeof(sram_spm_smpu_config) / sizeof(sram_spm_smpu_config[0]));
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+    status = smpu_config_unprotected(&default_smpu_master_config);
+    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
 
     /* fixed region ppu */
     status = ppu_fixed_rg_protect((cy_ppu_fixed_rg_cfg_t *)fixed_rg_pc0_ppu_config, sizeof(fixed_rg_pc0_ppu_config) / sizeof(fixed_rg_pc0_ppu_config[0]));
