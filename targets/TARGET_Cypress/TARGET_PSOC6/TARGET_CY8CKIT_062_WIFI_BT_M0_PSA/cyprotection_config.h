@@ -47,7 +47,8 @@ const cy_smpu_region_config_t flash_spm_smpu_config[] = {
         .pcMask = SECURE_CONTEXTS_MASK,
         .prot_region = PROT_SMPU_SMPU_STRUCT5,
         .userMstPermission = CY_PROT_PERM_R,
-        .privMstPermission = CY_PROT_PERM_R,
+        .privMstPermission = CY_PROT_PERM_RW,
+        .pcMstMask = CY_PROT_PCMASK1,
     }
 };
 
@@ -63,7 +64,8 @@ const cy_smpu_region_config_t sram_spm_smpu_config[] = {
         .pcMask = SECURE_CONTEXTS_MASK,
         .prot_region = PROT_SMPU_SMPU_STRUCT9,
         .userMstPermission = CY_PROT_PERM_R,
-        .privMstPermission = CY_PROT_PERM_R,
+        .privMstPermission = CY_PROT_PERM_RW,
+        .pcMstMask = CY_PROT_PCMASK1,
     }
 };
 
