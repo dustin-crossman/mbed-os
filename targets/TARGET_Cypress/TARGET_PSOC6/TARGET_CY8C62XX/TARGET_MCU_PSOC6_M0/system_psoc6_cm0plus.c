@@ -7,6 +7,7 @@
 ********************************************************************************
 * \copyright
 * Copyright 2016-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -54,18 +55,20 @@
 #define CY_CLK_SYSTEM_FREQ_HZ_DEFAULT       (4000000UL)
 
 /** IMO frequency in Hz */
-#define CY_CLK_IMO_FREQ_HZ                  (  8000000UL)
-/** PILO frequency in Hz */
-#define CY_CLK_PILO_FREQ_HZ                 (    32768UL)
-
-/** WCO frequency in Hz */
-#define CY_CLK_WCO_FREQ_HZ                  (    32768UL)
+#define CY_CLK_IMO_FREQ_HZ                  (8000000UL)
 
 /** HVILO frequency in Hz */
-#define CY_CLK_HVILO_FREQ_HZ                (    32000UL)
+#define CY_CLK_HVILO_FREQ_HZ                (32000UL)
+
+/** PILO frequency in Hz */
+#define CY_CLK_PILO_FREQ_HZ                 (32768UL)
+
+/** WCO frequency in Hz */
+#define CY_CLK_WCO_FREQ_HZ                  (32768UL)
 
 /** ALTLF frequency in Hz */
-#define CY_CLK_ALTLF_FREQ_HZ                (    32768UL)
+#define CY_CLK_ALTLF_FREQ_HZ                (32768UL)
+
 
 /**
 * Holds the SlowClk (Cortex-M0+) or FastClk (Cortex-M4) system core clock,
