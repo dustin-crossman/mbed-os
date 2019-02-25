@@ -37,8 +37,8 @@ CY_PROT_PCMASK3 + CY_PROT_PCMASK4)
 
 const cy_smpu_region_config_t flash_spm_smpu_config[] = {
     {   /* FLASH_PC1_SPM */
-        .address = (uint32_t *)(0x10000000),
-        .regionSize = CY_PROT_SIZE_512KB,
+        .address = (uint32_t *)PSA_SECURE_ROM_START, /* 0x10000000 */
+        .regionSize = CY_PROT_SIZE_512KB, /* 0x80000 */
         .subregions = ALL_SUBREGIONS,
         .userPermission = CY_PROT_PERM_RWX,
         .privPermission = CY_PROT_PERM_RWX,
@@ -53,8 +53,8 @@ const cy_smpu_region_config_t flash_spm_smpu_config[] = {
 
 const cy_smpu_region_config_t sram_spm_smpu_config[] = {
     {   /* SRAM_SPM_PRIV - must include SRAM_SPM_PUB area */
-        .address = (uint32_t *)(0x08000000),
-        .regionSize = CY_PROT_SIZE_64KB,
+        .address = (uint32_t *)PSA_SECURE_RAM_START, /* 0x08000000 */
+        .regionSize = CY_PROT_SIZE_64KB, /* 0x10000 */
         .subregions = ALL_SUBREGIONS,
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RWX,
