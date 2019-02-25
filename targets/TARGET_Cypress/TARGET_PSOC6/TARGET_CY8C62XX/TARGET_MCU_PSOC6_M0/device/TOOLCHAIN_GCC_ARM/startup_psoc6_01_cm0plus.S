@@ -298,13 +298,12 @@ Reset_Handler:
     ldr r1, =CY_CPU_VTOR_ADDR
     str r0, [r1]
     dsb 0xF
-/*
+
 #ifndef __NO_SYSTEM_INIT
     bl    SystemInit
 #endif
 
-    bl    main */
-    bl    _start
+    bl    main
 
     /* Should never get here */
     b   .
