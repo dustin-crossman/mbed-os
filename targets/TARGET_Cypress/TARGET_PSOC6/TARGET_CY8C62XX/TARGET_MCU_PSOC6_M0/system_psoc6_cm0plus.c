@@ -28,6 +28,7 @@
 #include "cy_device_headers.h"
 #include "cy_syslib.h"
 #include "cy_wdt.h"
+#include "psoc6_utils.h"
 
 #if !defined(CY_IPC_DEFAULT_CFG_DISABLE)
     #include "cy_ipc_sema.h"
