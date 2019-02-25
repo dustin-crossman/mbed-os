@@ -7,6 +7,7 @@
 ********************************************************************************
 * \copyright
 * Copyright 2016-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -225,6 +226,9 @@ void SystemInit(void)
     Cy_SystemInit();
     SystemCoreClockUpdate();
 
+#if defined(COMPONENT_SPM_MAILBOX)
+    mailbox_init();
+#endif
 #if defined(CY_DEVICE_PSOC6ABLE2) && !defined(CY_PSOC6ABLE2_REV_0A_SUPPORT_DISABLE)
     if (CY_SYSLIB_DEVICE_REV_0A == Cy_SysLib_GetDeviceRevision())
     {
