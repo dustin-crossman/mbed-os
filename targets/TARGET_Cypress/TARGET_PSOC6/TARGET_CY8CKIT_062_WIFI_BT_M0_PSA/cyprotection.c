@@ -47,6 +47,7 @@ cy_en_prot_status_t smpu_protect(cy_smpu_region_config_t smpu_config_arr[], uint
         }
         smpu_cfg.userPermission = smpu_config_arr[i].userMstPermission;
         smpu_cfg.privPermission = smpu_config_arr[i].privMstPermission;
+        smpu_cfg.pcMask = smpu_config_arr[i].pcMstMask;
         ret = Cy_Prot_ConfigSmpuMasterStruct(smpu_config_arr[i].prot_region, &smpu_cfg);
         if (ret != CY_PROT_SUCCESS)
         {

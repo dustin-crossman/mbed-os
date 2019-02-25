@@ -73,6 +73,7 @@ typedef struct {
     PROT_SMPU_SMPU_STRUCT_Type* prot_region; /* protection region */
     cy_en_prot_perm_t userMstPermission;   /**< User permissions for the region */
     cy_en_prot_perm_t privMstPermission;   /**< Privileged permissions for the region */
+    uint16_t          pcMstMask;           /**< Master Mask of allowed protection context(s) */
 } cy_smpu_region_config_t;
 
 /*
