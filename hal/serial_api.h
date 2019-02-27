@@ -293,6 +293,8 @@ void serial_tx_abort_asynch(serial_t *obj);
  */
 void serial_rx_abort_asynch(serial_t *obj);
 
+int serial_is_bt_tx_ongoing();
+
 /**@}*/
 
 #endif

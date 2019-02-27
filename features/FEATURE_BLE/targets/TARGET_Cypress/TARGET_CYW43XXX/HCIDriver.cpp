@@ -23,7 +23,7 @@
 #include "bstream.h"
 #include <stdbool.h>
 #include "hci_mbed_os_adaptation.h"
-#include "H4TransportDriver.h"
+#include "CyH4TransportDriver.h"
 #include "cycfg_pins.h"
 
 extern const int brcm_patch_ram_length;
@@ -35,6 +35,12 @@ static const uint8_t pre_brcm_patchram_buf[] = {
     0x2E, 0xFC, 0x00,
 };
 static const int pre_brcm_patch_ram_length = sizeof(pre_brcm_patchram_buf);
+
+static const uint8_t post_brcm_patchram_buf[] = {
+    // RESET cmd
+    0x03, 0x0C, 0x00,
+};
+static const int post_brcm_patch_ram_length = sizeof(post_brcm_patchram_buf);
 
 #define HCI_RESET_RAND_CNT        4
 #define HCI_VS_CMD_SET_SLEEP_MODE 0xFC27
@@ -50,15 +56,9 @@ class HCIDriver : public cordio::CordioHCIDriver {
 public:
     HCIDriver(
         cordio::CordioHCITransportDriver& transport_driver,
-        PinName bt_host_wake_name,
-        PinName bt_device_wake_name,
         PinName bt_power_name
     ) : cordio::CordioHCIDriver(transport_driver),
-        bt_host_wake_name(bt_host_wake_name),
-        bt_device_wake_name(bt_device_wake_name),
         bt_power_name(bt_power_name),
-        bt_host_wake(bt_host_wake_name, PIN_INPUT, PullNone, 0),
-        bt_device_wake(bt_device_wake_name, PIN_OUTPUT, PullDefault, 1),
         bt_power(bt_power_name, PIN_OUTPUT, PullUp, 0),
         service_pack_index(0),
         service_pack_ptr(0),
@@ -76,10 +76,7 @@ public:
     virtual void do_initialize()
     {
 
-        Cy_GPIO_Clr(BT_DEVICE_WAKE_PORT, BT_DEVICE_WAKE_PIN);
-        wait_ms(500);
-
-        Cy_GPIO_Set(BT_POWER_PORT, BT_POWER_PIN);
+        bt_power = 1;
         wait_ms(500);
     }
 
@@ -279,6 +276,16 @@ private:
     {
         service_pack_ptr = brcm_patchram_buf;
         service_pack_length = brcm_patch_ram_length;
+        service_pack_next = &HCIDriver::post_service_pack_transfert;
+        service_pack_index = 0;
+        service_pack_transfered = false;
+        send_service_pack_command();
+    }
+    // Called once brcm_patchram_buf has been transferred; send post_brcm_patchram_buf
+    void post_service_pack_transfert(void)
+    {
+        service_pack_ptr = post_brcm_patchram_buf;
+        service_pack_length = post_brcm_patch_ram_length;
         service_pack_next = &HCIDriver::terminate_service_pack_transfert;
         service_pack_index = 0;
         service_pack_transfered = false;
@@ -335,7 +342,7 @@ private:
             uint8_t *pBuf;
             if ((pBuf = hciCmdAlloc(HCI_VS_CMD_SET_SLEEP_MODE, 12)) != NULL)
             {
-                  pBuf[HCI_CMD_HDR_LEN] = 0x00; // no sleep moode
+                  pBuf[HCI_CMD_HDR_LEN] = 0x01; // sleep
                   pBuf[HCI_CMD_HDR_LEN + 1] = 0x00; // no idle threshold host (N/A)
                   pBuf[HCI_CMD_HDR_LEN + 2] = 0x00; // no idle threshold HC (N/A)
                   pBuf[HCI_CMD_HDR_LEN + 3] = 0x00; // BT WAKE
@@ -398,11 +405,7 @@ private:
         }
     }
 
-    PinName bt_host_wake_name;
-    PinName bt_device_wake_name;
     PinName bt_power_name;
-    DigitalInOut bt_host_wake;
-    DigitalInOut bt_device_wake;
     DigitalInOut bt_power;
     size_t service_pack_index;
     const uint8_t* service_pack_ptr;
@@ -417,13 +420,14 @@ private:
 } // namespace ble
 
 ble::vendor::cordio::CordioHCIDriver& ble_cordio_get_hci_driver() {
-    static ble::vendor::cordio::H4TransportDriver transport_driver(
+    static ble::vendor::cypress_ble::CyH4TransportDriver transport_driver(
         /* TX */ CY_BT_UART_TX, /* RX */ CY_BT_UART_RX,
-        /* cts */ CY_BT_UART_CTS, /* rts */ CY_BT_UART_RTS, 115200
+        /* cts */ CY_BT_UART_CTS, /* rts */ CY_BT_UART_RTS, 115200,
+		CY_BT_PIN_HOST_WAKE, CY_BT_PIN_DEVICE_WAKE
     );
     static ble::vendor::cypress::HCIDriver hci_driver(
-        transport_driver, /* host wake */ CY_BT_PIN_HOST_WAKE,
-        /* device wake */ CY_BT_PIN_DEVICE_WAKE, /* bt_power */ CY_BT_PIN_POWER
+        transport_driver,
+        /* bt_power */ CY_BT_PIN_POWER
     );
     return hci_driver;
 }

@@ -33,6 +33,7 @@
 #include "cy_gpio.h"
 #include "cy_scb_uart.h"
 #include "cy_sysint.h"
+#include "cycfg_pins.h"
 
 #define UART_OVERSAMPLE                 12
 #define UART_DEFAULT_BAUDRATE           115200
@@ -384,8 +385,21 @@ static void serial_init_peripheral(serial_obj_t *obj)
     Cy_SCB_UART_Enable(obj->base);
 }
 
+int serial_is_bt_tx_ongoing(void)
+{
+    serial_obj_t *obj = &(bt_uart.serial);
+    //serial_obj_t *obj = OBJ_P(obj_in);
+    if(true == Cy_SCB_UART_IsTxComplete(obj->base))
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
 
-#if DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED
+#if DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED && MBED_TICKLESS
 static cy_en_syspm_status_t serial_pm_callback(cy_stc_syspm_callback_params_t *params, cy_en_syspm_callback_mode_t mode)
 {
     serial_obj_t *obj = (serial_obj_t *)params->context;
@@ -411,7 +425,6 @@ static cy_en_syspm_status_t serial_pm_callback(cy_stc_syspm_callback_params_t *p
             }
             break;
 
-
         case CY_SYSPM_CHECK_FAIL:
             /* Enable the UART to operate */
             Cy_SCB_UART_Enable(obj->base);
@@ -434,7 +447,7 @@ static cy_en_syspm_status_t serial_pm_callback(cy_stc_syspm_callback_params_t *p
 
     return status;
 }
-#endif /* (DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED) */
+#endif /* (DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED && MBED_TICKLESS) */
 
 
 void serial_init(serial_t *obj_in, PinName tx, PinName rx)
@@ -491,7 +504,7 @@ void serial_init(serial_t *obj_in, PinName tx, PinName rx)
                 obj->div_num  = _FLD2VAL(CY_PERI_CLOCK_CTL_DIV_SEL,  map);
                 obj->div_type = (cy_en_divider_types_t) _FLD2VAL(CY_PERI_CLOCK_CTL_TYPE_SEL, map);
             } else {
-#if DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED
+#if DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED && MBED_TICKLESS
                 /* Register callback once */
                 obj->pm_callback_handler.callback = serial_pm_callback;
                 obj->pm_callback_handler.type = CY_SYSPM_DEEPSLEEP;
@@ -503,7 +516,7 @@ void serial_init(serial_t *obj_in, PinName tx, PinName rx)
                 if (!Cy_SysPm_RegisterCallback(&obj->pm_callback_handler)) {
                     error("PM callback registration failed!");
                 }
-#endif /* (DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED) */
+#endif /* (DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED && MBED_TICKLESS) */
             }
 
             /* Configure hardware resources */

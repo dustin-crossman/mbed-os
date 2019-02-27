@@ -139,6 +139,8 @@ void lp_ticker_set_interrupt(timestamp_t timestamp)
 
     delay = new_ts - c2_count;
 
+    Cy_MCWDT_ClearInterrupt(LPT_MCWDT_UNIT, (CY_MCWDT_CTR0 | CY_MCWDT_CTR1));
+
     if (delay > MCWDT_COUNTER0_MAX_COUNT) {
 
         uint32_t c0_increment = delay % (MCWDT_COUNTER0_MAX_COUNT + 1);
@@ -147,7 +149,7 @@ void lp_ticker_set_interrupt(timestamp_t timestamp)
         counter1_count = (c1_count + counter1_count) % (MCWDT_COUNTER1_MAX_COUNT + 1);
 
         Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER0, counter0_count, LPT_MCWDT_DELAY_NO_WAIT);
-        Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER1, counter1_count, LPT_MCWDT_DELAY_WAIT);
+        Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER1, counter1_count, LPT_MCWDT_DELAY_NO_WAIT);
         Cy_MCWDT_SetInterruptMask(LPT_MCWDT_UNIT, CY_MCWDT_CTR1);
 
     }
@@ -163,7 +165,7 @@ void lp_ticker_set_interrupt(timestamp_t timestamp)
         }
 
         Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER0, counter0_count, LPT_MCWDT_DELAY_NO_WAIT);
-        Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER1, MCWDT_COUNTER1_MAX_COUNT, LPT_MCWDT_DELAY_WAIT);
+        Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER1, MCWDT_COUNTER1_MAX_COUNT, LPT_MCWDT_DELAY_NO_WAIT);
         Cy_MCWDT_SetInterruptMask(LPT_MCWDT_UNIT, CY_MCWDT_CTR0);
     }
 }
