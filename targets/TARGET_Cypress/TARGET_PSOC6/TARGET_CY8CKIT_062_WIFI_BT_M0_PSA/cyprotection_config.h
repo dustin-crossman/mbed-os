@@ -56,7 +56,7 @@ const cy_smpu_region_config_t sram_spm_smpu_config[] = {
     {   /* SRAM_SPM_PRIV - must include SRAM_SPM_PUB area */
         .address = (uint32_t *)PSA_SECURE_RAM_START, /* 0x08020000 */
         .regionSize = CY_PROT_SIZE_64KB, /* 0x10000 */
-        .subregions = 0xC0, /*Size 0xC000 ALL_SUBREGIONS,*/
+        .subregions = ALL_SUBREGIONS, /* 0xC0, /*Size 0xC000 ALL_SUBREGIONS,*/
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RWX,
         .secure = true,
