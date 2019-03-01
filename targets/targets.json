@@ -7933,8 +7933,7 @@
             "MBED_TICKLESS",
             "MBEDTLS_PSA_CRYPTO_SPM",
             "MBEDTLS_PSA_CRYPTO_C",
-            "CY_IPC_DEFAULT_CFG_DISABLE",
-            "__HEAP_SIZE=0x00001000"
+            "CY_IPC_DEFAULT_CFG_DISABLE"
         ],
         "deliver_to_target": "CY8CKIT_062_WIFI_BT_PSA",
         "delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_CY8CKIT_062_WIFI_BT_PSA/prebuilt",
