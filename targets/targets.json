@@ -38,6 +38,10 @@
             "default-form-factor": {
                 "help": "Default form factor of this board taken from supported_form_factors. This must be a lowercase string such as 'arduino'",
                 "value": null
+            },
+            "tickless-from-us-ticker": {
+                "help": "Run tickless from the microsecond ticker rather than the low power ticker. Running tickless off of the microsecond ticker improves interrupt latency on targets which use lpticker_delay_ticks",
+                "value": false
             }
         }
     },
@@ -1461,7 +1465,8 @@
             "KPSDK_CODE",
             "MCU_K64F",
             "Freescale_EMAC",
-            "PSA"
+            "PSA",
+            "MBED_SPM"
         ],
         "is_disk_virtual": true,
         "macros": ["CPU_MK64FN1M0VMD12", "FSL_RTOS_MBED", "MBEDTLS_PSA_CRYPTO_C"],
@@ -1861,7 +1866,8 @@
             }
         },
         "overrides": {
-            "deep-sleep-latency": 3
+            "deep-sleep-latency": 3,
+            "tickless-from-us-ticker": true
         },
         "device_has": [
             "USTICKER",
@@ -2428,7 +2434,7 @@
         "inherits": ["FAMILY_STM32"],
         "supported_form_factors": ["ARDUINO", "MORPHO"],
         "core": "Cortex-M4F",
-        "extra_labels_add": ["STM32F4", "STM32F411xE", "STM32F411RE", "PSA"],
+        "extra_labels_add": ["STM32F4", "STM32F411xE", "STM32F411RE"],
         "components_add": ["FLASHIAP"],
         "detect_code": ["0740"],
         "config": {
@@ -3122,7 +3128,7 @@
             },
             "lpticker_lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
-                "value": 1
+                "value": 0
             }
         },
         "macros_add": [
@@ -3139,6 +3145,7 @@
             "MPU"
         ],
         "release_versions": ["2", "5"],
+        "bootloader_supported": true,
         "device_name": "STM32L073RZ"
     },
     "NUCLEO_L152RE": {
@@ -7028,7 +7035,8 @@
         "device_name": "NUC472HI8AE",
         "bootloader_supported": true,
         "overrides": {
-            "network-default-interface-type": "ETHERNET"
+            "network-default-interface-type": "ETHERNET",
+            "tickless-from-us-ticker": true
         }
     },
     "NCS36510": {
@@ -7151,7 +7159,10 @@
         ],
         "release_versions": ["2", "5"],
         "device_name": "M453VG6AE",
-        "bootloader_supported": true
+        "bootloader_supported": true,
+        "overrides": {
+            "tickless-from-us-ticker": true
+        }
     },
     "NUMAKER_PFM_NANO130": {
         "core": "Cortex-M0",
@@ -7213,7 +7224,10 @@
             "SPI_ASYNCH"
         ],
         "release_versions": ["5"],
-        "device_name": "NANO130KE3BN"
+        "device_name": "NANO130KE3BN",
+        "overrides": {
+            "tickless-from-us-ticker": true
+        }
     },
     "HI2110": {
         "inherits": ["Target"],
@@ -7537,7 +7551,8 @@
         "release_versions": ["5"],
         "bootloader_supported": true,
         "overrides": {
-            "network-default-interface-type": "ETHERNET"
+            "network-default-interface-type": "ETHERNET",
+            "tickless-from-us-ticker": true
         }
     },
     "NUMAKER_PFM_M487": {
@@ -7776,7 +7791,8 @@
         "detect_code": ["1305"],
         "release_versions": ["5"],
         "device_name": "M2351KIAAEES",
-        "bootloader_supported": true
+        "bootloader_supported": true,
+        "tickless-from-us-ticker": true
     },
     "TMPM3H6": {
         "inherits": ["Target"],
