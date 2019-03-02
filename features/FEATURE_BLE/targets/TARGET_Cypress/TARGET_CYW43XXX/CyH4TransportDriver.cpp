@@ -1,9 +1,6 @@
 /* mbed Microcontroller Library
  * Copyright (c) 2017-2017 ARM Limited
-<<<<<<< HEAD
  * SPDX-License-Identifier: Apache-2.0
-=======
->>>>>>> 7da331e2ba... PSOC6 deep-sleep changes
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
