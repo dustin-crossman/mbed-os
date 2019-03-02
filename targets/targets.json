@@ -7933,8 +7933,7 @@
             "MBED_TICKLESS",
             "MBEDTLS_PSA_CRYPTO_SPM",
             "MBEDTLS_PSA_CRYPTO_C",
-            "MBEDTLS_ENTROPY_NV_SEED",
-            "PU_ENABLE"
+            "MBEDTLS_ENTROPY_NV_SEED"
         ],
         "deliver_to_target": "CY8CKIT_062_WIFI_BT_PSA",
         "delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_CY8CKIT_062_WIFI_BT_PSA/prebuilt",
