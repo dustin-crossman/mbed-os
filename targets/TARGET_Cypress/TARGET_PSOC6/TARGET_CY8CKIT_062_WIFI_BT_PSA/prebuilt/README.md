@@ -19,5 +19,3 @@ These images were compiled by the following command:
 ```
 mbed test --compile -m CY8CKIT_062_WIFI_BT_M0_PSA -t GCC_ARM --profile debug -n *psa-*
 ```
-
-To update the prebuilt binaries run the previous commands and then run ```python export_binaries.py```
