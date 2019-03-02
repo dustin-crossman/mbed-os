@@ -175,7 +175,12 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .privPermission = CY_PROT_PERM_RW,
         .secure = false,
         .pcMatch = false,
+<<<<<<< HEAD
         .pcMask = CY_PROT_PCMASK7,
+=======
+        /*.pcMask = CY_PROT_PCMASK7,*/
+        .pcMask = ALL_PROTECTION_CONTEXTS_MASK - CY_PROT_PCMASK7,
+>>>>>>> 8f70d75d706af3d398e604b7c94b82a6b8c608cd
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
         .secureMst = true,

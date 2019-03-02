@@ -69,7 +69,11 @@ cy_en_prot_status_t smpu_protect(cy_smpu_region_config_t smpu_config_arr[], uint
 }
 
 /* protect all unconfigured SMPUs */
+<<<<<<< HEAD
 cy_en_prot_status_t smpu_config_unprotected(const cy_stc_smpu_cfg_t *smpu_config)
+=======
+cy_en_prot_status_t smpu_config_unprotected(cy_stc_smpu_cfg_t *smpu_config)
+>>>>>>> 8f70d75d706af3d398e604b7c94b82a6b8c608cd
 {
     cy_en_prot_status_t ret = CY_PROT_SUCCESS;
     uint32_t i;

@@ -173,8 +173,11 @@ void mbed_sdk_init(void)
     /* Initialize system and clocks. */
     /* Placed here as it must be done after proper LIBC initialization. */
     SystemInit();
+<<<<<<< HEAD:targets/TARGET_Cypress/TARGET_PSOC6/TARGET_CY8C62XX/TARGET_MCU_PSOC6_M0/system_psoc6_cm0plus.c
     /* Allocate and initialize semaphores for the system operations. */
     Cy_SemaIpcFlashInit();
+=======
+>>>>>>> 8f70d75d706af3d398e604b7c94b82a6b8c608cd:targets/TARGET_Cypress/TARGET_PSOC6/TARGET_CY8C62XX/TARGET_MCU_PSOC6_M0/system_psoc6_cm0plus.c
 }
 
 #if defined(COMPONENT_SPM_MAILBOX)
@@ -291,6 +294,8 @@ void SystemInit(void)
     Cy_Flash_Init();
 #endif /* defined(CY_DEVICE_PSOC6ABLE2) */
 
+#else/* !defined(CY_IPC_DEFAULT_CFG_DISABLE) */
+    Cy_SemaIpcFlashInit();
 #endif /* !defined(CY_IPC_DEFAULT_CFG_DISABLE) */
 }
 
