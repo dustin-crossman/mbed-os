@@ -1331,7 +1331,7 @@
     "KW24D": {
         "supported_form_factors": ["ARDUINO"],
         "core": "Cortex-M4",
-        "supported_toolchains": ["ARM", "GCC_ARM", "IAR"],
+        "supported_toolchains": ["ARMC5", "GCC_ARM", "IAR"],
         "extra_labels": ["Freescale", "MCUXpresso_MCUS", "KSDK2_MCUS", "FRDM"],
         "is_disk_virtual": true,
         "macros": ["CPU_MKW24D512VHA5", "FSL_RTOS_MBED"],
@@ -7855,7 +7855,7 @@
         "inherits": ["Target"],
         "macros": ["MBED_MPU_CUSTOM"],
         "default_toolchain": "GCC_ARM",
-        "supported_toolchains": ["GCC_ARM", "ARM", "IAR"],
+        "supported_toolchains": ["GCC_ARM", "IAR", "ARMC5"],
         "core": "Cortex-M4F",
         "OUTPUT_EXT": "hex",
         "device_has": [
@@ -7912,7 +7912,6 @@
         "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
         "supported_form_factors": ["ARDUINO"],
-        "release_versions": ["5"],
         "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW4343X", "CORDIO", "CY8C62XX"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "detect_code": ["1900"],
@@ -7975,7 +7974,6 @@
         "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
         "device_has_remove": ["ANALOGOUT"],
-        "release_versions": ["5"],
         "extra_labels_add": ["PSOC6_02", "WICED", "CYW43XXX", "CYW4343X", "CORDIO"],
         "macros_add": ["CY8C624ABZI_D44", "PSOC6_DYNSRM_DISABLE=1"],
         "public": false,
@@ -8004,7 +8002,6 @@
     },
     "CY8CKIT_062_4343W": {
         "inherits": ["MCU_PSOC6_M4"],
-        "release_versions": ["5"],
         "features": ["BLE"],
         "supported_form_factors": ["ARDUINO"],
         "device_has_remove": ["ANALOGOUT"],
@@ -8030,7 +8027,6 @@
     "CYW943012P6EVB_01": {
         "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
-        "release_versions": ["5"],
         "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW43012", "CORDIO", "CY8C62XX"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "detect_code": ["1906"],
@@ -8328,7 +8324,7 @@
         "detect_code": ["1703"],
         "macros_add": ["GD32E10X"],
         "release_versions": ["5"]
-		},
+	},
     "TT_M4G9": {
 		"inherits": ["Target"],
 		"core": "Cortex-M4",
@@ -8358,5 +8354,9 @@
 		"detect_code": ["8013"],
 		"release_versions": ["5"],
 		"bootloader_supported": true
+    },
+    "__build_tools_metadata__": {
+        "version": "1",
+        "public": false
     }
 }
