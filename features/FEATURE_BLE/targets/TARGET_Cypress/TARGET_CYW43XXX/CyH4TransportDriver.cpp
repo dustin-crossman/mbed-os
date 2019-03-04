@@ -112,7 +112,11 @@ void CyH4TransportDriver::assert_bt_dev_wake()
 void CyH4TransportDriver::deassert_bt_dev_wake()
 {
 #if (defined(MBED_TICKLESS) && DEVICE_SLEEP && DEVICE_LPTICKER)
-	//De-assert bt_device_wake
+
+    //wait for UART HW FIFO's to be flushed
+    while(serial_is_bt_tx_ongoing() == true) {};
+
+    //de-assert bt_device_wake
 	bt_device_wake = 1;
 #endif
 }
