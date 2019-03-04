@@ -1,4 +1,5 @@
 /* Copyright (c) 2017-2018 ARM Limited
+ * Copyright 2018-2019 Cypress Semiconductor Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
  *
