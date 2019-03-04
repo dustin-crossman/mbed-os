@@ -89,7 +89,7 @@ MEMORY
      * where 'xx' is the device group; for example, 'cy8c6xx7_cm4_dual.ld'.
      */
     ram               (rwx)   : ORIGIN = MBED_RAM_START, LENGTH = MBED_RAM_SIZE
-    shared_ram        (rwx)   : ORIGIN = MBED_SHARED_RAM_START, LENGTH = MBED_SHARED_RAM_SIZE
+    shared_ram        (rwx)   : ORIGIN = (MBED_SHARED_RAM_START + 0x100), LENGTH = (MBED_SHARED_RAM_SIZE - 0x100)
     flash             (rx)    : ORIGIN = MBED_ROM_START, LENGTH = (MBED_ROM_SIZE - 0x8000)
 
     /* This is a 32K flash region used for EEPROM emulation. This region can also be used as the general purpose flash.
@@ -341,7 +341,7 @@ SECTIONS
     /* Shared public RAM */
     .cy_pub_ram (NOLOAD):
     {
-        . = ALIGN(4) + 0x100;
+        . = ALIGN(4);
         KEEP(*(.cy_pub_ram))
     } > shared_ram
 
