@@ -79,7 +79,7 @@ define symbol __ICFEDIT_region_IRAM1_start__ = MBED_RAM_START;
 define symbol __ICFEDIT_region_IRAM1_end__   = (MBED_RAM_START + MBED_RAM_SIZE);
 /* Shared RAM */
 define symbol __ICFEDIT_region_IRAM2_start__ = MBED_SHARED_RAM_START + 0x100;
-define symbol __ICFEDIT_region_IRAM2_end__   = (MBED_SHARED_RAM_START + MBED_SHARED_RAM_SIZE - 0x100);
+define symbol __ICFEDIT_region_IRAM2_end__   = (MBED_SHARED_RAM_START + MBED_SHARED_RAM_SIZE);
 /* Flash */
 define symbol __ICFEDIT_region_IROM1_start__ = MBED_ROM_START;
 define symbol __ICFEDIT_region_IROM1_end__   = (MBED_ROM_START + MBED_ROM_SIZE - 0x8000);
