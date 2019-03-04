@@ -390,6 +390,21 @@ static void serial_init_peripheral(serial_obj_t *obj)
     Cy_SCB_UART_Enable(obj->base);
 }
 
+int serial_is_bt_tx_ongoing(void)
+{
+    serial_obj_t *obj = &(bt_uart.serial);
+    //serial_obj_t *obj = OBJ_P(obj_in);
+    if(true == Cy_SCB_UART_IsTxComplete(obj->base))
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+
 /*
  * Callback function to handle into and out of deep sleep state transitions.
  */
