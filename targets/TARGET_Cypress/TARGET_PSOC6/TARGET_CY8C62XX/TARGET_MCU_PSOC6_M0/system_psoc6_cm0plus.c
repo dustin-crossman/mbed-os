@@ -194,7 +194,7 @@ void mailbox_init(void);
 void SystemInit(void)
 {
     /* Workaround to avoid twice SystemInit() call when ARMC5 compiler is used */
-    static temp_var = 0;
+    static uint32_t temp_var = 0;
 
     if (temp_var == 0)
     {
