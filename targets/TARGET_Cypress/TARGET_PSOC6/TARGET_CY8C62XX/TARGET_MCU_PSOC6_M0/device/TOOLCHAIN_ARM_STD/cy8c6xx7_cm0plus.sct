@@ -58,12 +58,12 @@
   #define MBED_RAM_SIZE     0x10000
 #endif
 
-#if !defined(MBED_SHARED_RAM_START)
-  #define MBED_SHARED_RAM_START    0x08047500
+#if !defined(MBED_PUBLIC_RAM_START)
+  #define MBED_PUBLIC_RAM_START    0x08047600
 #endif
 
-#if !defined(MBED_SHARED_RAM_SIZE)
-  #define MBED_SHARED_RAM_SIZE     0x300
+#if !defined(MBED_PUBLIC_RAM_SIZE)
+  #define MBED_PUBLIC_RAM_SIZE     0x200
 #endif
 
 #if !defined(MBED_BOOT_STACK_SIZE)
@@ -83,9 +83,9 @@
 ; RAM
 #define RAM_START               MBED_RAM_START
 #define RAM_SIZE                MBED_RAM_SIZE
-; Shared RAM
-#define SHARED_RAM_START               MBED_SHARED_RAM_START + 0x100
-#define SHARED_RAM_SIZE                MBED_SHARED_RAM_SIZE - 0x100
+; Public RAM
+#define PUBLIC_RAM_START               MBED_PUBLIC_RAM_START
+#define PUBLIC_RAM_SIZE                MBED_PUBLIC_RAM_SIZE
 ; Flash
 ; Flash
 #define FLASH_START             MBED_ROM_START
@@ -169,7 +169,7 @@ LR_IROM1 FLASH_START (FLASH_SIZE - 0x8000)
     { ; Stack region growing down
     }
 
-    RW_IRAM2 SHARED_RAM_START UNINIT
+    RW_IRAM2 PUBLIC_RAM_START UNINIT
     {
         * (.cy_pub_ram)
     }
