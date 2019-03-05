@@ -105,6 +105,16 @@
                 "help": "Size in bytes of Shared RAM between Secure and Non-secure worlds",
                 "value": null,
                 "macro_name": "PSA_SHARED_RAM_SIZE"
+            },
+            "public-ram-start": {
+                "help": "Starting address of Public RAM for variables accessible from Non-secure worlds",
+                "value": null,
+                "macro_name": "PSA_PUBLIC_RAM_START"
+            },
+            "public-ram-size": {
+                "help": "Size in bytes of Public RAM variables accessible from Non-secure worlds",
+                "value": null,
+                "macro_name": "PSA_PUBLIC_RAM_SIZE"
             }
         }
     },
@@ -7947,7 +7957,9 @@
             "non-secure-ram-start": "0x08010000",
             "non-secure-ram-size": "0x37500",
             "shared-ram-start": "0x08047500",
-            "shared-ram-size": "0x300"
+            "shared-ram-size": "0x100",
+            "public-ram-start": "0x08047600",
+            "public-ram-size": "0x200"
         }
     },
     "CY8CKIT_062_WIFI_BT_PSA": {
@@ -7967,7 +7979,9 @@
             "non-secure-ram-start": "0x08010000",
             "non-secure-ram-size": "0x37500",
             "shared-ram-start": "0x08047500",
-            "shared-ram-size": "0x300"
+            "shared-ram-size": "0x100",
+            "public-ram-start": "0x08047600",
+            "public-ram-size": "0x200"
         }
     },
     "CY8CMOD_062_4343W": {

@@ -193,6 +193,13 @@ void mailbox_init(void);
 *******************************************************************************/
 void SystemInit(void)
 {
+    /* Workaround to avoid twice SystemInit() call when ARMC5 compiler is used */
+    static temp_var = 0;
+
+    if (temp_var == 0)
+    {
+    temp_var = 1;
+
     Cy_PDL_Init(CY_DEVICE_CFG);
 
     /* Restore FLL registers to the default state as they are not restored by the ROM code */
@@ -292,6 +299,8 @@ void SystemInit(void)
 #else/* !defined(CY_IPC_DEFAULT_CFG_DISABLE) */
     Cy_SemaIpcFlashInit();
 #endif /* !defined(CY_IPC_DEFAULT_CFG_DISABLE) */
+
+    }
 }
 
 
