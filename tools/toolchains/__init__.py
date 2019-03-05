@@ -816,8 +816,8 @@ class mbedToolchain:
                 "MBED_ROM_SIZE": "target.secure-rom-size",
                 "MBED_RAM_START": "target.secure-ram-start",
                 "MBED_RAM_SIZE": "target.secure-ram-size",
-                "MBED_SHARED_RAM_START": "target.shared-ram-start",
-                "MBED_SHARED_RAM_SIZE": "target.shared-ram-size"
+                "MBED_PUBLIC_RAM_START": "target.public-ram-start",
+                "MBED_PUBLIC_RAM_SIZE": "target.public-ram-size"
             }
 
         for flag, param in flags2params.items():
