@@ -98,7 +98,7 @@
         },
         "wiced-disable-mcu-powersave": {
             "macro_name": "WICED_DISABLE_MCU_POWERSAVE",
-            "value": "",
+            "value": null,
             "help": "Uncomment to disable MCU powersave API functions"
         },
         "wiced-platform_masks_bus_irq": {

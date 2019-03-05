@@ -8033,14 +8033,15 @@
         "features": ["BLE"],
         "release_versions": ["5"],
         "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW43012", "CORDIO", "CY8C62XX"],
-        "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
+        "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1", "MBED_TICKLESS"],
         "detect_code": ["1906"],
         "hex_filename": "psoc6_01_cm0p_sleep.hex",
         "post_binary_hook": {
             "function": "PSOC6Code.complete"
         },
         "overrides": {
-            "network-default-interface-type": "WIFI"
+            "network-default-interface-type": "WIFI",
+            "deep-sleep-latency": 5
         }
     },
     "FUTURE_SEQUANA_M0": {
