@@ -76,8 +76,9 @@ public:
 
     virtual void do_initialize()
     {
-        bt_power = 1;
+        bt_power = 0;
         wait_ms(500);
+        bt_power = 1;
     }
 
     virtual void do_terminate() { }
@@ -302,6 +303,7 @@ private:
         service_pack_next = NULL;
         service_pack_index = 0;
         service_pack_transfered = true;
+        wait_ms(1000);
         set_sleep_mode();
     }
 
@@ -343,7 +345,7 @@ private:
             uint8_t *pBuf;
             if ((pBuf = hciCmdAlloc(HCI_VS_CMD_SET_SLEEP_MODE, 12)) != NULL)
             {
-                  pBuf[HCI_CMD_HDR_LEN] = 0x00; // no sleep
+                  pBuf[HCI_CMD_HDR_LEN] = 0x01; // no sleep
                   pBuf[HCI_CMD_HDR_LEN + 1] = 0x00; // no idle threshold host (N/A)
                   pBuf[HCI_CMD_HDR_LEN + 2] = 0x00; // no idle threshold HC (N/A)
                   pBuf[HCI_CMD_HDR_LEN + 3] = 0x00; // BT WAKE
