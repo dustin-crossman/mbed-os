@@ -27,7 +27,7 @@
 #include "SecurityManager.h"
 
 /*! Maximum count of characteristics that can be stored for authorisation purposes */
-#define MAX_CHARACTERISTIC_AUTHORIZATION_CNT 20
+#define MAX_CHARACTERISTIC_AUTHORIZATION_CNT 25
 
 /*! client characteristic configuration descriptors settings */
 #define MAX_CCCD_CNT 20
