@@ -422,6 +422,8 @@ ble_error_t GattServer::insert_descriptor(
     memset(attribute_it->pValue + *attribute_it->pLen, 0, attribute_it->maxLen - *attribute_it->pLen);
 
     attribute_it->settings = 0;
+	attribute_it->settings |= ATTS_SET_READ_CBACK;
+    attribute_it->settings |= ATTS_SET_WRITE_CBACK;
 
     if (descriptor->getUUID().shortOrLong() == UUID::UUID_TYPE_LONG) {
         attribute_it->settings |= ATTS_SET_UUID_128;

@@ -48,7 +48,7 @@
         },
         "desired-att-mtu": {
             "help": "Desired ATT_MTU, this needs to be between 23 and 517 (inclusive).",
-            "value": 23
+            "value": 189
         },
         "max-prepared-writes": {
             "help": "Number of queued prepare writes supported by server.",

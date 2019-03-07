@@ -504,7 +504,7 @@ void BLE::stack_setup()
 
     stack_handler_id = WsfOsSetNextHandler(&BLE::stack_handler);
 
-    HciSetMaxRxAclLen(100);
+    HciSetMaxRxAclLen(189);
 
     DmRegister(BLE::device_manager_cb);
 #if BLE_FEATURE_CONNECTABLE
