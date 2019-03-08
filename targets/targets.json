@@ -4019,7 +4019,7 @@
         "release_versions": ["2", "5"],
         "device_name": "STM32L476VG",
         "bootloader_supported": true
-    },	
+    },
     "MTS_MDOT_F405RG": {
         "inherits": ["FAMILY_STM32"],
         "core": "Cortex-M4F",
@@ -7854,7 +7854,7 @@
     },
     "MCU_PSOC6": {
         "inherits": ["Target"],
-        "macros": ["MBED_MPU_CUSTOM"],
+        "macros": ["MBED_MPU_CUSTOM", "MBEDTLS_CONFIG_HW_SUPPORT"],
         "default_toolchain": "GCC_ARM",
         "supported_toolchains": ["GCC_ARM", "ARM", "IAR"],
         "core": "Cortex-M4F",
@@ -7958,6 +7958,7 @@
         "components_add": ["SPM_MAILBOX", "FLASHIAP"],
         "device_has_remove": ["TRNG", "CRC"],
         "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
+        "macros_remove": ["MBEDTLS_CONFIG_HW_SUPPORT"],
         "hex_filename": "psa_release_1.0.hex",
         "overrides": {
             "secure-rom-start": "0x10000000",
