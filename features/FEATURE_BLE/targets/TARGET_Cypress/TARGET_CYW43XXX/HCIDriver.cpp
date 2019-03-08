@@ -26,6 +26,7 @@
 #include "hci_mbed_os_adaptation.h"
 #include "CyH4TransportDriver.h"
 #include "cycfg_pins.h"
+#include "mbed_power_mgmt.h"
 
 extern const int brcm_patch_ram_length;
 extern const uint8_t brcm_patchram_buf[];
@@ -76,9 +77,10 @@ public:
 
     virtual void do_initialize()
     {
-        bt_power = 0;
-        wait_ms(500);
+        //Prevent PSoC6 to enter deep-sleep till BT initialization is complete
+        sleep_manager_lock_deep_sleep();
         bt_power = 1;
+        wait_ms(500);
     }
 
     virtual void do_terminate() { }
@@ -291,7 +293,6 @@ private:
         service_pack_next = &HCIDriver::terminate_service_pack_transfert;;
         service_pack_index = 0;
         service_pack_transfered = false;
-        wait_ms(1000);
         send_service_pack_command();
     }
 
@@ -305,6 +306,7 @@ private:
         service_pack_transfered = true;
         wait_ms(1000);
         set_sleep_mode();
+        sleep_manager_unlock_deep_sleep();
     }
 
     void send_service_pack_command(void)
