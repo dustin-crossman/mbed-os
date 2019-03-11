@@ -19,6 +19,7 @@
 
 #include "CyH4TransportDriver.h"
 #include "cycfg_pins.h"
+#include "mbed_power_mgmt.h"
 
 namespace ble {
 namespace vendor {
@@ -35,14 +36,14 @@ CyH4TransportDriver::CyH4TransportDriver(PinName tx, PinName rx, PinName cts, Pi
 
 void CyH4TransportDriver::bt_host_wake_irq_handler(void)
 {
-	sleep_manager_lock_deep_sleep();
 	CyH4TransportDriver::on_controller_irq();
-	sleep_manager_unlock_deep_sleep();
 }
 
 void CyH4TransportDriver::initialize()
 {
 	InterruptIn *host_wake_pin;
+
+    sleep_manager_lock_deep_sleep();
 
     uart.format(
         /* bits */ 8,
@@ -69,6 +70,7 @@ void CyH4TransportDriver::initialize()
 #endif
     bt_device_wake = 0;
     wait_ms(500);
+    sleep_manager_unlock_deep_sleep();
 }
 
 void CyH4TransportDriver::terminate() {  }
@@ -77,6 +79,7 @@ uint16_t CyH4TransportDriver::write(uint8_t type, uint16_t len, uint8_t *pData)
 {
     uint16_t i = 0;
 
+    sleep_manager_lock_deep_sleep();
     assert_bt_dev_wake();
 
     while (i < len + 1) {
@@ -87,11 +90,13 @@ uint16_t CyH4TransportDriver::write(uint8_t type, uint16_t len, uint8_t *pData)
     }
 
     deassert_bt_dev_wake();
+    sleep_manager_unlock_deep_sleep();
     return len;
 }
 
 void CyH4TransportDriver::on_controller_irq()
 {
+    sleep_manager_lock_deep_sleep();
 	assert_bt_dev_wake();
 
 	while (uart.readable()) {
@@ -100,12 +105,16 @@ void CyH4TransportDriver::on_controller_irq()
     }
 
 	deassert_bt_dev_wake();
+    sleep_manager_unlock_deep_sleep();
 }
 
 void CyH4TransportDriver::assert_bt_dev_wake()
 {
 #if (defined(MBED_TICKLESS) && DEVICE_SLEEP && DEVICE_LPTICKER)
     bt_device_wake = 0;
+
+    // BT Clock needs 1.8ms to come up
+    Cy_SysLib_Delay(2);
 #endif
 }
 
