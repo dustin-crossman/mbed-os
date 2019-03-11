@@ -33,6 +33,10 @@
 #ifndef INITIAL_SP
 #define INITIAL_SP              (0x08002000 + 0x00045800)  /* Ram origin + length */
 #endif
+#elif defined(TARGET_CY8CKIT_062_WIFI_BT_SINGLE_STAGE)
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08001000 + 0x0001F000)  /* Ram origin + length */
+#endif
 #elif defined(TARGET_CY8CMOD_062_4343W)
 #ifndef INITIAL_SP
 #define INITIAL_SP              (0x08002000 + 0x000FD800)  /* Ram origin + length */
@@ -44,6 +48,14 @@
 #elif defined(TARGET_CY8CPROTO_064_SB)
 #ifndef INITIAL_SP
 #define INITIAL_SP              (0x08002000 + 0x00045800)  /* Ram origin + length */
+#endif
+#elif defined(TARGET_CY8CPROTO_064_M0_PSA)
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08020000 + 0x0000C000)  /* Ram origin + length */
+#endif
+#elif defined(TARGET_CY8CPROTO_064_SB_PSA)
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08000000 + 0x00020000)  /* Ram origin + length */
 #endif
 #endif
 #endif  /* MBED_MBED_RTX_H */

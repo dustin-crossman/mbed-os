@@ -1,0 +1,30 @@
+{
+    "cm0p" : {
+                "boot0" : { 
+                    "VERSION" : "0.1",
+                    "ROLLBACK_COUNTER" : "0",
+                    "IMAGE_ID" : "3",
+                    "SLOT_SIZE" : "0x20000",
+                    "PAD" : "--pad"
+                },
+                "boot1" : {
+                    "VERSION" : "0.1",
+                    "ROLLBACK_COUNTER" : "0",
+                    "IMAGE_ID" : "3",
+                    "SLOT_SIZE" : "0x30000",
+                    "PAD" : "--pad"
+                }
+            },
+    
+    "cm4" : {
+                "boot0" : { 
+                    "VERSION" : "0.1",
+                    "ROLLBACK_COUNTER" : "0",
+                    "IMAGE_ID" : "5",
+                    "SLOT_SIZE" : "0x30000",
+                    "PAD" : "--pad"
+                }
+            },
+
+    "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/secureboot-tools-1.0/"
+}

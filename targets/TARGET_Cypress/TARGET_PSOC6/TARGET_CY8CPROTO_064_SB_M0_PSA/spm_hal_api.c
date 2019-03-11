@@ -38,7 +38,7 @@ void spm_hal_start_nspe(void)
 
 void spm_hal_memory_protection_init(void)
 {
-#ifdef PU_ENABLE
+#ifndef PU_ENABLE //+++ rnok: was #ifdef
     cy_en_prot_status_t status = CY_PROT_SUCCESS;
 
     /* smpu */
