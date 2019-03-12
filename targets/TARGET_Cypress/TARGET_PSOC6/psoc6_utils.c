@@ -379,10 +379,8 @@ int cy_reserve_crypto(cy_en_crypto_submodule_t module_num)
         }
 
         if (module_num == CY_CRYPTO_COMMON_HW) {
-            if (crypto_reservations[module_num] != 1) {
-                crypto_reservations[module_num] = 1;
-                result = 0;
-            }
+            crypto_reservations[module_num]++;
+            result = 0;
         } else {
             crypto_reservations[module_num] = 1;
             result = 0;
@@ -402,15 +400,17 @@ void cy_free_crypto(cy_en_crypto_submodule_t module_num)
     if (module_num < NUM_CRYPTO_HW) {
         core_util_critical_section_enter();
 
-        if (crypto_reservations[module_num] == 1) {
-            crypto_reservations[module_num] = 0;
-
-            if (cy_crypto_reserved_status() == 0) {
-                /* Crypto hardware is still in enabled state; to disable:
-                   Cy_Crypto_Core_Disable(CRYPTO) */
-            }
-
+        if (module_num == CY_CRYPTO_COMMON_HW && crypto_reservations[module_num] >= 1) {
+            crypto_reservations[module_num]--;
             result = 0;
+        }
+        else if (crypto_reservations[module_num] == 1) {
+            crypto_reservations[module_num] = 0;
+            result = 0;
+        }
+        if (cy_crypto_reserved_status() == 0) {
+            /* Crypto hardware is still in enabled state; to disable:
+               Cy_Crypto_Core_Disable(CRYPTO) */
         }
         core_util_critical_section_exit();
     }
