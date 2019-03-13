@@ -41,19 +41,19 @@ GROUP(-lgcc -lc -lnosys)
 ENTRY(Reset_Handler)
 
 #if !defined(MBED_ROM_START)
-  #define MBED_ROM_START    0x10002000
+  #define MBED_ROM_START    0x10000400
 #endif
 
 #if !defined(MBED_ROM_SIZE)
-  #define MBED_ROM_SIZE     0x000FE000
+  #define MBED_ROM_SIZE     0x00020000
 #endif
 
 #if !defined(MBED_RAM_START)
-  #define MBED_RAM_START    0x08002000
+  #define MBED_RAM_START    0x08010000
 #endif
 
 #if !defined(MBED_RAM_SIZE)
-  #define MBED_RAM_SIZE     0x00045800
+  #define MBED_RAM_SIZE     0x0001F000
 #endif
 
 #if !defined(MBED_BOOT_STACK_SIZE)
@@ -69,7 +69,7 @@ STACK_SIZE = MBED_BOOT_STACK_SIZE;
 * option.
 */
 EXTERN(Reset_Handler)
-
+EXTERN(uxTopUsedPriority) /*rnok: This symbol is needed to support debugging */
 /* The MEMORY section below describes the location and size of blocks of memory in the target.
 * Use this section to specify the memory regions available for allocation.
 */

@@ -1,0 +1,14 @@
+{   
+    "cm4" : {
+                "boot1" : { 
+                    "VERSION" : "0.1",
+                    "ROLLBACK_COUNTER" : "0",
+                    "IMAGE_ID" : "4",
+                    "SLOT_SIZE" : "0x20000",
+                    "PAD" : "--pad"
+                }
+            },
+
+    "sdk_path" : "mbed-os/targets/TARGET_Cypress/TARGET_PSOC6/secureboot-tools-1.0/",
+    "priv_key_file": "USERAPP_CM4_KEY_PRIV.pem"
+}

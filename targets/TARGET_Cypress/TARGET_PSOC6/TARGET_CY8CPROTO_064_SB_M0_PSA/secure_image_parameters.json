@@ -26,5 +26,6 @@
                 }
             },
 
-    "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/secureboot-tools-1.0/"
+    "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/secureboot-tools-1.0/",
+    "priv_key_file": "MCUBOOT_CM0P_KEY_PRIV.pem"
 }

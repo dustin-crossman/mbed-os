@@ -29,7 +29,7 @@ from intelhex.compat import asbytes
 
 from ..config import ConfigException
 
-from pathlib import Path
+from pathlib import Path, PurePath
 import json
 
 # The size of the program data in Cypress HEX files is limited to 0x80000000
@@ -49,6 +49,7 @@ CY_META_SILICON_ID_ADDR = 0x90500002
 # The address of the metadata checksum (4 bytes)
 CY_META_CHECKSUM_ADDR = 0x90500008
 
+
 # Patch Cypress hex file:
 # - update checksum
 # - update metadata
@@ -66,7 +67,7 @@ def patch(message_func, ihex, hexf, align=256):
         if start == CY_META_ADDR:
             # metadata section found in the original hex
             update_metadata = True
-        if start  >= CY_PROGRAM_SIZE:
+        if start >= CY_PROGRAM_SIZE:
             continue
         segment = ihex.tobinarray(start, end)
         checksum += sum(segment)
@@ -83,7 +84,7 @@ def patch(message_func, ihex, hexf, align=256):
     if update_metadata:
         signature = unpack('>L', ihex.tobinstr(start=CY_META_SILICON_ID_ADDR, size=4))[0]
         sigcheck = pack('>L', (checksum + signature) & 0x0FFFF)
-        ihex.frombytes(array('B',sigcheck), offset=CY_META_CHECKSUM_ADDR)
+        ihex.frombytes(array('B', sigcheck), offset=CY_META_CHECKSUM_ADDR)
 
     # align flash segments
     align_mask = align - 1
@@ -102,21 +103,24 @@ def patch(message_func, ihex, hexf, align=256):
             alignments.frombytes(ihex.tobinarray(end, aligned_end - 1), end)
     ihex.merge(alignments, 'ignore')
 
+
 def merge_images(hexf0, hexf1=None):
     ihex = IntelHex()
     ihex.padding = 0x00
     ihex.loadfile(hexf0, "hex")
-    if  hexf1 is not None:
+    if hexf1 is not None:
         # Merge the CM0+ image
         ihex1 = IntelHex(hexf1)
         ihex.merge(ihex1, 'ignore')
     return ihex
+
 
 def complete_func(message_func, elf0, hexf0, hexf1=None, dest=None):
     message_func("Postprocessing %s -> %s" % (elf0, hexf0))
     ihex = merge_images(hexf0, hexf1)
     patch(message_func, ihex, hexf0)
     ihex.write_hex_file(dest if dest else hexf0, write_start_addr=False, byte_count=16)
+
 
 # Find Cortex M0 image.
 def find_cm0_image(toolchain, resources, elf, hexf, hex_filename):
@@ -135,45 +139,55 @@ def find_cm0_image(toolchain, resources, elf, hexf, hex_filename):
 
     return m0hexf
 
+
 # Make a dictionary with arguments for signing image
-def collect_args(image_slot):
+def collect_args(toolchain, image_slot, target_type):
 
-    prj_config_file = Path("targets/TARGET_Cypress/TARGET_PSOC6/"
-                           "TARGET_CY8CPROTO_064_SB_M0_PSA/secure_image_parameters.json")
+    cy_targets = Path("targets/TARGET_Cypress/TARGET_PSOC6/")
+    sb_params_file_name = Path("secure_image_parameters.json")
 
-    with open(prj_config_file.absolute()) as f:
+    # resolve base compilation directory
+    if "mbed-os" not in str(cy_targets.resolve()):
+        sb_params_file_path = Path("mbed-os") / cy_targets / \
+                              Path("TARGET_" + target_type["name"]) / sb_params_file_name
+    else:
+        sb_params_file_path = cy_targets / Path("TARGET_" + target_type["name"]) / sb_params_file_name
+
+    with open(sb_params_file_path.absolute()) as f:
         json_str = f.read()
-        prj_config = json.loads(json_str)
-
-        # Secure MCU definitions
-        # sys.path.insert(0, str(Path(prj_config.get("sdk_path")).absolute()))  # 'mbed-os/targets/TARGET_Cypress/TARGET_PSOC6/secureboot-tools-1.0/')
-
-        # print("+++ we are in collect_arg func")
-        # print(prj_config["sdk_path"])
+        sb_config = json.loads(json_str)
 
         args_for_signature = {
-            "sdk_path":         Path(prj_config.get("sdk_path")).absolute(),
-            "priv_key":         str(Path(prj_config.get("sdk_path") + "MCUBOOT_CM0P_KEY_PRIV.pem").absolute()),
-            "imgtool":          str(Path(prj_config.get("sdk_path") + "imgtool/imgtool.py").absolute()),
-            "version":          str(prj_config["cm0p"][image_slot]["VERSION"]),
-            "id":               str(prj_config["cm0p"][image_slot]["IMAGE_ID"]),
-            "rollback_counter": str(prj_config["cm0p"][image_slot]["ROLLBACK_COUNTER"]),
-            "slot_size":        str(prj_config["cm0p"][image_slot]["SLOT_SIZE"]),
-            "header_size":      "0x400",
-            "align":            "8",
-            "pad":              prj_config["cm0p"][image_slot]["PAD"]
+            "sdk_path": Path(sb_config.get("sdk_path")).resolve(),
+            "priv_key": str(Path(sb_config.get("sdk_path") + sb_config["priv_key_file"]).resolve()),
+            "imgtool": str(Path(sb_config.get("sdk_path") + "imgtool/imgtool.py").resolve()),
+            "version": str(sb_config[target_type["core"]][image_slot]["VERSION"]),
+            "id": str(sb_config[target_type["core"]][image_slot]["IMAGE_ID"]),
+            "rollback_counter": str(sb_config[target_type["core"]][image_slot]["ROLLBACK_COUNTER"]),
+            "slot_size": str(sb_config[target_type["core"]][image_slot]["SLOT_SIZE"]),
+            "header_size": "0x400",
+            "align": "8",
+            "pad": sb_config[target_type["core"]][image_slot]["PAD"]
         }
 
     return args_for_signature
 
-# Sign binary image with Secureboot SDK tools
-def sign_image(toolchain, resources, elf0, binf, hexf1=None):
 
+# Sign binary image with Secure Boot SDK tools
+def sign_image(toolchain, resources, elf0, binf, hexf1=None):
     mbed_elf_path = Path(elf0).resolve()
     mbed_bin_path = Path(elf0[:-4] + ".bin").resolve()
     mbed_hex_path = Path(binf).resolve()
 
-    print(binf)
+    target = {"name": "UNDEFINED", "core": "UNDEFINED"}
+
+    # find target name and type before processing
+    for part in PurePath(binf).parts:
+        if "CY" in part:
+            if "_M0_" in part:
+                target = {"name": part, "core": "cm0p"}
+            else:
+                target = {"name": part, "core": "cm4"}
 
     # create binary file from mbed elf for the following processing
     subprocess.Popen(["arm-none-eabi-objcopy.exe", str(mbed_elf_path),
@@ -186,24 +200,34 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
     binf_signed = binf[:-4] + "_signed.bin"
 
     # gather arguments for signature command invoking
-    sign_args = collect_args(image_slot="boot1")
+    if target["name"] != "UNDEFINED":
+        sign_args = collect_args(toolchain, image_slot="boot1", target_type=target)
+    else:
+        toolchain.notify.tool_error("[PSOC6.sign_image hook message] ERROR: Target not found!")
+        exit(1)
 
     # call imgtool for signature
     process = subprocess.Popen(["python.exe", sign_args.get("imgtool"), "sign", "--key", sign_args.get("priv_key"),
-                               "--header-size", sign_args.get("header_size"), "--pad-header", "--align",
-                               sign_args.get("align"), "--version", sign_args.get("version"), "--image-id",
-                               sign_args.get("id"), "--rollback_counter", sign_args.get("rollback_counter"),
-                               "--slot-size", sign_args.get("slot_size"), "--overwrite-only", binf, binf_signed],
+                                "--header-size", sign_args.get("header_size"), "--pad-header", "--align",
+                                sign_args.get("align"), "--version", sign_args.get("version"), "--image-id",
+                                sign_args.get("id"), "--rollback_counter", sign_args.get("rollback_counter"),
+                                "--slot-size", sign_args.get("slot_size"), "--overwrite-only", binf, binf_signed],
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    # catch stderr, stdout outputs
+    # catch stderr outputs
     stderr = process.communicate()
-    if stderr:
-        print("[PSOC6.sign_image hook message] - " + str(stderr))
+    if stderr[1].decode("utf-8"):
+        toolchain.notify.tool_error("[PSOC6.sign_image hook message] ERROR: Signature is not added!")
+        toolchain.notify.tool_error("[PSOC6.sign_image hook message] Message from imgtool: " + stderr[1].decode("utf-8"))
+        raise Exception("imgtool finished execution with errors!")
+    else:
+        toolchain.notify.info("[PSOC6.sign_image hook message] SUCCESS: Image is signed with no errors!")
 
+    # TODO: resolve --image-base address gathering as parameter, not a constant
     # convert signed image binary back to hex format
-    subprocess.Popen(["arm-none-eabi-objcopy.exe", "--image-base", "0x10600400",
+    subprocess.Popen(["arm-none-eabi-objcopy.exe", "--image-base", "0x10000400",  # 0x10600400 for PSA M0
                       "-I", "binary", "-O", "ihex", binf_signed, str(mbed_hex_path)])
+
 
 def complete(toolchain, elf0, hexf0, hexf1=None):
     complete_func(toolchain.notify.debug, elf0, hexf0, hexf1)
