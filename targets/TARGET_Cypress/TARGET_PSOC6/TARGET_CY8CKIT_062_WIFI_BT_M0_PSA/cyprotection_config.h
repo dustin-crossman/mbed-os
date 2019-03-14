@@ -26,7 +26,6 @@
 
 #include "cyprotection.h"
 
-<<<<<<< HEAD
 /* Add to M0_PSA target in targets.json:
  * - INITIAL_ROT_PROTECTION_AVAILABLE - to disable pc0 related protections
  *   enabling. They are enabled by ROT if availabe.
@@ -34,8 +33,6 @@
  *   enabling. They are enabled by a bootloader if availabe.
  */
 
-=======
->>>>>>> 857f6b90d430c1d51cee8e20de8f9cb06cf672e5
 /* Only 7 protection contexts are available in PSoC6-BLE2 */
 #define ALL_PROTECTION_CONTEXTS_MASK (CY_PROT_PCMASK1 + CY_PROT_PCMASK2 +\
 CY_PROT_PCMASK3 + CY_PROT_PCMASK4 + CY_PROT_PCMASK5 + CY_PROT_PCMASK6 +\
