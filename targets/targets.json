@@ -8012,7 +8012,7 @@
     "CY8CKIT_062_WIFI_BT_M0": {
         "inherits": ["MCU_PSOC6_M0"],
         "supported_form_factors": ["ARDUINO"],
-        "extra_labels_add": ["CY8C62XX", "CY8CKIT_062_WIFI_BT"],
+        "extra_labels_add": ["PSOC6_01", "CY8C62XX", "CY8CKIT_062_WIFI_BT"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "detect_code": ["1900"],
         "post_binary_hook": {
