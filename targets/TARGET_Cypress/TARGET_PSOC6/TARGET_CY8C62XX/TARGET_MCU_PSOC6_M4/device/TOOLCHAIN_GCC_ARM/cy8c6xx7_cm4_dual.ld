@@ -41,19 +41,19 @@ GROUP(-lgcc -lc -lnosys)
 ENTRY(Reset_Handler)
 
 #if !defined(MBED_ROM_START)
-  #define MBED_ROM_START    0x10080000
+  #define MBED_ROM_START    0x10002000
 #endif
 
 #if !defined(MBED_ROM_SIZE)
-  #define MBED_ROM_SIZE     0x78000
+  #define MBED_ROM_SIZE     0x000FE000
 #endif
 
 #if !defined(MBED_RAM_START)
-  #define MBED_RAM_START    0x08010000
+  #define MBED_RAM_START    0x08002000
 #endif
 
 #if !defined(MBED_RAM_SIZE)
-  #define MBED_RAM_SIZE     0x37500
+  #define MBED_RAM_SIZE     0x00045800
 #endif
 
 #if !defined(MBED_BOOT_STACK_SIZE)
