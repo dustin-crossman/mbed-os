@@ -202,7 +202,6 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
     # gather arguments for signature command invoking
     if target["name"] != "UNDEFINED":
         sign_args = collect_args(toolchain, image_slot="boot1", target_type=target)
-        print(sign_args)
     else:
         toolchain.notify.tool_error("[PSOC6.sign_image hook message] ERROR: Target not found!")
         exit(1)
