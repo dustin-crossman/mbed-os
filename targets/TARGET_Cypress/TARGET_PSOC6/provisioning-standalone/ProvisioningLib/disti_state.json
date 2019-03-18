@@ -1,0 +1,17 @@
+{
+    "disti_priv_key": {
+        "crv": "P-256",
+        "d": "OVYPrgLM_7xNomT0-TIzL6OEM7pv5O8_eSlUdVJQg0Q",
+        "kty": "EC",
+        "use": "sig",
+        "x": "EN7Ve9fqyRkJf640eT7YTuFdL86N01p-dZvoc_XyLXE",
+        "y": "yti7KnBceJO6TxMHFFRtXbEEelxXMFxay_JW-TMNXDE"
+    },
+    "disti_pub_key": {
+        "crv": "P-256",
+        "kty": "EC",
+        "use": "sig",
+        "x": "EN7Ve9fqyRkJf640eT7YTuFdL86N01p-dZvoc_XyLXE",
+        "y": "yti7KnBceJO6TxMHFFRtXbEEelxXMFxay_JW-TMNXDE"
+    }
+}

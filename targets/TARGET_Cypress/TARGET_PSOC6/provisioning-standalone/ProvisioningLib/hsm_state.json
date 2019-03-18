@@ -1,0 +1,330 @@
+{
+    "hsm_priv_key": {
+        "crv": "P-256",
+        "d": "9PKd6gzQwllkFS3w_P5ToF4IiMoGhkAaw4xP2ryCWiA",
+        "kty": "EC",
+        "use": "sig",
+        "x": "RwJkj6BwfymE2SBrBrOM9ZbK07GgkODXauXoOCP48FM",
+        "y": "XHgw6LKQxTL82y9veYAfbpP_CM9N6JiLSwMNFuX5Muo"
+    },
+    "hsm_pub_key": {
+        "crv": "P-256",
+        "kty": "EC",
+        "use": "sig",
+        "x": "RwJkj6BwfymE2SBrBrOM9ZbK07GgkODXauXoOCP48FM",
+        "y": "XHgw6LKQxTL82y9veYAfbpP_CM9N6JiLSwMNFuX5Muo"
+    },
+    "disti_pub_key": {
+        "crv": "P-256",
+        "kty": "EC",
+        "use": "sig",
+        "x": "EN7Ve9fqyRkJf640eT7YTuFdL86N01p-dZvoc_XyLXE",
+        "y": "yti7KnBceJO6TxMHFFRtXbEEelxXMFxay_JW-TMNXDE"
+    },
+    "disti_auth": "eyJhbGciOiJFUzI1NiJ9.eyJkaXN0aV9wdWJfa2V5Ijp7ImNydiI6IlAtMjU2Iiwia3R5IjoiRUMiLCJ1c2UiOiJzaWciLCJ4IjoiRU43VmU5ZnF5UmtKZjY0MGVUN1lUdUZkTDg2TjAxcC1kWnZvY19YeUxYRSIsInkiOiJ5dGk3S25CY2VKTzZUeE1IRkZSdFhiRUVlbHhYTUZ4YXlfSlctVE1OWERFIn0sImV4cCI6MTU3Nzc0MzIwMCwiaHNtX3B1Yl9rZXkiOnsiY3J2IjoiUC0yNTYiLCJrdHkiOiJFQyIsInVzZSI6InNpZyIsIngiOiJSd0prajZCd2Z5bUUyU0JyQnJPTTlaYkswN0dna09EWGF1WG9PQ1A0OEZNIiwieSI6IlhIZ3c2TEtReFRMODJ5OXZlWUFmYnBQX0NNOU42SmlMU3dNTkZ1WDVNdW8ifSwidHlwZSI6IkRJU1RJX0FVVEhfSFNNIn0.SfJh-15hMRlnKisBIaE4uHAEQN0WhwOOiJcSw7MpygmfOfJl2m9IvW06XLxY0wAjyvFtJeztwojMwyQy3IhJPw",
+    "disti_auth_readable": {
+        "protected": {
+            "alg": "ES256"
+        },
+        "payload": {
+            "disti_pub_key": {
+                "crv": "P-256",
+                "kty": "EC",
+                "use": "sig",
+                "x": "EN7Ve9fqyRkJf640eT7YTuFdL86N01p-dZvoc_XyLXE",
+                "y": "yti7KnBceJO6TxMHFFRtXbEEelxXMFxay_JW-TMNXDE"
+            },
+            "exp": "2019-12-31 00:00:00",
+            "hsm_pub_key": {
+                "crv": "P-256",
+                "kty": "EC",
+                "use": "sig",
+                "x": "RwJkj6BwfymE2SBrBrOM9ZbK07GgkODXauXoOCP48FM",
+                "y": "XHgw6LKQxTL82y9veYAfbpP_CM9N6JiLSwMNFuX5Muo"
+            },
+            "type": "DISTI_AUTH_HSM"
+        },
+        "signature": "SfJh-15hMRlnKisBIaE4uHAEQN0WhwOOiJcSw7MpygmfOfJl2m9IvW06XLxY0wAjyvFtJeztwojMwyQy3IhJPw"
+    },
+    "cy_pub_key": {
+        "crv": "P-256",
+        "kid": "3",
+        "kty": "EC",
+        "use": "sig",
+        "x": "Sb8lTpy_pd3NrUTkhIzg2jzM37uNqNiut8WC-Qv3XMQ",
+        "y": "CtwCi4arXsjED5TVmr_vPlP2ke133KK7lP7Sz_IZiDE"
+    },
+    "cy_auth": "eyJhbGciOiJFUzI1NiJ9.eyJhdXRoIjp7fSwiY3lfcHViX2tleSI6eyJjcnYiOiJQLTI1NiIsImtpZCI6IjMiLCJrdHkiOiJFQyIsInVzZSI6InNpZyIsIngiOiJTYjhsVHB5X3BkM05yVVRraEl6ZzJqek0zN3VOcU5pdXQ4V0MtUXYzWE1RIiwieSI6IkN0d0NpNGFyWHNqRUQ1VFZtcl92UGxQMmtlMTMzS0s3bFA3U3pfSVppREUifSwiZXhwIjoxNTc3NzQzMjAwLCJoc21fcHViX2tleSI6eyJjcnYiOiJQLTI1NiIsImt0eSI6IkVDIiwidXNlIjoic2lnIiwieCI6IlJ3SmtqNkJ3ZnltRTJTQnJCck9NOVpiSzA3R2drT0RYYXVYb09DUDQ4Rk0iLCJ5IjoiWEhndzZMS1F4VEw4Mnk5dmVZQWZicFBfQ005TjZKaUxTd01ORnVYNU11byJ9LCJpYXQiOjE1NTI2NjI5NTUsInR5cGUiOiJDWV9BVVRIX0hTTSJ9._KO-xHD2efq-5E7rj9NVeiQPhar4OeF_M18D5vjME_ye6xbK0oyzW60f4lVpomP255k7Z8evXWYlvMYi4XpxCQ",
+    "cy_auth_readable": {
+        "protected": {
+            "alg": "ES256"
+        },
+        "payload": {
+            "auth": {},
+            "cy_pub_key": {
+                "crv": "P-256",
+                "kid": "3",
+                "kty": "EC",
+                "use": "sig",
+                "x": "Sb8lTpy_pd3NrUTkhIzg2jzM37uNqNiut8WC-Qv3XMQ",
+                "y": "CtwCi4arXsjED5TVmr_vPlP2ke133KK7lP7Sz_IZiDE"
+            },
+            "exp": "2019-12-31 00:00:00",
+            "hsm_pub_key": {
+                "crv": "P-256",
+                "kty": "EC",
+                "use": "sig",
+                "x": "RwJkj6BwfymE2SBrBrOM9ZbK07GgkODXauXoOCP48FM",
+                "y": "XHgw6LKQxTL82y9veYAfbpP_CM9N6JiLSwMNFuX5Muo"
+            },
+            "iat": "2019-03-15 17:15:55",
+            "type": "CY_AUTH_HSM"
+        },
+        "signature": "_KO-xHD2efq-5E7rj9NVeiQPhar4OeF_M18D5vjME_ye6xbK0oyzW60f4lVpomP255k7Z8evXWYlvMYi4XpxCQ"
+    },
+    "products": {
+        "my_thing": {
+            "iat": 1552662956,
+            "signing_priv_key": {
+                "crv": "P-256",
+                "d": "28gtlJfCJ2E3PiopnMGrNDpHHqL_dp5uiDPJK-ECx08",
+                "kty": "EC",
+                "use": "sig",
+                "x": "NBzwhoMIBa9nyF-LYnAHp8IzGHDX7s_-2_4ECbdAYT4",
+                "y": "5EK9DZawI4nAvSdncXvW55qS00fIYveaTbX_IzzCbHo"
+            },
+            "signing_pub_key": {
+                "crv": "P-256",
+                "kty": "EC",
+                "use": "sig",
+                "x": "NBzwhoMIBa9nyF-LYnAHp8IzGHDX7s_-2_4ECbdAYT4",
+                "y": "5EK9DZawI4nAvSdncXvW55qS00fIYveaTbX_IzzCbHo"
+            },
+            "oem_pub_key": {
+                "crv": "P-256",
+                "kid": "5",
+                "kty": "EC",
+                "use": "sig",
+                "x": "vfb7_jewTxpFVINcXdrZQJBArC5igrN0BLc783FigrM",
+                "y": "9rBBUKXzpj1A5K7fxPtEaJdsfo7Jj_wsF7LTZLc-sPM"
+            },
+            "rot_auth": "eyJhbGciOiJFUzI1NiJ9.eyJoc21fcHViX2tleSI6eyJjcnYiOiJQLTI1NiIsImt0eSI6IkVDIiwidXNlIjoic2lnIiwieCI6IlJ3SmtqNkJ3ZnltRTJTQnJCck9NOVpiSzA3R2drT0RYYXVYb09DUDQ4Rk0iLCJ5IjoiWEhndzZMS1F4VEw4Mnk5dmVZQWZicFBfQ005TjZKaUxTd01ORnVYNU11byJ9LCJpYXQiOjE1NTI2NjI5NTYsIm9lbV9wdWJfa2V5Ijp7ImNydiI6IlAtMjU2Iiwia2lkIjoiNSIsImt0eSI6IkVDIiwidXNlIjoic2lnIiwieCI6InZmYjdfamV3VHhwRlZJTmNYZHJaUUpCQXJDNWlnck4wQkxjNzgzRmlnck0iLCJ5IjoiOXJCQlVLWHpwajFBNUs3ZnhQdEVhSmRzZm83Smpfd3NGN0xUWkxjLXNQTSJ9LCJwcm9kX2lkIjoibXlfdGhpbmciLCJ0eXBlIjoiT0VNX1JPVF9BVVRIIn0.E0cC-H-Afj83_wxQeUvdShaN47-OUYc16rdx2KrGyiD_edXeZf59Ow_kAdC-yc7NtTU3bnVXxdHlIfwDgCPHVg",
+            "rot_auth_readable": {
+                "protected": {
+                    "alg": "ES256"
+                },
+                "payload": {
+                    "hsm_pub_key": {
+                        "crv": "P-256",
+                        "kty": "EC",
+                        "use": "sig",
+                        "x": "RwJkj6BwfymE2SBrBrOM9ZbK07GgkODXauXoOCP48FM",
+                        "y": "XHgw6LKQxTL82y9veYAfbpP_CM9N6JiLSwMNFuX5Muo"
+                    },
+                    "iat": "2019-03-15 17:15:56",
+                    "oem_pub_key": {
+                        "crv": "P-256",
+                        "kid": "5",
+                        "kty": "EC",
+                        "use": "sig",
+                        "x": "vfb7_jewTxpFVINcXdrZQJBArC5igrN0BLc783FigrM",
+                        "y": "9rBBUKXzpj1A5K7fxPtEaJdsfo7Jj_wsF7LTZLc-sPM"
+                    },
+                    "prod_id": "my_thing",
+                    "type": "OEM_ROT_AUTH"
+                },
+                "signature": "E0cC-H-Afj83_wxQeUvdShaN47-OUYc16rdx2KrGyiD_edXeZf59Ow_kAdC-yc7NtTU3bnVXxdHlIfwDgCPHVg"
+            },
+            "chain_of_trust": [
+                "CertificateToBeDone(die_id=None,dev_id=None,prod_id=my_thing)"
+            ],
+            "prov_req": "eyJhbGciOiJFUzI1NiJ9.eyJib290X3VwZ3JhZGUiOnsiZmlybXdhcmUiOlt7ImJhY2t1cCI6ZmFsc2UsImJvb3RfYXV0aCI6WzNdLCJpZCI6MCwibGF1bmNoIjo0LCJtb25vdG9uaWMiOjAsInJlc291cmNlcyI6W3siYWRkcmVzcyI6MjY5MDkwODE2LCJzaXplIjoxMzEwNzIsInR5cGUiOiJGTEFTSF9QQzFfU1BNIn0seyJhZGRyZXNzIjoxMzQzNDg4MDAsInNpemUiOjUzMjQ4LCJ0eXBlIjoiU1JBTV9TUE1fUFJJViJ9XSwidXBncmFkZSI6dHJ1ZSwidXBncmFkZV9hdXRoIjpbM119LHsiYmFja3VwIjpmYWxzZSwiYm9vdF9hdXRoIjpbOF0sImlkIjo0LCJtb25vdG9uaWMiOjAsInJlc291cmNlcyI6W3siYWRkcmVzcyI6MjY4NDM1NDU2LCJzaXplIjoxMzEwNzIsInR5cGUiOiJCT09UIn0seyJhZGRyZXNzIjoyNjg3NjMxMzYsInNpemUiOjEzMTA3MiwidHlwZSI6IlVQR1JBREUifV0sInVwZ3JhZGUiOnRydWUsInVwZ3JhZGVfYXV0aCI6WzhdfV0sInJlcHJvZ3JhbSI6W3sic2l6ZSI6OTE3NTA0LCJzdGFydCI6MjY4NDM1NDU2fSx7InNpemUiOjEzMTA3Miwic3RhcnQiOjI2ODgyODY3Mn1dLCJyZXByb3Zpc2lvbiI6eyJib290X2xvYWRlciI6ZmFsc2UsImtleXNfYW5kX3BvbGljaWVzIjp0cnVlfSwidGl0bGUiOiJ1cGdyYWRlX3BvbGljeSJ9LCJjdXN0b21fcHViX2tleSI6W3siY3J2IjoiUC0yNTYiLCJraWQiOiI2Iiwia3R5IjoiRUMiLCJ1c2UiOiJzaWciLCJ4IjoiamE3S2tzRUhNb3JUV3lKNnBMNFhnNXZiSmZSRTUtaTNodkRPNEpXakhpNCIsInkiOiJRbVp3a19JUXgyQ3BlV0RQVlRDTk9ISkVNVnZwU2dXdVRHOVdwel9naUQ4In0seyJjcnYiOiJQLTI1NiIsImtpZCI6IjciLCJrdHkiOiJFQyIsInVzZSI6InNpZyIsIngiOiJhcm40VnQ0YTVKa1FySEcwVzZ2U09icXpCYVB2X2hQcmlJWTBoa3BRMV9zIiwieSI6IlNReVNMNHJwSlBNRERpVGJmTFR3a0VzdFNEWnRSVjVDNGlhVUJrLUpJMzgifSx7ImNydiI6IlAtMjU2Iiwia2lkIjoiOCIsImt0eSI6IkVDIiwidXNlIjoic2lnIiwieCI6IlBDZjdrTkQyQ0VlWDZJVGFGS1B0Rktxd2dSb2o2eExPQnYyVnBndWZrLTAiLCJ5Ijoib0RRSU1qR3dsSFFzMWFneWpwNElnX1NZeXB4RlFJeGJzakVwR0dyUDRwWSJ9LHsiY3J2IjoiUC0yNTYiLCJraWQiOiI5Iiwia3R5IjoiRUMiLCJ1c2UiOiJzaWciLCJ4IjoiMTVpQWVOM2UwdTVjSnNoSU5jMmxuOHJMYzk0RERQd0lCNmtlMVVIRHNtbyIsInkiOiJnaGN0bjJHd2dtSjFIeU5nX1BEU1A0d2VuMDBBNENaaWFZSC1QaG93N2gwIn0seyJjcnYiOiJQLTI1NiIsImtpZCI6IjEwIiwia3R5IjoiRUMiLCJ1c2UiOiJzaWciLCJ4IjoiWTFoT0hhTmVKbUZ4NU0xV0xqZDRGajFBcFo2WXFCQmp0NFdQTmFnaTF0dyIsInkiOiJ1WW9QU213NlFEUl9XbGVJMG1ORUE0VWNFSlpGbmlUUktxVXJPWDNJTjhzIn1dLCJkZWJ1ZyI6eyJtMHAiOnsiY29udHJvbCI6ImNlcnRpZmljYXRlIiwia2V5IjoxLCJwZXJtaXNzaW9uIjoiZW5hYmxlZCJ9LCJtNCI6eyJjb250cm9sIjoib3BlbiIsImtleSI6MiwicGVybWlzc2lvbiI6ImVuYWJsZWQifSwicm1hIjp7ImRlc3Ryb3lfZmxhc2giOlt7InNpemUiOjAsInN0YXJ0IjoyNjg0MzU0NTZ9XSwiZGVzdHJveV9mdXNlcyI6W3sic2l6ZSI6Miwic3RhcnQiOjk2OH0seyJzaXplIjoyLCJzdGFydCI6OTc0fV0sImtleSI6MiwicGVybWlzc2lvbiI6ImFsbG93ZWQifSwic3lzdGVtIjp7ImNvbnRyb2wiOiJvcGVuIiwiZmxhc2giOnRydWUsImtleSI6MSwibW1pbyI6ZmFsc2UsInBlcm1pc3Npb24iOiJlbmFibGVkIiwic2ZsYXNoIjp0cnVlLCJzcmFtIjpmYWxzZSwic3lzY2FsbCI6dHJ1ZSwid29ya2ZsYXNoIjpmYWxzZX19LCJwcm9kX2lkIjoibXlfdGhpbmciLCJ3b3VuZGluZyI6eyJtZW1vcmllcyI6eyJmbGFzaCI6MTA0ODU3Niwic2ZsYXNoIjozMjc2OCwic3JhbSI6Mjk0OTEyLCJ3b3JrZmxhc2giOjMyNzY4fSwicGVyaXBoZXJhbHMiOlt7ImJhc2VfYWRkcmVzcyI6MTA3NzY3Mzk4NCwiaWQiOjEsInRpdGxlIjoiQkxFIn1dLCJzb2Z0d2FyZSI6W3siY2FwYWJpbGl0eSI6MiwiaWQiOjF9XSwidGl0bGUiOiJ3b3VuZGluZ19wb2xpY3kifX0.mUemh3sSwJ00KZJeYyTIst_hgf_qUqVKrOV01BHepAs2Pjl7M2bY-JpC8V_RavB96tZi-aKe9zo2IWSLPGEbZA",
+            "prov_req_readable": {
+                "protected": {
+                    "alg": "ES256"
+                },
+                "payload": {
+                    "boot_upgrade": {
+                        "firmware": [
+                            {
+                                "backup": false,
+                                "boot_auth": [
+                                    3
+                                ],
+                                "id": 0,
+                                "launch": 4,
+                                "monotonic": 0,
+                                "resources": [
+                                    {
+                                        "address": 269090816,
+                                        "size": 131072,
+                                        "type": "FLASH_PC1_SPM"
+                                    },
+                                    {
+                                        "address": 134348800,
+                                        "size": 53248,
+                                        "type": "SRAM_SPM_PRIV"
+                                    }
+                                ],
+                                "upgrade": true,
+                                "upgrade_auth": [
+                                    3
+                                ]
+                            },
+                            {
+                                "backup": false,
+                                "boot_auth": [
+                                    8
+                                ],
+                                "id": 4,
+                                "monotonic": 0,
+                                "resources": [
+                                    {
+                                        "address": 268435456,
+                                        "size": 131072,
+                                        "type": "BOOT"
+                                    },
+                                    {
+                                        "address": 268763136,
+                                        "size": 131072,
+                                        "type": "UPGRADE"
+                                    }
+                                ],
+                                "upgrade": true,
+                                "upgrade_auth": [
+                                    8
+                                ]
+                            }
+                        ],
+                        "reprogram": [
+                            {
+                                "size": 917504,
+                                "start": 268435456
+                            },
+                            {
+                                "size": 131072,
+                                "start": 268828672
+                            }
+                        ],
+                        "reprovision": {
+                            "boot_loader": false,
+                            "keys_and_policies": true
+                        },
+                        "title": "upgrade_policy"
+                    },
+                    "custom_pub_key": [
+                        {
+                            "crv": "P-256",
+                            "kid": "6",
+                            "kty": "EC",
+                            "use": "sig",
+                            "x": "ja7KksEHMorTWyJ6pL4Xg5vbJfRE5-i3hvDO4JWjHi4",
+                            "y": "QmZwk_IQx2CpeWDPVTCNOHJEMVvpSgWuTG9Wpz_giD8"
+                        },
+                        {
+                            "crv": "P-256",
+                            "kid": "7",
+                            "kty": "EC",
+                            "use": "sig",
+                            "x": "arn4Vt4a5JkQrHG0W6vSObqzBaPv_hPriIY0hkpQ1_s",
+                            "y": "SQySL4rpJPMDDiTbfLTwkEstSDZtRV5C4iaUBk-JI38"
+                        },
+                        {
+                            "crv": "P-256",
+                            "kid": "8",
+                            "kty": "EC",
+                            "use": "sig",
+                            "x": "PCf7kND2CEeX6ITaFKPtFKqwgRoj6xLOBv2Vpgufk-0",
+                            "y": "oDQIMjGwlHQs1agyjp4Ig_SYypxFQIxbsjEpGGrP4pY"
+                        },
+                        {
+                            "crv": "P-256",
+                            "kid": "9",
+                            "kty": "EC",
+                            "use": "sig",
+                            "x": "15iAeN3e0u5cJshINc2ln8rLc94DDPwIB6ke1UHDsmo",
+                            "y": "ghctn2GwgmJ1HyNg_PDSP4wen00A4CZiaYH-Phow7h0"
+                        },
+                        {
+                            "crv": "P-256",
+                            "kid": "10",
+                            "kty": "EC",
+                            "use": "sig",
+                            "x": "Y1hOHaNeJmFx5M1WLjd4Fj1ApZ6YqBBjt4WPNagi1tw",
+                            "y": "uYoPSmw6QDR_WleI0mNEA4UcEJZFniTRKqUrOX3IN8s"
+                        }
+                    ],
+                    "debug": {
+                        "m0p": {
+                            "control": "certificate",
+                            "key": 1,
+                            "permission": "enabled"
+                        },
+                        "m4": {
+                            "control": "open",
+                            "key": 2,
+                            "permission": "enabled"
+                        },
+                        "rma": {
+                            "destroy_flash": [
+                                {
+                                    "size": 0,
+                                    "start": 268435456
+                                }
+                            ],
+                            "destroy_fuses": [
+                                {
+                                    "size": 2,
+                                    "start": 968
+                                },
+                                {
+                                    "size": 2,
+                                    "start": 974
+                                }
+                            ],
+                            "key": 2,
+                            "permission": "allowed"
+                        },
+                        "system": {
+                            "control": "open",
+                            "flash": true,
+                            "key": 1,
+                            "mmio": false,
+                            "permission": "enabled",
+                            "sflash": true,
+                            "sram": false,
+                            "syscall": true,
+                            "workflash": false
+                        }
+                    },
+                    "prod_id": "my_thing",
+                    "wounding": {
+                        "memories": {
+                            "flash": 1048576,
+                            "sflash": 32768,
+                            "sram": 294912,
+                            "workflash": 32768
+                        },
+                        "peripherals": [
+                            {
+                                "base_address": 1077673984,
+                                "id": 1,
+                                "title": "BLE"
+                            }
+                        ],
+                        "software": [
+                            {
+                                "capability": 2,
+                                "id": 1
+                            }
+                        ],
+                        "title": "wounding_policy"
+                    }
+                },
+                "signature": "mUemh3sSwJ00KZJeYyTIst_hgf_qUqVKrOV01BHepAs2Pjl7M2bY-JpC8V_RavB96tZi-aKe9zo2IWSLPGEbZA"
+            },
+            "prov_req_cnt": 99,
+            "prov_req_exp": 1577743200
+        }
+    }
+}

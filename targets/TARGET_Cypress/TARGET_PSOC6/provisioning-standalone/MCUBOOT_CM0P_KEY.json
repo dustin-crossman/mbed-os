@@ -1,0 +1,19 @@
+{
+    "custom_priv_key": {
+        "crv": "P-256",
+        "d": "k2GdriAC1LdxHUnG784kM2rXdYRXiwT9F4kHyKuyx1A",
+        "kty": "EC",
+        "use": "sig",
+        "x": "p4gIeUZU3fqNJNxmWbvBb_tGq8WxBk1phGqqQ9NKzVc",
+        "y": "SZZ2XNz-Q4QaQVyAJRSfkYYjEh9nKU4grhIrc0EW3-A",
+        "kid": "6"
+    },
+    "custom_pub_key": {
+        "crv": "P-256",
+        "kty": "EC",
+        "use": "sig",
+        "x": "p4gIeUZU3fqNJNxmWbvBb_tGq8WxBk1phGqqQ9NKzVc",
+        "y": "SZZ2XNz-Q4QaQVyAJRSfkYYjEh9nKU4grhIrc0EW3-A",
+        "kid": "6"
+    }
+}
