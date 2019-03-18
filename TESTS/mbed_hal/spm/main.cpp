@@ -24,7 +24,7 @@
 #endif
 
 #if defined(TARGET_FUTURE_SEQUANA_PSA)
-#error [NOT_SUPPORTED] Disable this Test until FUTURE_SEQUANA_PSA enable Memory protection
+#error [NOT_SUPPORTED] Disable this Test until FUTURE_SEQUANA_PSA enables Memory protection
 #endif
 
 #if defined(__CORTEX_M33)

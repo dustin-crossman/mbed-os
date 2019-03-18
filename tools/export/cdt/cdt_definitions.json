@@ -73,6 +73,14 @@
       }
     },
 
+    "CY8CPROTO_064_SB": {
+      "generic": {
+        "gdbServerGdbPortNumber": 3334,
+        "gdbServerOther": "-p 3333&#13;&#10;--no-deprecation-warning",
+        "corePortNumber": 3334
+      }
+    },
+
     "CY8CKIT_062_BLE": {
       "generic": {
         "gdbServerGdbPortNumber": 3334,

@@ -4095,7 +4095,7 @@
         "device_name": "STM32L476VG",
         "bootloader_supported": true
     },
-	"RHOMBIO_L476DMW1K": {
+   "RHOMBIO_L476DMW1K": {
         "components_add": ["FLASHIAP"],
         "inherits": ["FAMILY_STM32"],
         "core": "Cortex-M4F",
@@ -7956,11 +7956,11 @@
             "SLEEP",
             "USTICKER",
             "MPU"
-        ],
-        "device_name": "TMPM4G9F15FG",
-        "detect_code": ["7015"],
-        "release_versions": ["5"],
-        "bootloader_supported": true
+       ],
+       "device_name": "TMPM4G9F15FG",
+       "detect_code": ["7015"],
+       "release_versions": ["5"],
+       "bootloader_supported": true
     },
     "MCU_PSOC6": {
         "inherits": ["Target"],
@@ -8082,6 +8082,87 @@
             "shared-ram-start": "0x08047500",
             "shared-ram-size": "0x100",
             "public-ram-start": "0x08047600",
+            "public-ram-size": "0x200"
+        }
+    },
+    "CY8CPROTO_064_SB_M0": {
+        "inherits": ["MCU_PSOC6_M0"],
+        "supported_form_factors": ["ARDUINO"],
+        "extra_labels_add": ["CY8C62XX", "CY8CPROTO_064_SB"],
+        "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
+        "detect_code": ["1900"],
+        "post_binary_hook": {
+            "function": "PSOC6Code.complete"
+        }
+    },
+    "CY8CPROTO_064_SB": {
+        "inherits": ["MCU_PSOC6_M4"],
+        "features": ["BLE"],
+        "supported_form_factors": ["ARDUINO"],
+        "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW4343X", "CORDIO", "CY8C62XX"],
+        "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
+        "detect_code": ["1900"],
+        "post_binary_hook": {
+            "function": "PSOC6Code.sign_image"
+        },
+        "overrides": {
+            "network-default-interface-type": "WIFI"
+        }
+    },
+    "CY8CPROTO_064_SB_M0_PSA": {
+        "inherits": ["SPE_Target", "CY8CPROTO_064_SB_M0"],
+        "components_add": ["SPM_MAILBOX", "FLASHIAP"],
+        "extra_labels_add": ["PSA", "MBED_SPM"],
+        "macros_add": [
+            "MBED_TICKLESS",
+            "MBEDTLS_PSA_CRYPTO_SPM",
+            "MBEDTLS_PSA_CRYPTO_C",
+            "MBEDTLS_ENTROPY_NV_SEED",
+            "CY_IPC_DEFAULT_CFG_DISABLE",
+            "PU_ENABLE"
+        ],
+        "deliver_to_target": "CY8CPROTO_064_SB_PSA",
+        "delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_CY8CPROTO_064_SB_PSA/prebuilt",
+        "post_binary_hook": {
+            "function": "PSOC6Code.sign_image"
+        },
+        "overrides": {
+            "secure-rom-start": "0x10060400",
+            "secure-rom-size": "0x40000",
+            "non-secure-rom-start": "0x10000000",
+            "non-secure-rom-size": "0x60000",
+            "secure-ram-start": "0x08020000",
+            "secure-ram-size": "0xD000",
+            "non-secure-ram-start": "0x08000000",
+            "non-secure-ram-size": "0x20000",
+            "shared-ram-start": "0x0802D000",
+            "shared-ram-size": "0x100",
+            "public-ram-start": "0x0802D100", 
+            "public-ram-size": "0x200"
+        }
+    },
+    "CY8CPROTO_064_SB_PSA": {
+        "inherits": ["NSPE_Target", "CY8CPROTO_064_SB"],
+        "extra_labels_add": ["PSA", "MBED_SPM"],
+        "components_add": ["SPM_MAILBOX", "FLASHIAP"],
+        "device_has_remove": ["TRNG", "CRC"],
+        "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
+        "hex_filename": "psa_release_1.0.hex",
+        "post_binary_hook": {
+            "function": "PSOC6Code.complete"
+        },
+        "overrides": {
+            "secure-rom-start": "0x10060400",
+            "secure-rom-size": "0x40000",
+            "non-secure-rom-start": "0x10000000",
+            "non-secure-rom-size": "0x60000",
+            "secure-ram-start": "0x08020000",
+            "secure-ram-size": "0xD000",
+            "non-secure-ram-start": "0x08000000",
+            "non-secure-ram-size": "0x20000",
+            "shared-ram-start": "0x0802D000",
+            "shared-ram-size": "0x100",
+            "public-ram-start": "0x0802D100", 
             "public-ram-size": "0x200"
         }
     },
@@ -8440,15 +8521,15 @@
         "detect_code": ["1703"],
         "macros_add": ["GD32E10X"],
         "release_versions": ["5"]
-	},
+   },
     "TT_M4G9": {
-		"inherits": ["Target"],
-		"core": "Cortex-M4",
-		"is_disk_virtual": true,
-		"extra_labels": ["TT"],
-		"macros": ["__TT_M4G9__"],
-		"supported_toolchains": ["GCC_ARM", "ARM", "IAR"],
-		"device_has": ["USTICKER",
+       "inherits": ["Target"],
+       "core": "Cortex-M4",
+       "is_disk_virtual": true,
+       "extra_labels": ["TT"],
+       "macros": ["__TT_M4G9__"],
+       "supported_toolchains": ["GCC_ARM", "ARM", "IAR"],
+       "device_has": ["USTICKER",
                    "RESET_REASON",
                    "ANALOGIN",
                    "ANALOGOUT",
@@ -8465,11 +8546,11 @@
                    "STDIO_MESSAGES",
                    "FLASH",
                    "MPU"
-		],
-		"device_name": "TMPM4G9F15FG",
-		"detect_code": ["8013"],
-		"release_versions": ["5"],
-		"bootloader_supported": true
+        ],
+        "device_name": "TMPM4G9F15FG",
+        "detect_code": ["8013"],
+        "release_versions": ["5"],
+        "bootloader_supported": true
     },
     "__build_tools_metadata__": {
         "version": "1",

@@ -69,7 +69,7 @@ STACK_SIZE = MBED_BOOT_STACK_SIZE;
 * option.
 */
 EXTERN(Reset_Handler)
-
+EXTERN(uxTopUsedPriority) /*rnok: This symbol is needed to support debugging */
 /* The MEMORY section below describes the location and size of blocks of memory in the target.
 * Use this section to specify the memory regions available for allocation.
 */

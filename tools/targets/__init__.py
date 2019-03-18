@@ -599,6 +599,12 @@ class PSOC6Code:
         else:
             psoc6_complete(t_self, elf, binf)
 
+    @staticmethod
+    def sign_image(t_self, resources, elf, binf):
+        from tools.targets.PSOC6 import sign_image as psoc6_sign_image
+
+        psoc6_sign_image(t_self, resources, elf, binf)
+
 class LPC55S69Code:
     """LPC55S69 Hooks"""
     @staticmethod
