@@ -12,7 +12,7 @@ CUSTOM_STATE_NAME = 'customer_state.json'
 CY_AUTH_FILE = 'cy_auth.jwt'
 POLICY_FILE = 'policy.json'
 BOOTLOADER_JWT_FILE = 'cy_bootloader.jwt'
-INPUT_PATH = './ProvisioningLib'
+INPUT_PATH = './prebuild'
 oem_state_path = os.path.join(INPUT_PATH, OEM_STATE_NAME)
 hsm_state_path = os.path.join(INPUT_PATH, HSM_STATE_NAME)
 cust_key_path = os.path.join(INPUT_PATH, CUSTOM_STATE_NAME)
@@ -27,7 +27,7 @@ ROT_JWT_FILE = 'rot_cmd.jwt'
 PROV_JWT_FILE = 'prov_cmd.jwt'
 OEM_PUB_FILE = 'oem_pub_key.pem'
 OEM_PRIV_FILE = 'oem_priv_key.pem'
-output_path = './Packets/out'
+output_path = './prebuild/out'
 
 CUSTOMER_KEY_N = 5
 

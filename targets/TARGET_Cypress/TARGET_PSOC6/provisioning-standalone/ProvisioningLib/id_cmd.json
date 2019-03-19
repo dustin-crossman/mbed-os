@@ -1,1 +1,0 @@
-{"type": "CY_DEV_ID", "die_id": {"fab": 5, "lot": 26, "wafer": 40, "ypos": 321, "xpos": 456}, "dev_id": "dev_id", "cy_pub_key": {"crv": "P-256", "kty": "EC", "use": "sig", "kid": "3", "x": "Sb8lTpy_pd3NrUTkhIzg2jzM37uNqNiut8WC-Qv3XMQ", "y": "CtwCi4arXsjED5TVmr_vPlP2ke133KK7lP7Sz_IZiDE"}}
