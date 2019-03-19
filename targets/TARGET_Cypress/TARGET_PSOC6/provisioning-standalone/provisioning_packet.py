@@ -10,7 +10,6 @@ CYPROV_LIB_PATH = './provisioning-lib'
 # Default output values and pathes
 OEM_AUDIT_NAME = 'oem_log.json'
 HSM_AUDIT_NAME = 'hsm_log.json'
-ROT_JWT_FILE = 'rot_cmd.jwt'
 PROV_JWT_FILE = 'prov_cmd.jwt'
 
 CUSTOMER_KEY_N = 5
@@ -64,7 +63,6 @@ def main(oem_state_path, hsm_state_path, image_cert, cy_auth_path,
     
     oem_audit_path = os.path.join(output_path, OEM_AUDIT_NAME)
     hsm_audit_path = os.path.join(output_path, HSM_AUDIT_NAME)
-    rot_jwt_path = os.path.join(output_path, ROT_JWT_FILE)
     prov_jwt_path = os.path.join(output_path, PROV_JWT_FILE)
 
     if not os.path.exists(output_path):
@@ -84,11 +82,6 @@ def main(oem_state_path, hsm_state_path, image_cert, cy_auth_path,
             blob['custom_pub_key'] = [key.get_pub_key() for key in customer]
     
     prov_req = oem.create_provision_request(blob)
-    
-    rot_auth_pkg = oem.pack_rot_auth(prod_id, hsm.state['hsm_pub_key'])
-    
-    rot_cmd = hsm.pack_rot_command(prod_id, cy_auth_path, rot_auth_pkg)
-    crypto.dump_jwt(rot_cmd, rot_jwt_path)
     
     prov_cmd = hsm.pack_provision_cmd(
             cy_auth = cy_auth_path, 
