@@ -59,6 +59,10 @@ def process_customer_keys(paths):
               help='Customer key that will be used for image signing.')
 def main(oem_state_path, hsm_state_path, image_cert, cy_auth_path,
          policy_path, output_path, cust_key_path):
+
+    if len(cust_key_path) > CUSTOMER_KEY_N:
+        raise Exception('Maximum number of customer keys must be {}!'.format(CUSTOMER_KEY_N))
+
     prod_id = PROD_NAME
     
     oem_audit_path = os.path.join(output_path, OEM_AUDIT_NAME)
