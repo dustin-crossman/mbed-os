@@ -65,6 +65,8 @@ public:
 
     void bt_host_wake_irq_handler();
 
+    void on_host_stack_inactivity();
+
 private:
 private:
     void on_controller_irq();
