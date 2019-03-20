@@ -2,6 +2,7 @@
 
 compiler=$1
 TARGETS=$2
+profile=$3
 
 echo "compiler = $compiler"
 
@@ -17,13 +18,19 @@ fi
 set -ex
 
 TOOLCHAIN=$compiler
+if [[-z "$profile"]]; then
+    TOOLCHAIN_FROM_FOLDER="$TOOLCHAIN"
+else
+    TOOLCHAIN_FROM_FOLDER="$TOOLCHAIN-${profile^^}"
+fi
+
 mbed toolchain $TOOLCHAIN
 
 #
 # Generate libraries from object files
 #
 for target in $TARGETS;do
-    TARGET_OBJECTS=$(find ./BUILD/$target/$TOOLCHAIN/mbed-os/targets/TARGET_WICED_SRC/ -name \*.o)
+    TARGET_OBJECTS=$(find ./BUILD/$target/$TOOLCHAIN_FROM_FOLDER/mbed-os/targets/TARGET_WICED_SRC/ -name \*.o)
 
     md5sum $TARGET_OBJECTS
 

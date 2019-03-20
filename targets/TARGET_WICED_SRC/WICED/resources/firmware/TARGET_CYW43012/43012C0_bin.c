@@ -1,4 +1,5 @@
 #include "w_resources.h"
+#include "w_platform_toolchain.h"
 
 extern const resource_hnd_t wifi_firmware_image;
 
@@ -8,7 +9,7 @@ const resource_hnd_t wifi_firmware_image = {
     .val.mem.data = wifi_firmware_image_data,
 };
 
-const char wifi_firmware_image_data[] = {
+ALIGNED_PRE(32) const char wifi_firmware_image_data[] ALIGNED(32) = {
         0, 0, 0, 0, 37, 46, 0, 0, 25, 45, 0, 0, 25, 45, 0, 0, 25, 45, 0, 0,
         25, 45, 0, 0, 25, 45, 0, 0, 25, 45, 0, 0, 25, 45, 0, 0, 25, 45, 0, 0,
         25, 45, 0, 0, 221, 36, 0, 0, 25, 45, 0, 0, 25, 45, 0, 0, 221, 36, 0,
@@ -19229,4 +19230,5 @@ const char wifi_firmware_image_data[] = {
         32, 48, 49, 45, 51, 48, 48, 52, 48, 53, 51, 99, 0, 146, 0, 68, 86, 73,
         68, 32, 48, 49, 45, 57, 49, 98, 100, 49, 57, 53, 57
 };
-const int wifi_firmware_image_data_len = 337942;
+
+const int wifi_firmware_image_data_len = sizeof(wifi_firmware_image_data);
