@@ -4850,7 +4850,7 @@ inline wl_chanspec_t wwd_channel_to_wl_band( uint32_t channel )
     return ( ( (channel) <= CH_MAX_2G_CHANNEL ) ? WL_CHANSPEC_BAND_2G : WL_CHANSPEC_BAND_5G );
 }
 
-#if defined ( __CC_ARM )
+#if defined ( __ARMCC_VERSION )
 int strnlen(const char *s, int n)
 {
     char *end = memchr(s, 0, n);
