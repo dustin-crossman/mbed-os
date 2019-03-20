@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include <stdint.h>
+#include "w_platform_toolchain.h"
 #ifdef MODUSTOOLBOX
 #include "generated_mac_address.txt"
 #else
@@ -25,7 +26,7 @@ extern "C" {
  * Character array of NVRAM image
  */
 
-static const char wifi_nvram_image[] =
+ALIGNED_PRE(32) static const char wifi_nvram_image[] ALIGNED(32) =
         // # The following parameter values are just placeholders, need to be updated.
         "manfid=0x2d0"                                                       "\x00"
         "prodid=0x0726"                                                      "\x00"
