@@ -1,4 +1,5 @@
 #include "w_resources.h"
+#include "w_platform_toolchain.h"
 
 extern const resource_hnd_t wifi_firmware_clm_blob;
 
@@ -8,7 +9,7 @@ const resource_hnd_t wifi_firmware_clm_blob = {
     .val.mem.data = wifi_firmware_clm_blob_image_data,
 };
 
-const char wifi_firmware_clm_blob_image_data[] = {
+ALIGNED_PRE(32) const char wifi_firmware_clm_blob_image_data[] ALIGNED(32) = {
         66, 76, 79, 66, 60, 0, 0, 0, 80, 27, 100, 130, 1, 0, 0, 0, 2, 0, 0,
         0, 0, 0, 0, 0, 60, 0, 0, 0, 246, 27, 0, 0, 112, 22, 242, 170, 0, 0,
         0, 0, 0, 0, 0, 0, 50, 28, 0, 0, 4, 0, 0, 0, 42, 255, 237, 159, 0, 0,
@@ -386,4 +387,5 @@ const char wifi_firmware_clm_blob_image_data[] = {
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 1, 18, 1, 255, 1, 52, 1, 14,
         1, 15, 3, 28, 39, 49, 2, 19, 49, 166, 169, 0, 0
 };
-const int wifi_firmware_clm_blob_image_data_len = 7222;
+
+const int wifi_firmware_clm_blob_image_data_len = sizeof(wifi_firmware_clm_blob_image_data);
