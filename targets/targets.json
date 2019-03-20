@@ -8132,37 +8132,37 @@
             "non-secure-rom-start": "0x10000000",
             "non-secure-rom-size": "0x60000",
             "secure-ram-start": "0x08020000",
-            "secure-ram-size": "0xD000",
+            "secure-ram-size": "0xF000",
             "non-secure-ram-start": "0x08000000",
             "non-secure-ram-size": "0x20000",
-            "shared-ram-start": "0x0802D000",
+            "shared-ram-start": "0x0802F000",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0802D100", 
+            "public-ram-start": "0x0802F100", 
             "public-ram-size": "0x200"
         }
     },
+    "CY8CPROTO_064_SB_M0_PSA_MCUBOOT": {
+        "inherits": ["CY8CPROTO_064_SB_M0_PSA"],
+        "extra_labels_add": ["MCUBOOT"]
+    },    
     "CY8CPROTO_064_SB_PSA": {
         "inherits": ["NSPE_Target", "CY8CPROTO_064_SB"],
         "extra_labels_add": ["PSA", "MBED_SPM"],
         "components_add": ["SPM_MAILBOX", "FLASHIAP"],
         "device_has_remove": ["TRNG", "CRC"],
         "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
-        "hex_filename": "psa_release_1.0.hex",
-        "post_binary_hook": {
-            "function": "PSOC6Code.complete"
-        },
         "overrides": {
             "secure-rom-start": "0x10060400",
             "secure-rom-size": "0x40000",
             "non-secure-rom-start": "0x10000000",
             "non-secure-rom-size": "0x60000",
             "secure-ram-start": "0x08020000",
-            "secure-ram-size": "0xD000",
+            "secure-ram-size": "0xF000",
             "non-secure-ram-start": "0x08000000",
             "non-secure-ram-size": "0x20000",
-            "shared-ram-start": "0x0802D000",
+            "shared-ram-start": "0x0802F000",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0802D100", 
+            "public-ram-start": "0x0802F100", 
             "public-ram-size": "0x200"
         }
     },

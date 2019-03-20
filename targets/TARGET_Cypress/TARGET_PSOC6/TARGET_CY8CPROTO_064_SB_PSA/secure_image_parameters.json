@@ -1,0 +1,14 @@
+{   
+    "cm4" : {
+                "boot1" : { 
+                    "VERSION" : "0.1",
+                    "ROLLBACK_COUNTER" : "0",
+                    "IMAGE_ID" : "4",
+                    "SLOT_SIZE" : "0x50000",
+                    "PAD" : "--pad"
+                }
+            },
+
+    "sdk_path" : "mbed-os/targets/TARGET_Cypress/TARGET_PSOC6/provisioning-standalone/",
+    "priv_key_file": "provisioning-packet/USERAPP_CM4_KEY_PRIV.pem"
+}

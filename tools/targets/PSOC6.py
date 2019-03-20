@@ -148,10 +148,27 @@ def collect_args(toolchain, image_slot, target_type):
 
     # resolve base compilation directory - check if we compile from ./mbed-os or ../mbed-os
     if "/mbed-os/" not in str(os.getcwd()):
-        sb_params_file_path = 'mbed-os' / cy_targets / \
-                              Path("TARGET_" + target_type["name"]) / sb_params_file_name
+        # build settings file path
+        sb_params_file_path = 'mbed-os' / cy_targets
     else:
-        sb_params_file_path = cy_targets / Path("TARGET_" + target_type["name"]) / sb_params_file_name
+        sb_params_file_path = cy_targets
+
+    sb_params_file_path = sb_params_file_path / Path("TARGET_" + target_type["name"]) / sb_params_file_name
+
+    # check if secure boot settings file exist before open it
+    if not os.path.isfile(sb_params_file_path.resolve()):
+        # may be MCUBOOT target
+        sb_params_file_path = 'mbed-os' / cy_targets / 'TARGET_MCUBOOT' / \
+                              Path("TARGET_" + target_type["name"]) / sb_params_file_name
+        if not (os.path.isfile(sb_params_file_path.resolve())):
+            raise Exception("[PSOC6.sign_image]: Can't find Secure Boot settings file at this location - ",
+                            str(os.path.isfile(sb_params_file_path.resolve())))
+        else:
+            print("[PSOC6.sign_image]: Found Secure Boot settings file at this location - ",
+                  str(sb_params_file_path.resolve()))
+    else:
+        print("[PSOC6.sign_image]: Found Secure Boot settings file at this location - ",
+              str(sb_params_file_path.resolve()))
 
     with open(sb_params_file_path.resolve()) as f:
         json_str = f.read()
@@ -203,7 +220,7 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
     if target["name"] != "UNDEFINED":
         sign_args = collect_args(toolchain, image_slot="boot1", target_type=target)
     else:
-        toolchain.notify.tool_error("[PSOC6.sign_image hook message] ERROR: Target not found!")
+        toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Target not found!")
         exit(1)
 
     # call imgtool for signature
@@ -217,11 +234,11 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
     # catch stderr outputs
     stderr = process.communicate()
     if stderr[1].decode("utf-8"):
-        toolchain.notify.tool_error("[PSOC6.sign_image hook message] ERROR: Signature is not added!")
-        toolchain.notify.tool_error("[PSOC6.sign_image hook message] Message from imgtool: " + stderr[1].decode("utf-8"))
+        toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")
+        toolchain.notify.tool_error("[PSOC6.sign_image] Message from imgtool: " + stderr[1].decode("utf-8"))
         raise Exception("imgtool finished execution with errors!")
     else:
-        toolchain.notify.info("[PSOC6.sign_image hook message] SUCCESS: Image is signed with no errors!")
+        toolchain.notify.info("[PSOC6.sign_image] SUCCESS: Image is signed with no errors!")
 
     # TODO: resolve --image-base address gathering as parameter, not a constant
     # convert signed image binary back to hex format
