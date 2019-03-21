@@ -76,7 +76,7 @@
 #define __CORTEX_M                (0x04)                                   /*!< Cortex-M Core                    */
 
 
-#if   defined ( __CC_ARM )
+#if   defined ( __ARMCC_VERSION )
   #define __ASM            __asm                                      /*!< asm keyword for ARM Compiler          */
   #define __INLINE         __inline                                   /*!< inline keyword for ARM Compiler       */
   #define __STATIC_INLINE  static __inline
@@ -106,7 +106,7 @@
 
 /** __FPU_USED indicates whether an FPU is used or not. For this, __FPU_PRESENT has to be checked prior to making use of FPU specific registers and functions.
 */
-#if defined ( __CC_ARM )
+#if defined ( __ARMCC_VERSION )
   #if defined __TARGET_FPU_VFP
     #if (__FPU_PRESENT == 1)
       #define __FPU_USED       1

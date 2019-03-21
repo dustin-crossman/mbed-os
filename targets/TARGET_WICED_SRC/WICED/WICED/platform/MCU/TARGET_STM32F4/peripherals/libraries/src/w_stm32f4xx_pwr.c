@@ -934,7 +934,7 @@ void PWR_EnterSTANDBYMode(void)
   SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
   
   /* This option is used to ensure that store operations are completed */
-#if defined ( __CC_ARM   )
+#if defined ( __ARMCC_VERSION   )
   __force_stores();
 #endif
   /* Request Wait For Interrupt */

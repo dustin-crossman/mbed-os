@@ -1,11 +1,12 @@
 #include <stdint.h>
+#include "w_platform_toolchain.h"
 
 /* labelling: appname-(chipname)(stepping)-frequency-(headset GIT SHA)-(generating SDK version)-
  *                                                                            Wiced-release.hcd */
 const char brcm_patch_version[] = "CYW43012C0_003.001.015.0090.0000_Generic_UART_37_4MHz_wlcsp_ref3_sLNA";
 const uint8_t brcm_patchram_format = 0x01;
 /* Configuration Data Records (Write_RAM) */
-const unsigned char brcm_patchram_buf[63699] = {
+ALIGNED_PRE(32) const uint8_t brcm_patchram_buf[] ALIGNED(32) = {
         76, 252, 70, 0, 0, 34, 0, 66, 82, 67, 77, 99, 102, 103, 83, 0, 0, 0,
         0, 50, 0, 0, 0, 1, 1, 4, 24, 146, 0, 0, 0, 3, 6, 172, 31, 0, 44, 1,
         67, 0, 1, 28, 66, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
