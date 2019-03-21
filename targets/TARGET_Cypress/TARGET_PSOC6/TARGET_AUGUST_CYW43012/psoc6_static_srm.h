@@ -60,16 +60,18 @@
 *  P1_0 and P1_1 reserved for I2C
 *  P1_3 reserved for GAS_GAUGE_EN
 *  P1_4 reserved for MAG_INT
-*  P2_0 ... P2_5 reserved for SDHC 
+*  P2_0 ... P2_5 reserved for SDIO
 *  P2_6 and P2_7 reserved for WL_GET_ON and WL_HOST_WAKE
 *  P3_0 ... P3_3 reserved for BT_UART
 *  P3_4 and P3_5 reserved for BT_REG_ON and BT_HOST_WAKE
+*  P4_0 and P4_1 reserved for BT_DEV_WAKE and WL_DEV_WAKE
 *  P5_1 ... P5_3 reserved for I2S
 *  P5_5 and P5_6 reserved for AUDIO_GAIN_SEL and AUDIO_SD_MODE
-*  P6-4, P6-6 and P6_7 reserved for SWD,
-*  P7_0, P7_2, P7_3 reserved for ENCODER
+*  P6-4, P6-6 and P6_7 reserved for SWD
+*  P6_3, P6_5, P7_0, P7_5 reserved for ENCODER
 *  P8_0 and P8_4 reserved for MOT_EN
 *  P8_1 reserved for M_SLEEP
+*  P8_3 reserved for BUTTON
 *  P9_0 reserved for BAT_VOLT_DIV
 *  P9_3 reserved for MOT_CUR_PGA_OUT
 *  P9_4 reserved for MOT_CUR_PGA_NEG
@@ -84,11 +86,11 @@
                                   SRM_PORT(1, 0x1b),\
                                   SRM_PORT(2, 0xff),\
                                   SRM_PORT(3, 0x3f),\
-                                  SRM_PORT(4, 0x00),\
+                                  SRM_PORT(4, 0x03),\
                                   SRM_PORT(5, 0x6e),\
-                                  SRM_PORT(6, 0xd0),\
-                                  SRM_PORT(7, 0x0d),\
-                                  SRM_PORT(8, 0x13),\
+                                  SRM_PORT(6, 0xf8),\
+                                  SRM_PORT(7, 0x21),\
+                                  SRM_PORT(8, 0x1b),\
                                   SRM_PORT(9, 0x39),\
                                   SRM_PORT(10, 0x02),\
                                   SRM_PORT(11, 0xfc),\
@@ -101,10 +103,11 @@
 *  8-bit divider 1 reserved for PWM
 *  8-bit divider 2 reserved for CLK_PUMP
 *  8-bit divider 3 reserved for SAR ADC
+*  8-bit divider 4 reserved for SDIO
 *  16-bit divider 0 reserved for BT_UART
 *  16-bit divider 1 reserved for UART
 */
-#define CYCFG_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x0F), \
+#define CYCFG_ASSIGNED_DIVIDERS   SRM_DIVIDER(CY_SYSCLK_DIV_8_BIT, 0x1F), \
                                   SRM_DIVIDER(CY_SYSCLK_DIV_16_BIT, 0x03)
                                
 #define CYCFG_ASSIGNED_SCBS

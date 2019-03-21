@@ -220,6 +220,66 @@ extern "C" {
 #endif
 #define MAG_INT_HSIOM ioss_0_port_1_pin_4_HSIOM
 #define MAG_INT_IRQ ioss_interrupts_gpio_1_IRQn
+#define SDIO_DATA_0_PORT GPIO_PRT2
+#define SDIO_DATA_0_PIN 0U
+#define SDIO_DATA_0_NUM 0U
+#define SDIO_DATA_0_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_DATA_0_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_2_pin_0_HSIOM
+	#define ioss_0_port_2_pin_0_HSIOM HSIOM_SEL_GPIO
+#endif
+#define SDIO_DATA_0_HSIOM ioss_0_port_2_pin_0_HSIOM
+#define SDIO_DATA_0_IRQ ioss_interrupts_gpio_2_IRQn
+#define SDIO_DATA_1_PORT GPIO_PRT2
+#define SDIO_DATA_1_PIN 1U
+#define SDIO_DATA_1_NUM 1U
+#define SDIO_DATA_1_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_DATA_1_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_2_pin_1_HSIOM
+	#define ioss_0_port_2_pin_1_HSIOM HSIOM_SEL_GPIO
+#endif
+#define SDIO_DATA_1_HSIOM ioss_0_port_2_pin_1_HSIOM
+#define SDIO_DATA_1_IRQ ioss_interrupts_gpio_2_IRQn
+#define SDIO_DATA_2_PORT GPIO_PRT2
+#define SDIO_DATA_2_PIN 2U
+#define SDIO_DATA_2_NUM 2U
+#define SDIO_DATA_2_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_DATA_2_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_2_pin_2_HSIOM
+	#define ioss_0_port_2_pin_2_HSIOM HSIOM_SEL_GPIO
+#endif
+#define SDIO_DATA_2_HSIOM ioss_0_port_2_pin_2_HSIOM
+#define SDIO_DATA_2_IRQ ioss_interrupts_gpio_2_IRQn
+#define SDIO_DATA_3_PORT GPIO_PRT2
+#define SDIO_DATA_3_PIN 3U
+#define SDIO_DATA_3_NUM 3U
+#define SDIO_DATA_3_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_DATA_3_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_2_pin_3_HSIOM
+	#define ioss_0_port_2_pin_3_HSIOM HSIOM_SEL_GPIO
+#endif
+#define SDIO_DATA_3_HSIOM ioss_0_port_2_pin_3_HSIOM
+#define SDIO_DATA_3_IRQ ioss_interrupts_gpio_2_IRQn
+#define SDIO_CMD_PORT GPIO_PRT2
+#define SDIO_CMD_PIN 4U
+#define SDIO_CMD_NUM 4U
+#define SDIO_CMD_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_CMD_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_2_pin_4_HSIOM
+	#define ioss_0_port_2_pin_4_HSIOM HSIOM_SEL_GPIO
+#endif
+#define SDIO_CMD_HSIOM ioss_0_port_2_pin_4_HSIOM
+#define SDIO_CMD_IRQ ioss_interrupts_gpio_2_IRQn
+#define SDIO_CLK_PORT GPIO_PRT2
+#define SDIO_CLK_PIN 5U
+#define SDIO_CLK_NUM 5U
+#define SDIO_CLK_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_CLK_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_2_pin_5_HSIOM
+	#define ioss_0_port_2_pin_5_HSIOM HSIOM_SEL_GPIO
+#endif
+#define SDIO_CLK_HSIOM ioss_0_port_2_pin_5_HSIOM
+#define SDIO_CLK_IRQ ioss_interrupts_gpio_2_IRQn
 #define WL_REG_ON_PORT GPIO_PRT2
 #define WL_REG_ON_PIN 6U
 #define WL_REG_ON_NUM 6U
@@ -370,6 +430,16 @@ extern "C" {
 #endif
 #define AUDIO_SD_MODE_HSIOM ioss_0_port_5_pin_6_HSIOM
 #define AUDIO_SD_MODE_IRQ ioss_interrupts_gpio_5_IRQn
+#define ENCODER_1_PORT GPIO_PRT6
+#define ENCODER_1_PIN 3U
+#define ENCODER_1_NUM 3U
+#define ENCODER_1_DRIVEMODE CY_GPIO_DM_HIGHZ
+#define ENCODER_1_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_6_pin_3_HSIOM
+	#define ioss_0_port_6_pin_3_HSIOM HSIOM_SEL_GPIO
+#endif
+#define ENCODER_1_HSIOM ioss_0_port_6_pin_3_HSIOM
+#define ENCODER_1_IRQ ioss_interrupts_gpio_6_IRQn
 #define SWO_PORT GPIO_PRT6
 #define SWO_PIN 4U
 #define SWO_NUM 4U
@@ -380,6 +450,16 @@ extern "C" {
 #endif
 #define SWO_HSIOM ioss_0_port_6_pin_4_HSIOM
 #define SWO_IRQ ioss_interrupts_gpio_6_IRQn
+#define ENCODER_3_PORT GPIO_PRT6
+#define ENCODER_3_PIN 5U
+#define ENCODER_3_NUM 5U
+#define ENCODER_3_DRIVEMODE CY_GPIO_DM_HIGHZ
+#define ENCODER_3_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_6_pin_5_HSIOM
+	#define ioss_0_port_6_pin_5_HSIOM HSIOM_SEL_GPIO
+#endif
+#define ENCODER_3_HSIOM ioss_0_port_6_pin_5_HSIOM
+#define ENCODER_3_IRQ ioss_interrupts_gpio_6_IRQn
 #define SWDIO_PORT GPIO_PRT6
 #define SWDIO_PIN 6U
 #define SWDIO_NUM 6U
@@ -404,31 +484,21 @@ extern "C" {
 #define ENCODER_0_PIN 0U
 #define ENCODER_0_NUM 0U
 #define ENCODER_0_DRIVEMODE CY_GPIO_DM_HIGHZ
-#define ENCODER_0_INIT_DRIVESTATE 0
+#define ENCODER_0_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_7_pin_0_HSIOM
 	#define ioss_0_port_7_pin_0_HSIOM HSIOM_SEL_GPIO
 #endif
 #define ENCODER_0_HSIOM ioss_0_port_7_pin_0_HSIOM
 #define ENCODER_0_IRQ ioss_interrupts_gpio_7_IRQn
-#define ENCODER_1_PORT GPIO_PRT7
-#define ENCODER_1_PIN 2U
-#define ENCODER_1_NUM 2U
-#define ENCODER_1_DRIVEMODE CY_GPIO_DM_HIGHZ
-#define ENCODER_1_INIT_DRIVESTATE 0
-#ifndef ioss_0_port_7_pin_2_HSIOM
-	#define ioss_0_port_7_pin_2_HSIOM HSIOM_SEL_GPIO
-#endif
-#define ENCODER_1_HSIOM ioss_0_port_7_pin_2_HSIOM
-#define ENCODER_1_IRQ ioss_interrupts_gpio_7_IRQn
 #define ENCODER_2_PORT GPIO_PRT7
-#define ENCODER_2_PIN 3U
-#define ENCODER_2_NUM 3U
+#define ENCODER_2_PIN 5U
+#define ENCODER_2_NUM 5U
 #define ENCODER_2_DRIVEMODE CY_GPIO_DM_HIGHZ
-#define ENCODER_2_INIT_DRIVESTATE 0
-#ifndef ioss_0_port_7_pin_3_HSIOM
-	#define ioss_0_port_7_pin_3_HSIOM HSIOM_SEL_GPIO
+#define ENCODER_2_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_7_pin_5_HSIOM
+	#define ioss_0_port_7_pin_5_HSIOM HSIOM_SEL_GPIO
 #endif
-#define ENCODER_2_HSIOM ioss_0_port_7_pin_3_HSIOM
+#define ENCODER_2_HSIOM ioss_0_port_7_pin_5_HSIOM
 #define ENCODER_2_IRQ ioss_interrupts_gpio_7_IRQn
 #define MOT_EN_1_PORT GPIO_PRT8
 #define MOT_EN_1_PIN 0U
@@ -453,8 +523,8 @@ extern "C" {
 #define BUTTON_PORT GPIO_PRT8
 #define BUTTON_PIN 3U
 #define BUTTON_NUM 3U
-#define BUTTON_DRIVEMODE CY_GPIO_DM_HIGHZ
-#define BUTTON_INIT_DRIVESTATE 0
+#define BUTTON_DRIVEMODE CY_GPIO_DM_PULLUP_DOWN
+#define BUTTON_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_8_pin_3_HSIOM
 	#define ioss_0_port_8_pin_3_HSIOM HSIOM_SEL_GPIO
 #endif
@@ -530,6 +600,12 @@ extern const cy_stc_gpio_pin_config_t SCL_config;
 extern const cy_stc_gpio_pin_config_t SDA_config;
 extern const cy_stc_gpio_pin_config_t GAS_GAUGE_EN_config;
 extern const cy_stc_gpio_pin_config_t MAG_INT_config;
+extern const cy_stc_gpio_pin_config_t SDIO_DATA_0_config;
+extern const cy_stc_gpio_pin_config_t SDIO_DATA_1_config;
+extern const cy_stc_gpio_pin_config_t SDIO_DATA_2_config;
+extern const cy_stc_gpio_pin_config_t SDIO_DATA_3_config;
+extern const cy_stc_gpio_pin_config_t SDIO_CMD_config;
+extern const cy_stc_gpio_pin_config_t SDIO_CLK_config;
 extern const cy_stc_gpio_pin_config_t WL_REG_ON_config;
 extern const cy_stc_gpio_pin_config_t WL_HOST_WAKE_config;
 extern const cy_stc_gpio_pin_config_t BT_UART_TXD_config;
@@ -545,11 +621,12 @@ extern const cy_stc_gpio_pin_config_t LRCLK_config;
 extern const cy_stc_gpio_pin_config_t DATA_L_config;
 extern const cy_stc_gpio_pin_config_t AUDIO_GAIN_SEL_config;
 extern const cy_stc_gpio_pin_config_t AUDIO_SD_MODE_config;
+extern const cy_stc_gpio_pin_config_t ENCODER_1_config;
 extern const cy_stc_gpio_pin_config_t SWO_config;
+extern const cy_stc_gpio_pin_config_t ENCODER_3_config;
 extern const cy_stc_gpio_pin_config_t SWDIO_config;
 extern const cy_stc_gpio_pin_config_t SWCLK_config;
 extern const cy_stc_gpio_pin_config_t ENCODER_0_config;
-extern const cy_stc_gpio_pin_config_t ENCODER_1_config;
 extern const cy_stc_gpio_pin_config_t ENCODER_2_config;
 extern const cy_stc_gpio_pin_config_t MOT_EN_1_config;
 extern const cy_stc_gpio_pin_config_t MOT_SLEEP_config;

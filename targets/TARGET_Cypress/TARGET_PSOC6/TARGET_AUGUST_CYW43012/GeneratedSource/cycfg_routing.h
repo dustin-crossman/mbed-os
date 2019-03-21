@@ -42,6 +42,12 @@ void init_cycfg_routing(void);
 #define ioss_0_port_13_pin_1_HSIOM P13_1_SCB6_UART_TX
 #define ioss_0_port_1_pin_0_HSIOM P1_0_SCB7_I2C_SCL
 #define ioss_0_port_1_pin_1_HSIOM P1_1_SCB7_I2C_SDA
+#define ioss_0_port_2_pin_0_HSIOM P2_0_DSI_DSI
+#define ioss_0_port_2_pin_1_HSIOM P2_1_DSI_DSI
+#define ioss_0_port_2_pin_2_HSIOM P2_2_DSI_DSI
+#define ioss_0_port_2_pin_3_HSIOM P2_3_DSI_DSI
+#define ioss_0_port_2_pin_4_HSIOM P2_4_DSI_DSI
+#define ioss_0_port_2_pin_5_HSIOM P2_5_DSI_GPIO
 #define ioss_0_port_3_pin_0_HSIOM P3_0_SCB2_UART_RX
 #define ioss_0_port_3_pin_1_HSIOM P3_1_SCB2_UART_TX
 #define ioss_0_port_3_pin_2_HSIOM P3_2_SCB2_UART_RTS
