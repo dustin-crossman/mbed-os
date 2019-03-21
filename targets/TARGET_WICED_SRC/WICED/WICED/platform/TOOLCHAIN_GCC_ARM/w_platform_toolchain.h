@@ -78,7 +78,7 @@ extern "C"
 #define ALWAYS_INLINE    __attribute__((always_inline))
 #endif
 
-#if defined ( __CC_ARM )
+#if defined ( __ARMCC_VERSION )
 
 #ifndef INLINE_ASM
 #define INLINE_ASM  __asm

@@ -54,7 +54,7 @@
   @{
 */
 
-#if   defined ( __CC_ARM ) /*------------------RealView Compiler -----------------*/
+#if   defined ( __ARMCC_VERSION ) /*------------------RealView Compiler -----------------*/
 /* ARM armcc specific functions */
 
 /*------ CM4 SIMD Intrinsics -----------------------------------------------------*/

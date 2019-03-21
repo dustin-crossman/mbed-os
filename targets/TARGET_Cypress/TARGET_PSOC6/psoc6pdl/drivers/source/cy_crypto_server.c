@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_crypto_server.c
-* \version 2.20
+* \version 2.30
 *
 * \brief
 *  This file provides the source code to the API for Crypto Server
@@ -468,7 +468,7 @@ void Cy_Crypto_Server_Process(void)
                             cy_stc_crypto_context_aes_t *cfContext = (cy_stc_crypto_context_aes_t *)myData->xdata;
                             myData->resp =
                                 (cy_CryptoFunctionTable->aesInitFunc)(CY_CRYPTO_BASE,
-                                    (uint8_t*)cfContext->key, cfContext->keyLength, &cfContext->aesState);
+                                    (uint8_t*)cfContext->key, cfContext->keyLength, &cfContext->aesState, (cy_stc_crypto_aes_buffers_t *)(REG_CRYPTO_MEM_BUFF(CY_CRYPTO_BASE)));
                         }
                         break;
 
