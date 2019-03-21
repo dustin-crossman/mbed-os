@@ -7,6 +7,7 @@
 
 #include <string.h>
 #include <stdint.h>
+#include "w_platform_toolchain.h"
 #include "../generated_mac_address.txt"
 
 /*
@@ -24,7 +25,7 @@ extern "C" {
  * Character array of NVRAM image generated from
  * cyw943012c0fcref_3_ipa.txt
  */
-static const char wifi_nvram_image[] =
+ALIGNED_PRE(32) static const char wifi_nvram_image[] ALIGNED(32) =
        "NVRAMRev=$Rev: 680160 $"                                            "\x00"
        "sromrev=11"                                                         "\x00"
        "cckdigfilttype=4"                                                   "\x00"

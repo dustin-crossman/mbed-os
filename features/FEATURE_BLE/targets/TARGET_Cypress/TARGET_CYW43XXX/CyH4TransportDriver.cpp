@@ -36,7 +36,12 @@ CyH4TransportDriver::CyH4TransportDriver(PinName tx, PinName rx, PinName cts, Pi
 
 void CyH4TransportDriver::bt_host_wake_irq_handler(void)
 {
-	CyH4TransportDriver::on_controller_irq();
+    uart.attach(
+        callback(this, &CyH4TransportDriver::on_controller_irq),
+        SerialBase::RxIrq
+    );
+
+    CyH4TransportDriver::on_controller_irq();
 }
 
 void CyH4TransportDriver::initialize()
@@ -92,6 +97,11 @@ uint16_t CyH4TransportDriver::write(uint8_t type, uint16_t len, uint8_t *pData)
     deassert_bt_dev_wake();
     sleep_manager_unlock_deep_sleep();
     return len;
+}
+
+void CyH4TransportDriver::on_host_stack_inactivity()
+{
+    uart.attach(NULL, SerialBase::RxIrq);
 }
 
 void CyH4TransportDriver::on_controller_irq()
