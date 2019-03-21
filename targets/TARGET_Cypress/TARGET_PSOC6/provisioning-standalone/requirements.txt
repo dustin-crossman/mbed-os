@@ -5,3 +5,4 @@ cryptography>=2.4.2
 Click>=7.0
 intelhex>=2.2.1
 jwcrypto>=0.6.0
+pathlib>=1.0.1; python_version<"3.4"
