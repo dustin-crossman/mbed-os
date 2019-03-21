@@ -8088,7 +8088,7 @@
     "CY8CPROTO_064_SB_M0": {
         "inherits": ["MCU_PSOC6_M0"],
         "supported_form_factors": ["ARDUINO"],
-        "extra_labels_add": ["CY8C62XX", "CY8CPROTO_064_SB"],
+        "extra_labels_add": ["PSOC6_01", "CY8C62XX", "CY8CPROTO_064_SB"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "detect_code": ["1900"],
         "post_binary_hook": {
@@ -8137,7 +8137,7 @@
             "non-secure-ram-size": "0x20000",
             "shared-ram-start": "0x0802D000",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0802D100", 
+            "public-ram-start": "0x0802D100",
             "public-ram-size": "0x200"
         }
     },
@@ -8162,7 +8162,7 @@
             "non-secure-ram-size": "0x20000",
             "shared-ram-start": "0x0802D000",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0802D100", 
+            "public-ram-start": "0x0802D100",
             "public-ram-size": "0x200"
         }
     },
@@ -8214,7 +8214,7 @@
     },
     "CYW943012P6EVB_01_M0": {
         "inherits": ["MCU_PSOC6_M0"],
-        "extra_labels_add": ["CY8C62XX", "CYW943012P6EVB_01"],
+        "extra_labels_add": ["PSOC6_01", "CY8C62XX", "CYW943012P6EVB_01"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "post_binary_hook": {
             "function": "PSOC6Code.complete"

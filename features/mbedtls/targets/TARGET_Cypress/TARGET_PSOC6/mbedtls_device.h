@@ -18,23 +18,21 @@
 #ifndef MBEDTLS_DEVICE_H
 #define MBEDTLS_DEVICE_H
 
-//#define MBEDTLS_SHA1_ALT
-//#define MBEDTLS_SHA256_ALT
-//#define MBEDTLS_SHA512_ALT
+#define MBEDTLS_SHA1_ALT
+#define MBEDTLS_SHA256_ALT
+#define MBEDTLS_SHA512_ALT
 
-//#define MBEDTLS_AES_ALT
+#define MBEDTLS_AES_ALT
 
-/* ECP ALT is temporary disabled */
 /* Only NIST-P curves are currently supported */
-// #define MBEDTLS_ECP_ALT
+#define MBEDTLS_ECP_ALT
 // #define MBEDTLS_ECP_DP_SECP192R1_ENABLED
 // #define MBEDTLS_ECP_DP_SECP224R1_ENABLED
 // #define MBEDTLS_ECP_DP_SECP256R1_ENABLED
 // #define MBEDTLS_ECP_DP_SECP384R1_ENABLED
 // #define MBEDTLS_ECP_DP_SECP521R1_ENABLED
 
-/* ECDSA ALT is stemporary disabled */
-// #define MBEDTLS_ECDSA_SIGN_ALT
-// #define MBEDTLS_ECDSA_VERIFY_ALT
+#define MBEDTLS_ECDSA_SIGN_ALT
+#define MBEDTLS_ECDSA_VERIFY_ALT
 
 #endif /* MBEDTLS_DEVICE_H */
