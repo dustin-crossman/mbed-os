@@ -39,6 +39,11 @@
                 <Param id="fracDivider" value="0"/>
                 <Param id="startOnReset" value="true"/>
             </Block>
+            <Block location="peri[0].div_8[4]" alias="" template="mxs40peripheralclock" version="1.0">
+                <Param id="intDivider" value="2"/>
+                <Param id="fracDivider" value="0"/>
+                <Param id="startOnReset" value="true"/>
+            </Block>
         </Clocks>
         <Peripherals>
             <Block location="audioss[0].i2s[0]" alias="I2S" template="mxs40i2s" version="1.0">
@@ -375,6 +380,7 @@
                 <Param id="InvertPwm_n" value="false"/>
                 <Param id="inFlash" value="true"/>
             </Block>
+            <Block location="udb[0]" alias="" template="mxs40udbsdio" version="1.0"/>
         </Peripherals>
         <Pins>
             <Block location="ioss[0].port[10].pin[1]" alias="MOT_CUR_FILT" template="mxs40pin" version="1.0">
@@ -567,6 +573,66 @@
                 <Param id="sioOutputBuffer" value="true"/>
                 <Param id="inFlash" value="true"/>
             </Block>
+            <Block location="ioss[0].port[2].pin[0]" alias="SDIO_DATA_0" template="mxs40pin" version="1.0">
+                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="initialState" value="1"/>
+                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+                <Param id="sioOutputBuffer" value="true"/>
+                <Param id="inFlash" value="true"/>
+            </Block>
+            <Block location="ioss[0].port[2].pin[1]" alias="SDIO_DATA_1" template="mxs40pin" version="1.0">
+                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="initialState" value="1"/>
+                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+                <Param id="sioOutputBuffer" value="true"/>
+                <Param id="inFlash" value="true"/>
+            </Block>
+            <Block location="ioss[0].port[2].pin[2]" alias="SDIO_DATA_2" template="mxs40pin" version="1.0">
+                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="initialState" value="1"/>
+                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+                <Param id="sioOutputBuffer" value="true"/>
+                <Param id="inFlash" value="true"/>
+            </Block>
+            <Block location="ioss[0].port[2].pin[3]" alias="SDIO_DATA_3" template="mxs40pin" version="1.0">
+                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="initialState" value="1"/>
+                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+                <Param id="sioOutputBuffer" value="true"/>
+                <Param id="inFlash" value="true"/>
+            </Block>
+            <Block location="ioss[0].port[2].pin[4]" alias="SDIO_CMD" template="mxs40pin" version="1.0">
+                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="initialState" value="1"/>
+                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+                <Param id="sioOutputBuffer" value="true"/>
+                <Param id="inFlash" value="true"/>
+            </Block>
+            <Block location="ioss[0].port[2].pin[5]" alias="SDIO_CLK" template="mxs40pin" version="1.0">
+                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="initialState" value="1"/>
+                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+                <Param id="sioOutputBuffer" value="true"/>
+                <Param id="inFlash" value="true"/>
+            </Block>
             <Block location="ioss[0].port[2].pin[6]" alias="WL_REG_ON" template="mxs40pin" version="1.0">
                 <Param id="DriveModes" value="CY_GPIO_DM_OD_DRIVESHIGH_IN_OFF"/>
                 <Param id="initialState" value="0"/>
@@ -717,8 +783,28 @@
                 <Param id="sioOutputBuffer" value="true"/>
                 <Param id="inFlash" value="true"/>
             </Block>
+            <Block location="ioss[0].port[6].pin[3]" alias="ENCODER_1" template="mxs40pin" version="1.0">
+                <Param id="DriveModes" value="CY_GPIO_DM_HIGHZ"/>
+                <Param id="initialState" value="1"/>
+                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+                <Param id="sioOutputBuffer" value="true"/>
+                <Param id="inFlash" value="true"/>
+            </Block>
             <Block location="ioss[0].port[6].pin[4]" alias="SWO" template="mxs40pin" version="1.0">
                 <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
+                <Param id="initialState" value="1"/>
+                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+                <Param id="sioOutputBuffer" value="true"/>
+                <Param id="inFlash" value="true"/>
+            </Block>
+            <Block location="ioss[0].port[6].pin[5]" alias="ENCODER_3" template="mxs40pin" version="1.0">
+                <Param id="DriveModes" value="CY_GPIO_DM_HIGHZ"/>
                 <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
                 <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -749,7 +835,7 @@
             </Block>
             <Block location="ioss[0].port[7].pin[0]" alias="ENCODER_0" template="mxs40pin" version="1.0">
                 <Param id="DriveModes" value="CY_GPIO_DM_HIGHZ"/>
-                <Param id="initialState" value="0"/>
+                <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
                 <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
                 <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
@@ -757,19 +843,9 @@
                 <Param id="sioOutputBuffer" value="true"/>
                 <Param id="inFlash" value="true"/>
             </Block>
-            <Block location="ioss[0].port[7].pin[2]" alias="ENCODER_1" template="mxs40pin" version="1.0">
+            <Block location="ioss[0].port[7].pin[5]" alias="ENCODER_2" template="mxs40pin" version="1.0">
                 <Param id="DriveModes" value="CY_GPIO_DM_HIGHZ"/>
-                <Param id="initialState" value="0"/>
-                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
-                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
-                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
-                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
-                <Param id="sioOutputBuffer" value="true"/>
-                <Param id="inFlash" value="true"/>
-            </Block>
-            <Block location="ioss[0].port[7].pin[3]" alias="ENCODER_2" template="mxs40pin" version="1.0">
-                <Param id="DriveModes" value="CY_GPIO_DM_HIGHZ"/>
-                <Param id="initialState" value="0"/>
+                <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
                 <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
                 <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
@@ -798,8 +874,8 @@
                 <Param id="inFlash" value="true"/>
             </Block>
             <Block location="ioss[0].port[8].pin[3]" alias="BUTTON" template="mxs40pin" version="1.0">
-                <Param id="DriveModes" value="CY_GPIO_DM_HIGHZ"/>
-                <Param id="initialState" value="0"/>
+                <Param id="DriveModes" value="CY_GPIO_DM_PULLUP_DOWN"/>
+                <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
                 <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
                 <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
@@ -961,6 +1037,70 @@
             <Port name="scb[7].i2c_sda[0]"/>
         </Net>
         <Net>
+            <Port name="ioss[0].port[2].pin[0].digital_in[0]"/>
+            <Port name="udb[0].in_p[48]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[0].digital_out[0]"/>
+            <Port name="udb[0].port_if[16]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[0].oe[0]"/>
+            <Port name="udb[0].port_oe[16]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[1].digital_in[0]"/>
+            <Port name="udb[0].in_p[49]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[1].digital_out[0]"/>
+            <Port name="udb[0].port_if[17]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[1].oe[0]"/>
+            <Port name="udb[0].port_oe[17]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[2].digital_in[0]"/>
+            <Port name="udb[0].in_p[50]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[2].digital_out[0]"/>
+            <Port name="udb[0].port_if[18]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[2].oe[0]"/>
+            <Port name="udb[0].port_oe[18]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[3].digital_in[0]"/>
+            <Port name="udb[0].in_p[51]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[3].digital_out[0]"/>
+            <Port name="udb[0].port_if[19]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[3].oe[0]"/>
+            <Port name="udb[0].port_oe[19]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[4].digital_in[0]"/>
+            <Port name="udb[0].in_p[52]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[4].digital_out[0]"/>
+            <Port name="udb[0].port_if[20]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[4].oe[0]"/>
+            <Port name="udb[0].port_oe[20]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[2].pin[5].digital_out[0]"/>
+            <Port name="udb[0].port_if[21]"/>
+        </Net>
+        <Net>
             <Port name="ioss[0].port[3].pin[0].digital_inout[0]"/>
             <Port name="scb[2].uart_rx[0]"/>
         </Net>
@@ -1073,6 +1213,10 @@
             <Port name="peri[0].div_8[1].clk[0]"/>
             <Port name="tcpwm[1].cnt[16].clock[0]"/>
             <Port name="tcpwm[1].cnt[18].clock[0]"/>
+        </Net>
+        <Net>
+            <Port name="peri[0].div_8[4].clk[0]"/>
+            <Port name="udb[0].clocks[0]"/>
         </Net>
         <Net>
             <Port name="smif[0].clk_hf[0]"/>

@@ -328,6 +328,102 @@ const cy_stc_gpio_pin_config_t MAG_INT_config =
 	.vrefSel = 0UL,
 	.vohSel = 0UL,
 };
+const cy_stc_gpio_pin_config_t SDIO_DATA_0_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_ANALOG,
+	.hsiom = SDIO_DATA_0_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t SDIO_DATA_1_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_ANALOG,
+	.hsiom = SDIO_DATA_1_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t SDIO_DATA_2_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_ANALOG,
+	.hsiom = SDIO_DATA_2_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t SDIO_DATA_3_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_ANALOG,
+	.hsiom = SDIO_DATA_3_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t SDIO_CMD_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_ANALOG,
+	.hsiom = SDIO_CMD_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t SDIO_CLK_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_ANALOG,
+	.hsiom = SDIO_CLK_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
 const cy_stc_gpio_pin_config_t WL_REG_ON_config = 
 {
 	.outVal = 0,
@@ -568,11 +664,43 @@ const cy_stc_gpio_pin_config_t AUDIO_SD_MODE_config =
 	.vrefSel = 0UL,
 	.vohSel = 0UL,
 };
+const cy_stc_gpio_pin_config_t ENCODER_1_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_HIGHZ,
+	.hsiom = ENCODER_1_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
 const cy_stc_gpio_pin_config_t SWO_config = 
 {
 	.outVal = 1,
 	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
 	.hsiom = SWO_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_FULL,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t ENCODER_3_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_HIGHZ,
+	.hsiom = ENCODER_3_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
 	.vtrip = CY_GPIO_VTRIP_CMOS,
@@ -618,7 +746,7 @@ const cy_stc_gpio_pin_config_t SWCLK_config =
 };
 const cy_stc_gpio_pin_config_t ENCODER_0_config = 
 {
-	.outVal = 0,
+	.outVal = 1,
 	.driveMode = CY_GPIO_DM_HIGHZ,
 	.hsiom = ENCODER_0_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
@@ -632,25 +760,9 @@ const cy_stc_gpio_pin_config_t ENCODER_0_config =
 	.vrefSel = 0UL,
 	.vohSel = 0UL,
 };
-const cy_stc_gpio_pin_config_t ENCODER_1_config = 
-{
-	.outVal = 0,
-	.driveMode = CY_GPIO_DM_HIGHZ,
-	.hsiom = ENCODER_1_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_FULL,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
 const cy_stc_gpio_pin_config_t ENCODER_2_config = 
 {
-	.outVal = 0,
+	.outVal = 1,
 	.driveMode = CY_GPIO_DM_HIGHZ,
 	.hsiom = ENCODER_2_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
@@ -698,8 +810,8 @@ const cy_stc_gpio_pin_config_t MOT_SLEEP_config =
 };
 const cy_stc_gpio_pin_config_t BUTTON_config = 
 {
-	.outVal = 0,
-	.driveMode = CY_GPIO_DM_HIGHZ,
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_PULLUP_DOWN,
 	.hsiom = BUTTON_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
@@ -834,6 +946,18 @@ void init_cycfg_pins(void)
 
 	Cy_GPIO_Pin_Init(MAG_INT_PORT, MAG_INT_PIN, &MAG_INT_config);
 
+	Cy_GPIO_Pin_Init(SDIO_DATA_0_PORT, SDIO_DATA_0_PIN, &SDIO_DATA_0_config);
+
+	Cy_GPIO_Pin_Init(SDIO_DATA_1_PORT, SDIO_DATA_1_PIN, &SDIO_DATA_1_config);
+
+	Cy_GPIO_Pin_Init(SDIO_DATA_2_PORT, SDIO_DATA_2_PIN, &SDIO_DATA_2_config);
+
+	Cy_GPIO_Pin_Init(SDIO_DATA_3_PORT, SDIO_DATA_3_PIN, &SDIO_DATA_3_config);
+
+	Cy_GPIO_Pin_Init(SDIO_CMD_PORT, SDIO_CMD_PIN, &SDIO_CMD_config);
+
+	Cy_GPIO_Pin_Init(SDIO_CLK_PORT, SDIO_CLK_PIN, &SDIO_CLK_config);
+
 	Cy_GPIO_Pin_Init(WL_REG_ON_PORT, WL_REG_ON_PIN, &WL_REG_ON_config);
 
 	Cy_GPIO_Pin_Init(WL_HOST_WAKE_PORT, WL_HOST_WAKE_PIN, &WL_HOST_WAKE_config);
@@ -864,15 +988,17 @@ void init_cycfg_pins(void)
 
 	Cy_GPIO_Pin_Init(AUDIO_SD_MODE_PORT, AUDIO_SD_MODE_PIN, &AUDIO_SD_MODE_config);
 
+	Cy_GPIO_Pin_Init(ENCODER_1_PORT, ENCODER_1_PIN, &ENCODER_1_config);
+
 	Cy_GPIO_Pin_Init(SWO_PORT, SWO_PIN, &SWO_config);
+
+	Cy_GPIO_Pin_Init(ENCODER_3_PORT, ENCODER_3_PIN, &ENCODER_3_config);
 
 	Cy_GPIO_Pin_Init(SWDIO_PORT, SWDIO_PIN, &SWDIO_config);
 
 	Cy_GPIO_Pin_Init(SWCLK_PORT, SWCLK_PIN, &SWCLK_config);
 
 	Cy_GPIO_Pin_Init(ENCODER_0_PORT, ENCODER_0_PIN, &ENCODER_0_config);
-
-	Cy_GPIO_Pin_Init(ENCODER_1_PORT, ENCODER_1_PIN, &ENCODER_1_config);
 
 	Cy_GPIO_Pin_Init(ENCODER_2_PORT, ENCODER_2_PIN, &ENCODER_2_config);
 

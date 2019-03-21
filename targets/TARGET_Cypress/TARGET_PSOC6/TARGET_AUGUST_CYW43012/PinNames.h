@@ -167,10 +167,10 @@ typedef enum {
     BT_UART_CTS = P3_3,
     BT_UART_RTS = P3_2,
 
-    BT_PIN_POWER        = P3_4,
-    BT_PIN_HOST_WAKE    = P4_0,
-    BT_PIN_DEVICE_WAKE  = P3_5,
-    BT_PIN_DEVICE_RESET = P4_1,
+    BT_REG_ON    = P3_4,
+    BT_HOST_WAKE = P3_5,
+    BT_DEV_WAKE  = P4_0,
+    WL_DEV_WAKE  = P4_1,
 
     I2S_SCLK       = P5_1,
     I2S_LRCLK      = P5_2,
@@ -178,9 +178,10 @@ typedef enum {
     AUDIO_GAIN_SEL = P5_5,
     AUDIO_SD_MODE  = P5_6,
 
-    ENCODER_1 = P7_0,
-    ENCODER_2 = P7_2,
-    ENCODER_3 = P7_3,
+    ENCODER_0 = P7_0,
+    ENCODER_1 = P6_3,
+    ENCODER_2 = P7_5,
+    ENCODER_3 = P6_5,
 
     MOT_EN_1 = P8_0,
     M_SLEEP  = P8_1,
@@ -223,14 +224,14 @@ typedef enum {
     CY_BT_UART_CTS      = BT_UART_CTS,
     CY_BT_UART_RTS      = BT_UART_RTS,
 
-    CY_BT_PIN_POWER       = BT_PIN_POWER,
-    CY_BT_PIN_HOST_WAKE   = BT_PIN_HOST_WAKE,
-    CY_BT_PIN_DEVICE_WAKE = BT_PIN_DEVICE_WAKE,
+    CY_BT_PIN_POWER       = BT_REG_ON,
+    CY_BT_PIN_HOST_WAKE   = BT_HOST_WAKE,
+    CY_BT_PIN_DEVICE_WAKE = BT_DEV_WAKE,
 
     USBTX   = UART_TX,
     USBRX   = UART_RX,
 
-    CY_WIFI_HOST_WAKE     = P2_7,
+    CY_WIFI_HOST_WAKE     = WL_HOST_WAKE,
 
     // Not connected
     AOUT    = (int)0xFFFFFFFF  
