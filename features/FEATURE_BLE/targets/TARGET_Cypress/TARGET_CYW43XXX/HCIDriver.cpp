@@ -57,7 +57,7 @@ namespace cypress {
 class HCIDriver : public cordio::CordioHCIDriver {
 public:
     HCIDriver(
-        cordio::CordioHCITransportDriver& transport_driver,
+        ble::vendor::cypress_ble::CyH4TransportDriver& transport_driver,
         PinName bt_power_name
     ) : cordio::CordioHCIDriver(transport_driver),
         bt_power_name(bt_power_name),
@@ -66,7 +66,8 @@ public:
         service_pack_ptr(0),
         service_pack_length(0),
         service_pack_next(),
-        service_pack_transfered(false) {
+        service_pack_transfered(false),
+        cy_transport_driver(transport_driver) {
     }
 
     virtual cordio::buf_pool_desc_t get_buffer_pool_description()
@@ -261,6 +262,11 @@ public:
         }
     }
 
+    virtual void on_host_stack_inactivity(void)
+    {
+        cy_transport_driver.on_host_stack_inactivity();
+    }
+
 private:
 
     // send pre_brcm_patchram_buf
@@ -417,6 +423,7 @@ private:
     int service_pack_length;
     void (HCIDriver::*service_pack_next)();
     bool service_pack_transfered;
+    ble::vendor::cypress_ble::CyH4TransportDriver& cy_transport_driver;
 
 };
 

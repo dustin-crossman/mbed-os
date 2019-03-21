@@ -50,7 +50,7 @@
 /** 
   * @brief  __RAM_FUNC definition
   */ 
-#if defined ( __CC_ARM   )
+#if defined ( __ARMCC_VERSION   )
 /* ARM Compiler
    ------------
    RAM functions are defined using the toolchain options. 
