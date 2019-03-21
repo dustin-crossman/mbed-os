@@ -8214,7 +8214,7 @@
     },
     "AUGUST_CYW43012_M0": {
         "inherits": ["MCU_PSOC6_M0"],
-        "extra_labels_add": ["CY8C62XX", "AUGUST_CYW43012"],
+        "extra_labels_add": ["AUGUST_CYW43012"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "post_binary_hook": {
             "function": "PSOC6Code.complete"
@@ -8223,7 +8223,7 @@
     "AUGUST_CYW43012": {
         "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
-        "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW43012", "CORDIO", "CY8C62XX"],
+        "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW43012", "CORDIO"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1", "MBED_TICKLESS"],
         "detect_code": ["1906"],
         "hex_filename": "psoc6_01_cm0p_sleep.hex",
@@ -8238,7 +8238,7 @@
     "AUGUST_CYW43012_M0_PSA": {
         "inherits": ["SPE_Target", "AUGUST_CYW43012_M0"],
         "components_add": ["SPM_MAILBOX", "FLASHIAP"],
-        "extra_labels_add": ["PSA", "MBED_SPM"],
+        "extra_labels_add": ["PSA", "MBED_SPM", "AUGUST_CYW43012_PSA"],
         "macros_add": [
             "MBED_TICKLESS",
             "MBEDTLS_PSA_CRYPTO_SPM",
