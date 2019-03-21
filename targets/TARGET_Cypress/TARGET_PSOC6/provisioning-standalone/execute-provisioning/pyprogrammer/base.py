@@ -137,10 +137,12 @@ class ProgrammerBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def program(self, filename):
+    def program(self, filename, file_format=None, address=None):
         """
         Programs a file into flash.
         :param filename: Path to a file.
+        :param file_format: File format. Default is to use the file's extension.
+        :param address: Base address used for the address where to flash a binary.
         :return: True if programmed successfully, otherwise False.
         """
         pass

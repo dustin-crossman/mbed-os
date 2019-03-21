@@ -11,13 +11,10 @@ def main():
     data = tool.read8(0x10000000)
     print(f'read8 = {hex(data)}')
 
-    data = tool.read8(0x4023004c)
-    print(f'read8 = {hex(data)}')
-
-    data = tool.read16(0x10000002)
+    data = tool.read16(0x10000000)
     print(f'read16 = {hex(data)}')
 
-    data = tool.read32(0x4023004c)
+    data = tool.read32(0xE0000000)
     print(f'read32 = {hex(data)}')
 
 
