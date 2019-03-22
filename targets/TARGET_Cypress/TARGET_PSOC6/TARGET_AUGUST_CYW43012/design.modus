@@ -376,7 +376,7 @@
                 <Param id="StartInput" value="CY_TCPWM_INPUT_DISABLED"/>
                 <Param id="SwapInput" value="CY_TCPWM_INPUT_DISABLED"/>
                 <Param id="KillMode" value="CY_TCPWM_PWM_STOP_ON_KILL"/>
-                <Param id="InvertPwm" value="true"/>
+                <Param id="InvertPwm" value="false"/>
                 <Param id="InvertPwm_n" value="false"/>
                 <Param id="inFlash" value="true"/>
             </Block>
