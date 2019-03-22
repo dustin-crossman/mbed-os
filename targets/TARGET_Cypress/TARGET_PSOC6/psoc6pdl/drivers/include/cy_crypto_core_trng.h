@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_crypto_core_trng.h
-* \version 2.30
+* \version 2.20
 *
 * \brief
 *  This file provides provides constant and parameters

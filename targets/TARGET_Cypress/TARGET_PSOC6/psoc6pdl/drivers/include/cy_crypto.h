@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_crypto.h
-* \version 2.30
+* \version 2.20
 *
 * \brief
 *  This file provides the public interface for the Crypto driver.
@@ -284,18 +284,6 @@
 * \section group_crypto_changelog Changelog
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
-*   <tr>
-*     <td>2.30</td>
-*     <td>
-*         <ul>
-*         <li>Added multi-instance support for AES and SHA.</li>
-*         <li>Added support for ARM Compiler 6.</li>
-*         </ul>
-*     </td>
-*     <td>Integration with mbedOS/mbedTLS, restructured the implementation of
-*         AES and SHA for the Crypto ALT interface.
-*     </td>
-*   </tr>
 *   <tr>
 *     <td>2.20</td>
 *     <td>

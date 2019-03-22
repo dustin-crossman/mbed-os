@@ -1,8 +1,8 @@
 /***************************************************************************//**
-* \file cy_crypto_core_hw_vu.h
-* \version 2.30
+* file cy_crypto_core_hw_vu.h
+* version 2.20
 *
-* \brief
+* brief
 *  This file provides constants and function prototypes
 *  for the Vector Unit functions in the Crypto block driver.
 *
