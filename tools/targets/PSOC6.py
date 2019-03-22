@@ -171,7 +171,7 @@ def collect_args(toolchain, image_slot, target_type):
 
         args_for_signature = {
             "sdk_path": skd_path,
-            "priv_key": str(skd_path + '/provisioning-packet/' + sb_config["priv_key_file"]),
+            "priv_key": str(skd_path + sb_config["priv_key_file"]),
             "imgtool": str(skd_path + "/imgtool/imgtool.py"),
             "version": str(sb_config[target_type["core"]][image_slot]["VERSION"]),
             "id": str(sb_config[target_type["core"]][image_slot]["IMAGE_ID"]),
@@ -233,6 +233,8 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
 
     # catch stderr outputs
     stderr = process.communicate()
+    print(str(stderr[1].decode("utf-8")))
+
     if stderr[1].decode("utf-8"):
         toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")
         toolchain.notify.tool_error("[PSOC6.sign_image] Message from imgtool: " + stderr[1].decode("utf-8"))
