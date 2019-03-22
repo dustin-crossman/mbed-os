@@ -354,15 +354,14 @@ void cy_free_tcpwm(uint32_t tcpwm_num)
     }
 }
 
-#define MAX_CRYPTO_OBJ_ID  UINT8_MAX
-typedef uint8_t crypto_reservation_t;
-static crypto_reservation_t crypto_reservations[NUM_CRYPTO_HW] = { 0u };
+
+static uint8_t  crypto_reservations[NUM_CRYPTO_HW] = { 0u };
 
 static int cy_crypto_reserved_status(void)
 {
-    return ((int)(crypto_reservations[CY_CRYPTO_TRNG_HW] +
-                  crypto_reservations[CY_CRYPTO_CRC_HW]  +
-                  crypto_reservations[CY_CRYPTO_VU_HW]   +
+    return ((int)(crypto_reservations[CY_CRYPTO_TRNG_HW] |
+                  crypto_reservations[CY_CRYPTO_CRC_HW]  |
+                  crypto_reservations[CY_CRYPTO_VU_HW]  |
                   crypto_reservations[CY_CRYPTO_COMMON_HW]));
 }
 
@@ -372,19 +371,19 @@ int cy_reserve_crypto(cy_en_crypto_submodule_t module_num)
     int result = (-1);
 
     if (module_num < NUM_CRYPTO_HW) {
-
         core_util_critical_section_enter();
 
         if (cy_crypto_reserved_status() == 0) {
-
             /* Enable Crypto IP on demand */
             Cy_Crypto_Core_Enable(CRYPTO);
         }
 
-        if (crypto_reservations[module_num] < MAX_CRYPTO_OBJ_ID) {
+        if (module_num == CY_CRYPTO_COMMON_HW) {
             crypto_reservations[module_num]++;
-
-            result = crypto_reservations[module_num];
+            result = 0;
+        } else {
+            crypto_reservations[module_num] = 1;
+            result = 0;
         }
 
         core_util_critical_section_exit();
@@ -399,24 +398,23 @@ void cy_free_crypto(cy_en_crypto_submodule_t module_num)
     int result = (-1);
 
     if (module_num < NUM_CRYPTO_HW) {
-
         core_util_critical_section_enter();
 
-        if (crypto_reservations[module_num] != 0) {
-            --crypto_reservations[module_num];
-
-            if (cy_crypto_reserved_status() == 0) {
-
-                /* Disable Crypto IP when it unreserved */
-                Cy_Crypto_Core_Disable(CRYPTO);
-            }
+        if (module_num == CY_CRYPTO_COMMON_HW && crypto_reservations[module_num] >= 1) {
+            crypto_reservations[module_num]--;
+            result = 0;
         }
-
-        result = crypto_reservations[module_num];
-
+        else if (crypto_reservations[module_num] == 1) {
+            crypto_reservations[module_num] = 0;
+            result = 0;
+        }
+        if (cy_crypto_reserved_status() == 0) {
+            /* Crypto hardware is still in enabled state; to disable:
+               Cy_Crypto_Core_Disable(CRYPTO) */
+        }
         core_util_critical_section_exit();
     }
-    if (result < 0) {
+    if (result) {
         error("Trying to release wrong CRYPTO hardware submodule.");
     }
 }

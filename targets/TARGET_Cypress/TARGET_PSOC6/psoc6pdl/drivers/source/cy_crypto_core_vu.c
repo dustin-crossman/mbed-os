@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_crypto_core_vu.c
-* \version 2.30
+* \version 2.20
 *
 * \brief
 *  This file provides the source code to the API for the Vector Unit helpers

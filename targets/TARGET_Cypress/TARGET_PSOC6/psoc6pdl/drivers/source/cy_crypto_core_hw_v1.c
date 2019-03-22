@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_crypto_core_hw_v1.c
-* \version 2.30
+* \version 2.20
 *
 * \brief
 *  This file provides the source code for the HAL API for the
@@ -30,6 +30,8 @@
 
 #include "cy_syslib.h"
 
+#define CY_CRYPTO_FIFODEPTH              (0x08u)
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_SetReg1Instr
 ****************************************************************************//**
@@ -47,7 +49,7 @@
 void Cy_Crypto_SetReg1Instr(CRYPTO_Type *base, uint32_t data0)
 {
     /* Check whether FIFO has enough space for 1 instruction */
-    while(Cy_Crypto_Core_GetFIFOUsed(base) >= (CY_CRYPTO_INSTR_FIFODEPTH - 1u))
+    while(Cy_Crypto_Core_GetFIFOUsed(base) >= (CY_CRYPTO_FIFODEPTH - 1u))
     {
     }
 
@@ -78,7 +80,7 @@ void Cy_Crypto_SetReg1Instr(CRYPTO_Type *base, uint32_t data0)
 void Cy_Crypto_SetReg2Instr(CRYPTO_Type *base, uint32_t data0, uint32_t data1)
 {
     /* Check whether FIFO has enough space for 2 instructions */
-    while(Cy_Crypto_Core_GetFIFOUsed(base) >= (CY_CRYPTO_INSTR_FIFODEPTH - 2u))
+    while(Cy_Crypto_Core_GetFIFOUsed(base) >= (CY_CRYPTO_FIFODEPTH - 2u))
     {
     }
 
@@ -115,7 +117,7 @@ void Cy_Crypto_SetReg2Instr(CRYPTO_Type *base, uint32_t data0, uint32_t data1)
 void Cy_Crypto_SetReg3Instr(CRYPTO_Type *base, uint32_t data0, uint32_t data1, uint32_t data2)
 {
     /* Check whether FIFO has enough space for 3 instructions */
-    while(Cy_Crypto_Core_GetFIFOUsed(base) >= (CY_CRYPTO_INSTR_FIFODEPTH - 3u))
+    while(Cy_Crypto_Core_GetFIFOUsed(base) >= (CY_CRYPTO_FIFODEPTH - 3u))
     {
     }
 
@@ -158,7 +160,7 @@ void Cy_Crypto_SetReg3Instr(CRYPTO_Type *base, uint32_t data0, uint32_t data1, u
 void Cy_Crypto_SetReg4Instr(CRYPTO_Type *base, uint32_t data0, uint32_t data1, uint32_t data2, uint32_t data3)
 {
     /* Check whether FIFO has enough space for 4 instructions */
-    while(Cy_Crypto_Core_GetFIFOUsed(base) >= (CY_CRYPTO_INSTR_FIFODEPTH - 4u))
+    while(Cy_Crypto_Core_GetFIFOUsed(base) >= (CY_CRYPTO_FIFODEPTH - 4u))
     {
     }
 
@@ -190,7 +192,7 @@ void Cy_Crypto_SetReg4Instr(CRYPTO_Type *base, uint32_t data0, uint32_t data1, u
 void Cy_Crypto_Run0ParamInstr(CRYPTO_Type *base, uint8_t instr)
 {
     /* Check whether FIFO has enough space for 1 instruction */
-    while(Cy_Crypto_Core_GetFIFOUsed(base) >= CY_CRYPTO_INSTR_FIFODEPTH)
+    while(Cy_Crypto_Core_GetFIFOUsed(base) >= CY_CRYPTO_FIFODEPTH)
     {
     }
 
@@ -217,7 +219,7 @@ void Cy_Crypto_Run0ParamInstr(CRYPTO_Type *base, uint8_t instr)
 void Cy_Crypto_Run1ParamInstr(CRYPTO_Type *base, uint8_t instr, uint32_t rdst0Shift)
 {
     /* Check whether FIFO has enough space for 1 instruction */
-    while(Cy_Crypto_Core_GetFIFOUsed(base) >= CY_CRYPTO_INSTR_FIFODEPTH)
+    while(Cy_Crypto_Core_GetFIFOUsed(base) >= CY_CRYPTO_FIFODEPTH)
     {
     }
 
@@ -252,7 +254,7 @@ void Cy_Crypto_Run2ParamInstr(CRYPTO_Type *base,
                            uint32_t rdst1Shift)
 {
     /* Check whether FIFO has enough space for 1 instruction */
-    while(Cy_Crypto_Core_GetFIFOUsed(base) >= CY_CRYPTO_INSTR_FIFODEPTH)
+    while(Cy_Crypto_Core_GetFIFOUsed(base) >= CY_CRYPTO_FIFODEPTH)
     {
     }
 
@@ -293,7 +295,7 @@ void Cy_Crypto_Run3ParamInstr(CRYPTO_Type *base,
                            uint8_t rdst2Shift)
 {
     /* Check whether FIFO has enough space for 1 instruction */
-    while(Cy_Crypto_Core_GetFIFOUsed(base) >= CY_CRYPTO_INSTR_FIFODEPTH)
+    while(Cy_Crypto_Core_GetFIFOUsed(base) >= CY_CRYPTO_FIFODEPTH)
     {
     }
 
@@ -340,7 +342,7 @@ void Cy_Crypto_Run4ParamInstr(CRYPTO_Type *base,
                            uint32_t rdst3Shift)
 {
     /* Check whether FIFO has enough space for 1 instruction */
-    while(Cy_Crypto_Core_GetFIFOUsed(base) >= CY_CRYPTO_INSTR_FIFODEPTH)
+    while(Cy_Crypto_Core_GetFIFOUsed(base) >= CY_CRYPTO_FIFODEPTH)
     {
     }
 

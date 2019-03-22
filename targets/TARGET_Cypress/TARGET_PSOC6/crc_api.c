@@ -40,7 +40,7 @@ void hal_crc_compute_partial_start(const crc_mbed_config_t *config)
 {
     uint32_t myMask = 0UL;
 
-    if (!hal_crc_is_supported(config) || (cy_reserve_crypto(CY_CRYPTO_CRC_HW) < 0U)) {
+    if (!hal_crc_is_supported(config) || (cy_reserve_crypto(CY_CRYPTO_CRC_HW) != 0U)) {
         return;
     }
 
