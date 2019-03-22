@@ -17,20 +17,11 @@ class ProgrammerBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def connect(self, target_name=None, interface=Interface.SWD):
+    def connect(self, target_name=None, interface=None):
         """
         Connects to target.
         :param target_name: The target name.
         :param interface: Debug interface.
-        :return: True if connected successfully, otherwise False.
-        """
-        pass
-
-    @abstractmethod
-    def connect(self, target_name=None):
-        """
-        Connects to target using default debug interface.
-        :param target_name: The target name.
         :return: True if connected successfully, otherwise False.
         """
         pass
