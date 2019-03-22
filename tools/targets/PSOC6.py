@@ -23,7 +23,7 @@ import subprocess
 import errno
 from array import array
 from struct import (pack, unpack)
-from shutil import copyfile
+from shutil import copy2
 from intelhex import IntelHex
 from intelhex.compat import asbytes
 
@@ -145,22 +145,34 @@ def collect_args(toolchain, image_slot, target_type):
 
     cy_targets = Path("targets/TARGET_Cypress/TARGET_PSOC6/")
     sb_params_file_name = Path("secure_image_parameters.json")
+    root_dir = Path(os.getcwd())
 
-    # resolve base compilation directory - check if we compile from ./mbed-os or ../mbed-os
-    if "/mbed-os/" not in str(os.getcwd()):
-        sb_params_file_path = 'mbed-os' / cy_targets / \
+    # suppose default location for application ../mbed-os
+    sb_params_file_path = root_dir / cy_targets / Path("TARGET_" + target_type["name"]) / sb_params_file_name
+
+    if not os.path.isfile(str(sb_params_file_path)):
+        # try location for tests ./mbed-os
+        sb_params_file_path = root_dir / 'mbed-os' / cy_targets / \
                               Path("TARGET_" + target_type["name"]) / sb_params_file_name
-    else:
-        sb_params_file_path = cy_targets / Path("TARGET_" + target_type["name"]) / sb_params_file_name
+        if not os.path.isfile(str(sb_params_file_path)):
+            toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Target not found!")
+            raise Exception("imgtool finished execution with errors!")
 
-    with open(sb_params_file_path.resolve()) as f:
+    with open(str(sb_params_file_path)) as f:
         json_str = f.read()
         sb_config = json.loads(json_str)
 
+        # suppose default location for application ../mbed-os
+        skd_path = str(Path(sb_config.get("sdk_path")).absolute())
+
+        if not os.path.isdir(skd_path):
+            # try location for tests ./mbed-os
+            skd_path = str(('mbed-os' / Path(sb_config.get("sdk_path"))).absolute())
+
         args_for_signature = {
-            "sdk_path": Path(sb_config.get("sdk_path")).resolve(),
-            "priv_key": str(Path(sb_config.get("sdk_path") + sb_config["priv_key_file"]).resolve()),
-            "imgtool": str(Path(sb_config.get("sdk_path") + "imgtool/imgtool.py").resolve()),
+            "sdk_path": skd_path,
+            "priv_key": str(skd_path + sb_config["priv_key_file"]),
+            "imgtool": str(skd_path + "/imgtool/imgtool.py"),
             "version": str(sb_config[target_type["core"]][image_slot]["VERSION"]),
             "id": str(sb_config[target_type["core"]][image_slot]["IMAGE_ID"]),
             "rollback_counter": str(sb_config[target_type["core"]][image_slot]["ROLLBACK_COUNTER"]),
@@ -175,18 +187,23 @@ def collect_args(toolchain, image_slot, target_type):
 
 # Sign binary image with Secure Boot SDK tools
 def sign_image(toolchain, resources, elf0, binf, hexf1=None):
-    mbed_elf_path = Path(elf0).resolve()
-    mbed_bin_path = Path(elf0[:-4] + ".bin").resolve()
+    mbed_elf_path = str(Path(elf0).resolve())
+    mbed_bin_path = mbed_elf_path[:-4] + ".bin"
     mbed_hex_path = Path(binf).resolve()
 
     target = {"name": "UNDEFINED", "core": "UNDEFINED"}
+    img_start_addr = 0
 
     # find target name and type before processing
     for part in PurePath(binf).parts:
         if "CY" in part:
             if "_M0_" in part:
                 target = {"name": part, "core": "cm0p"}
+                # SPE image flash address start
+                img_start_addr = "0x10600400"
             else:
+                # NSPE image flash address start
+                img_start_addr = "0x10000400"
                 target = {"name": part, "core": "cm4"}
 
     # create binary file from mbed elf for the following processing
@@ -194,7 +211,7 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
                       "-O", "binary", str(mbed_bin_path)])
 
     # preserve original hex file from mbed-os build
-    mbed_hex_path.replace((str(mbed_hex_path)[:-4] + "_unsigned.hex"))
+    copy2(str(mbed_hex_path), (str(mbed_hex_path)[:-4] + "_unsigned.hex"))
 
     binf = binf[:-4] + ".bin"
     binf_signed = binf[:-4] + "_signed.bin"
@@ -203,7 +220,7 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
     if target["name"] != "UNDEFINED":
         sign_args = collect_args(toolchain, image_slot="boot1", target_type=target)
     else:
-        toolchain.notify.tool_error("[PSOC6.sign_image hook message] ERROR: Target not found!")
+        toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Target not found!")
         exit(1)
 
     # call imgtool for signature
@@ -216,18 +233,23 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
 
     # catch stderr outputs
     stderr = process.communicate()
+    print(str(stderr[1].decode("utf-8")))
+
     if stderr[1].decode("utf-8"):
-        toolchain.notify.tool_error("[PSOC6.sign_image hook message] ERROR: Signature is not added!")
-        toolchain.notify.tool_error("[PSOC6.sign_image hook message] Message from imgtool: " + stderr[1].decode("utf-8"))
+        toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")
+        toolchain.notify.tool_error("[PSOC6.sign_image] Message from imgtool: " + stderr[1].decode("utf-8"))
         raise Exception("imgtool finished execution with errors!")
     else:
-        toolchain.notify.info("[PSOC6.sign_image hook message] SUCCESS: Image is signed with no errors!")
+        toolchain.notify.info("[PSOC6.sign_image] SUCCESS: Image is signed with no errors!")
 
-    # TODO: resolve --image-base address gathering as parameter, not a constant
+    # TODO: resolve img_start_addr acquisition as parameter, not a constant
     # convert signed image binary back to hex format
-    subprocess.Popen(["arm-none-eabi-objcopy.exe", "--image-base", "0x10000400",  # 0x10600400 for PSA M0
-                      "-I", "binary", "-O", "ihex", binf_signed, str(mbed_hex_path)])
-
+    if img_start_addr:
+        subprocess.Popen(["arm-none-eabi-objcopy.exe", "--change-address", img_start_addr,  # 0x10600400 for PSA M0
+                          "-I", "binary", "-O", "ihex", binf_signed, str(mbed_hex_path)])
+    else:
+        toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")
+        raise Exception("imgtool finished execution with errors!")
 
 def complete(toolchain, elf0, hexf0, hexf1=None):
     complete_func(toolchain.notify.debug, elf0, hexf0, hexf1)

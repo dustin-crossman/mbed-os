@@ -36,22 +36,22 @@ def process_customer_keys(paths):
 
 @click.command()
 @click.option('--oem', 'oem_state_path',
-              default='prebuild/oem_state.json',
+              default='../prebuild/oem_state.json',
               help='OEM key file.')
 @click.option('--hsm', 'hsm_state_path',
-              default='prebuild/hsm_state.json',
+              default='../prebuild/hsm_state.json',
               help='HSM key file.')
 @click.option('--cyboot', 'image_cert',
-              default='prebuild/CypressBootloader_CM0p.jwt',
+              default='../prebuild/CypressBootloader_CM0p.jwt',
               help='Cypress Bootloader image certificate.')
 @click.option('--cyauth', 'cy_auth_path',
-              default='prebuild/cy_auth.jwt',
+              default='../prebuild/cy_auth.jwt',
               help='Provisioning authorization certificate.')
 @click.option('--policy', 'policy_path',
               default='policy_1stage_CM4.json',
               help='Policy file.')
 @click.option('--out', 'output_path',
-              default='provisioning-packet',
+              default='../packet',
               help='Output directory.')
 @click.option('--ckey', 'cust_key_path',
               default=None,
