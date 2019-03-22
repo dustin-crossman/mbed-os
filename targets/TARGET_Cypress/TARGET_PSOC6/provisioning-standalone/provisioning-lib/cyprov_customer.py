@@ -5,6 +5,10 @@ from cyprov_crypto import crypto
 class CustomerEntity(Entity):
     def __init__(self, state_name, audit_name) :
         Entity.__init__(self, state_name, audit_name)
+        if "custom_priv_key" not in self.state:
+            d = dict()
+            d["custom_priv_key"] = self.state
+            self.state = d
         
     def create_entity(self, kid) :
         """
@@ -19,7 +23,12 @@ class CustomerEntity(Entity):
         self.state_loaded = True
     
     def get_pub_key(self):
-        return self.state["custom_pub_key"]
+        if "custom_pub_key" not in self.state:
+            key = self.state["custom_priv_key"]
+            del key["d"]
+        else:
+            key = self.state["custom_pub_key"]
+        return key
     
     def get_priv_key(self):
         return self.state["custom_priv_key"]
