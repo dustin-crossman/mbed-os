@@ -4,14 +4,14 @@
                     "VERSION" : "0.1",
                     "ROLLBACK_COUNTER" : "0",
                     "IMAGE_ID" : "3",
-                    "SLOT_SIZE" : "0x20000",
+                    "SLOT_SIZE" : "0x40000",
                     "PAD" : "--pad"
                 },
                 "boot1" : {
                     "VERSION" : "0.1",
                     "ROLLBACK_COUNTER" : "0",
                     "IMAGE_ID" : "3",
-                    "SLOT_SIZE" : "0x30000",
+                    "SLOT_SIZE" : "0x40000",
                     "PAD" : "--pad"
                 }
             },
