@@ -1,0 +1,15 @@
+stages:
+  - test
+
+# Compile TARGET_PSOC6
+test_mbed:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - mbed test --compile -m CY8CKIT_062_WIFI_BT_M0_PSA -t GCC_ARM -n *psa-spm_smoke -v
+    - mbed test --compile -m CY8CKIT_062_WIFI_BT_PSA -t GCC_ARM -n *psa-spm_smoke -v
+    - mbed test --run -m CY8CKIT_062_WIFI_BT_PSA -t GCC_ARM -n *psa-spm_smoke -v
+    
+
+
