@@ -14,7 +14,15 @@ def main():
     data = tool.read16(0x10000000)
     print(f'read16 = {hex(data)}')
 
-    data = tool.read32(0xE0000000)
+    tool.halt()
+    tool.write32(0x4023004c, 0xDEADBEAF)
+
+    data = tool.read32(0x4023004c)
+    print(f'read32 = {hex(data)}')
+
+    tool.reset()
+
+    data = tool.read32(0x4023004c)
     print(f'read32 = {hex(data)}')
 
 
