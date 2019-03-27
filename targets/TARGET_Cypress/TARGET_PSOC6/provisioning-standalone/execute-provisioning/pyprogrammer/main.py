@@ -8,6 +8,16 @@ def main():
     if tool.connect(target):
         print(f"Connected to {target}")
 
+    tool.halt()
+
+    data = tool.read_reg('r1')
+
+    data = tool.write_reg('r1', 0x000000FA)
+
+    data = tool.read_reg('r1')
+
+    tool.resume()
+
     data = tool.read8(0x10000000)
     print(f'read8 = {hex(data)}')
 
@@ -24,6 +34,7 @@ def main():
 
     data = tool.read32(0x4023004c)
     print(f'read32 = {hex(data)}')
+
 
 
 if __name__ == "__main__":

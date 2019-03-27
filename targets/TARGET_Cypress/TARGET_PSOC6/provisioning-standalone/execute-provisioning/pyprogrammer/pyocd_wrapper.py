@@ -3,6 +3,7 @@ from pyocd.core.helpers import ConnectHelper
 from pyocd.core import exceptions
 from pyocd.flash import loader
 from pyocd.flash.loader import FlashEraser
+from pyocd import coresight
 from exceptions import ExtendedTransferFaultError
 
 
@@ -46,6 +47,15 @@ class Pyocd(ProgrammerBase):
 
             self.target = self.board.target
             self.probe = self.session.probe
+
+            # Write infinite loop into RAM and start core execution
+            self.halt()
+            self.write32(0x08000000, 0xE7FEB662)
+            self.write_reg('pc', 0x08000000)
+            self.write_reg('sp', 0x08001000)
+            self.write_reg('xpsr', 0x01000000)
+            self.resume()
+
             return True
 
     def disconnect(self):
@@ -72,6 +82,14 @@ class Pyocd(ProgrammerBase):
         if self.session is None:
             raise ValueError('Debug session is not initialized.')
         self.target.halt()
+
+    def resume(self):
+        """
+        Resumes the execution
+        """
+        if self.target is None:
+            raise ValueError('Target is not initialized.')
+        self.target.resume()
 
     def reset(self, reset_type=ResetType.SW):
         """
@@ -190,6 +208,32 @@ class Pyocd(ProgrammerBase):
             raise ExtendedTransferFaultError(e.fault_address, e.fault_length)
         return data
 
+    def read_reg(self, reg_name):
+        """
+        Gets value of a core register.
+        :param reg_name: Core register name.
+        :return: The register value.
+        """
+        reg = reg_name.lower()
+        if reg in coresight.cortex_m.CORE_REGISTER:
+            value = self.target.read_core_register(reg)
+            return value
+        else:
+            raise ValueError(f'Unknown core register {reg}.')
+
+    def write_reg(self, reg_name, value):
+        """
+        Sets value of a core register.
+        :param reg_name: Core register name.
+        :param value: The value to set.
+        :return: The register value.
+        """
+        reg = reg_name.lower()
+        if reg in coresight.cortex_m.CORE_REGISTER:
+            self.target.write_core_register(reg, value)
+        else:
+            raise ValueError(f'Unknown core register {reg}.')
+
     def erase(self, address, size):
         eraser = FlashEraser(self.session, FlashEraser.Mode.SECTOR)
         while size:
@@ -204,7 +248,7 @@ class Pyocd(ProgrammerBase):
             eraser.erase([address])
 
             # Next page.
-            size -= region.blocksize
+            size -= 1
             address += region.blocksize
 
     def program(self, filename, file_format=None, address=None):
