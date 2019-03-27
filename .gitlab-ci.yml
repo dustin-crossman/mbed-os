@@ -7,7 +7,7 @@ test_mbed_062:
   tags:
     - MBED_TEST
   script:
-    - mbedls -m 1902:CY8CKIT_062_WIFI_BT 
+    - mbedls -m 1900:CY8CKIT_062_WIFI_BT 
     - mbed test --compile -m CY8CKIT_062_WIFI_BT_M0_PSA -t GCC_ARM -n *psa-spm_smoke -v
     - mbed test --compile -m CY8CKIT_062_WIFI_BT_PSA -t GCC_ARM -n *psa-spm_smoke -v
     - mbed test --run -m CY8CKIT_062_WIFI_BT_PSA -t GCC_ARM -n *psa-spm_smoke -v
