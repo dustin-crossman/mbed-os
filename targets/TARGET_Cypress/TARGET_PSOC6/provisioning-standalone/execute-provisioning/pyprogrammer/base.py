@@ -49,6 +49,13 @@ class ProgrammerBase(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
+    def resume(self):
+        """
+        Resumes the execution
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
     def reset(self, reset_type=ResetType.SW):
         """
         Resets the target.
@@ -123,6 +130,24 @@ class ProgrammerBase(metaclass=ABCMeta):
         Writes 32-bit value by specified memory location.
         :param address: The memory address to write.
         :param value: The 32-bit value to write.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def read_reg(self, reg_name):
+        """
+        Gets value of a core register.
+        :param reg_name: Core register name.
+        :return: The register value.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def write_reg(self, reg_name, value):
+        """
+        Sets value of a core register.
+        :param reg_name: Core register name.
+        :param value: The value to set.
         """
         raise NotImplementedError()
 
