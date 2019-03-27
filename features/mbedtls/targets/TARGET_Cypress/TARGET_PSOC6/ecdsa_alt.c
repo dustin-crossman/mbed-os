@@ -160,6 +160,7 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
 
     /* make a PMSN value -> get_priv_key() */
     MBEDTLS_MPI_CHK( mbedtls_mpi_fill_random( &t, bytesize, f_rng, p_rng ) );
+
     if( bytesize * 8 > grp->nbits ) {
         MBEDTLS_MPI_CHK( mbedtls_mpi_shift_r( &t, 8 * bytesize - grp->nbits ) );
     }
