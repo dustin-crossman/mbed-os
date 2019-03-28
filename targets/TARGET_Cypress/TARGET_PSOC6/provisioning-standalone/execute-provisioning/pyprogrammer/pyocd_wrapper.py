@@ -244,20 +244,13 @@ class Pyocd(ProgrammerBase):
         :param size: The memory size.
         """
         region = self.session.target.memory_map.get_region_for_address(address)
-        if size < region.blocksize:
-            raise ValueError('Number of bytes to erase is less than row size.')
+        if not region:
+            raise ValueError('Address 0x%08x is not within a memory region.' % address)
+        if not region.is_flash:
+            raise ValueError('Address 0x%08x is not in flash.' % address)
         eraser = FlashEraser(self.session, FlashEraser.Mode.SECTOR)
-        while size:
-            # Look up the flash region so we can get the row size.
-            region = self.session.target.memory_map.get_region_for_address(address)
-            if not region:
-                raise ValueError('Address 0x%08x is not within a memory region.' % address)
-            if not region.is_flash:
-                raise ValueError('Address 0x%08x is not in flash.' % address)
-
-            eraser.erase([address])
-            size -= region.blocksize
-            address += region.blocksize
+        address_range = f"{hex(address)}-{hex(address + size)}"
+        eraser.erase([address_range])
 
     def program(self, filename, file_format=None, address=None):
         """
