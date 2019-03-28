@@ -116,7 +116,10 @@ class Pyocd(ProgrammerBase):
         """
         if self.target is None:
             raise ValueError('Target is not initialized.')
-        self.target.selected_core(core_number)
+        # self.target.selected_core = core_number
+        if core_number not in self.target.cores:
+            raise ValueError("Invalid core number")
+        self.target._selected_core = core_number
 
     def read8(self, address):
         """
@@ -235,20 +238,25 @@ class Pyocd(ProgrammerBase):
             raise ValueError(f'Unknown core register {reg}.')
 
     def erase(self, address, size):
+        """
+        Erases entire device flash or specified sectors.
+        :param address: The memory location.
+        :param size: The memory size.
+        """
+        region = self.session.target.memory_map.get_region_for_address(address)
+        if size < region.blocksize:
+            raise ValueError('Number of bytes to erase is less than row size.')
         eraser = FlashEraser(self.session, FlashEraser.Mode.SECTOR)
         while size:
-            # Look up the flash region so we can get the page size.
+            # Look up the flash region so we can get the row size.
             region = self.session.target.memory_map.get_region_for_address(address)
             if not region:
                 raise ValueError('Address 0x%08x is not within a memory region.' % address)
             if not region.is_flash:
                 raise ValueError('Address 0x%08x is not in flash.' % address)
 
-            # Erase this page.
             eraser.erase([address])
-
-            # Next page.
-            size -= 1
+            size -= region.blocksize
             address += region.blocksize
 
     def program(self, filename, file_format=None, address=None):
