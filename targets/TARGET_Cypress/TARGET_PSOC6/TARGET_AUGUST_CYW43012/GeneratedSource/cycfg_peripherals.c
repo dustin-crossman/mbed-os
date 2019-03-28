@@ -95,7 +95,7 @@ const cy_stc_sar_config_t ADC_config =
 {
 	.ctrl = (uint32_t) ADC_CTRL,
 	.sampleCtrl = (uint32_t) ADC_SAMPLE,
-	.sampleTime01 = (438UL << CY_SAR_SAMPLE_TIME0_SHIFT) | (3UL << CY_SAR_SAMPLE_TIME1_SHIFT),
+	.sampleTime01 = (802UL << CY_SAR_SAMPLE_TIME0_SHIFT) | (4UL << CY_SAR_SAMPLE_TIME1_SHIFT),
 	.sampleTime23 = (2UL << CY_SAR_SAMPLE_TIME2_SHIFT) | (2UL << CY_SAR_SAMPLE_TIME3_SHIFT),
 	.rangeThres = (3584UL << CY_SAR_RANGE_HIGH_SHIFT) | (512UL << CY_SAR_RANGE_LOW_SHIFT),
 	.rangeCond = CY_SAR_RANGE_COND_BELOW,
@@ -255,7 +255,7 @@ void init_cycfg_peripherals(void)
 
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB6_CLOCK, CY_SYSCLK_DIV_16_BIT, 1U);
 
-	Cy_SysClk_PeriphAssignDivider(PCLK_SCB7_CLOCK, CY_SYSCLK_DIV_8_BIT, 0U);
+	Cy_SysClk_PeriphAssignDivider(PCLK_SCB7_CLOCK, CY_SYSCLK_DIV_8_BIT, 4U);
 
 	Cy_SysClk_PeriphAssignDivider(PCLK_TCPWM1_CLOCKS16, CY_SYSCLK_DIV_8_BIT, 1U);
 
