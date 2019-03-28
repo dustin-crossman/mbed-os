@@ -50,6 +50,8 @@ class Pyocd(ProgrammerBase):
 
             # Write infinite loop into RAM and start core execution
             self.halt()
+            # B662 - CPSIE I - Enable IRQ by clearing PRIMASK
+            # E7FE - B - Jump to address (argument is an offset)
             self.write32(0x08000000, 0xE7FEB662)
             self.write_reg('pc', 0x08000000)
             self.write_reg('sp', 0x08001000)
