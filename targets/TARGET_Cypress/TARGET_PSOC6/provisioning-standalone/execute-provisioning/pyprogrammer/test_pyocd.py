@@ -131,19 +131,20 @@ class TestPyocd(TestCase):
         self.assertEqual(data, 0x12890735)
 
     def test_erase(self):
-        # self.tool.program('512.bin', 'bin', MAIN_ADDR)
+        self.tool.program('512.bin', 'bin', MAIN_ADDR)
         data = self.tool.read32(MAIN_ADDR)
+        self.assertNotEqual(data, 0x00000000)
         self.tool.erase(0x10000000, 0x00000800)
         data = self.tool.read32(MAIN_ADDR)
+        self.assertEqual(data, 0x00000000)
 
     def test_program(self):
+        self.tool.erase(0x10000000, 0x00000800)
+        data = self.tool.read32(MAIN_ADDR)
+        self.assertEqual(data, 0x00000000)
         self.tool.program('512.bin', 'bin', MAIN_ADDR)
         data = self.tool.read8(MAIN_ADDR)
-        data = self.tool.read8(MAIN_ADDR+1)
-        data = self.tool.read8(MAIN_ADDR+2)
-        data = self.tool.read8(MAIN_ADDR+3)
-        data = self.tool.read8(MAIN_ADDR+4)
-        self.assertGreater(data, 0xBABBCCDD)
+        self.assertGreater(data, 0x00000000)
 
     @staticmethod
     def decomposite32(value):
