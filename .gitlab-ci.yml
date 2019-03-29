@@ -1,7 +1,7 @@
 stages:
   - test
 before_script:
-    python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-provisioning/requirements.txt
+    - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-provisioning/requirements.txt
     
 # Compile TARGET_PSOC6_PSA
 test_mbed_064_psa:
