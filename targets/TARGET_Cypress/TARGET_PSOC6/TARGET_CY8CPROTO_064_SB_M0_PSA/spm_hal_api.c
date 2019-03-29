@@ -1,4 +1,5 @@
 /* Copyright (c) 2017-2018 ARM Limited
+ * Copyright 2018-2019 Cypress Semiconductor Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -57,7 +58,6 @@ void spm_hal_start_nspe(void)
     if ( (CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL )
     {
         IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
-       // pc.printf("rnok: TEST MODE");
         __disable_irq();
         CPUSS->CM4_VECTOR_TABLE_BASE = CY_BL_CM4_ROM_LOOP_ADDR;
         turn_on_cm4();
@@ -72,8 +72,8 @@ void spm_hal_start_nspe(void)
 
 void spm_hal_memory_protection_init(void)
 {
-#ifndef PU_ENABLE  //+++ rnok: was #ifdef
-    cy_en_prot_status_t status;
+#ifndef PU_ENABLE //+++ rnok: was #ifdef
+    cy_en_prot_status_t status = CY_PROT_SUCCESS;
 
     /* smpu */
     status = smpu_protect((cy_smpu_region_config_t *)flash_spm_smpu_config, sizeof(flash_spm_smpu_config) / sizeof(flash_spm_smpu_config[0]));
@@ -84,32 +84,29 @@ void spm_hal_memory_protection_init(void)
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
 
     /* fixed region ppu */
-    status = ppu_fixed_rg_protect((cy_ppu_fixed_rg_cfg_t *)fixed_rg_pc0_ppu_config, sizeof(fixed_rg_pc0_ppu_config) / sizeof(fixed_rg_pc0_ppu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+#ifndef INITIAL_PROTECTION_AVAILABLE
     status = ppu_fixed_rg_protect((cy_ppu_fixed_rg_cfg_t *)fixed_rg_spm_ppu_config, sizeof(fixed_rg_spm_ppu_config) / sizeof(fixed_rg_spm_ppu_config[0]));
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+#endif /* INITIAL_PROTECTION_AVAILABLE */
     status = ppu_fixed_rg_protect((cy_ppu_fixed_rg_cfg_t *)fixed_rg_any_ppu_config, sizeof(fixed_rg_any_ppu_config) / sizeof(fixed_rg_any_ppu_config[0]));
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
     /* fixed slave ppu */
-    status = ppu_fixed_sl_protect((cy_ppu_fixed_sl_cfg_t *)fixed_sl_pc0_ppu_config, sizeof(fixed_sl_pc0_ppu_config) / sizeof(fixed_sl_pc0_ppu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+#ifndef INITIAL_PROTECTION_AVAILABLE
     status = ppu_fixed_sl_protect((cy_ppu_fixed_sl_cfg_t *)fixed_sl_spm_ppu_config, sizeof(fixed_sl_spm_ppu_config) / sizeof(fixed_sl_spm_ppu_config[0]));
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+#endif /* INITIAL_PROTECTION_AVAILABLE */
     status = ppu_fixed_sl_protect((cy_ppu_fixed_sl_cfg_t *)fixed_sl_any_ppu_config, sizeof(fixed_sl_any_ppu_config) / sizeof(fixed_sl_any_ppu_config[0]));
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
     /* programmable ppu */
-    status = ppu_prog_protect((cy_ppu_prog_cfg_t *)prog_pc0_ppu_config, sizeof(prog_pc0_ppu_config) / sizeof(prog_pc0_ppu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+#ifndef INITIAL_PROTECTION_AVAILABLE
     status = ppu_prog_protect((cy_ppu_prog_cfg_t *)prog_spm_ppu_config, sizeof(prog_spm_ppu_config) / sizeof(prog_spm_ppu_config[0]));
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+#endif /* INITIAL_PROTECTION_AVAILABLE */
     /* fixed group ppu */
-    status = ppu_fixed_gr_protect((cy_ppu_fixed_gr_cfg_t *)fixed_gr_pc0_ppu_config, sizeof(fixed_gr_pc0_ppu_config) / sizeof(fixed_gr_pc0_ppu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+#ifndef INITIAL_PROTECTION_AVAILABLE
     status = ppu_fixed_gr_protect((cy_ppu_fixed_gr_cfg_t *)fixed_gr_spm_ppu_config, sizeof(fixed_gr_spm_ppu_config) / sizeof(fixed_gr_spm_ppu_config[0]));
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+#endif /* INITIAL_PROTECTION_AVAILABLE */
 
-    /* bus masters */
-    status = bus_masters_protect((cy_bus_master_config_t *)bus_masters_config, sizeof(bus_masters_config) / sizeof(bus_masters_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
-#endif // PU_ENABLE
+#endif /* PU_ENABLE */
 }
