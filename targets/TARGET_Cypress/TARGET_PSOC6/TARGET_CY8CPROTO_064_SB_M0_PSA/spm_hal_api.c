@@ -21,11 +21,32 @@
 
 #include "cy_sysint.h"
 #include "spm_internal.h"
+#include "cy_device.h"
 
 #ifdef PU_ENABLE
 #include "cyprotection_config.h"
 #endif // PU_ENABLE
 
+#define CY_SRSS_TST_MODE_ADDR           (SRSS_BASE | 0x0100UL)
+#define TST_MODE_TEST_MODE_MASK         (0x80000000UL)
+#define TST_MODE_ENTERED_MAGIC          (0x12344321UL)
+#define CY_SYS_CM4_PWR_CTL_KEY_OPEN     (0x05FAUL)
+#define CY_BL_CM4_ROM_LOOP_ADDR         (0x16004000UL)
+
+static void turn_on_cm4(void)
+{
+    uint32_t regValue;
+
+    regValue = CPUSS->CM4_PWR_CTL & ~(CPUSS_CM4_PWR_CTL_VECTKEYSTAT_Msk | CPUSS_CM4_PWR_CTL_PWR_MODE_Msk);
+    regValue |= _VAL2FLD(CPUSS_CM4_PWR_CTL_VECTKEYSTAT, CY_SYS_CM4_PWR_CTL_KEY_OPEN);
+    regValue |= CY_SYS_CM4_STATUS_ENABLED;
+    CPUSS->CM4_PWR_CTL = regValue;
+
+    while((CPUSS->CM4_STATUS & CPUSS_CM4_STATUS_PWR_DONE_Msk) == 0UL)
+    {
+        /* Wait for the power mode to take effect */
+    }
+}
 
 /* -------------------------------------- HAL API ------------------------------------ */
 
@@ -33,6 +54,19 @@
 
 void spm_hal_start_nspe(void)
 {
+    /* Stop in case we are in the TEST MODE */
+    if ( (CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL )
+    {
+        IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
+        __disable_irq();
+        CPUSS->CM4_VECTOR_TABLE_BASE = CY_BL_CM4_ROM_LOOP_ADDR;
+        turn_on_cm4();
+        Cy_SysLib_Delay(1);
+        CPUSS->CM4_VECTOR_TABLE_BASE = PSA_NON_SECURE_ROM_START;
+        while((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL);
+        __enable_irq();
+    }
+
     Cy_SysEnableCM4(PSA_NON_SECURE_ROM_START);
 }
 

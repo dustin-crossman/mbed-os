@@ -110,12 +110,12 @@
                 "resources": [
                     {
                         "type": "BOOT",
-                        "address": 268435456,
-                        "size": 131072
+                        "address": 268828672,
+                        "size": 262144
                     },
                     {
                         "type": "UPGRADE",
-                        "address": 268763136,
+                        "address": 269090816,
                         "size": 131072
                     }
                 ]
@@ -134,12 +134,12 @@
                 "resources": [
                     {
                         "type": "BOOT",
-                        "address": 268566528,
-                        "size": 196608
+                        "address": 268435456,
+                        "size": 393216
                     },
                     {
                         "type": "UPGRADE",
-                        "address": 268894208,
+                        "address": 268828672,
                         "size": 196608
                     }
                 ]
