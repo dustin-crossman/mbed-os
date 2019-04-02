@@ -200,7 +200,7 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
             if "_M0_" in part:
                 target = {"name": part, "core": "cm0p"}
                 # SPE image flash address start
-                img_start_addr = "0x10060000"
+                img_start_addr = "0x10050000"
             else:
                 # NSPE image flash address start
                 img_start_addr = "0x10000000"

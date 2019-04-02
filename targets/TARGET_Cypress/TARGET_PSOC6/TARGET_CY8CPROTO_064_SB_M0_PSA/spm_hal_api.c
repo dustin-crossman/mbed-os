@@ -72,41 +72,42 @@ void spm_hal_start_nspe(void)
 
 void spm_hal_memory_protection_init(void)
 {
-#ifndef PU_ENABLE //+++ rnok: was #ifdef
+#ifdef PU_ENABLE //+++ rnok: was #ifdef
     cy_en_prot_status_t status = CY_PROT_SUCCESS;
 
-    /* smpu */
-    status = smpu_protect((cy_smpu_region_config_t *)flash_spm_smpu_config, sizeof(flash_spm_smpu_config) / sizeof(flash_spm_smpu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
-    status = smpu_protect((cy_smpu_region_config_t *)sram_spm_smpu_config, sizeof(sram_spm_smpu_config) / sizeof(sram_spm_smpu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+//    /* smpu */
+    //status = smpu_protect((cy_smpu_region_config_t *)flash_spm_smpu_config, sizeof(flash_spm_smpu_config) / sizeof(flash_spm_smpu_config[0]));
+    //CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+    //status = smpu_protect((cy_smpu_region_config_t *)sram_spm_smpu_config, sizeof(sram_spm_smpu_config) / sizeof(sram_spm_smpu_config[0]));
+    //CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
     status = smpu_config_unprotected(&default_smpu_master_config);
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
 
     /* fixed region ppu */
 #ifndef INITIAL_PROTECTION_AVAILABLE
-    status = ppu_fixed_rg_protect((cy_ppu_fixed_rg_cfg_t *)fixed_rg_spm_ppu_config, sizeof(fixed_rg_spm_ppu_config) / sizeof(fixed_rg_spm_ppu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+   status = ppu_fixed_rg_protect((cy_ppu_fixed_rg_cfg_t *)fixed_rg_spm_ppu_config, sizeof(fixed_rg_spm_ppu_config) / sizeof(fixed_rg_spm_ppu_config[0]));
+   CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
 #endif /* INITIAL_PROTECTION_AVAILABLE */
-    status = ppu_fixed_rg_protect((cy_ppu_fixed_rg_cfg_t *)fixed_rg_any_ppu_config, sizeof(fixed_rg_any_ppu_config) / sizeof(fixed_rg_any_ppu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
-    /* fixed slave ppu */
+   status = ppu_fixed_rg_protect((cy_ppu_fixed_rg_cfg_t *)fixed_rg_any_ppu_config, sizeof(fixed_rg_any_ppu_config) / sizeof(fixed_rg_any_ppu_config[0]));
+   CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+   /* fixed slave ppu */
 #ifndef INITIAL_PROTECTION_AVAILABLE
-    status = ppu_fixed_sl_protect((cy_ppu_fixed_sl_cfg_t *)fixed_sl_spm_ppu_config, sizeof(fixed_sl_spm_ppu_config) / sizeof(fixed_sl_spm_ppu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+   status = ppu_fixed_sl_protect((cy_ppu_fixed_sl_cfg_t *)fixed_sl_spm_ppu_config, sizeof(fixed_sl_spm_ppu_config) / sizeof(fixed_sl_spm_ppu_config[0]));
+   CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
 #endif /* INITIAL_PROTECTION_AVAILABLE */
-    status = ppu_fixed_sl_protect((cy_ppu_fixed_sl_cfg_t *)fixed_sl_any_ppu_config, sizeof(fixed_sl_any_ppu_config) / sizeof(fixed_sl_any_ppu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
-    /* programmable ppu */
+   status = ppu_fixed_sl_protect((cy_ppu_fixed_sl_cfg_t *)fixed_sl_any_ppu_config, sizeof(fixed_sl_any_ppu_config) / sizeof(fixed_sl_any_ppu_config[0]));
+   CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+   /* programmable ppu */
 #ifndef INITIAL_PROTECTION_AVAILABLE
-    status = ppu_prog_protect((cy_ppu_prog_cfg_t *)prog_spm_ppu_config, sizeof(prog_spm_ppu_config) / sizeof(prog_spm_ppu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+   status = ppu_prog_protect((cy_ppu_prog_cfg_t *)prog_spm_ppu_config, sizeof(prog_spm_ppu_config) / sizeof(prog_spm_ppu_config[0]));
+   CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
 #endif /* INITIAL_PROTECTION_AVAILABLE */
-    /* fixed group ppu */
-#ifndef INITIAL_PROTECTION_AVAILABLE
-    status = ppu_fixed_gr_protect((cy_ppu_fixed_gr_cfg_t *)fixed_gr_spm_ppu_config, sizeof(fixed_gr_spm_ppu_config) / sizeof(fixed_gr_spm_ppu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
-#endif /* INITIAL_PROTECTION_AVAILABLE */
+/* TODO: Temporary commented, because it is configured by FlashBoot to fix some silicon issues,
+   /* fixed group ppu */
+// #ifndef INITIAL_PROTECTION_AVAILABLE
+   // status = ppu_fixed_gr_protect((cy_ppu_fixed_gr_cfg_t *)fixed_gr_spm_ppu_config, sizeof(fixed_gr_spm_ppu_config) / sizeof(fixed_gr_spm_ppu_config[0]));
+   // CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+// #endif /* INITIAL_PROTECTION_AVAILABLE */
 
 #endif /* PU_ENABLE */
 }
