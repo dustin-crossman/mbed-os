@@ -42,39 +42,39 @@ CY_PROT_PCMASK3 + CY_PROT_PCMASK4)
 
 #define ALL_SUBREGIONS (0x0)
 
-const cy_smpu_region_config_t flash_spm_smpu_config[] = {
-    {   /* FLASH_PC1_SPM */
-        .address = (uint32_t *)PSA_SECURE_ROM_START, /* 0x10000000 */
-        .regionSize = CY_PROT_SIZE_512KB, /* 0x80000 */
-        .subregions = ALL_SUBREGIONS,
-        .userPermission = CY_PROT_PERM_RWX,
-        .privPermission = CY_PROT_PERM_RWX,
-        .secure = true,
-        .pcMatch = false,
-        .pcMask = SECURE_CONTEXTS_MASK,
-        .prot_region = PROT_SMPU_SMPU_STRUCT5,
-        .userMstPermission = CY_PROT_PERM_R,
-        .privMstPermission = CY_PROT_PERM_RW,
-        .pcMstMask = CY_PROT_PCMASK1,
-    }
-};
+// const cy_smpu_region_config_t flash_spm_smpu_config[] = {
+    // {   /* FLASH_PC1_SPM */
+        // .address = (uint32_t *)PSA_SECURE_ROM_START, /* 0x10500400 */
+        // .regionSize = CY_PROT_SIZE_512KB, /* 0x80000 */
+        // .subregions = ALL_SUBREGIONS,
+        // .userPermission = CY_PROT_PERM_RWX,
+        // .privPermission = CY_PROT_PERM_RWX,
+        // .secure = true,
+        // .pcMatch = false,
+        // .pcMask = SECURE_CONTEXTS_MASK,
+        // .prot_region = PROT_SMPU_SMPU_STRUCT5,
+        // .userMstPermission = CY_PROT_PERM_R,
+        // .privMstPermission = CY_PROT_PERM_RW,
+        // .pcMstMask = CY_PROT_PCMASK1,
+    // }
+// };
 
-const cy_smpu_region_config_t sram_spm_smpu_config[] = {
-    {   /* SRAM_SPM_PRIV - must include SRAM_SPM_PUB area */
-        .address = (uint32_t *)PSA_SECURE_RAM_START, /* 0x08020000 */
-        .regionSize = CY_PROT_SIZE_64KB, /* 0x10000 */
-        .subregions = ALL_SUBREGIONS, /* 0xC0, /*Size 0xC000 ALL_SUBREGIONS,*/
-        .userPermission = CY_PROT_PERM_DISABLED,
-        .privPermission = CY_PROT_PERM_RWX,
-        .secure = true,
-        .pcMatch = false,
-        .pcMask = SECURE_CONTEXTS_MASK,
-        .prot_region = PROT_SMPU_SMPU_STRUCT9,
-        .userMstPermission = CY_PROT_PERM_R,
-        .privMstPermission = CY_PROT_PERM_RW,
-        .pcMstMask = CY_PROT_PCMASK1,
-    }
-};
+// const cy_smpu_region_config_t sram_spm_smpu_config[] = {
+    // {   /* SRAM_SPM_PRIV - must include SRAM_SPM_PUB area */
+        // .address = (uint32_t *)PSA_SECURE_RAM_START, /* 0x08020000 */
+        // .regionSize = CY_PROT_SIZE_64KB, /* 0x10000 */
+        // .subregions = ALL_SUBREGIONS, /* 0xC0, /*Size 0xC000 ALL_SUBREGIONS,*/
+        // .userPermission = CY_PROT_PERM_DISABLED,
+        // .privPermission = CY_PROT_PERM_RWX,
+        // .secure = false,
+        // .pcMatch = false,
+        // .pcMask = SECURE_CONTEXTS_MASK,
+        // .prot_region = PROT_SMPU_SMPU_STRUCT9,
+        // .userMstPermission = CY_PROT_PERM_R,
+        // .privMstPermission = CY_PROT_PERM_RW,
+        // .pcMstMask = CY_PROT_PCMASK1,
+    // }
+// };
 
 /* Only privileged secure PC=1 master can change the SMPUs */
 const cy_stc_smpu_cfg_t default_smpu_master_config = {
@@ -83,7 +83,7 @@ const cy_stc_smpu_cfg_t default_smpu_master_config = {
     .subregions = ALL_SUBREGIONS, /* Not used */
     .userPermission = CY_PROT_PERM_R,
     .privPermission = CY_PROT_PERM_RW,
-    .secure = true,
+    .secure = false,
     .pcMatch = false,
     .pcMask = CY_PROT_PCMASK1,
 };
@@ -97,7 +97,7 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMask = ALL_PROTECTION_CONTEXTS_MASK - CY_PROT_PCMASK7,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_STRUCT3,
     },
@@ -110,7 +110,7 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMask = ALL_PROTECTION_CONTEXTS_MASK - CY_PROT_PCMASK7,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_STRUCT4,
     },
@@ -135,19 +135,19 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMask = ALL_PROTECTION_CONTEXTS_MASK - CY_PROT_PCMASK7,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_STRUCT6,
     },
     {   /* IPC_INTR_STRUCT1 */
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_INTR_STRUCT1,
     },
@@ -159,103 +159,103 @@ const cy_ppu_fixed_rg_cfg_t fixed_rg_spm_ppu_config[] = {
         .pcMask = ALL_PROTECTION_CONTEXTS_MASK - CY_PROT_PCMASK7,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_IPC_INTR_STRUCT2,
     },
     {   /* CPUSS-M4.PROT.SMPU */
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_SMPU,
     },
     {   /* CPUSS-M4.PROT.MPU_CM0P */
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_MPU_CM0P,
     },
     {   /* CPUSS-M4.PROT.MPU_CRYPTO */
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_MPU_CRYPTO,
     },
     {   /* CPUSS-M4.PROT.MPU_TC */
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_MPU_TC,
     },
     {   /* DW1_DW_CH_STRUCT0 */
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_DW1_DW_CH_STRUCT0,
     },
     {   /* DW1_DW_CH_STRUCT1 */
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_DW1_DW_CH_STRUCT1,
     },
     {   /* DW1_DW_CH_STRUCT2 */
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_DW1_DW_CH_STRUCT2,
     },
     {   /* DW1_DW_CH_STRUCT3 */
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_RG_DW1_DW_CH_STRUCT3,
     }
@@ -400,12 +400,12 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
     {   /* CPUSS-M4.CRYPTO */
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_CRYPTO,
     },
@@ -424,7 +424,7 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
          */
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_CPUSS,
     },
@@ -436,7 +436,7 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
         .pcMask = ALL_PROTECTION_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_IPC,
     },
@@ -448,7 +448,7 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
         .pcMask = ALL_PROTECTION_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_PROT,
     },
@@ -467,7 +467,7 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
          */
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_SRSS,
     },/* SRSS.BACKUP. SAS - Needs a secure driver to support secure time. Alternate option, no secure time
@@ -486,12 +486,12 @@ const cy_ppu_fixed_sl_cfg_t fixed_sl_spm_ppu_config[] = {
     {
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_GR_PPU_SL_DW1,
     }/*,
@@ -843,12 +843,12 @@ const cy_ppu_prog_cfg_t prog_spm_ppu_config[] = {
         .subregions = ALL_SUBREGIONS,
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RW,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_PPU_PR4,
     }
@@ -863,7 +863,7 @@ const cy_ppu_fixed_gr_cfg_t fixed_gr_spm_ppu_config[] = {
         .pcMask = ALL_PROTECTION_CONTEXTS_MASK,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
-        .secureMst = true,
+        .secureMst = false,
         .pcMstMask = SECURE_CONTEXTS_MASK,
         .pPpuStr = PERI_PPU_GR0,
     }

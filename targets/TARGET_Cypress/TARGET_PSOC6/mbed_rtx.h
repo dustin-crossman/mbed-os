@@ -47,11 +47,11 @@
 #endif
 #elif defined(TARGET_CY8CPROTO_064_M0_PSA)
 #ifndef INITIAL_SP
-#define INITIAL_SP              (0x08020000 + 0x0000D000)  /* Ram origin + length */
+#define INITIAL_SP              (0x0800F000 + 0x00010000)  /* Ram origin + length */
 #endif
 #elif defined(TARGET_CY8CPROTO_064_SB_PSA)
 #ifndef INITIAL_SP
-#define INITIAL_SP              (0x08000000 + 0x00020000)  /* Ram origin + length */
+#define INITIAL_SP              (0x08000000 + 0x0000F000)  /* Ram origin + length */ 
 #endif
 #endif
 #endif  /* MBED_MBED_RTX_H */

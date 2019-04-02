@@ -10,6 +10,6 @@ test_mbed_064_psa:
     - MBED_TEST
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB 
-    - mbed test --compile -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *psa-* -v
-    - mbed test --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa-* -v
-    - mbed test --run -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa-* -v
+    - mbed test --compile -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *psa* -vv
+    - mbed test --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
+    - mbed test --run -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
