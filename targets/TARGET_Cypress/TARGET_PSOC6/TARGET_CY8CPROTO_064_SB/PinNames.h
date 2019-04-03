@@ -207,14 +207,10 @@ typedef enum {
 
 
     SWITCH2     = P0_4,
-    LED1        = P0_3,
-    LED2        = P1_1,
-    LED3        = P11_1,
-    LED4        = P1_5,
-    LED5        = P13_7,
+    LED1        = P13_7,
+    LED2        = P1_5,
 
     LED_RED     = LED1,
-    LED_BLUE    = LED3,
     LED_GREEN   = LED2,
 
     USER_BUTTON = SWITCH2,
