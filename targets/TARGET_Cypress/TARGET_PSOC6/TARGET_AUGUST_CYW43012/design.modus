@@ -493,6 +493,26 @@
             <Block location="udb[0]" alias="" template="mxs40udbsdio" version="1.0"/>
         </Peripherals>
         <Pins>
+            <Block location="ioss[0].port[0].pin[0]" alias="" template="mxs40pin" version="1.0">
+                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="initialState" value="1"/>
+                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+                <Param id="sioOutputBuffer" value="true"/>
+                <Param id="inFlash" value="true"/>
+            </Block>
+            <Block location="ioss[0].port[0].pin[1]" alias="" template="mxs40pin" version="1.0">
+                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="initialState" value="1"/>
+                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
+                <Param id="sioOutputBuffer" value="true"/>
+                <Param id="inFlash" value="true"/>
+            </Block>
             <Block location="ioss[0].port[10].pin[1]" alias="MOT_CUR_FILT" template="mxs40pin" version="1.0">
                 <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
                 <Param id="initialState" value="1"/>
@@ -1054,7 +1074,7 @@
                 <Param id="sourceClock" value="lfclk"/>
             </Block>
             <Block location="srss[0].clock[0].bakclk[0]" alias="" template="mxs40bakclk" version="1.0">
-                <Param id="sourceClock" value="lfclk"/>
+                <Param id="sourceClock" value="wco"/>
             </Block>
             <Block location="srss[0].clock[0].eco[0]" alias="" template="mxs40eco" version="1.1">
                 <Param id="ecoFrequency" value="16.00"/>
@@ -1089,12 +1109,21 @@
                 <Param id="trim" value="1"/>
             </Block>
             <Block location="srss[0].clock[0].lfclk[0]" alias="" template="mxs40lfclk" version="1.1">
-                <Param id="sourceClock" value="ilo"/>
+                <Param id="sourceClock" value="wco"/>
             </Block>
             <Block location="srss[0].clock[0].pathmux[0]" alias="" template="mxs40pathmux" version="1.0">
                 <Param id="sourceClock" value="imo"/>
             </Block>
             <Block location="srss[0].clock[0].pathmux[1]" alias="" template="mxs40pathmux" version="1.0">
+                <Param id="sourceClock" value="imo"/>
+            </Block>
+            <Block location="srss[0].clock[0].pathmux[2]" alias="" template="mxs40pathmux" version="1.0">
+                <Param id="sourceClock" value="imo"/>
+            </Block>
+            <Block location="srss[0].clock[0].pathmux[3]" alias="" template="mxs40pathmux" version="1.0">
+                <Param id="sourceClock" value="imo"/>
+            </Block>
+            <Block location="srss[0].clock[0].pathmux[4]" alias="" template="mxs40pathmux" version="1.0">
                 <Param id="sourceClock" value="imo"/>
             </Block>
             <Block location="srss[0].clock[0].periclk[0]" alias="" template="mxs40periclk" version="1.0">
@@ -1106,16 +1135,31 @@
                 <Param id="desiredFrequency" value="150.000"/>
                 <Param id="optimization" value="MinPower"/>
             </Block>
-            <Block location="srss[0].clock[0].pumpclk[0]" alias="" template="mxs40pumpclk" version="1.0">
-                <Param id="sourceClockNumber" value="0"/>
-                <Param id="divider" value="8"/>
-            </Block>
             <Block location="srss[0].clock[0].slowclk[0]" alias="" template="mxs40slowclk" version="1.0">
                 <Param id="divider" value="1"/>
             </Block>
             <Block location="srss[0].clock[0].timerclk[0]" alias="" template="mxs40timerclk" version="1.0">
                 <Param id="sourceClock" value="imo"/>
                 <Param id="timerDivider" value="1"/>
+            </Block>
+            <Block location="srss[0].clock[0].wco[0]" alias="" template="mxs40wco" version="1.0">
+                <Param id="clockPort" value="CY_SYSCLK_WCO_NOT_BYPASSED"/>
+                <Param id="clockLostDetection" value="false"/>
+                <Param id="clockSupervisor" value="CY_SYSCLK_WCO_CSV_SUPERVISOR_ILO"/>
+                <Param id="lossWindow" value="CY_SYSCLK_CSV_LOSS_4_CYCLES"/>
+                <Param id="lossAction" value="CY_SYSCLK_CSV_ERROR_FAULT"/>
+                <Param id="accuracyPpm" value="150"/>
+            </Block>
+            <Block location="srss[0].power[0]" alias="" template="mxs40power" version="1.1">
+                <Param id="pwrMode" value="LDO_1_1"/>
+                <Param id="pmicEnable" value="false"/>
+                <Param id="backupSrc" value="VDDD"/>
+                <Param id="vddaMv" value="3300"/>
+                <Param id="vdddMv" value="3300"/>
+                <Param id="vBackupMv" value="3300"/>
+                <Param id="vddNsMv" value="3300"/>
+                <Param id="vddio0Mv" value="3300"/>
+                <Param id="vddio1Mv" value="3300"/>
             </Block>
         </Platform>
     </BlockConfig>
@@ -1163,6 +1207,14 @@
         <Net>
             <Port name="cpuss[0].dw1[0].chan[3].tr_in[0]"/>
             <Port name="udb[0].out_p[123]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[0].pin[0].analog[0]"/>
+            <Port name="srss[0].clock[0].wco[0].wco_in[0]"/>
+        </Net>
+        <Net>
+            <Port name="ioss[0].port[0].pin[1].analog[0]"/>
+            <Port name="srss[0].clock[0].wco[0].wco_out[0]"/>
         </Net>
         <Net>
             <Port name="ioss[0].port[1].pin[0].digital_inout[0]"/>
