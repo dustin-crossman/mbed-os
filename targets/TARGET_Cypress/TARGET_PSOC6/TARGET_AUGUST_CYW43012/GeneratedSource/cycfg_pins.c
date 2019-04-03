@@ -331,7 +331,7 @@ const cy_stc_gpio_pin_config_t MAG_INT_config =
 const cy_stc_gpio_pin_config_t SDIO_DATA_0_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG,
 	.hsiom = SDIO_DATA_0_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
@@ -347,7 +347,7 @@ const cy_stc_gpio_pin_config_t SDIO_DATA_0_config =
 const cy_stc_gpio_pin_config_t SDIO_DATA_1_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG,
 	.hsiom = SDIO_DATA_1_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
@@ -363,7 +363,7 @@ const cy_stc_gpio_pin_config_t SDIO_DATA_1_config =
 const cy_stc_gpio_pin_config_t SDIO_DATA_2_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG,
 	.hsiom = SDIO_DATA_2_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
@@ -379,7 +379,7 @@ const cy_stc_gpio_pin_config_t SDIO_DATA_2_config =
 const cy_stc_gpio_pin_config_t SDIO_DATA_3_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG,
 	.hsiom = SDIO_DATA_3_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
@@ -395,7 +395,7 @@ const cy_stc_gpio_pin_config_t SDIO_DATA_3_config =
 const cy_stc_gpio_pin_config_t SDIO_CMD_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG,
 	.hsiom = SDIO_CMD_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
@@ -411,7 +411,7 @@ const cy_stc_gpio_pin_config_t SDIO_CMD_config =
 const cy_stc_gpio_pin_config_t SDIO_CLK_config = 
 {
 	.outVal = 1,
-	.driveMode = CY_GPIO_DM_ANALOG,
+	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
 	.hsiom = SDIO_CLK_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
