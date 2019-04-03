@@ -148,18 +148,23 @@ def collect_args(toolchain, image_slot, target_type):
     root_dir = Path(os.getcwd())
 
     # suppose default location for application ../mbed-os
-    sb_params_file_path = root_dir / cy_targets / Path("TARGET_" + target_type["name"]) / sb_params_file_name
+    sb_params_file_path = root_dir / cy_targets / Path("TARGET_" + target_type["name"]) / sb_params_file_name                                
 
     if not os.path.isfile(str(sb_params_file_path)):
-        # try location for tests ./mbed-os
-        sb_params_file_path = root_dir / 'mbed-os' / cy_targets / \
+        # may be muboot target
+        sb_params_file_path = root_dir / cy_targets / 'TARGET_MCUBOOT' / \
                               Path("TARGET_" + target_type["name"]) / sb_params_file_name
         if not os.path.isfile(str(sb_params_file_path)):
-            sb_params_file_path = root_dir / 'mbed-os' / cy_targets / 'TARGET_MCUBOOT' / \
+            # consider tests build
+            sb_params_file_path = root_dir / 'mbed-os' / cy_targets / \
                               Path("TARGET_" + target_type["name"]) / sb_params_file_name
             if not os.path.isfile(str(sb_params_file_path)):
-                toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Target not found!")
-                raise Exception("imgtool finished execution with errors!")
+                # tests build may also be muboot target
+                sb_params_file_path = root_dir / 'mbed-os' / cy_targets / 'TARGET_MCUBOOT' / \
+                              Path("TARGET_" + target_type["name"]) / sb_params_file_name
+                if not os.path.isfile(str(sb_params_file_path)):
+                    toolchain.notify.debug("[PSOC6.sign_image] ERROR: Target not found!")
+                    raise Exception("imgtool finished execution with errors!")
 
     with open(str(sb_params_file_path)) as f:
         json_str = f.read()

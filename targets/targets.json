@@ -8141,7 +8141,7 @@
             "public-ram-size": "0x200"
         }
     },
-    "CY8CPROTO_064_SB_M0_PSA_MCUBOOT": {
+    "CY_M0_PSA_MB": {
         "inherits": ["CY8CPROTO_064_SB_M0_PSA"],
         "extra_labels_add": ["MCUBOOT"]
     },    
