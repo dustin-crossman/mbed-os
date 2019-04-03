@@ -684,7 +684,7 @@
                 <Param id="inFlash" value="true"/>
             </Block>
             <Block location="ioss[0].port[2].pin[0]" alias="SDIO_DATA_0" template="mxs40pin" version="1.0">
-                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="DriveModes" value="CY_GPIO_DM_STRONG"/>
                 <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
                 <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -694,7 +694,7 @@
                 <Param id="inFlash" value="true"/>
             </Block>
             <Block location="ioss[0].port[2].pin[1]" alias="SDIO_DATA_1" template="mxs40pin" version="1.0">
-                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="DriveModes" value="CY_GPIO_DM_STRONG"/>
                 <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
                 <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -704,7 +704,7 @@
                 <Param id="inFlash" value="true"/>
             </Block>
             <Block location="ioss[0].port[2].pin[2]" alias="SDIO_DATA_2" template="mxs40pin" version="1.0">
-                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="DriveModes" value="CY_GPIO_DM_STRONG"/>
                 <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
                 <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -714,7 +714,7 @@
                 <Param id="inFlash" value="true"/>
             </Block>
             <Block location="ioss[0].port[2].pin[3]" alias="SDIO_DATA_3" template="mxs40pin" version="1.0">
-                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="DriveModes" value="CY_GPIO_DM_STRONG"/>
                 <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
                 <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -724,7 +724,7 @@
                 <Param id="inFlash" value="true"/>
             </Block>
             <Block location="ioss[0].port[2].pin[4]" alias="SDIO_CMD" template="mxs40pin" version="1.0">
-                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="DriveModes" value="CY_GPIO_DM_STRONG"/>
                 <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
                 <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -734,7 +734,7 @@
                 <Param id="inFlash" value="true"/>
             </Block>
             <Block location="ioss[0].port[2].pin[5]" alias="SDIO_CLK" template="mxs40pin" version="1.0">
-                <Param id="DriveModes" value="CY_GPIO_DM_ANALOG"/>
+                <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
                 <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
                 <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
