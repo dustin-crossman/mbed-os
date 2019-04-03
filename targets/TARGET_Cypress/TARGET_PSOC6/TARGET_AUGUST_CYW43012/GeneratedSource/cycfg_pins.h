@@ -33,6 +33,24 @@
 extern "C" {
 #endif
 
+#define ioss_0_port_0_pin_0_PORT GPIO_PRT0
+#define ioss_0_port_0_pin_0_PIN 0U
+#define ioss_0_port_0_pin_0_NUM 0U
+#define ioss_0_port_0_pin_0_DRIVEMODE CY_GPIO_DM_ANALOG
+#define ioss_0_port_0_pin_0_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_0_pin_0_HSIOM
+	#define ioss_0_port_0_pin_0_HSIOM HSIOM_SEL_GPIO
+#endif
+#define ioss_0_port_0_pin_0_IRQ ioss_interrupts_gpio_0_IRQn
+#define ioss_0_port_0_pin_1_PORT GPIO_PRT0
+#define ioss_0_port_0_pin_1_PIN 1U
+#define ioss_0_port_0_pin_1_NUM 1U
+#define ioss_0_port_0_pin_1_DRIVEMODE CY_GPIO_DM_ANALOG
+#define ioss_0_port_0_pin_1_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_0_pin_1_HSIOM
+	#define ioss_0_port_0_pin_1_HSIOM HSIOM_SEL_GPIO
+#endif
+#define ioss_0_port_0_pin_1_IRQ ioss_interrupts_gpio_0_IRQn
 #define MOT_CUR_FILT_PORT GPIO_PRT10
 #define MOT_CUR_FILT_PIN 1U
 #define MOT_CUR_FILT_NUM 1U
@@ -581,6 +599,8 @@ extern "C" {
 #define MOT_CUR_PGA_POS_HSIOM ioss_0_port_9_pin_5_HSIOM
 #define MOT_CUR_PGA_POS_IRQ ioss_interrupts_gpio_9_IRQn
 
+extern const cy_stc_gpio_pin_config_t ioss_0_port_0_pin_0_config;
+extern const cy_stc_gpio_pin_config_t ioss_0_port_0_pin_1_config;
 extern const cy_stc_gpio_pin_config_t MOT_CUR_FILT_config;
 extern const cy_stc_gpio_pin_config_t ioss_0_port_10_pin_2_config;
 extern const cy_stc_gpio_pin_config_t FLASH_CS_config;
