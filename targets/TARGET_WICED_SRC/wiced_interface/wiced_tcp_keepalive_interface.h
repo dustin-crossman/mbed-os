@@ -40,15 +40,31 @@
 #include "LWIPStack.h"
 #include "wiced_tcp_keepalive.h"
 
-typedef struct {
+
+typedef struct tcp_keepalive_socket_params tcp_keepalive_socket_params_t;
+typedef int (*tcp_socket_callback_t)( tcp_keepalive_socket_params_t* params, void* arg );
+
+struct tcp_keepalive_socket_params
+{
+	TCPSocket *socket; /* TCP Socket */
 	uint16_t keepalive_interval;
 	uint16_t keepalive_retry_count;
 	uint16_t keepalive_retry_interval;
 	uint16_t remote_port;
 	uint16_t local_port;
-} tcp_keepalive_params_t;
+	struct
+	{
+		tcp_socket_callback_t receive;
+		tcp_socket_callback_t send;
+	} callbacks;
+	void* callback_arg;
+};
 
-int tcp_keepalive_enable(WiFiInterface *wifi, TCPSocket *socket, tcp_keepalive_params_t *tcp_keepalive_params);
+int tcp_keepalive_enable(WiFiInterface *wifi, tcp_keepalive_socket_params_t *params );
 int tcp_keepalive_disable(void);
+nsapi_error_t get_tcp_socket_parameters( TCPSocket *socket, void **tcpsock_info );
+
+int tcp_register_socket_callbacks(tcp_keepalive_socket_params_t *params, tcp_socket_callback_t send, tcp_socket_callback_t recv, void * arg);
+int tcp_deregister_socket_callbacks ( tcp_keepalive_socket_params_t *tcp_keep_alive_params );
 
 #endif /* _TCP_KEEPALIVE_H__*/
