@@ -1,6 +1,6 @@
 /***************************************************************************//**
-* \file cy8c6xx7_cm0plus.icf
-* \version 2.30
+* \file cy8c6xx7_cm0plus_psa.icf
+* \version 2.40
 *
 * Linker file for the IAR compiler.
 *

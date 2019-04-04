@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy8c6xx7_cm4_dual.ld
-* \version 2.30
+* \version 2.40
 *
 * Linker file for the GNU C compiler.
 *
@@ -93,7 +93,7 @@ MEMORY
 {
     /* The ram and flash regions control RAM and flash memory allocation for the CM4 core.
      * You can change the memory allocation by editing the 'ram' and 'flash' regions.
-     * Note that 2 KB of RAM (at the end of the RAM section) are reserved for system use.
+     * Note that 2 KB of RAM (at the end of the SRAM) are reserved for system use.
      * Using this memory region for other purposes will lead to unexpected behavior.
      * Your changes must be aligned with the corresponding memory regions for CM0+ core in 'xx_cm0plus.ld',
      * where 'xx' is the device group; for example, 'cy8c6xx7_cm0plus.ld'.

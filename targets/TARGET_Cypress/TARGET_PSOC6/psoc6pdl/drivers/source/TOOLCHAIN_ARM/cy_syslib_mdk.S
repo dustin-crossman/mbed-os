@@ -1,6 +1,6 @@
 ;-------------------------------------------------------------------------------
-; \file cy_syslib_mdk.s
-; \version 2.20
+; \file cy_syslib_mdk.S
+; \version 2.30
 ;
 ;  \brief Assembly routines for ARMCC.
 ;

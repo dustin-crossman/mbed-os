@@ -1,5 +1,5 @@
 ;/**************************************************************************//**
-; * @file     startup_psoc6_02_cm4.s
+; * @file     startup_psoc6_02_cm4.S
 ; * @brief    CMSIS Core Device Startup File for
 ; *           ARMCM4 Device Series
 ; * @version  V5.00
@@ -38,7 +38,6 @@ Stack_Size      EQU     0x00000400
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
 Stack_Mem       SPACE   Stack_Size
 __initial_sp
-
 
 ; <h> Heap Configuration
 ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
@@ -255,7 +254,6 @@ __Vectors       DCD     __initial_sp              ; Top of Stack
 __Vectors_End
 
 __Vectors_Size  EQU     __Vectors_End - __Vectors
-
                 EXPORT __ramVectors
                 AREA    RESET_RAM, READWRITE, NOINIT
 __ramVectors    SPACE   __Vectors_Size
@@ -275,7 +273,6 @@ Cy_OnResetUser  PROC
                 EXPORT  Cy_OnResetUser        [WEAK]
                 BX      LR
                 ENDP
-
 
 ; Reset Handler
 Reset_Handler   PROC
@@ -738,14 +735,13 @@ sdhc_1_interrupt_general_IRQHandler
 
                 ELSE
 
-                IMPORT  __use_two_region_memory
                 EXPORT  __user_initial_stackheap
 
 __user_initial_stackheap PROC
-                LDR     R0, =  Heap_Mem
+                LDR     R0, =Heap_Mem
                 LDR     R1, =(Stack_Mem + Stack_Size)
-                LDR     R2, = (Heap_Mem +  Heap_Size)
-                LDR     R3, = Stack_Mem
+                LDR     R2, =(Heap_Mem +  Heap_Size)
+                LDR     R3, =Stack_Mem
                 BX      LR
                 ENDP
 
