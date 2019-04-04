@@ -32,6 +32,9 @@
  */
 
 #include "wiced_tcp_keepalive_interface.h"
+#include "wiced_tcp_keepalive.h"
+
+
 struct tcp_pcb *g_socket_tcp = NULL;
 int tcp_keepalive_enable(WiFiInterface *wifi, tcp_keepalive_socket_params_t *tcp_keepalive_params)
 {
