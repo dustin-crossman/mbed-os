@@ -38,8 +38,10 @@
 #include "lwip/etharp.h"
 #include "WicedInterface.h"
 #include "LWIPStack.h"
-#include "wiced_tcp_keepalive.h"
 
+#define TCP_KEEPALIVE_ERROR   (-1)
+#define TCP_KEEPALIVE_TIMEOUT (-2)
+#define TCP_KEEPALIVE_SUCCESS (0)
 
 typedef struct tcp_keepalive_socket_params tcp_keepalive_socket_params_t;
 typedef int (*tcp_socket_callback_t)( tcp_keepalive_socket_params_t* params, void* arg );
