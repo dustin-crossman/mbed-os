@@ -68,6 +68,7 @@ extern "C" {
  ******************************************************/
 
 #define TCP_KEEPALIVE_ERROR   (-1)
+#define TCP_KEEPALIVE_TIMEOUT (-2)
 #define TCP_KEEPALIVE_SUCCESS (0)
 
 /******************************************************
@@ -118,6 +119,10 @@ int tko_enable (bool enable);
 int tko_param (uint16_t keepalive_interval, uint16_t keepalive_retry_count, uint16_t keepalive_retry_interval);
 int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_offload );
 int tcp_client_connect ( tcp_keep_alive_t* keep_alive_offload);
+
+/* TCP socket callback */
+void tcp_socket_snd_rcv_callback (void* params);
+
 
 #ifdef __cplusplus
 } /*extern "C" */
