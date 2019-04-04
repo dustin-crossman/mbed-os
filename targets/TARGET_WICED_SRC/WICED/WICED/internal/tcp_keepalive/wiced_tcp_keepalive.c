@@ -117,7 +117,7 @@ int tko_enable (bool enable )
         }
         else
         {
-            DEBUG_PRINTF((" tko disable success\n" ));
+            DEBUG_PRINTF((" tko enable success\n" ));
         }
     }
 
@@ -322,6 +322,11 @@ int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_of
     datalen += sizeof(keep_alive_offload->dstip);
 
     keep_alive_offload->seqnum = keep_alive_offload->seqnum - 1;
+
+    printf("keep alive Seq num:%lu\n",    keep_alive_offload->seqnum );
+    printf("keep alive Ack num:%lu\n",    keep_alive_offload->acknum );
+    printf("keep alive Rcv Window:%lu\n", keep_alive_offload->rx_window );
+
 
     connect->request_len = tcp_keepalive_pkt(&connect->data[datalen], keep_alive_offload );
     if(connect->request_len == 0xffff)
