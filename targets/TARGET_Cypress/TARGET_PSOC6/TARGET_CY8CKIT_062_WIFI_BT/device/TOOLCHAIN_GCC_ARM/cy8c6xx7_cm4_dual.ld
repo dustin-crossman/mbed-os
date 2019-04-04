@@ -49,7 +49,7 @@ ENTRY(Reset_Handler)
 * is equal to MBED_ROM_START 
 */ 
 #if !defined(MBED_APP_START)
-  #define MBED_APP_START    MBED_ROM_START 
+  #define MBED_APP_START MBED_ROM_START
 #endif
 
 #if !defined(MBED_ROM_SIZE)
@@ -61,7 +61,7 @@ ENTRY(Reset_Handler)
 * is equal to MBED_ROM_SIZE 
 */ 
 #if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE     MBED_ROM_SIZE
+  #define MBED_APP_SIZE MBED_ROM_SIZE
 #endif
 
 #if !defined(MBED_RAM_START)
