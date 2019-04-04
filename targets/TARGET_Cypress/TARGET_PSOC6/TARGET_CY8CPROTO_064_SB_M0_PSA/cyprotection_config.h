@@ -41,23 +41,24 @@ CY_PROT_PCMASK7)
 CY_PROT_PCMASK3 + CY_PROT_PCMASK4)
 
 #define ALL_SUBREGIONS (0x0)
+#define SECURE_IMAGE_HEADER_SIZE (0x400)
 
-// const cy_smpu_region_config_t flash_spm_smpu_config[] = {
-    // {   /* FLASH_PC1_SPM */
-        // .address = (uint32_t *)PSA_SECURE_ROM_START, /* 0x10500400 */
-        // .regionSize = CY_PROT_SIZE_512KB, /* 0x80000 */
-        // .subregions = ALL_SUBREGIONS,
-        // .userPermission = CY_PROT_PERM_RWX,
-        // .privPermission = CY_PROT_PERM_RWX,
-        // .secure = true,
-        // .pcMatch = false,
-        // .pcMask = SECURE_CONTEXTS_MASK,
-        // .prot_region = PROT_SMPU_SMPU_STRUCT5,
-        // .userMstPermission = CY_PROT_PERM_R,
-        // .privMstPermission = CY_PROT_PERM_RW,
-        // .pcMstMask = CY_PROT_PCMASK1,
-    // }
-// };
+const cy_smpu_region_config_t flash_spm_smpu_config[] = {
+    {   /* FLASH_PC1_SPM */
+        .address = (uint32_t *)(PSA_SECURE_ROM_START - SECURE_IMAGE_HEADER_SIZE), /* 0x10080000, include header of SPE image */
+        .regionSize = CY_PROT_SIZE_512KB, /* 0x80000 */
+        .subregions = (CY_PROT_SUBREGION_DIS7 | CY_PROT_SUBREGION_DIS6), /* disable regions 6, 7, end protection on 0x100E0000 */
+        .userPermission = CY_PROT_PERM_RWX,
+        .privPermission = CY_PROT_PERM_RWX,
+        .secure = false,
+        .pcMatch = false,
+        .pcMask = SECURE_CONTEXTS_MASK,
+        .prot_region = PROT_SMPU_SMPU_STRUCT5,
+        .userMstPermission = CY_PROT_PERM_R,
+        .privMstPermission = CY_PROT_PERM_RW,
+        .pcMstMask = CY_PROT_PCMASK1,
+    }
+};                                   
 
 // const cy_smpu_region_config_t sram_spm_smpu_config[] = {
     // {   /* SRAM_SPM_PRIV - must include SRAM_SPM_PUB area */
