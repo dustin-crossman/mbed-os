@@ -107,6 +107,7 @@ def patch(message_func, ihex, hexf, align=256):
 def merge_images(hexf0, hexf1=None):
     ihex = IntelHex()
     ihex.padding = 0x00
+
     ihex.loadfile(hexf0, "hex")
     if hexf1 is not None:
         # Merge the CM0+ image
@@ -192,15 +193,15 @@ def collect_args(toolchain, image_slot, target_type):
 
     return args_for_signature
 
-
 # Sign binary image with Secure Boot SDK tools
-def sign_image(toolchain, resources, elf0, binf, hexf1=None):
+def sign_image(toolchain, elf0, binf, hexf1=None):
     mbed_elf_path = str(Path(elf0).resolve())
     mbed_bin_path = mbed_elf_path[:-4] + ".bin"
     mbed_hex_path = Path(binf).resolve()
 
     target = {"name": "UNDEFINED", "core": "UNDEFINED"}
     img_start_addr = 0
+    need_completition = 0
 
     # find target name and type before processing
     for part in PurePath(binf).parts:
@@ -208,11 +209,12 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
             if "_M0_" in part:
                 target = {"name": part, "core": "cm0p"}
                 # SPE image flash address start
-                img_start_addr = "0x10050000"
+                img_start_addr = "0x10060000"
             else:
                 # NSPE image flash address start
                 img_start_addr = "0x10000000"
                 target = {"name": part, "core": "cm4"}
+                need_completition = 1
 
     # create binary file from mbed elf for the following processing
     subprocess.Popen(["arm-none-eabi-objcopy.exe", str(mbed_elf_path),
@@ -258,6 +260,9 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
     else:
         toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")
         raise Exception("imgtool finished execution with errors!")
+
+    if (need_completition == 1):
+        complete_func(toolchain.notify.debug, elf0, mbed_hex_path, hexf1)
 
 def complete(toolchain, elf0, hexf0, hexf1=None):
     complete_func(toolchain.notify.debug, elf0, hexf0, hexf1)
