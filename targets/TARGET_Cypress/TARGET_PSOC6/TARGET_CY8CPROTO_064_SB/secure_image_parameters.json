@@ -9,6 +9,6 @@
                 }
             },
 
-    "sdk_path" : "mbed-os/targets/TARGET_Cypress/TARGET_PSOC6/provisioning-standalone/",
-    "priv_key_file": "provisioning-packet/USERAPP_CM4_KEY_PRIV.pem"
+    "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/provisioning-standalone/",
+    "priv_key_file": "/USERAPP_CM4_KEY_PRIV.pem"
 }

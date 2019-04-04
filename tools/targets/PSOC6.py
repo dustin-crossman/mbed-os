@@ -170,17 +170,17 @@ def collect_args(toolchain, image_slot, target_type):
         json_str = f.read()
         sb_config = json.loads(json_str)
 
-        # suppose default location for application ../mbed-os
-        skd_path = str(Path(sb_config.get("sdk_path")).absolute())
+        # suppose default location for tests ./mbed-os
+        sdk_path = str(root_dir / cy_targets / Path(sb_config.get("sdk_path")).absolute())
 
-        if not os.path.isdir(skd_path):
-            # try location for tests ./mbed-os
-            skd_path = str(('mbed-os' / Path(sb_config.get("sdk_path"))).absolute())
+        if not os.path.isdir(sdk_path):
+            # try location for application ../mbed-os
+            sdk_path = str(root_dir / 'mbed-os' / cy_targets / Path(sb_config.get("sdk_path")).absolute())
 
         args_for_signature = {
-            "sdk_path": skd_path,
-            "priv_key": str(skd_path + sb_config["priv_key_file"]),
-            "imgtool": str(skd_path + "/imgtool/imgtool.py"),
+            "sdk_path": sdk_path,
+            "priv_key": str(sdk_path + sb_config["priv_key_file"]),
+            "imgtool": str(sdk_path + "/imgtool/imgtool.py"),
             "version": str(sb_config[target_type["core"]][image_slot]["VERSION"]),
             "id": str(sb_config[target_type["core"]][image_slot]["IMAGE_ID"]),
             "rollback_counter": str(sb_config[target_type["core"]][image_slot]["ROLLBACK_COUNTER"]),
