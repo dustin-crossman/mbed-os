@@ -67,10 +67,6 @@ extern "C" {
  *                    Constants
  ******************************************************/
 
-#define TCP_KEEPALIVE_ERROR   (-1)
-#define TCP_KEEPALIVE_TIMEOUT (-2)
-#define TCP_KEEPALIVE_SUCCESS (0)
-
 /******************************************************
  *                   Enumerations
  ******************************************************/
