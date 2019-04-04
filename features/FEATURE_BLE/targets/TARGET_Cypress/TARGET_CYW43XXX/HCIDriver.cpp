@@ -112,6 +112,30 @@ public:
 
             /* decode opcode */
             switch (opcode) {
+#ifdef CY_DEBUG
+                case HCI_OPCODE_READ_LOCAL_VER_INFO:
+                    uint8_t hci_version;
+                    uint8_t hci_revision;
+                    uint8_t lmp_revision;
+                    uint16_t manufacturer_name;
+
+                    BSTREAM_TO_UINT8(hci_version, pMsg);
+                    BSTREAM_TO_UINT8(hci_revision, pMsg);
+                    BSTREAM_TO_UINT8(lmp_revision, pMsg);
+                    BSTREAM_TO_UINT16(manufacturer_name, pMsg);
+
+                    if(hci_revision == 0 || manufacturer_name == 0xF)
+                    {
+                        printf("bt firmware download failed, rom code is being used\n");
+                    }
+                    else
+                    {
+                        printf("bt firmware download success\n");
+                    }
+
+                    set_sleep_mode();
+                    break;
+#endif
                 // Note: Reset is handled by ack_service_pack.
                 case HCI_VS_CMD_SET_SLEEP_MODE:
                     HciWriteLeHostSupport();
@@ -311,7 +335,12 @@ private:
         service_pack_index = 0;
         service_pack_transfered = true;
         wait_ms(1000);
+#ifdef CY_DEBUG
+        HciReadLocalVerInfoCmd();
+#else
         set_sleep_mode();
+#endif
+
         sleep_manager_unlock_deep_sleep();
     }
 
