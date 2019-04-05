@@ -90,7 +90,12 @@ void server_part2_main(void *ptr)
                     psa_reply(msg.handle, PSA_SUCCESS);
 #if defined(TARGET_MBED_SPM)
                     // Then the servers waits to some driver making long calculations - imitate using osDelay()
+/* Workaround to eliminate osDelay call, which is known to fail in current repo state (probably fixed in mainline mbed-os) */
+#if defined(TARGET_PSOC6)
+                    for(int32_t i = 32768; i != 0; i--);
+#else
                     osDelay(20);
+#endif
 #endif
                     // After work is done, ring the doorbell
                     psa_notify(caller_part_id);
