@@ -24,7 +24,7 @@ class CustomerEntity(Entity):
     
     def get_pub_key(self):
         if "custom_pub_key" not in self.state:
-            key = self.state["custom_priv_key"]
+            key = dict(self.state["custom_priv_key"])
             del key["d"]
         else:
             key = self.state["custom_pub_key"]
