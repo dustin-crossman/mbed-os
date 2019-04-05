@@ -31,7 +31,7 @@ class Pyocd(ProgrammerBase):
                 }
             else:
                 options = {}
-            self.session = ConnectHelper.session_with_chosen_probe(options=options)
+            self.session = ConnectHelper.session_with_chosen_probe(blocking=True, options=options)
             if self.session is None:
                 return False
             self.board = self.session.board
@@ -264,6 +264,5 @@ class Pyocd(ProgrammerBase):
         """
         if self.session is None:
             raise ValueError('Debug session is not initialized.')
-        programmer = loader.FileProgrammer(self.session, chip_erase=True)
+        programmer = loader.FileProgrammer(self.session, chip_erase=False)
         programmer.program(filename, base_address=address, file_format=file_format)
-
