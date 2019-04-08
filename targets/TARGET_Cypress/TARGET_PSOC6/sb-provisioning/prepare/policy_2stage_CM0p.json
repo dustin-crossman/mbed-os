@@ -84,8 +84,8 @@
                 "resources": [
                     {
                         "type": "FLASH_PC1_SPM",
-                        "address": 269090816,
-                        "size": 131072
+                        "address": 269287424,
+                        "size": 65536
                     },
                     {
                         "type": "SRAM_SPM_PRIV",
@@ -110,13 +110,13 @@
                 "resources": [
                     {
                         "type": "BOOT",
-                        "address": 268828672,
-                        "size": 262144
+                        "address": 268959744,
+                        "size": 327680
                     },
                     {
                         "type": "UPGRADE",
-                        "address": 269090816,
-                        "size": 131072
+                        "address": 269287424,
+                        "size": 1024
                     }
                 ]
             },
@@ -135,12 +135,12 @@
                     {
                         "type": "BOOT",
                         "address": 268435456,
-                        "size": 393216
+                        "size": 524288
                     },
                     {
                         "type": "UPGRADE",
-                        "address": 268828672,
-                        "size": 196608
+                        "address": 268959744,
+                        "size": 1024
                     }
                 ]
             }
