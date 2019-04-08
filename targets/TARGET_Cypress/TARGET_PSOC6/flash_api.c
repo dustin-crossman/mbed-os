@@ -98,14 +98,7 @@ uint32_t flash_get_start_address(const flash_t *obj)
 uint32_t flash_get_size(const flash_t *obj)
 {
     (void)(obj);
-/* rnok: this define will be revisioned once kv_config.cpp line 275 implementation 
-   will consider existance of  NSPE images starting from lower flash locations
-   and ending in the middle - before start of SPE */
-#ifndef TARGET_CY8CPROTO_064_SB_PSA
     return CY_FLASH_SIZE;
-#else
-    return PSA_NON_SECURE_ROM_SIZE;
-#endif
 }
 
 uint8_t flash_get_erase_value(const flash_t *obj)
