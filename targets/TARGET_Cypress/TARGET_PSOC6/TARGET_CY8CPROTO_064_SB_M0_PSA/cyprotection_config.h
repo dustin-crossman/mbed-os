@@ -62,7 +62,7 @@ const cy_smpu_region_config_t flash_spm_smpu_config[] = {
 
 const cy_smpu_region_config_t sram_spm_smpu_config[] = {
     {   /* SRAM_SPM_PRIV - must include SRAM_SPM_PUB area */
-        .address = (uint32_t *)PSA_SECURE_RAM_START, /* 0x08010000 */
+        .address = (uint32_t *)PSA_NON_SECURE_RAM_START, /* 0x08000000 */
         .regionSize = CY_PROT_SIZE_256KB, /* 0x40000 */
         /* 0xC3 - disable regions 0, 1 (NSPE RAM) 6, 7 (DAP RAM, FLASHBOOT etc)
            protect SPE, CyBootloader. End protection at 0x08030000 */
