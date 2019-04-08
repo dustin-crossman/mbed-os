@@ -1,8 +1,8 @@
 /***************************************************************************//**
-* file cy_crypto_core_hw_vu.h
-* version 2.20
+* \file cy_crypto_core_hw_vu.h
+* \version 2.30
 *
-* brief
+* \brief
 *  This file provides constants and function prototypes
 *  for the Vector Unit functions in the Crypto block driver.
 *
@@ -190,6 +190,7 @@
 #define CY_CRYPTO_VU2_CLR_BIT_IMM_OPC         (0x2Du)
 #define CY_CRYPTO_VU2_INV_BIT_IMM_OPC         (0x2Eu)
 
+#define CY_CRYPTO_VU1_WAIT_FOR_COMPLETE(base)  while (0uL != _FLD2VAL(CRYPTO_STATUS_VU_BUSY, REG_CRYPTO_STATUS(base))){}
 
 __STATIC_INLINE void CY_CRYPTO_VU_SAVE_REG (CRYPTO_Type *base, uint32_t rsrc, uint32_t *data);
 __STATIC_INLINE void CY_CRYPTO_VU_RESTORE_REG (CRYPTO_Type *base, uint32_t rdst, uint32_t data);
@@ -233,6 +234,8 @@ __STATIC_INLINE void CY_CRYPTO_VU_COND_MOV_IMM_TO_STATUS (CRYPTO_Type *base, uin
         /* Load 4 bit immediate value */
         CY_CRYPTO_VU_SET_REG(base, tmpReg, imm4, 4u);
         CY_CRYPTO_VU_COND_MOV_REG_TO_STATUS(base, cc, tmpReg);
+
+        CY_CRYPTO_VU1_WAIT_FOR_COMPLETE(base);
 
         CY_CRYPTO_VU_RESTORE_REG(base, tmpReg, tmpData);
     }
@@ -713,6 +716,8 @@ __STATIC_INLINE void CY_CRYPTO_VU_COND_SET_BIT_IMM (CRYPTO_Type *base, uint32_t 
         CY_CRYPTO_VU_SET_REG(base, tmpReg, imm13, 13u);
         CY_CRYPTO_VU_COND_SET_BIT(base, cc, rdst, tmpReg);
 
+        CY_CRYPTO_VU1_WAIT_FOR_COMPLETE(base);
+
         CY_CRYPTO_VU_RESTORE_REG(base, tmpReg, tmpData);
     }
     else
@@ -743,6 +748,8 @@ __STATIC_INLINE void CY_CRYPTO_VU_COND_CLR_BIT_IMM (CRYPTO_Type *base, uint32_t 
         CY_CRYPTO_VU_SET_REG(base, tmpReg, imm13, 13u);
         CY_CRYPTO_VU_COND_CLR_BIT(base, cc, rdst, tmpReg);
 
+        CY_CRYPTO_VU1_WAIT_FOR_COMPLETE(base);
+
         CY_CRYPTO_VU_RESTORE_REG(base, tmpReg, tmpData);
     }
     else
@@ -772,6 +779,8 @@ __STATIC_INLINE void CY_CRYPTO_VU_COND_INV_BIT_IMM (CRYPTO_Type *base, uint32_t 
         /* Load 13 bit immediate value */
         CY_CRYPTO_VU_SET_REG(base, tmpReg, imm13, 13u);
         CY_CRYPTO_VU_COND_INV_BIT(base, cc, rdst, tmpReg);
+
+        CY_CRYPTO_VU1_WAIT_FOR_COMPLETE(base);
 
         CY_CRYPTO_VU_RESTORE_REG(base, tmpReg, tmpData);
     }
