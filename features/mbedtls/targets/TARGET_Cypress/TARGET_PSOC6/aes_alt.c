@@ -48,7 +48,7 @@ void mbedtls_aes_init( mbedtls_aes_context *ctx )
 {
     cy_reserve_crypto(CY_CRYPTO_COMMON_HW);
 
-    memset( ctx, 0, sizeof( mbedtls_aes_context ) );
+    Cy_Crypto_Core_MemSet(CRYPTO, ctx, 0u, sizeof( mbedtls_aes_context ) );
 }
 
 void mbedtls_aes_free( mbedtls_aes_context *ctx )
@@ -56,7 +56,9 @@ void mbedtls_aes_free( mbedtls_aes_context *ctx )
     if( ctx == NULL )
         return;
 
-    mbedtls_platform_zeroize( ctx, sizeof( mbedtls_aes_context ) );
+    if (ctx->aes_state.buffers != NULL) {
+        Cy_Crypto_Core_Aes_Free(CRYPTO, &ctx->aes_state);
+    }
 
     cy_free_crypto(CY_CRYPTO_COMMON_HW);
 }
@@ -86,6 +88,9 @@ static int aes_set_keys( mbedtls_aes_context *ctx, const unsigned char *key,
 	cy_en_crypto_aes_key_length_t key_length;
 	cy_en_crypto_status_t status;
 
+    if( ctx == NULL )
+        return (MBEDTLS_ERR_AES_BAD_INPUT_DATA);
+
     switch( keybits )
     {
         case 128: key_length = CY_CRYPTO_KEY_AES_128; break;
@@ -94,20 +99,13 @@ static int aes_set_keys( mbedtls_aes_context *ctx, const unsigned char *key,
         default : return( MBEDTLS_ERR_AES_INVALID_KEY_LENGTH );
     }
 
-    status = Cy_Crypto_Core_Aes_Init(CRYPTO, key, key_length, &ctx->aes_state);
+    status = Cy_Crypto_Core_Aes_InitContext(CRYPTO, key, key_length, &ctx->aes_state, &ctx->aes_buffers);
 
     if (CY_CRYPTO_SUCCESS != status)
     {
     	ret = MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
     	goto exit;
     }
-
-    memcpy(ctx->aes_buffers.key,    ctx->aes_state.key,    CY_CRYPTO_AES_256_KEY_SIZE);
-    memcpy(ctx->aes_buffers.keyInv, ctx->aes_state.invKey, CY_CRYPTO_AES_256_KEY_SIZE);
-
-    ctx->aes_state.buffers = (uint32_t *) &ctx->aes_buffers;
-    ctx->aes_state.key     = (uint8_t *)  (ctx->aes_buffers.key);
-    ctx->aes_state.invKey  = (uint8_t *)  (ctx->aes_buffers.keyInv);
 
 exit:
     return( ret );
@@ -212,6 +210,9 @@ int mbedtls_internal_aes_encrypt( mbedtls_aes_context *ctx,
     int ret = 0;
     cy_en_crypto_status_t status;
 
+    if ((ctx == NULL) || (ctx->aes_state.buffers == NULL))
+        return (MBEDTLS_ERR_AES_BAD_INPUT_DATA);
+
     status = Cy_Crypto_Core_Aes_Ecb(CRYPTO, CY_CRYPTO_ENCRYPT, output, input, &ctx->aes_state);
 
     if (CY_CRYPTO_SUCCESS != status)
@@ -240,6 +241,9 @@ int mbedtls_internal_aes_decrypt( mbedtls_aes_context *ctx,
 {
     int ret = 0;
     cy_en_crypto_status_t status;
+
+    if ((ctx == NULL) || (ctx->aes_state.buffers == NULL))
+        return (MBEDTLS_ERR_AES_BAD_INPUT_DATA);
 
     status = Cy_Crypto_Core_Aes_Ecb(CRYPTO, CY_CRYPTO_DECRYPT, output, input, &ctx->aes_state);
 
@@ -292,6 +296,9 @@ int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
 
     if( length % CY_CRYPTO_AES_BLOCK_SIZE )
         return( MBEDTLS_ERR_AES_INVALID_INPUT_LENGTH );
+
+    if ((ctx == NULL) || (ctx->aes_state.buffers == NULL))
+        return (MBEDTLS_ERR_AES_BAD_INPUT_DATA);
 
     if( mode == MBEDTLS_AES_DECRYPT )
     {

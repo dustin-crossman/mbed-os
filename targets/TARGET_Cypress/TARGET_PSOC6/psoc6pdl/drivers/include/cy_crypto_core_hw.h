@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_crypto_core_hw.h
-* \version 2.20
+* \version 2.30
 *
 * \brief
 *  This file provides the headers to the API for the utils
@@ -206,6 +206,7 @@ extern const cy_stc_cryptoIP_t  *cy_cryptoIP;
                                                     CRYPTO_INTR_MASKED_TR_AP_DETECT_ERROR_Msk | \
                                                     CRYPTO_INTR_MASKED_TR_RC_DETECT_ERROR_Msk))
 
+#define CY_CRYPTO_INSTR_FIFODEPTH          (8u)
 #define CY_CRYPTO_V1_DATA_FIFODEPTH        (8u)
 #define CY_CRYPTO_V2_DATA_FIFODEPTH        (16u)
 
@@ -275,7 +276,7 @@ __STATIC_INLINE bool Cy_Crypto_Core_IsEnabled(CRYPTO_Type *base)
 *******************************************************************************/
 __STATIC_INLINE uint8_t Cy_Crypto_Core_GetFIFODepth(CRYPTO_Type *base)
 {
-    return (cy_device->cryptoVersion == 1u) ? (CY_CRYPTO_V1_DATA_FIFODEPTH) : (CY_CRYPTO_V2_DATA_FIFODEPTH);
+    return (CY_CRYPTO_INSTR_FIFODEPTH);
 }
 
 /*******************************************************************************
