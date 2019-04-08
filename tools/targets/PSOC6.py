@@ -117,6 +117,7 @@ def merge_images(hexf0, hexf1=None):
 
 
 def complete_func(message_func, elf0, hexf0, hexf1=None, dest=None):
+    print("METHOD CALL : complete_func()")    
     message_func("Postprocessing %s -> %s" % (elf0, hexf0))
     ihex = merge_images(hexf0, hexf1)
     patch(message_func, ihex, hexf0)
@@ -195,13 +196,13 @@ def collect_args(toolchain, image_slot, target_type):
 
 # Sign binary image with Secure Boot SDK tools
 def sign_image(toolchain, elf0, binf, hexf1=None):
+    print("METHOD CALL : sign_image()")
     mbed_elf_path = str(Path(elf0).resolve())
     mbed_bin_path = mbed_elf_path[:-4] + ".bin"
     mbed_hex_path = Path(binf).resolve()
 
     target = {"name": "UNDEFINED", "core": "UNDEFINED"}
     img_start_addr = 0
-    need_completion = 0
 
     # find target name and type before processing
     for part in PurePath(binf).parts:
@@ -214,7 +215,6 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
                 # NSPE image flash address start
                 img_start_addr = "0x10000000"
                 target = {"name": part, "core": "cm4"}
-                need_completion = 1
 
     # create binary file from mbed elf for the following processing
     process = subprocess.Popen(["arm-none-eabi-objcopy.exe", str(mbed_elf_path),
@@ -277,10 +277,12 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
         toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")
         raise Exception("imgtool finished execution with errors!")
 
-    if need_completion == 1:
-        if os.path.isfile(str(mbed_hex_path)) and os.path.isfile(str(hexf1)):
-            complete_func(toolchain.notify.debug, elf0, mbed_hex_path, hexf1)
-
-
 def complete(toolchain, elf0, hexf0, hexf1=None):
-    complete_func(toolchain.notify.debug, elf0, hexf0, hexf1)
+    print("METHOD CALL : complete()")
+    if os.path.isfile(str(hexf0)) and os.path.isfile(str(hexf1)):
+        complete_func(toolchain.notify.debug, elf0, hexf0, hexf1)
+            
+def sign_complete(toolchain, elf0, binf, m0hex):
+    print("METHOD CALL : sing_complete()")
+    sign_image(toolchain, elf0, binf, None)
+    complete_func(toolchain.notify.debug, None, binf, m0hex)

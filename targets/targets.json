@@ -8092,7 +8092,7 @@
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "detect_code": ["1900"],
         "post_binary_hook": {
-            "function": "PSOC6Code.complete"
+            "function": "PSOC6Code.sign_image"
         }
     },
     "CY8CPROTO_064_SB": {
@@ -8131,7 +8131,7 @@
         "overrides": {
             "secure-rom-start": "0x10060400",
             "secure-rom-size": "0x40000",
-            "non-secure-rom-start": "0x10000000",
+            "non-secure-rom-start": "0x10000400",
             "non-secure-rom-size": "0x60000",
             "secure-ram-start": "0x08020000",
             "secure-ram-size": "0xF000",
@@ -8146,7 +8146,7 @@
     "CY_M0_PSA_MB": {
         "inherits": ["CY8CPROTO_064_SB_M0_PSA"],
         "extra_labels_add": ["MCUBOOT"]
-    },    
+    },
     "CY8CPROTO_064_SB_PSA": {
         "inherits": ["NSPE_Target", "CY8CPROTO_064_SB"],
         "extra_labels_add": ["PSA", "MBED_SPM"],
@@ -8155,7 +8155,7 @@
         "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
         "hex_filename": "psa_release_1.0.hex",
         "post_binary_hook": {
-            "function": "PSOC6Code.sign_image"
+            "function": "PSOC6Code.sign_complete"
         },
         "overrides": {
             "secure-rom-start": "0x10060400",
