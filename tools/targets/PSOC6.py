@@ -201,7 +201,7 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
 
     target = {"name": "UNDEFINED", "core": "UNDEFINED"}
     img_start_addr = 0
-    need_completition = 0
+    need_completion = 0
 
     # find target name and type before processing
     for part in PurePath(binf).parts:
@@ -214,11 +214,19 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
                 # NSPE image flash address start
                 img_start_addr = "0x10000000"
                 target = {"name": part, "core": "cm4"}
-                need_completition = 1
+                need_completion = 1
 
     # create binary file from mbed elf for the following processing
-    subprocess.Popen(["arm-none-eabi-objcopy.exe", str(mbed_elf_path),
+    process = subprocess.Popen(["arm-none-eabi-objcopy.exe", str(mbed_elf_path),
                       "-O", "binary", str(mbed_bin_path)])
+
+    stderr = process.communicate()
+    rc = process.wait()
+    if rc != 0:
+        toolchain.notify.debug("[PSOC6.sign_image] ERROR: Unsigned hex file is not created.")
+        toolchain.notify.debug("[PSOC6.sign_image] Message from arm-none-eabi-objcopy: "
+                               + stderr[1].decode("utf-8"))
+        raise Exception("from arm-none-eabi-objcopy finished execution with errors!")
 
     # preserve original hex file from mbed-os build
     copy2(str(mbed_hex_path), (str(mbed_hex_path)[:-4] + "_unsigned.hex"))
@@ -243,11 +251,11 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
 
     # catch stderr outputs
     stderr = process.communicate()
-    print(str(stderr[1].decode("utf-8")))
+    rc = process.wait()
 
-    if stderr[1].decode("utf-8"):
-        toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")
-        toolchain.notify.tool_error("[PSOC6.sign_image] Message from imgtool: " + stderr[1].decode("utf-8"))
+    if rc != 0:
+        toolchain.notify.debug("[PSOC6.sign_image] ERROR: Signature is not added!")
+        toolchain.notify.debug("[PSOC6.sign_image] Message from imgtool: " + stderr[1].decode("utf-8"))
         raise Exception("imgtool finished execution with errors!")
     else:
         toolchain.notify.info("[PSOC6.sign_image] SUCCESS: Image is signed with no errors!")
@@ -255,14 +263,24 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
     # TODO: resolve img_start_addr acquisition as parameter, not a constant
     # convert signed image binary back to hex format
     if img_start_addr:
-        subprocess.Popen(["arm-none-eabi-objcopy.exe", "--change-address", img_start_addr,
+        process = subprocess.Popen(["arm-none-eabi-objcopy", "--change-address", img_start_addr,
                           "-I", "binary", "-O", "ihex", binf_signed, str(mbed_hex_path)])
+        stderr = process.communicate()
+        rc = process.wait()
+        if rc != 0:
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: Signed hex file is not created.")
+            toolchain.notify.debug("[PSOC6.sign_image] Message from arm-none-eabi-objcopy: "
+                                   + stderr[1].decode("utf-8"))
+            raise Exception("from arm-none-eabi-objcopy finished execution with errors!")
+
     else:
         toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")
         raise Exception("imgtool finished execution with errors!")
 
-    if (need_completition == 1):
-        complete_func(toolchain.notify.debug, elf0, mbed_hex_path, hexf1)
+    if need_completion == 1:
+        if os.path.isfile(str(mbed_hex_path)) and os.path.isfile(str(hexf1)):
+            complete_func(toolchain.notify.debug, elf0, mbed_hex_path, hexf1)
+
 
 def complete(toolchain, elf0, hexf0, hexf1=None):
     complete_func(toolchain.notify.debug, elf0, hexf0, hexf1)
