@@ -167,7 +167,7 @@ extern "C" {
 
 #if defined( __GNUC__ ) || defined ( __IAR_SYSTEMS_ICC__ )
 
-#if defined( __CC_ARM )
+#if defined( __ARMCC_VERSION )
 
 #define WICED_SAVE_INTERRUPTS(flags) \
     do { flags = __get_PRIMASK(); } while(0)
@@ -195,7 +195,7 @@ extern "C" {
 
 #endif // WICED_NO_VECTORS
 
-#endif //  defined( __CC_ARM )
+#endif //  defined( __ARMCC_VERSION )
 
 #endif // defined( __GNUC__ ) || defined ( __IAR_SYSTEMS_ICC__ )
 

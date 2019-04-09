@@ -65,7 +65,7 @@ extern /*@noreturn@*/ void WICED_TRIGGER_BREAKPOINT( void );
 
 #else /* #if defined ( LINT ) */
 
-#if defined ( __CC_ARM )
+#if defined ( __ARMCC_VERSION )
 #define WICED_TRIGGER_BREAKPOINT( ) do { __asm("bkpt 0");  } while (0)
 #else
 #define WICED_TRIGGER_BREAKPOINT( ) do { __asm__("bkpt");  } while (0)

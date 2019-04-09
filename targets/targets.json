@@ -8088,7 +8088,7 @@
     "CY8CPROTO_064_SB_M0": {
         "inherits": ["MCU_PSOC6_M0"],
         "supported_form_factors": ["ARDUINO"],
-        "extra_labels_add": ["CY8C62XX", "CY8CPROTO_064_SB"],
+        "extra_labels_add": ["PSOC6_01", "CY8C62XX", "CY8CPROTO_064_SB"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "detect_code": ["1900"],
         "post_binary_hook": {
@@ -8129,20 +8129,21 @@
             "function": "PSOC6Code.sign_image"
         },
         "overrides": {
+            "non-secure-rom-start": "0x10000000",
+            "non-secure-rom-size": "0x80000",
             "secure-rom-start": "0x10080400",
-            "secure-rom-size": "0x40000",
-            "non-secure-rom-start": "0x10000400",
-            "non-secure-rom-size": "0x60000",
-            "secure-ram-start": "0x08020000",
-            "secure-ram-size": "0xF000",
+            "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
-            "non-secure-ram-size": "0x20000",
-            "shared-ram-start": "0x0802F000",
+            "non-secure-ram-size": "0xFD00",
+            "shared-ram-start": "0x0800FD00",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0802F100", 
-            "public-ram-size": "0x200"
+            "public-ram-start": "0x0800FE00", 
+            "public-ram-size": "0x200",
+            "secure-ram-start": "0x08010000",
+            "secure-ram-size": "0x10000"
         }
     },
+
     "CY_M0_PSA_MB": {
         "inherits": ["CY8CPROTO_064_SB_M0_PSA"],
         "extra_labels_add": ["MCUBOOT"],
@@ -8165,18 +8166,18 @@
             "function": "PSOC6Code.sign_complete"
         },
         "overrides": {
-            "secure-rom-start": "0x10060400",
-            "secure-rom-size": "0x40000",
             "non-secure-rom-start": "0x10000000",
-            "non-secure-rom-size": "0x60000",
-            "secure-ram-start": "0x08020000",
-            "secure-ram-size": "0xF000",
+            "non-secure-rom-size": "0x80000",
+            "secure-rom-start": "0x10080400",
+            "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
-            "non-secure-ram-size": "0x20000",
-            "shared-ram-start": "0x0802F000",
+            "non-secure-ram-size": "0xFD00",
+            "shared-ram-start": "0x0800FD00",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0802F100", 
-            "public-ram-size": "0x200"
+            "public-ram-start": "0x0800FE00", 
+            "public-ram-size": "0x200",
+            "secure-ram-start": "0x08010000",
+            "secure-ram-size": "0x10000"
         }
     },
     "CY8CMOD_062_4343W": {
@@ -8227,7 +8228,7 @@
     },
     "CYW943012P6EVB_01_M0": {
         "inherits": ["MCU_PSOC6_M0"],
-        "extra_labels_add": ["CY8C62XX", "CYW943012P6EVB_01"],
+        "extra_labels_add": ["PSOC6_01", "CY8C62XX", "CYW943012P6EVB_01"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "post_binary_hook": {
             "function": "PSOC6Code.complete"
