@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_crypto_common.h
-* \version 2.20
+* \version 2.30
 *
 * \brief
 *  This file provides common constants and parameters
@@ -57,7 +57,7 @@
 #define CY_CRYPTO_DRV_VERSION_MAJOR         2
 
 /** Driver minor version */
-#define CY_CRYPTO_DRV_VERSION_MINOR         20
+#define CY_CRYPTO_DRV_VERSION_MINOR         30
 
 /**
 * \addtogroup group_crypto_cli_srv_macros
@@ -91,8 +91,11 @@
 /** Defines the Crypto AES_256 key maximum size (in bytes) */
 #define CY_CRYPTO_AES_256_KEY_SIZE        (32u)
 
+/** Defines the Crypto AES key maximum size (in bytes) */
+#define CY_CRYPTO_AES_MAX_KEY_SIZE        (CY_CRYPTO_AES_256_KEY_SIZE)
+
 /** Defines the Crypto AES_256 key maximum size (in four-byte words) */
-#define CY_CRYPTO_AES_256_KEY_SIZE_U32    (32u)
+#define CY_CRYPTO_AES_MAX_KEY_SIZE_U32    (uint32_t)(CY_CRYPTO_AES_MAX_KEY_SIZE / 4ul)
 
 /** Defines size of the AES block, in four-byte words */
 #define CY_CRYPTO_AES_BLOCK_SIZE_U32      (uint32_t)(CY_CRYPTO_AES_BLOCK_SIZE / 4ul)
@@ -515,17 +518,26 @@ typedef enum
 * ensure that the defined instance of this structure remains in scope
 * while the drive is in use.
 */
+
+/* The structure to define used memory buffers */
 typedef struct
 {
     /** \cond INTERNAL */
-    /** Pointer to AES key */
-    uint8_t *key;
-    /** Pointer to AES inverse key */
-    uint8_t *invKey;
+    uint32_t key[CY_CRYPTO_AES_MAX_KEY_SIZE_U32];
+    uint32_t keyInv[CY_CRYPTO_AES_MAX_KEY_SIZE_U32];
+    uint32_t block0[CY_CRYPTO_AES_BLOCK_SIZE_U32];
+    uint32_t block1[CY_CRYPTO_AES_BLOCK_SIZE_U32];
+    uint32_t block2[CY_CRYPTO_AES_BLOCK_SIZE_U32];
+    /** \endcond */
+} cy_stc_crypto_aes_buffers_t;
+
+typedef struct
+{
+    /** \cond INTERNAL */
     /** AES key length */
     cy_en_crypto_aes_key_length_t keyLength;
     /** Pointer to AES work buffers */
-    uint32_t *buffers;
+    cy_stc_crypto_aes_buffers_t *buffers;
     /** AES processed block index (for CMAC, SHA operations) */
     uint32_t blockIdx;
     /** \endcond */
@@ -545,6 +557,7 @@ typedef struct
 {
     /** \cond INTERNAL */
     uint32_t mode;
+    uint32_t modeHw;
     uint8_t *block;
     uint32_t blockSize;
     uint8_t *hash;
