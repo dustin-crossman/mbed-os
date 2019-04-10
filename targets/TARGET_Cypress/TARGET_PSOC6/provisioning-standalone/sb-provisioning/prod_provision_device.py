@@ -47,19 +47,20 @@ ACCESS_PORT = DebugCore.debug_sys_ap  # Access port used for device provisioning
 @click.option('--prov-jwt', 'prov_cmd_jwt',
               default='packet/prov_cmd.jwt',
               type=click.STRING,
-              help='Provisioning command JWT file.')
+              help='Path to provisioning JWT file (packet which contains all data necessary '
+                   'for provisioning, including policy, authorization packets and keys)')
 @click.option('--hex', 'cy_bootloader_hex',
               default='prebuild/CyBootloader_Release/CypressBootloader_CM0p.hex',
               type=click.STRING,
-              help='Path to Cypress Bootloader HEX binary file.')
-@click.option('--pub-key-json', 'pub_key_json',
+              help='Path to Cypress Bootloader HEX binary file')
+@click.option('--pubkey-json', 'pub_key_json',
               default='keys/dev_pub_key.json',
               type=click.STRING,
-              help='')
-@click.option('--pub-key-pem', 'pub_key_pem',
+              help='File where to save public key in JSON format')
+@click.option('--pubkey-pem', 'pub_key_pem',
               default='keys/dev_pub_key.pem',
               type=click.STRING,
-              help='Path to the public key in PEM format to create.')
+              help='File where to save public key in PEM format')
 def main(prov_cmd_jwt, cy_bootloader_hex, pub_key_json, pub_key_pem):
     """
     Parses command line arguments and provides high level support for
