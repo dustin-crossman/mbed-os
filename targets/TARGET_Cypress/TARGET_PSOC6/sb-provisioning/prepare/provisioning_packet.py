@@ -87,10 +87,19 @@ def main(oem_state_path, hsm_state_path, image_cert, cy_auth_path,
     
     prov_req = oem.create_provision_request(blob)
     
+    rot_auth_pkg = oem.pack_rot_auth(prod_id, hsm.state["hsm_pub_key"])
+
+    dev_cert = crypto.create_x509_cert(
+            prod_id = prod_id,
+            pub_key = None,
+            priv_key = None)
+
     prov_cmd = hsm.pack_provision_cmd(
             cy_auth = cy_auth_path, 
             image_cert = image_cert,
-            prov_req = prov_req)
+            prov_req = prov_req,
+            rot_auth = rot_auth_pkg,
+            chain_of_trust = dev_cert)
     crypto.dump_jwt(prov_cmd, prov_jwt_path)
 
     print('#' * 80)
