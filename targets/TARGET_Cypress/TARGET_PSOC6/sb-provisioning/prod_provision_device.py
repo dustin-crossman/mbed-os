@@ -82,7 +82,6 @@ def main(prov_cmd_jwt, cy_bootloader_hex, pub_key_json, pub_key_pem):
         print('Invalid access port.')
         sys.exit(1)
 
-    # Execute secure_blinky.tcl script
     test_status = False
     tool = ProgrammingTool.create(TOOL_NAME)
     if tool.connect(target):
