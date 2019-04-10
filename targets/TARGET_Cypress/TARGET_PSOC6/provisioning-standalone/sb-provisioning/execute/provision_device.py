@@ -1,147 +1,109 @@
-from sys_call import get_prov_det_noprint_syscall, provision_keys_and_policies_debug
-from gen_data_from_json import *
-from p6_reg import *
-from enum import Enum
+"""
+Copyright (c) 2018-2019 Cypress Semiconductor Corporation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
+import os
 from time import sleep
+from execute.sys_call import get_prov_details, provision_keys_and_policies
+from execute.gen_data_from_json import ENTRANCE_EXAM_FW_STATUS_REG, ENTRANCE_EXAM_FW_STATUS_MASK, \
+    ENTRANCE_EXAM_FW_STATUS_VAL
+from execute.p6_reg import CYREG_CPUSS_PROTECTION, CYREG_IPC2_STRUCT_DATA, NVSTORE_AREA_1_ADDRESS
 
 
-def provision_execution(tool, prov_cmd_jwt, cy_bootloader_hex):
-    # Use CM0, CM4, or SYS access port
-    use_access_port = DebugCore.debug_cm0_ap
-
-    # Indicates if will be converted to SECURE mode or not
-    blow_secure_fuse = True
-
-    # Acquire without RESET
-    enable_acquire = 0
-
-    if use_access_port == DebugCore.debug_cm0_ap:
-        ENABLE_CM4 = 0
-        ENABLE_CM0 = 1
-        #tool.set_core(0)
-        print('Selected Access Port: CM0_AP')
-    elif use_access_port == DebugCore.debug_cm4_ap:
-        ENABLE_CM4 = 1
-        ENABLE_CM0 = 0
-        #tool.set_core(1)
-        print('Selected Access Port: CM4_AP')
-    elif use_access_port == DebugCore.debug_sys_ap:
-        ENABLE_CM4 = 0
-        ENABLE_CM0 = 0
-        #tool.set_core(0)
-        print('Selected Access Port: SYS_AP')
-    else:
-        tool.disconnect()
-        raise ValueError(f"FAIL: 'use_access_port' value is invalid: {use_access_port}")
-
+def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
+    """
+    Programs Cypress Bootloader and calls system calls for device provisioning.
+    :param tool: Programming/debugging tool used for communication with device.
+    :param pub_key_json: File where to save public key in JSON format.
+    :param prov_cmd_jwt: Path to provisioning JWT file (packet which contains
+           all data necessary for provisioning, including policy, authorization
+           packets and keys).
+    :param cy_bootloader_hex: Path to Cypress Bootloader program file.
+    :return: True if provisioning passed, otherwise False
+    """
     tool.set_frequency(200)
 
-    sleep(0.1)
+    print("CPUSS.PROTECTION state: '0': UNKNOWN. '1': VIRGIN. '2': NORMAL. '3': SECURE. '4': DEAD.")
+    print(hex(CYREG_CPUSS_PROTECTION), hex(tool.read32(CYREG_CPUSS_PROTECTION)))
 
-    # psoc6 sflash_restrictions 2    !!!!!!!!!!!!!!! no command
-
-    # Prepare file with example status
-    filename = 'tcl_prov_res.txt'
-    with open(filename, 'w') as result_file:
-        result_file.write('PROVISIONING: FAIL\n')
-
-    print("\nCPUSS.PROTECTION state: '0': UNKNOWN. '1': VIRGIN. '2': NORMAL. '3': SECURE. '4': DEAD.")
-    print(hex(tool.read32(CYREG_CPUSS_PROTECTION)))
-
-    tool.reset()
-    sleep(0.1)
-
-    rc, key = get_prov_det_noprint_syscall(tool, 1)
-    if rc:
-        print('Device public key has been read successfully.')
-    else:
-        print('FAIL: Cannot read device public key.')
-
+    reset_device(tool)
+    result, key = get_prov_details(tool, 1)
+    print('Device public key has been read successfully.' if result else 'FAIL: Cannot read device public key.')
     print(key)
-    with open('dev_pub_key.json', 'w') as json_file:
+
+    with open(os.path.join(pub_key_json), 'w') as json_file:
         json_file.write(key)
 
+    # Check whether device is in NORMAL mode
     if tool.read32(CYREG_CPUSS_PROTECTION) != 3:
         print(f'FAIL: Device is not in NORMAL mode, error code: {hex(tool.read32(CYREG_IPC2_STRUCT_DATA))}')
-        print('\nRead Secure Hash from eFUSEs:\n')  # 00 expected on virgin device
+        print('Read Secure Hash from eFUSEs:')  # 00 expected on virgin device
         got_factory_hash = ''
         i = 0
         while i < 24:
             hash_byte_val = hex(tool.read8(0x402C0814 + i))
-            got_factory_hash += hash_byte_val
+            got_factory_hash += hash_byte_val + ' '
             i += 1
-        print(f"Received SECURE_HASH: '{hex(got_factory_hash)}'")
+        print(f"Received SECURE_HASH: '{got_factory_hash}'")
         return False
 
-    print('\nErase main flash and TOC3:')
+    print(os.linesep + 'Erase main flash and TOC3:')
     tool.erase(0x10000000, 0x000e0000)
+    reset_device(tool)
 
-    tool.reset()
-    sleep(0.1)
-
-    print('\nRead FB Firmware status:\n')
+    print(os.linesep + 'Read FB Firmware status:')
     fb_firmware_status = tool.read32(ENTRANCE_EXAM_FW_STATUS_REG)
     print(f'FB Firmware status = {hex(fb_firmware_status)}')
     # Print Expected and received LIFECYCLE_STAGE values
     print(f'Received FB_FW_STATUS = {hex(fb_firmware_status & ENTRANCE_EXAM_FW_STATUS_MASK)}')
     print(f'Expected FB_FW_STATUS = {hex(ENTRANCE_EXAM_FW_STATUS_VAL)}')
     # Verify if received value is the same as expected
-    if (fb_firmware_status & ENTRANCE_EXAM_FW_STATUS_MASK) == ENTRANCE_EXAM_FW_STATUS_VAL:
-        print('PASS: FB Firmware status is as expected')
-        is_exam_pass = True
-    else:
-        print('FAIL: FB Firmware status is not as expected')
-        is_exam_pass = False
+    is_exam_pass = (fb_firmware_status & ENTRANCE_EXAM_FW_STATUS_MASK) == ENTRANCE_EXAM_FW_STATUS_VAL
+    print('PASS: FB Firmware status is as expected' if is_exam_pass else 'FAIL: FB Firmware status is not as expected')
 
     if is_exam_pass:
-        print('\nPROGRAMMING APP HEX:')
-        # poll off !!!!!!! no command
+        print(os.linesep + 'PROGRAMMING APP HEX:')
         tool.program(cy_bootloader_hex)
-        # reset_config srst_only
-        # adapter_nsrst_delay 2000
-        tool.reset()
-        sleep(0.1)
-
-    print('Reading FB Status code:')
-    print(hex(tool.read32(CYREG_IPC2_STRUCT_DATA)))
-
-    print('\nRead FB Firmware status:(expected MSB=0xfx)')
-    print(hex(tool.read32(ENTRANCE_EXAM_FW_STATUS_REG)))
+        reset_device(tool)
 
     if is_exam_pass:
-        print('\nRun provisioning syscall')
-        syscall_passed = provision_keys_and_policies_debug(tool, blow_secure_fuse, prov_cmd_jwt)
-        i = 0
-        print(hex(NVSTORE_AREA_1_ADDRESS), ":\n")
-        if syscall_passed:
-            while i < 8 * 4:
-                print(hex(tool.read32(NVSTORE_AREA_1_ADDRESS + i)))
+        print(os.linesep + 'Run provisioning syscall')
+        blow_secure_fuse = 1  # indicates whether to convert device to SECURE CLAIMED mode
+        is_exam_pass = provision_keys_and_policies(tool, blow_secure_fuse, os.path.join(prov_cmd_jwt))
+        print(hex(NVSTORE_AREA_1_ADDRESS) + ': ', sep=' ', end='', flush=True)
+        if is_exam_pass:
+            i = 0
+            while i < 8 * 4:  # output 8 words
+                print(hex(tool.read32(NVSTORE_AREA_1_ADDRESS + i)) + ' ', sep=' ', end='', flush=True)
                 i += 4
+            print(os.linesep)
         else:
-            print('FAIL: Unexpected provision_keys_and_policies_debug syscall response')
-            is_exam_pass = False
+            print('FAIL: Unexpected ProvisionKeysAndPolicies syscall response')
 
     if is_exam_pass:
-        # Prepare file with example status
-        print('\n*****************************************')
-        print("       PROVISIONING PASSED         ")
+        print('*****************************************')
+        print("       PROVISIONING PASSED               ")
         print("*****************************************")
-        with open(filename, 'w') as result_file:
-            result_file.write('PROVISIONING: PASS\n')
+
+    reset_device(tool)
+    return is_exam_pass
 
 
-class DebugCore(Enum):
+def reset_device(tool):
     """
-    CM0 access port.
+    Resets device and waits for device initialization.
+    :param tool: Programming/debugging tool used for communication with device.
     """
-    debug_cm0_ap = 0
-
-    """
-    CM4 access port.
-    """
-    debug_cm4_ap = 1
-
-    """
-    SYS access port.
-    """
-    debug_sys_ap = 2
+    tool.reset()
+    sleep(0.2)
