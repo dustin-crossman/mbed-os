@@ -49,7 +49,7 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
 
     # Check whether device is in SECURE mode
     if tool.read32(CYREG_CPUSS_PROTECTION) != 3:
-        print(f'FAIL: Device is not in NORMAL mode, error code: {hex(tool.read32(CYREG_IPC2_STRUCT_DATA))}')
+        print(f'FAIL: Device is not in SECURE mode, error code: {hex(tool.read32(CYREG_IPC2_STRUCT_DATA))}')
         print('Read Secure Hash from eFUSEs:')  # 00 expected on virgin device
         got_factory_hash = ''
         i = 0
