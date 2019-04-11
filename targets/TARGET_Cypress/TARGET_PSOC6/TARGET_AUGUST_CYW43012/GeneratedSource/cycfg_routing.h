@@ -61,6 +61,19 @@ void init_cycfg_routing(void);
 #define ioss_0_port_8_pin_0_HSIOM P8_0_TCPWM1_LINE16
 #define ioss_0_port_8_pin_4_HSIOM P8_4_TCPWM1_LINE18
 
+#define cpuss_0_dw0_0_chan_0_tr_in_0_TRIGGER_OUT TRIG0_OUT_CPUSS_DW0_TR_IN0
+#define cpuss_0_dw0_0_chan_1_tr_in_0_TRIGGER_OUT TRIG0_OUT_CPUSS_DW0_TR_IN1
+#define cpuss_0_dw1_0_chan_1_tr_in_0_TRIGGER_OUT TRIG1_OUT_CPUSS_DW1_TR_IN1
+#define cpuss_0_dw1_0_chan_3_tr_in_0_TRIGGER_OUT TRIG1_OUT_CPUSS_DW1_TR_IN3
+#define udb_0_out_p_116_TRIGGER_IN_0 TRIG14_IN_UDB_TR_UDB0
+#define udb_0_out_p_116_TRIGGER_IN_1 TRIG1_IN_TR_GROUP14_OUTPUT1
+#define udb_0_out_p_117_TRIGGER_IN_0 TRIG0_IN_TR_GROUP14_OUTPUT4
+#define udb_0_out_p_117_TRIGGER_IN_1 TRIG14_IN_UDB_TR_UDB1
+#define udb_0_out_p_119_TRIGGER_IN_0 TRIG0_IN_TR_GROUP14_OUTPUT3
+#define udb_0_out_p_119_TRIGGER_IN_1 TRIG14_IN_UDB_TR_UDB3
+#define udb_0_out_p_123_TRIGGER_IN_0 TRIG14_IN_UDB_TR_UDB7
+#define udb_0_out_p_123_TRIGGER_IN_1 TRIG1_IN_TR_GROUP14_OUTPUT0
+
 #if defined(__cplusplus)
 }
 #endif

@@ -32,26 +32,55 @@
 #define CY_CFG_SYSCLK_CLKALTSYSTICK_ENABLED 1
 #define CY_CFG_SYSCLK_CLKBAK_ENABLED 1
 #define CY_CFG_SYSCLK_ECO_ENABLED 1
+#define CY_CFG_SYSCLK_CLKFAST_ENABLED 1
+#define CY_CFG_SYSCLK_FLL_ENABLED 1
 #define CY_CFG_SYSCLK_CLKHF0_ENABLED 1
-#define CY_CFG_SYSCLK_CLKHF0_FREQ_MHZ 150UL
-#define CY_CFG_SYSCLK_CLKHF0_CLKPATH CY_SYSCLK_CLKHF_IN_CLKPATH1
+#define CY_CFG_SYSCLK_CLKHF0_FREQ_MHZ 100UL
+#define CY_CFG_SYSCLK_CLKHF0_CLKPATH CY_SYSCLK_CLKHF_IN_CLKPATH0
 #define CY_CFG_SYSCLK_CLKHF1_ENABLED 1
 #define CY_CFG_SYSCLK_CLKHF1_FREQ_MHZ 150UL
 #define CY_CFG_SYSCLK_CLKHF1_CLKPATH CY_SYSCLK_CLKHF_IN_CLKPATH1
 #define CY_CFG_SYSCLK_CLKHF2_ENABLED 1
-#define CY_CFG_SYSCLK_CLKHF2_FREQ_MHZ 37UL
-#define CY_CFG_SYSCLK_CLKHF2_CLKPATH CY_SYSCLK_CLKHF_IN_CLKPATH1
+#define CY_CFG_SYSCLK_CLKHF2_FREQ_MHZ 50UL
+#define CY_CFG_SYSCLK_CLKHF2_CLKPATH CY_SYSCLK_CLKHF_IN_CLKPATH0
 #define CY_CFG_SYSCLK_ILO_ENABLED 1
 #define CY_CFG_SYSCLK_IMO_ENABLED 1
 #define CY_CFG_SYSCLK_CLKLF_ENABLED 1
+#define CY_CFG_SYSCLK_CLKPATH0_ENABLED 1
+#define CY_CFG_SYSCLK_CLKPATH0_SOURCE CY_SYSCLK_CLKPATH_IN_IMO
 #define CY_CFG_SYSCLK_CLKPATH1_ENABLED 1
 #define CY_CFG_SYSCLK_CLKPATH1_SOURCE CY_SYSCLK_CLKPATH_IN_IMO
+#define CY_CFG_SYSCLK_CLKPATH2_ENABLED 1
+#define CY_CFG_SYSCLK_CLKPATH2_SOURCE CY_SYSCLK_CLKPATH_IN_IMO
+#define CY_CFG_SYSCLK_CLKPATH3_ENABLED 1
+#define CY_CFG_SYSCLK_CLKPATH3_SOURCE CY_SYSCLK_CLKPATH_IN_IMO
+#define CY_CFG_SYSCLK_CLKPATH4_ENABLED 1
+#define CY_CFG_SYSCLK_CLKPATH4_SOURCE CY_SYSCLK_CLKPATH_IN_IMO
 #define CY_CFG_SYSCLK_CLKPERI_ENABLED 1
 #define CY_CFG_SYSCLK_PLL0_ENABLED 1
-#define CY_CFG_SYSCLK_CLKPUMP_ENABLED 1
 #define CY_CFG_SYSCLK_CLKSLOW_ENABLED 1
 #define CY_CFG_SYSCLK_CLKTIMER_ENABLED 1
+#define CY_CFG_SYSCLK_WCO_ENABLED 1
+#define CY_CFG_PWR_ENABLED 1
+#define CY_CFG_PWR_USING_LDO 1
+#define CY_CFG_PWR_USING_PMIC 0
+#define CY_CFG_PWR_VBAC_SUPPLY CY_CFG_PWR_VBAC_SUPPLY_VDD
+#define CY_CFG_PWR_LDO_VOLTAGE CY_SYSPM_LDO_VOLTAGE_1_1V
+#define CY_CFG_PWR_USING_ULP 0
 
+static const cy_stc_fll_manual_config_t srss_0_clock_0_fll_0_fllConfig = 
+{
+	.fllMult = 500U,
+	.refDiv = 20U,
+	.ccoRange = CY_SYSCLK_FLL_CCO_RANGE4,
+	.enableOutputDiv = true,
+	.lockTolerance = 10U,
+	.igain = 9U,
+	.pgain = 5U,
+	.settlingCount = 8U,
+	.outputMode = CY_SYSCLK_FLLPLL_OUTPUT_OUTPUT,
+	.cco_Freq = 355U,
+};
 static const cy_stc_pll_manual_config_t srss_0_clock_0_pll_0_pllConfig = 
 {
 	.feedbackDiv = 75,
@@ -72,7 +101,7 @@ __STATIC_INLINE void Cy_SysClk_ClkAltSysTickInit()
 }
 __STATIC_INLINE void Cy_SysClk_ClkBakInit()
 {
-    Cy_SysClk_ClkBakSetSource(CY_SYSCLK_BAK_IN_CLKLF);
+    Cy_SysClk_ClkBakSetSource(CY_SYSCLK_BAK_IN_WCO);
 }
 __STATIC_INLINE void Cy_SysClk_EcoInit()
 {
@@ -85,6 +114,21 @@ __STATIC_INLINE void Cy_SysClk_EcoInit()
     if (CY_SYSCLK_TIMEOUT == Cy_SysClk_EcoEnable(3000u))
     {
         cycfg_ClockStartupError(CY_CFG_SYSCLK_ECO_ERROR);
+    }
+}
+__STATIC_INLINE void Cy_SysClk_ClkFastInit()
+{
+    Cy_SysClk_ClkFastSetDivider(0U);
+}
+__STATIC_INLINE void Cy_SysClk_FllInit()
+{
+    if (CY_SYSCLK_SUCCESS != Cy_SysClk_FllManualConfigure(&srss_0_clock_0_fll_0_fllConfig))
+    {
+        cycfg_ClockStartupError(CY_CFG_SYSCLK_FLL_ERROR);
+    }
+    if (CY_SYSCLK_SUCCESS != Cy_SysClk_FllEnable(200000UL))
+    {
+        cycfg_ClockStartupError(CY_CFG_SYSCLK_FLL_ERROR);
     }
 }
 __STATIC_INLINE void Cy_SysClk_ClkHf0Init()
@@ -101,7 +145,7 @@ __STATIC_INLINE void Cy_SysClk_ClkHf1Init()
 __STATIC_INLINE void Cy_SysClk_ClkHf2Init()
 {
     Cy_SysClk_ClkHfSetSource(2U, CY_CFG_SYSCLK_CLKHF2_CLKPATH);
-    Cy_SysClk_ClkHfSetDivider(2U, CY_SYSCLK_CLKHF_DIVIDE_BY_4);
+    Cy_SysClk_ClkHfSetDivider(2U, CY_SYSCLK_CLKHF_DIVIDE_BY_2);
     Cy_SysClk_ClkHfEnable(2U);
 }
 __STATIC_INLINE void Cy_SysClk_IloInit()
@@ -113,15 +157,31 @@ __STATIC_INLINE void Cy_SysClk_IloInit()
 __STATIC_INLINE void Cy_SysClk_ClkLfInit()
 {
     /* The WDT is unlocked in the default startup code */
-    Cy_SysClk_ClkLfSetSource(CY_SYSCLK_CLKLF_IN_ILO);
+    Cy_SysClk_ClkLfSetSource(CY_SYSCLK_CLKLF_IN_WCO);
+}
+__STATIC_INLINE void Cy_SysClk_ClkPath0Init()
+{
+    Cy_SysClk_ClkPathSetSource(0U, CY_CFG_SYSCLK_CLKPATH0_SOURCE);
 }
 __STATIC_INLINE void Cy_SysClk_ClkPath1Init()
 {
     Cy_SysClk_ClkPathSetSource(1U, CY_CFG_SYSCLK_CLKPATH1_SOURCE);
 }
+__STATIC_INLINE void Cy_SysClk_ClkPath2Init()
+{
+    Cy_SysClk_ClkPathSetSource(2U, CY_CFG_SYSCLK_CLKPATH2_SOURCE);
+}
+__STATIC_INLINE void Cy_SysClk_ClkPath3Init()
+{
+    Cy_SysClk_ClkPathSetSource(3U, CY_CFG_SYSCLK_CLKPATH3_SOURCE);
+}
+__STATIC_INLINE void Cy_SysClk_ClkPath4Init()
+{
+    Cy_SysClk_ClkPathSetSource(4U, CY_CFG_SYSCLK_CLKPATH4_SOURCE);
+}
 __STATIC_INLINE void Cy_SysClk_ClkPeriInit()
 {
-    Cy_SysClk_ClkPeriSetDivider(1U);
+    Cy_SysClk_ClkPeriSetDivider(0U);
 }
 __STATIC_INLINE void Cy_SysClk_Pll0Init()
 {
@@ -134,13 +194,6 @@ __STATIC_INLINE void Cy_SysClk_Pll0Init()
         cycfg_ClockStartupError(CY_CFG_SYSCLK_PLL_ERROR);
     }
 }
-__STATIC_INLINE void Cy_SysClk_ClkPumpInit()
-{
-    Cy_SysClk_ClkPumpDisable();
-     Cy_SysClk_ClkPumpSetSource(CY_SYSCLK_PUMP_IN_CLKPATH1);
-    Cy_SysClk_ClkPumpSetDivider(CY_SYSCLK_PUMP_DIV_8);
-    Cy_SysClk_ClkPumpEnable();
-}
 __STATIC_INLINE void Cy_SysClk_ClkSlowInit()
 {
     Cy_SysClk_ClkSlowSetDivider(0U);
@@ -151,6 +204,15 @@ __STATIC_INLINE void Cy_SysClk_ClkTimerInit()
      Cy_SysClk_ClkTimerSetSource(CY_SYSCLK_CLKTIMER_IN_IMO);
     Cy_SysClk_ClkTimerSetDivider(0U);
     Cy_SysClk_ClkTimerEnable();
+}
+__STATIC_INLINE void Cy_SysClk_WcoInit()
+{
+    (void)Cy_GPIO_Pin_FastInit(GPIO_PRT0, 0U, 0x00U, 0x00U, HSIOM_SEL_GPIO);
+    (void)Cy_GPIO_Pin_FastInit(GPIO_PRT0, 1U, 0x00U, 0x00U, HSIOM_SEL_GPIO);
+    if (CY_SYSCLK_SUCCESS != Cy_SysClk_WcoEnable(1000000UL))
+    {
+        cycfg_ClockStartupError(CY_CFG_SYSCLK_WCO_ERROR);
+    }
 }
 
 
