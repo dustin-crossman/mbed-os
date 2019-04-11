@@ -1,10 +1,10 @@
-from execute.programmer.base import ProgrammerBase, Interface, ResetType
+from base import ProgrammerBase, Interface, ResetType
 from pyocd.core.helpers import ConnectHelper
 from pyocd.core import exceptions
 from pyocd.flash import loader
 from pyocd.flash.loader import FlashEraser
 from pyocd import coresight
-from execute.programmer.exceptions import ExtendedTransferFaultError
+from exceptions import ExtendedTransferFaultError
 
 
 class Pyocd(ProgrammerBase):
