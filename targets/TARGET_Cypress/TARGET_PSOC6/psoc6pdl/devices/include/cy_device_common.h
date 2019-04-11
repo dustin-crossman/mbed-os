@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_device_common.h
-* \version 2.30
+* \version 2.40
 *
 * \brief
 * This file provides types and IP block definitions common for all PSoC 6

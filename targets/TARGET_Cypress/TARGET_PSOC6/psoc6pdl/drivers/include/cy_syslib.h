@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_syslib.h
-* \version 2.20
+* \version 2.30
 *
 * Provides an API declaration of the SysLib driver.
 *
@@ -158,6 +158,15 @@
 * \section group_syslib_changelog Changelog
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td rowspan="2">2.30</td>
+*     <td>Updated implementation of the Cy_SysLib_AsmInfiniteLoop() function to be compatible with ARMC6.</td>
+*     <td>Provided support for the ARM Compiler 6.</td>
+*   </tr>
+*   <tr>
+*     <td>Minor documentation edits.</td>
+*     <td>Documentation update and clarification.</td>
+*   </tr>
 *   <tr>
 *     <td rowspan="2">2.20</td>
 *     <td>Updated implementation of the \ref Cy_SysLib_AssertFailed() function to be available in Release and Debug modes.</td>
@@ -440,7 +449,7 @@ typedef enum
 #define CY_SYSLIB_DRV_VERSION_MAJOR    2
 
 /** The driver minor version */
-#define CY_SYSLIB_DRV_VERSION_MINOR    20
+#define CY_SYSLIB_DRV_VERSION_MINOR    30
 
 
 /*******************************************************************************
@@ -477,7 +486,11 @@ typedef enum
      * attributes at the first place of declaration/definition.
      * For example: CY_NOINIT uint32_t noinitVar;
      */
-    #define CY_NOINIT           __attribute__ ((section(".noinit"), zero_init))
+    #if (__ARMCC_VERSION >= 6010050)
+        #define CY_NOINIT           __attribute__ ((section(".noinit")))
+    #else
+        #define CY_NOINIT           __attribute__ ((section(".noinit"), zero_init))
+    #endif /* (__ARMCC_VERSION >= 6010050) */
     #define CY_SECTION(name)    __attribute__ ((section(name)))
     #define CY_UNUSED           __attribute__ ((unused))
     #define CY_NOINLINE         __attribute__ ((noinline))

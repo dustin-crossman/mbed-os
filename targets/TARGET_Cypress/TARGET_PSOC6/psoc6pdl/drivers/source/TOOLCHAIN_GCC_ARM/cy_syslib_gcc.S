@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_syslib_gcc.S
-* \version 2.20
+* \version 2.30
 *
 * \brief Assembly routines for GNU GCC.
 *
