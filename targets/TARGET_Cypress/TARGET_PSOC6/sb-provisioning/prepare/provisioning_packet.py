@@ -5,7 +5,7 @@ import click
 
 # Default input values and pathes
 PROD_NAME = 'my_thing'
-CYPROV_LIB_PATH = './provisioning-lib'
+CYPROV_LIB_PATH = './provisioning_lib'
 
 # Default output values and pathes
 OEM_AUDIT_NAME = 'oem_log.json'
