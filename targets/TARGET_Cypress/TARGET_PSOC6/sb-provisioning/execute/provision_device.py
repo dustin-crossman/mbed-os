@@ -16,9 +16,11 @@ limitations under the License.
 import os
 from time import sleep
 from execute.sys_call import get_prov_details, provision_keys_and_policies
+from execute.p6_memory_map import FLASH_ADDRESS, FLASH_SIZE
 from execute.gen_data_from_json import ENTRANCE_EXAM_FW_STATUS_REG, ENTRANCE_EXAM_FW_STATUS_MASK, \
     ENTRANCE_EXAM_FW_STATUS_VAL
-from execute.p6_reg import CYREG_CPUSS_PROTECTION, CYREG_IPC2_STRUCT_DATA, NVSTORE_AREA_1_ADDRESS
+from execute.p6_reg import CYREG_CPUSS_PROTECTION, CYREG_IPC2_STRUCT_DATA, NVSTORE_AREA_1_ADDRESS, \
+    CYREG_EFUSE_SECURE_HASH
 
 
 def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
@@ -45,21 +47,21 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
     with open(os.path.join(pub_key_json), 'w') as json_file:
         json_file.write(key)
 
-    # Check whether device is in NORMAL mode
+    # Check whether device is in SECURE mode
     if tool.read32(CYREG_CPUSS_PROTECTION) != 3:
         print(f'FAIL: Device is not in NORMAL mode, error code: {hex(tool.read32(CYREG_IPC2_STRUCT_DATA))}')
         print('Read Secure Hash from eFUSEs:')  # 00 expected on virgin device
         got_factory_hash = ''
         i = 0
         while i < 24:
-            hash_byte_val = hex(tool.read8(0x402C0814 + i))
+            hash_byte_val = hex(tool.read8(CYREG_EFUSE_SECURE_HASH + i))
             got_factory_hash += hash_byte_val + ' '
             i += 1
         print(f"Received SECURE_HASH: '{got_factory_hash}'")
         return False
 
     print(os.linesep + 'Erase main flash and TOC3:')
-    tool.erase(0x10000000, 0x000e0000)
+    tool.erase(FLASH_ADDRESS, FLASH_SIZE)
     reset_device(tool)
 
     print(os.linesep + 'Read FB Firmware status:')
