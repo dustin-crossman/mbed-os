@@ -1,4 +1,4 @@
-from pyocd_wrapper import Pyocd
+from execute.programmer.pyocd_wrapper import Pyocd
 
 
 tools = {
