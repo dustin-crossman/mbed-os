@@ -8129,7 +8129,7 @@
             "function": "PSOC6Code.sign_image"
         },
         "overrides": {
-            "non-secure-rom-start": "0x10000000",
+            "non-secure-rom-start": "0x10000400",
             "non-secure-rom-size": "0x80000",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
@@ -8166,7 +8166,7 @@
             "function": "PSOC6Code.sign_complete"
         },
         "overrides": {
-            "non-secure-rom-start": "0x10000000",
+            "non-secure-rom-start": "0x10000400",
             "non-secure-rom-size": "0x80000",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",

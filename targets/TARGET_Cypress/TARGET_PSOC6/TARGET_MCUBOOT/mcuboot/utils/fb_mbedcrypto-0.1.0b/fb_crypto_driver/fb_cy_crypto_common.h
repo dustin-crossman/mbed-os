@@ -18,6 +18,21 @@
 #if !defined(FB_CY_CRYPTO_COMMON_H)
 #define FB_CY_CRYPTO_COMMON_H
 
+/** Defines the Crypto AES block size (in bytes) */
+#define FB_CY_CRYPTO_AES_BLOCK_SIZE          (16u)
+
+/** Defines the Crypto AES_256 key maximum size (in bytes) */
+#define FB_CY_CRYPTO_AES_256_KEY_SIZE        (32u)
+
+/** Defines the Crypto AES key maximum size (in bytes) */
+#define FB_CY_CRYPTO_AES_MAX_KEY_SIZE        (FB_CY_CRYPTO_AES_256_KEY_SIZE)
+
+/** Defines the Crypto AES_256 key maximum size (in four-byte words) */
+#define FB_CY_CRYPTO_AES_MAX_KEY_SIZE_U32    (uint32_t)(FB_CY_CRYPTO_AES_MAX_KEY_SIZE / 4ul)
+
+/** Defines size of the AES block, in four-byte words */
+#define FB_CY_CRYPTO_AES_BLOCK_SIZE_U32      (uint32_t)(FB_CY_CRYPTO_AES_BLOCK_SIZE / 4ul)
+
 /** The key length options for the AES method. */
 typedef enum
 {
@@ -26,17 +41,23 @@ typedef enum
     FB_CY_CRYPTO_KEY_AES_256   = 0x02u    /**< The AES key size is 256 bits */
 } fb_cy_en_crypto_aes_key_length_t;
 
+/* The structure to define used memory buffers */
+typedef struct
+{
+    uint32_t key[FB_CY_CRYPTO_AES_MAX_KEY_SIZE_U32];
+    uint32_t keyInv[FB_CY_CRYPTO_AES_MAX_KEY_SIZE_U32];
+    uint32_t block0[FB_CY_CRYPTO_AES_BLOCK_SIZE_U32];
+    uint32_t block1[FB_CY_CRYPTO_AES_BLOCK_SIZE_U32];
+    uint32_t block2[FB_CY_CRYPTO_AES_BLOCK_SIZE_U32];
+} fb_cy_stc_crypto_aes_buffers_t;
+
 /** Structure for storing the AES state */
 typedef struct
 {
-    /** Pointer to AES key */
-    uint8_t *key;
-    /** Pointer to AES inversed key */
-    uint8_t *invKey;
     /** AES key length */
     fb_cy_en_crypto_aes_key_length_t keyLength;
     /** Pointer to AES work buffers */
-    uint32_t *buffers;
+    fb_cy_stc_crypto_aes_buffers_t *buffers;
     /** AES processed block index (for CMAC, SHA operations) */
     uint32_t blockIdx;
 } fb_cy_stc_crypto_aes_state_t;
@@ -45,6 +66,7 @@ typedef struct
 typedef struct
 {
     uint32_t mode;
+    uint32_t modeHw;
     uint8_t *block;
     uint32_t blockSize;
     uint8_t *hash;

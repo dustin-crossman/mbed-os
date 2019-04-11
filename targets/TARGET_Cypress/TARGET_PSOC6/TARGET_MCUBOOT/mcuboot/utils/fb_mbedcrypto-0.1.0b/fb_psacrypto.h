@@ -50,7 +50,6 @@
 
 #include "fb_mbed_tls_config.h"
 #include "fb_crypto_driver/fb_cy_crypto_common.h"
-#include "fb_crypto_driver/fb_cy_crypto_core_aes_v1.h"
 #include "fb_crypto_driver/fb_cy_crypto_core_sha_v1.h"
 #include "fb_mbedtls/fb_cipher.h"
 #include "fb_mbedtls/fb_cipher_internal.h"

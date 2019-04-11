@@ -22,8 +22,6 @@
 #if defined(FB_MBEDTLS_SHA256_ALT)
 
 typedef struct fb_mbedtls_sha256_context {
-    uint32_t length;                               /* The total number of Bytes processed. */
-    uint32_t currBlockLen;                         /* Length of data of incomplete block.  */
     fb_cy_stc_crypto_sha_state_t hashState;           /* Structure used by CY Crypto Driver   */
     fb_cy_stc_crypto_v1_sha256_buffers_t shaBuffers;  /* Structure used by CY Crypto Driver   */
 }

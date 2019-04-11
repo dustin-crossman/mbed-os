@@ -65,6 +65,22 @@ struct device *boot_flash_device;
 
 extern struct flash_map_entry part_map[];
 
+const struct device_config psoc6_flash_dev_cfg =
+{
+    devName,
+    &psoc6_flash_init,
+#ifdef CONFIG_DEVICE_POWER_MANAGEMENT
+    &psoc6_flash_pm_ctl,
+#endif
+    NULL
+};
+
+const struct device psoc6_flash_device =
+{
+    (struct device_config*)&psoc6_flash_dev_cfg,
+    (void *)&psoc6_flash_api,
+    NULL,
+};
 /* ------------------------------ */
 
 #define CY_SRSS_TST_MODE_ADDR           (SRSS_BASE | 0x0100UL)
@@ -127,10 +143,10 @@ static void do_boot(struct boot_rsp *rsp)
     rc = flash_device_base(rsp->br_flash_dev_id, &flash_base);
     assert(rc == 0);
 
-    while(!Cy_SCB_UART_IsTxComplete(SCB5))
-    {
-       /* Wait until UART transmission complete */
-    }
+//    while(!Cy_SCB_UART_IsTxComplete(SCB5))
+//    {
+//       /* Wait until UART transmission complete */
+//    }
 
     app_addr = flash_base + rsp->br_image_off + rsp->br_hdr->ih_hdr_size;
 
@@ -150,6 +166,8 @@ static void do_boot(struct boot_rsp *rsp)
         Cy_SRAM_TestBitLoop();
         __enable_irq();
     }
+    /* It is aligned to 0x400 (256 records in vector table*4bytes each) */
+    Cy_SysEnableCM4(app_addr);
 }
 #endif /* TARGET_MCUBOOT */
 /* -------------------------------------- HAL API ------------------------------------ */
@@ -193,27 +211,13 @@ void spm_hal_start_nspe(void)
     }
 
     // BOOT_LOG_INF("Jumping to the image in slot 0");
-
-    /* Stop in case we are in the TEST MODE */
-    if ( (CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL )
-    {
-        IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
-       // pc.printf("rnok: TEST MODE");
-        __disable_irq();
-        CPUSS->CM4_VECTOR_TABLE_BASE = CY_BL_CM4_ROM_LOOP_ADDR;
-        turn_on_cm4();
-        Cy_SysLib_Delay(1);
-        CPUSS->CM4_VECTOR_TABLE_BASE = PSA_NON_SECURE_ROM_START;
-        while((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL);
-        __enable_irq();
-    }
 	
 	do_boot(&rsp);
 	
 	/* MCUBoot integration should end before start of CM4 image */
 #endif /* TARGET_MCUBOOT */
 
-    Cy_SysEnableCM4(PSA_NON_SECURE_ROM_START);
+//    Cy_SysEnableCM4(PSA_NON_SECURE_ROM_START);
 }
 
 void spm_hal_memory_protection_init(void)
