@@ -129,6 +129,11 @@ void CyH4TransportDriver::deassert_bt_dev_wake()
 #endif
 }
 
+void CyH4TransportDriver::update_uart_baud_rate(int baud)
+{
+	uart.baud(baud);
+}
+
 } // namespace cypress_ble
 } // namespace vendor
 } // namespace ble
