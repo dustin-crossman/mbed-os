@@ -326,9 +326,9 @@ int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_of
 
     keep_alive_offload->seqnum = keep_alive_offload->seqnum - 1;
 
-    DEBUG_PRINTF_ERROR(("keep alive Seq num:%lu\n",    keep_alive_offload->seqnum ));
-    DEBUG_PRINTF_ERROR(("keep alive Ack num:%lu\n",    keep_alive_offload->acknum ));
-    DEBUG_PRINTF_ERROR(("keep alive Rcv Window:%lu\n", keep_alive_offload->rx_window ));
+    DEBUG_PRINTF(("keep alive Seq num:%lu\n",    keep_alive_offload->seqnum ));
+    DEBUG_PRINTF(("keep alive Ack num:%lu\n",    keep_alive_offload->acknum ));
+    DEBUG_PRINTF(("keep alive Rcv Window:%lu\n", keep_alive_offload->rx_window ));
 
 
     connect->request_len = tcp_keepalive_pkt(&connect->data[datalen], keep_alive_offload );
