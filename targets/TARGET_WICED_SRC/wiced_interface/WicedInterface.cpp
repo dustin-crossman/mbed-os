@@ -205,6 +205,11 @@ nsapi_error_t WicedInterface::connect()
             NULL,
             WWD_STA_INTERFACE);
        if (res == WICED_SUCCESS) {
+    	   res = wiced_wlan_register_link_events();
+    	   if ( res == WICED_SUCCESS )
+    	   {
+    		   printf("Registered Link Events Handler\n");
+    	   }
            break;
        }
     }

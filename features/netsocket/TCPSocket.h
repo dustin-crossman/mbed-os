@@ -189,8 +189,13 @@ public:
     /* Get TCP Socket Event *
        * @param : void
        * @return : Event Flag READ, WRITE, FINISHED
-       */
-      uint32_t get_event( void);
+    */
+    uint32_t get_event( void);
+
+    static const int READ_FLAG = InternetSocket::READ_FLAG;
+    static const int WRITE_FLAG = InternetSocket::WRITE_FLAG;
+    static const int FINISHED_FLAG = InternetSocket::FINISHED_FLAG;
+
 protected:
     friend class TCPServer;
     virtual nsapi_protocol_t get_proto();

@@ -123,17 +123,7 @@
         "ppp-thread-stacksize": {
             "help": "Thread stack size for PPP",
             "value": 768
-        },
-        "tcpsocket-readflag": {
-                "help": "TCP socket Read Flag",
-                "value": 1,
-                "macro_name": "TCPSOCKET_READ_FLAG" 
-        },
-        "tcpsocket-sendflag": {
-                "help": "TCP socket send Flag",
-                "value": 2,
-                "macro_name": "TCPSOCKET_WRITE_FLAG" 
-        }        
+        }
     },
     "target_overrides": {
         "REALTEK_RTL8195AM": {
