@@ -199,7 +199,6 @@ void wiced_network_notify_link_up   (wiced_interface_t interface) {}
 
 void wiced_network_notify_link_down (wiced_interface_t interface)
 {
-	printf("Wireless Network Notify Link Down Intf:%d\n", interface );
 	wiced_emac_wwd_wifi_link_state_changed(false);
 }
 
