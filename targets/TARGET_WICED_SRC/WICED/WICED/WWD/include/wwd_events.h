@@ -202,7 +202,8 @@ typedef enum
     WLC_E_DPSTA_INTF_IND                 = 140, /* DPSTA interface indication */
     WLC_E_RRM                            = 141, /* RRM Event */
     WLC_E_ULP                            = 146, /* ULP entry event */
-    WLC_E_LAST                           = 147, /** highest val + 1 for range checking */
+    WLC_E_TKO                            = 151, /* TCP Keep Alive Offload Event */
+    WLC_E_LAST                           = 152, /** highest val + 1 for range checking */
     WLC_E_FORCE_32_BIT                   = 0x7FFFFFFE  /** Force enum to be stored in 32 bit variable */
 } wwd_event_num_t;
 

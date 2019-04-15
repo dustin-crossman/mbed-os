@@ -41,6 +41,7 @@
 #include "wwd_structures.h"
 #include "wwd_bcmendian.h"
 #include "wwd_sdpcm.h"
+#include "wwd_events.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,6 +57,13 @@ extern "C" {
 
 //Uncomment below line to debug TCP KEEPALIVE
 //#define TCP_KEEPALIVE_DEBUG
+#define TCP_KEEPALIVE_DEBUG_ERROR
+
+#ifdef TCP_KEEPALIVE_DEBUG_ERROR
+#define DEBUG_PRINTF_ERROR(x) printf x
+#else
+#define DEBUG_PRINTF_ERROR(x)
+#endif
 
 #ifdef TCP_KEEPALIVE_DEBUG
 #define DEBUG_PRINTF(x) printf x
