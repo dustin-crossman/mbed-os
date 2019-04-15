@@ -676,7 +676,7 @@ wiced_result_t wiced_join_ap_specific( wiced_ap_info_t* details, uint8_t securit
 
     if ( join_result == WICED_SUCCESS )
     {
-        printf ( "Successfully joined : %s\n", ssid_name) ;
+        WPRINT_WICED_INFO( ( "Successfully joined : %s\n", ssid_name) );
 
 #ifdef WICED_USE_WIFI_TWO_STA_INTERFACE
         wiced_sta_link_up[interface]       = WICED_TRUE;
@@ -685,8 +685,6 @@ wiced_result_t wiced_join_ap_specific( wiced_ap_info_t* details, uint8_t securit
         wiced_sta_link_up       = WICED_TRUE;
         wiced_sta_security_type = details->security;
 #endif
-
-        printf("link_events registered\n");
         wwd_management_set_event_handler( link_events, wiced_link_events_handler, NULL, WICED_TO_WWD_INTERFACE(interface) );
         return WICED_SUCCESS;
     }
@@ -913,7 +911,7 @@ static void link_up( void )
 #endif
 {
 	wiced_sta_link_up =  wwd_wifi_get_link_status();
-	printf("link_up event wiced_sta_link_up:%d\n", wiced_sta_link_up );
+
 #ifndef WICED_USE_WIFI_TWO_STA_INTERFACE
     wiced_interface_t interface  = WICED_STA_INTERFACE;
     if ( wiced_sta_link_up == WICED_FALSE )
@@ -943,7 +941,7 @@ static void link_down( void )
 #endif
 {
 	wiced_sta_link_up =  wwd_wifi_get_link_status();
-	printf("link_down event wiced_sta_link_up:%d\n", wiced_sta_link_up );
+
 #ifndef WICED_USE_WIFI_TWO_STA_INTERFACE
     wiced_interface_t interface = WICED_STA_INTERFACE;
     if ( wiced_sta_link_up == WICED_TRUE )
@@ -1070,8 +1068,6 @@ static void* wiced_link_events_handler( const wwd_event_header_t* event_header, 
     WPRINT_NETWORK_DEBUG( ("Link event (type, status, reason, flags) %u %u %u %u\n", (unsigned int)event_header->event_type, (unsigned int)event_header->status,
             (unsigned int)event_header->reason, (unsigned int)event_header->flags ) );
 
-    printf("Link event (type, status, reason, flags) %u %u %u %u\n", (unsigned int)event_header->event_type, (unsigned int)event_header->status,
-            (unsigned int)event_header->reason, (unsigned int)event_header->flags );
 
     WWD_IOCTL_LOG_ADD_EVENT(event_header->event_type, event_header->flags);
 
