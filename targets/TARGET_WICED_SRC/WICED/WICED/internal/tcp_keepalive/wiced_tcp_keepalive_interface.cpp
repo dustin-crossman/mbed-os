@@ -275,14 +275,14 @@ void tcp_socket_snd_rcv_callback (void* params)
 	if ( socketptr != NULL )
 	{
 		flags = socketptr->get_event();
-		if ((flags & TCPSocket::READ_FLAG) != 0)
+		if ((flags & socketptr->get_tcp_socket_read_flag() ) != 0)
 		{
 		  	if ( tcpkeep_alive->callbacks.receive != NULL )
 		  	{
 		  		tcpkeep_alive->callbacks.receive(tcpkeep_alive, tcpkeep_alive->callback_arg );
 		  	}
 		}
-		if ((flags & TCPSocket::WRITE_FLAG ) != 0 )
+		if ((flags & socketptr->get_tcp_socket_write_flag() ) != 0 )
 		{
 		  	if ( tcpkeep_alive->callbacks.send != NULL )
 		  	{

@@ -192,9 +192,23 @@ public:
     */
     uint32_t get_event( void);
 
-    static const int READ_FLAG = InternetSocket::READ_FLAG;
-    static const int WRITE_FLAG = InternetSocket::WRITE_FLAG;
-    static const int FINISHED_FLAG = InternetSocket::FINISHED_FLAG;
+    /* GET TCP socket READ flag */
+    int get_tcp_socket_read_flag ( void )
+    {
+    	return InternetSocket::READ_FLAG;
+    }
+
+    /* GET TCP socket WRITE flag */
+    int get_tcp_socket_write_flag (void )
+    {
+    	return InternetSocket::WRITE_FLAG;
+    }
+
+    /* GET TCP socket FINISHED_FLAG flag */
+    int get_tcp_socket_finished_flag (void )
+    {
+    	return InternetSocket::FINISHED_FLAG;
+    }
 
 protected:
     friend class TCPServer;
