@@ -128,10 +128,12 @@ static irq_info_t irq_info[NUM_SERIAL_PORTS] = {
     {NULL, NULL, 0, unconnected_IRQn}
 };
 
-static uint32_t Cy_SCB_UART_GetRtsAcitvePolarity(CySCB_Type const *base)
+#if DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED
+static uint32_t Cy_SCB_UART_GetRtsActivePolarity(CySCB_Type const *base)
 {
     return _FLD2VAL(SCB_UART_FLOW_CTRL_RTS_POLARITY, SCB_UART_FLOW_CTRL(base));
 }
+#endif /* DEVICE_SLEEP && DEVICE_LPTICKER && SERIAL_PM_CALLBACK_ENABLED */
 
 /** Routes interrupt to proper SCB block.
  *
@@ -416,7 +418,7 @@ static cy_en_syspm_status_t serial_pm_callback(cy_stc_syspm_callback_params_t *c
                 if (0 == Cy_SCB_UART_GetNumInRxFifo(obj->base)) {
                     /* Configure RTS and TX GPIO DR register to drive output (high) */
                     if(obj->pin_rts != NC) {
-                        uint32_t rts_polarity = Cy_SCB_UART_GetRtsAcitvePolarity(obj->base);
+                        uint32_t rts_polarity = Cy_SCB_UART_GetRtsActivePolarity(obj->base);
                         uint32_t rts_value = ((rts_polarity == CY_SCB_UART_ACTIVE_LOW) ? CY_SCB_UART_ACTIVE_HIGH : CY_SCB_UART_ACTIVE_LOW);
                         Cy_GPIO_Write   (port_rts, CY_PIN(obj->pin_rts), rts_value);
                         Cy_GPIO_SetHSIOM(port_rts, CY_PIN(obj->pin_rts), HSIOM_SEL_GPIO);
