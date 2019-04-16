@@ -3,8 +3,8 @@
                 "boot1" : { 
                     "VERSION" : "0.1",
                     "ROLLBACK_COUNTER" : "0",
-                    "IMAGE_ID" : "4",
-                    "SLOT_SIZE" : "0x50000",
+                    "IMAGE_ID" : "5",
+                    "SLOT_SIZE" : "0x80000",
                     "PAD" : "--pad"
                 }
             },

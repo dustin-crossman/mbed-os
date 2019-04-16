@@ -38,6 +38,12 @@
 #include "cycfg.h"
 #include "cy_prot.h"
 
+#include "flash_map/flash_map.h"
+#include "sysflash/sysflash.h"
+#include "flash_psoc6.h"
+#include "fb_device.h"
+#include "os/os.h"
+
 #include "bootutil.h"
 #include "bootutil_log.h"
 #include "image.h"
@@ -167,6 +173,7 @@ static void do_boot(struct boot_rsp *rsp)
         __enable_irq();
     }
     /* It is aligned to 0x400 (256 records in vector table*4bytes each) */
+    BOOT_LOG_INF("Cy_SysEnableCM4");
     Cy_SysEnableCM4(app_addr);
 }
 #endif /* TARGET_MCUBOOT */
@@ -181,36 +188,62 @@ void spm_hal_start_nspe(void)
 	
 	struct boot_rsp rsp;
     int rc = 0;
-	
-	/* Processing of policy in JWT format */
-    jwt_ptr_t *jwt = (jwt_ptr_t*)PROVISIONING_JWT_ADDR;
-    rc = Cy_JWT_ParseProvisioningPacket(jwt->str, &bnu_policy,
-            CY_BOOTLOADER_MASTER_IMG_ID);
+   
+    boot_flash_device = (struct device*)&psoc6_flash_device;
+    
+//    IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
+//    Cy_SRAM_TestBitLoop();
+//    __BKPT(0);
+
+//    uint8_t *test;
+//    test = malloc(100);
+
+    /* Processing of policy in JWT format */
+    uint32_t jwtLen;
+    char *jwt;
+    rc = Cy_JWT_GetProvisioningDetails(FB_POLICY_JWT, &jwt, &jwtLen);
+    if(0 == rc)
+    {
+        rc = Cy_JWT_ParseProvisioningPacket(jwt, &bnu_policy,
+                CY_BOOTLOADER_MASTER_IMG_ID);
+    }
     if(0 != rc)
     {
-        // BOOT_LOG_ERR("Policy parsing failed with code %i", rc);
+         BOOT_LOG_ERR("Policy parsing failed with code %i", rc);
     }
 
-    part_map[0].area.fa_off = bnu_policy.bnu_img_policy.boot_area.start-FLASH_DEVICE_BASE;
-    part_map[0].area.fa_size = bnu_policy.bnu_img_policy.boot_area.size;
+//    part_map[0].area.fa_off = bnu_policy.bnu_img_policy.boot_area.start-FLASH_DEVICE_BASE;
+//    part_map[0].area.fa_size = bnu_policy.bnu_img_policy.boot_area.size;
+//
+//    part_map[1].area.fa_off = bnu_policy.bnu_img_policy.upgrade_area.start-FLASH_DEVICE_BASE;
+//    part_map[1].area.fa_size = bnu_policy.bnu_img_policy.upgrade_area.size;
 
-    part_map[1].area.fa_off = bnu_policy.bnu_img_policy.upgrade_area.start-FLASH_DEVICE_BASE;
-    part_map[1].area.fa_size = bnu_policy.bnu_img_policy.upgrade_area.size;
+    // hardcoded for debug
+    part_map[0].area.fa_off = 0x10000000-FLASH_DEVICE_BASE;
+    part_map[0].area.fa_size = 0x80000;
 
-    // BOOT_LOG_INF("Processing available images");
+    part_map[1].area.fa_off = 0x10080000-FLASH_DEVICE_BASE;
+    part_map[1].area.fa_size = 0x80000;
+
+    bnu_policy.bnu_img_policy.boot_auth[0] = 8;
+    bnu_policy.bnu_img_policy.upgrade_auth[0] = 8;
+    bnu_policy.bnu_img_policy.id = 5;
+    bnu_policy.bnu_img_policy.upgrade = 1;
+
+    BOOT_LOG_INF("Processing available images");
     rc = boot_go(&rsp);
 	if (rc != 0)
     {
-        // BOOT_LOG_ERR("Unable to find bootable image");
-        /* indicate M4 image boot failed */
+         BOOT_LOG_ERR("Unable to find bootable image");
+//        /* indicate M4 image boot failed */
         while(1)
         {
-            // Cy_GPIO_Inv(LED_PORT, LED_PIN);
-            // Cy_SysLib_Delay(100);
+//            // Cy_GPIO_Inv(LED_PORT, LED_PIN);
+//            // Cy_SysLib_Delay(100);
         }
     }
 
-    // BOOT_LOG_INF("Jumping to the image in slot 0");
+    BOOT_LOG_INF("Jumping to the image in slot 0");
 	
 	do_boot(&rsp);
 	

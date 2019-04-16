@@ -91,7 +91,7 @@ MBED_NORETURN void mbed_rtos_start()
 
 #if defined(COMPONENT_SPE)
     // At this point, the mailbox is already initialized
-    spm_hal_start_nspe();
+//    spm_hal_start_nspe();
     psa_spm_init();
 #endif // defined(COMPONENT_SPE)
 
