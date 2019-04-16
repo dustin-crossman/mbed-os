@@ -200,10 +200,10 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
             if "_M0_" in part:
                 target = {"name": part, "core": "cm0p"}
                 # SPE image flash address start
-                img_start_addr = "0x10600400"
+                img_start_addr = "0x10080000"
             else:
                 # NSPE image flash address start
-                img_start_addr = "0x10000400"
+                img_start_addr = "0x10000000"
                 target = {"name": part, "core": "cm4"}
 
     # create binary file from mbed elf for the following processing
@@ -245,7 +245,7 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
     # TODO: resolve img_start_addr acquisition as parameter, not a constant
     # convert signed image binary back to hex format
     if img_start_addr:
-        subprocess.Popen(["arm-none-eabi-objcopy.exe", "--change-address", img_start_addr,  # 0x10600400 for PSA M0
+        subprocess.Popen(["arm-none-eabi-objcopy.exe", "--change-address", img_start_addr,
                           "-I", "binary", "-O", "ihex", binf_signed, str(mbed_hex_path)])
     else:
         toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")

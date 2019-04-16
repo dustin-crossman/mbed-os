@@ -1,17 +1,18 @@
 {
     "hsm_priv_key": {
         "crv": "P-256",
-        "d": "9PKd6gzQwllkFS3w_P5ToF4IiMoGhkAaw4xP2ryCWiA",
+        "d": "d-r9nPjLka7g5BHiT7OexYV7na-ofuNfjPPN4XvP_yQ",
         "kty": "EC",
         "use": "sig",
-        "x": "RwJkj6BwfymE2SBrBrOM9ZbK07GgkODXauXoOCP48FM",
-        "y": "XHgw6LKQxTL82y9veYAfbpP_CM9N6JiLSwMNFuX5Muo"
+        "x": "sJMsN-2Jo27kc51wVK7xJ2fP9BDkzAc2fZEZMlohHXA",
+        "y": "MWluzmXgXOvdQQDYX3yy1Tk9QoHL-9DZhswZpY0Xe5U"
     },
     "hsm_pub_key": {
         "crv": "P-256",
         "kty": "EC",
         "use": "sig",
-        "x": "RwJkj6BwfymE2SBrBrOM9ZbK07GgkODXauXoOCP48FM",
-        "y": "XHgw6LKQxTL82y9veYAfbpP_CM9N6JiLSwMNFuX5Muo"
+        "kid": "4",
+        "x": "sJMsN-2Jo27kc51wVK7xJ2fP9BDkzAc2fZEZMlohHXA",
+        "y": "MWluzmXgXOvdQQDYX3yy1Tk9QoHL-9DZhswZpY0Xe5U"
     }
 }

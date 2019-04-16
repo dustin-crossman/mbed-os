@@ -24,14 +24,14 @@ class ProgrammerBase(metaclass=ABCMeta):
         :param interface: Debug interface.
         :return: True if connected successfully, otherwise False.
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def disconnect(self):
         """
         Disconnects from target.
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def set_frequency(self, value_khz):
@@ -39,14 +39,21 @@ class ProgrammerBase(metaclass=ABCMeta):
         Sets probe frequency.
         :param value_khz: Frequency in kHz.
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def halt(self):
         """
         Halts the target.
         """
-        pass
+        raise NotImplementedError()
+
+    @abstractmethod
+    def resume(self):
+        """
+        Resumes the execution
+        """
+        raise NotImplementedError()
 
     @abstractmethod
     def reset(self, reset_type=ResetType.SW):
@@ -54,15 +61,23 @@ class ProgrammerBase(metaclass=ABCMeta):
         Resets the target.
         :param reset_type: The reset type.
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
-    def set_core(self, core_name):
+    def reset_and_halt(self, reset_type=ResetType.SW):
         """
-        Selects CPU core by name.
-        :param core_name: The core name.
+        Resets the target and halts the CPU immediately after reset.
+        :param reset_type: The reset type.
         """
-        pass
+        raise NotImplementedError()
+
+    @abstractmethod
+    def set_core(self, core_number):
+        """
+        Selects CPU core by number.
+        :param core_number: The core number.
+        """
+        raise NotImplementedError()
 
     @abstractmethod
     def read8(self, address):
@@ -71,7 +86,7 @@ class ProgrammerBase(metaclass=ABCMeta):
         :param address: The memory address to read.
         :return: The read value.
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def read16(self, address):
@@ -80,7 +95,7 @@ class ProgrammerBase(metaclass=ABCMeta):
         :param address: The memory address to read.
         :return: The read value.
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def read32(self, address):
@@ -89,7 +104,7 @@ class ProgrammerBase(metaclass=ABCMeta):
         :param address: The memory address to read.
         :return: The read value.
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def write8(self, address, value):
@@ -98,7 +113,7 @@ class ProgrammerBase(metaclass=ABCMeta):
         :param address: The memory address to write.
         :param value: The 8-bit value to write.
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def write16(self, address, value):
@@ -107,7 +122,7 @@ class ProgrammerBase(metaclass=ABCMeta):
         :param address: The memory address to write.
         :param value: The 16-bit value to write.
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def write32(self, address, value):
@@ -116,16 +131,34 @@ class ProgrammerBase(metaclass=ABCMeta):
         :param address: The memory address to write.
         :param value: The 32-bit value to write.
         """
-        pass
+        raise NotImplementedError()
+
+    @abstractmethod
+    def read_reg(self, reg_name):
+        """
+        Gets value of a core register.
+        :param reg_name: Core register name.
+        :return: The register value.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def write_reg(self, reg_name, value):
+        """
+        Sets value of a core register.
+        :param reg_name: Core register name.
+        :param value: The value to set.
+        """
+        raise NotImplementedError()
 
     @abstractmethod
     def erase(self, address, size):
         """
-        Performs erase of specified memory region.
+        Erases entire device flash or specified sectors.
         :param address: The memory location.
         :param size: The memory size.
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def program(self, filename, file_format=None, address=None):
@@ -136,4 +169,4 @@ class ProgrammerBase(metaclass=ABCMeta):
         :param address: Base address used for the address where to flash a binary.
         :return: True if programmed successfully, otherwise False.
         """
-        pass
+        raise NotImplementedError()
