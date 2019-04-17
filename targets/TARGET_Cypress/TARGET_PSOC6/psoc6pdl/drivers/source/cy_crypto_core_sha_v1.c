@@ -387,7 +387,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Update(CRYPTO_Type *base,
                 {
                     uint32_t tempBlockSize = hashBlockSize - hashBlockIdx;
 
-                    Cy_Crypto_Core_V1_MemCpy(base, (void *)hashState->block + hashBlockIdx, message, (uint16_t)tempBlockSize);
+                    Cy_Crypto_Core_V1_MemCpy(base, (void *)((uint32_t)hashState->block + hashBlockIdx), message, (uint16_t)tempBlockSize);
 
                     Cy_Crypto_Core_V1_Sha_ProcessBlock(base, hashState, hashState->block);
 
@@ -403,7 +403,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Update(CRYPTO_Type *base,
                 /* Copy the end of the message to the block */
                 if (messageSize != 0U)
                 {
-                    Cy_Crypto_Core_V1_MemCpy(base, (void *)hashState->block + hashBlockIdx, message, (uint16_t)messageSize);
+                    Cy_Crypto_Core_V1_MemCpy(base, (void *)((uint32_t)hashState->block + hashBlockIdx), message, (uint16_t)messageSize);
                 }
             }
 
