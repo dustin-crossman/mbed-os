@@ -26,6 +26,6 @@
                 }
             },
 
-    "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/sb-provisioning/",
+    "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/",
     "priv_key_file": "/keys/MCUBOOT_CM0P_KEY_PRIV.pem"
 }
