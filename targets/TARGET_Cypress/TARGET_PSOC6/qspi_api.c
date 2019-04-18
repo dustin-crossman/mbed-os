@@ -465,6 +465,36 @@ qspi_status_t qspi_command_transfer(qspi_t *obj, const qspi_command_t *command, 
     return status;
 }
 
+const PinMap *qspi_master_sclk_pinmap(void)
+{
+    return PinMap_QSPI_SCLK;
+}
+
+const PinMap *qspi_master_ssel_pinmap(void)
+{
+    return PinMap_QSPI_SSEL;
+}
+
+const PinMap *qspi_master_data0_pinmap(void)
+{
+    return PinMap_QSPI_DATA;
+}
+
+const PinMap *qspi_master_data1_pinmap(void)
+{
+    return PinMap_QSPI_DATA;
+}
+
+const PinMap *qspi_master_data2_pinmap(void)
+{
+    return PinMap_QSPI_DATA;
+}
+
+const PinMap *qspi_master_data3_pinmap(void)
+{
+    return PinMap_QSPI_DATA;
+}
+
 #endif
 
 /** @}*/
