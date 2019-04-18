@@ -22,6 +22,7 @@
 #include "wwd_assert.h"
 #include "network/wwd_buffer_interface.h"
 #include "mbed_critical.h"
+#include "pbuf.h"
 
 wwd_result_t host_buffer_check_leaked(void)
 {
@@ -32,18 +33,31 @@ wwd_result_t host_buffer_check_leaked(void)
 wwd_result_t internal_host_buffer_get(wiced_buffer_t * buffer, wwd_buffer_dir_t direction, unsigned short size, unsigned long timeout_ms)
 {
     assert(core_util_are_interrupts_enabled());
-    void *p = malloc(sizeof(wiced_buffer_impl_t));
-    if (!p) {
-        return WWD_BUFFER_UNAVAILABLE_PERMANENT;
-    }
-    *buffer = p;
+    wiced_buffer_impl_t * pkt = NULL;
+    struct pbuf *pbuffer = NULL;
+    uint16_t bufsize = sizeof(wiced_buffer_impl_t) + size;
 
-    p = malloc(size);
-    if (!p) {
-        free(p);
-        return WWD_BUFFER_UNAVAILABLE_PERMANENT;
+    if (direction == WWD_NETWORK_RX )
+    {
+      pbuffer = pbuf_alloc(PBUF_RAW, bufsize, PBUF_RAM);
+      if (pbuffer == NULL) {
+          return WWD_BUFFER_UNAVAILABLE_PERMANENT;;
+      }
+      pkt = (wiced_buffer_impl_t *)pbuffer->payload;
+      *buffer = (wiced_buffer_t) pbuffer->payload;
+       pkt->parent = pbuffer;
     }
-    (*buffer)->ptr = p;
+    else
+    {
+    	 void *p = malloc(sizeof(wiced_buffer_impl_t) + size);
+    	 if (!p) {
+    	        return WWD_BUFFER_UNAVAILABLE_PERMANENT;
+    	 }
+    	 pkt = (wiced_buffer_impl_t *)p;
+    	 *buffer = p;
+
+    }
+    (*buffer)->ptr = &pkt[1];
 
     (*buffer)->size = size;
     (*buffer)->offset = 0;
@@ -59,8 +73,14 @@ void host_buffer_release(wiced_buffer_t buffer, wwd_buffer_dir_t direction )
 {
     assert(buffer != NULL);
     assert(core_util_are_interrupts_enabled());
-    free(buffer->ptr); // bug here
-    free(buffer);
+    if ( direction != WWD_NETWORK_RX )
+    {
+    	free(buffer);
+    }
+    else
+    {
+    	pbuf_free(buffer->parent);
+    }
 }
 
 uint8_t* host_buffer_get_current_piece_data_pointer(wiced_buffer_t buffer )
