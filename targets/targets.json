@@ -8130,7 +8130,7 @@
         },
         "overrides": {
             "non-secure-rom-start": "0x10000000",
-            "non-secure-rom-size": "0x80000",
+            "non-secure-rom-size": "0x30000",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
@@ -8155,7 +8155,7 @@
         },
         "overrides": {
             "non-secure-rom-start": "0x10000000",
-            "non-secure-rom-size": "0x80000",
+            "non-secure-rom-size": "0x30000",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
