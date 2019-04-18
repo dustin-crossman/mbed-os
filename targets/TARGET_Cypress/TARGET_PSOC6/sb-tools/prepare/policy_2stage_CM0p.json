@@ -74,7 +74,7 @@
                     3
                 ],
                 "id": 0,
-                "launch": 3,
+                "launch": 1,
                 "monotonic": 0,
                 "upgrade": true,
                 "upgrade_auth": [
@@ -98,7 +98,7 @@
                 "boot_auth": [
                     6
                 ],
-                "id": 3,
+                "id": 1,
                 "launch": 5,
                 "monotonic": 0,
                 "upgrade": true,
