@@ -30,6 +30,7 @@
 
 #ifdef TARGET_MCUBOOT
 
+#include "cy_policy.h"
 /* mcuboot Headers */
 #include "cy_device_headers.h"
 #include "cycfg_peripherals.h"
@@ -149,11 +150,6 @@ static void do_boot(struct boot_rsp *rsp)
     rc = flash_device_base(rsp->br_flash_dev_id, &flash_base);
     assert(rc == 0);
 
-//    while(!Cy_SCB_UART_IsTxComplete(SCB5))
-//    {
-//       /* Wait until UART transmission complete */
-//    }
-
     app_addr = flash_base + rsp->br_image_off + rsp->br_hdr->ih_hdr_size;
 
     /* Set Protection Context 6 for CM4 */
@@ -163,7 +159,7 @@ static void do_boot(struct boot_rsp *rsp)
     if ( (CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & (TST_MODE_TEST_MODE_MASK)) != 0UL )
     {
         IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
-        // BOOT_LOG_INF("TEST MODE");
+        BOOT_LOG_INF("SPE: TEST MODE");
         __disable_irq();
         CPUSS->CM4_VECTOR_TABLE_BASE = CY_BL_CM4_ROM_LOOP_ADDR;
         turn_on_cm4();
@@ -174,30 +170,41 @@ static void do_boot(struct boot_rsp *rsp)
     }
     /* It is aligned to 0x400 (256 records in vector table*4bytes each) */
     BOOT_LOG_INF("Cy_SysEnableCM4");
+
+    if(1)
+//    if((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL)
+    {
+        IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
+        BOOT_LOG_INF("TEST BIT SET !");
+    }
+
+#if(MCUBOOT_LOG_LEVEL != 0)
+    while(!Cy_SCB_UART_IsTxComplete(SCB5))
+    {
+       /* Wait until UART transmission complete */
+    }
+#endif
     Cy_SysEnableCM4(app_addr);
 }
 #endif /* TARGET_MCUBOOT */
 /* -------------------------------------- HAL API ------------------------------------ */
 
 // These implementations are meant to be used only for SPM running on PSoC6 M0+ core.
-
 void spm_hal_start_nspe(void)
 {
 #ifdef TARGET_MCUBOOT
 	/* MCUBoot integration starts here */
-	
 	struct boot_rsp rsp;
     int rc = 0;
    
     boot_flash_device = (struct device*)&psoc6_flash_device;
     
+    /* Debugger launch hook */
 //    IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
 //    Cy_SRAM_TestBitLoop();
 //    __BKPT(0);
 
-//    uint8_t *test;
-//    test = malloc(100);
-
+#if(MCUBOOT_POLICY == MCUBOOT_POLICY_JWT)
     /* Processing of policy in JWT format */
     uint32_t jwtLen;
     char *jwt;
@@ -212,45 +219,39 @@ void spm_hal_start_nspe(void)
          BOOT_LOG_ERR("Policy parsing failed with code %i", rc);
     }
 
-//    part_map[0].area.fa_off = bnu_policy.bnu_img_policy.boot_area.start-FLASH_DEVICE_BASE;
-//    part_map[0].area.fa_size = bnu_policy.bnu_img_policy.boot_area.size;
-//
-//    part_map[1].area.fa_off = bnu_policy.bnu_img_policy.upgrade_area.start-FLASH_DEVICE_BASE;
-//    part_map[1].area.fa_size = bnu_policy.bnu_img_policy.upgrade_area.size;
+    part_map[0].area.fa_off     = bnu_policy.bnu_img_policy.boot_area.start-FLASH_DEVICE_BASE;
+    part_map[0].area.fa_size    = bnu_policy.bnu_img_policy.boot_area.size;
 
-    // hardcoded for debug
-    part_map[0].area.fa_off = 0x10000000-FLASH_DEVICE_BASE;
-    part_map[0].area.fa_size = 0x80000;
+    part_map[1].area.fa_off     = bnu_policy.bnu_img_policy.upgrade_area.start-FLASH_DEVICE_BASE;
+    part_map[1].area.fa_size    = bnu_policy.bnu_img_policy.upgrade_area.size;
+#else /* (MCUBOOT_POLICY_JWT != MCUBOOT_POLICY_JWT) */
+    /* (MCUBOOT_POLICY_JWT == MCUBOOT_POLICY_HDR) */
+    part_map[0].area.fa_off     = MCUBOOT_POLICY_FLASH_AREA_0_START-FLASH_DEVICE_BASE;
+    part_map[0].area.fa_size    = MCUBOOT_POLICY_FLASH_AREA_SIZE;
 
-    part_map[1].area.fa_off = 0x10080000-FLASH_DEVICE_BASE;
-    part_map[1].area.fa_size = 0x80000;
+    part_map[1].area.fa_off     = MCUBOOT_POLICY_FLASH_AREA_1_START-FLASH_DEVICE_BASE;
+    part_map[1].area.fa_size    = MCUBOOT_POLICY_FLASH_AREA_SIZE;
 
-    bnu_policy.bnu_img_policy.boot_auth[0] = 8;
-    bnu_policy.bnu_img_policy.upgrade_auth[0] = 8;
-    bnu_policy.bnu_img_policy.id = 5;
-    bnu_policy.bnu_img_policy.upgrade = 1;
+    bnu_policy.bnu_img_policy.boot_auth[0]      = MCUBOOT_POLICY_BOOT_AUTH;
+    bnu_policy.bnu_img_policy.upgrade_auth[0]   = MCUBOOT_POLICY_UPGRADE_AUTH;
+    bnu_policy.bnu_img_policy.id                = MCUBOOT_POLICY_IMG_ID;
+    bnu_policy.bnu_img_policy.upgrade           = MCUBOOT_POLICY_UPGRADE;
+#endif
 
     BOOT_LOG_INF("Processing available images");
     rc = boot_go(&rsp);
 	if (rc != 0)
     {
-         BOOT_LOG_ERR("Unable to find bootable image");
-//        /* indicate M4 image boot failed */
-        while(1)
-        {
-//            // Cy_GPIO_Inv(LED_PORT, LED_PIN);
-//            // Cy_SysLib_Delay(100);
-        }
+        /* indicate M4 image boot failed */
+        BOOT_LOG_ERR("Unable to find bootable image");
+        while(1);
     }
 
-    BOOT_LOG_INF("Jumping to the image in slot 0");
-	
-	do_boot(&rsp);
-	
 	/* MCUBoot integration should end before start of CM4 image */
-#endif /* TARGET_MCUBOOT */
+    BOOT_LOG_INF("Jumping to the image in slot 0");
+	do_boot(&rsp);
 
-//    Cy_SysEnableCM4(PSA_NON_SECURE_ROM_START);
+#endif /* TARGET_MCUBOOT */
 }
 
 void spm_hal_memory_protection_init(void)
