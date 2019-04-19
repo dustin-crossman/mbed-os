@@ -8129,8 +8129,8 @@
             "function": "PSOC6Code.sign_image"
         },
         "overrides": {
-            "non-secure-rom-start": "0x10000400",
-            "non-secure-rom-size": "0x80000",
+            "non-secure-rom-start": "0x10000000",
+            "non-secure-rom-size": "0x30000",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
@@ -8140,7 +8140,7 @@
             "public-ram-start": "0x0800FE00", 
             "public-ram-size": "0x200",
             "secure-ram-start": "0x08010000",
-            "secure-ram-size": "0x12000"
+            "secure-ram-size": "0x10000"
         }
     },
 
@@ -8154,7 +8154,21 @@
             "CY8CKIT_001",
             "CONFIG_FLASH_PAGE_LAYOUT",
             "IMAGE_0"
-        ]
+        ],
+        "overrides": {
+            "non-secure-rom-start": "0x10000400",
+            "non-secure-rom-size": "0x30000",
+            "secure-rom-start": "0x10080400",
+            "secure-rom-size": "0x4FC00",
+            "non-secure-ram-start": "0x08000000",
+            "non-secure-ram-size": "0xFD00",
+            "shared-ram-start": "0x0800FD00",
+            "shared-ram-size": "0x100",
+            "public-ram-start": "0x0800FE00", 
+            "public-ram-size": "0x200",
+            "secure-ram-start": "0x08010000",
+            "secure-ram-size": "0x12000"
+        }
     },
     "CY8CPROTO_064_SB_PSA": {
         "inherits": ["NSPE_Target", "CY8CPROTO_064_SB"],
@@ -8164,11 +8178,31 @@
         "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
         "hex_filename": "psa_release_1.0.hex",
         "post_binary_hook": {
+            "function": "PSOC6Code.complete"
+        },
+        "overrides": {
+            "non-secure-rom-start": "0x10000000",
+            "non-secure-rom-size": "0x30000",
+            "secure-rom-start": "0x10080400",
+            "secure-rom-size": "0x4FC00",
+            "non-secure-ram-start": "0x08000000",
+            "non-secure-ram-size": "0xFD00",
+            "shared-ram-start": "0x0800FD00",
+            "shared-ram-size": "0x100",
+            "public-ram-start": "0x0800FE00", 
+            "public-ram-size": "0x200",
+            "secure-ram-start": "0x08010000",
+            "secure-ram-size": "0x10000"
+        }
+    },
+    "CY_M4_PSA_MB": {
+        "inherits": ["CY8CPROTO_064_SB_PSA"],
+        "post_binary_hook": {
             "function": "PSOC6Code.sign_complete"
         },
         "overrides": {
             "non-secure-rom-start": "0x10000400",
-            "non-secure-rom-size": "0x80000",
+            "non-secure-rom-size": "0x30000",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
@@ -8227,6 +8261,80 @@
             "network-default-interface-type": "WIFI"
         }
     },
+    "AUGUST_CYW43012_M0": {
+        "inherits": ["MCU_PSOC6_M0"],
+        "extra_labels_add": ["AUGUST_CYW43012"],
+        "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
+        "post_binary_hook": {
+            "function": "PSOC6Code.complete"
+        }
+    },
+    "AUGUST_CYW43012": {
+        "inherits": ["MCU_PSOC6_M4"],
+        "features": ["BLE"],
+        "extra_labels_add": ["PSOC6_01", "WICED_SRC", "CYW43XXX", "CYW43012", "CORDIO"],
+        "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1", "MBED_TICKLESS"],
+        "detect_code": ["1906"],
+        "hex_filename": "psoc6_01_cm0p_sleep.hex",
+        "post_binary_hook": {
+            "function": "PSOC6Code.complete"
+        },
+        "overrides": {
+            "network-default-interface-type": "WIFI",
+            "deep-sleep-latency": 5
+        }
+    },
+    "AUGUST_CYW43012_M0_PSA": {
+        "inherits": ["SPE_Target", "AUGUST_CYW43012_M0"],
+        "components_add": ["SPM_MAILBOX", "FLASHIAP"],
+        "extra_labels_add": ["PSA", "MBED_SPM", "AUGUST_CYW43012_PSA"],
+        "macros_add": [
+            "MBED_TICKLESS",
+            "MBEDTLS_PSA_CRYPTO_SPM",
+            "MBEDTLS_PSA_CRYPTO_C",
+            "MBEDTLS_ENTROPY_NV_SEED",
+            "CY_IPC_DEFAULT_CFG_DISABLE",
+            "PU_ENABLE"
+        ],
+        "deliver_to_target": "AUGUST_CYW43012_PSA",
+        "delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_AUGUST_CYW43012_PSA/prebuilt",
+        "overrides": {
+            "secure-rom-start": "0x10000000",
+            "secure-rom-size": "0x80000",
+            "non-secure-rom-start": "0x10080000",
+            "non-secure-rom-size": "0x78000",
+            "secure-ram-start": "0x08000000",
+            "secure-ram-size": "0x10000",
+            "non-secure-ram-start": "0x08010000",
+            "non-secure-ram-size": "0x37500",
+            "shared-ram-start": "0x08047500",
+            "shared-ram-size": "0x100",
+            "public-ram-start": "0x08047600",
+            "public-ram-size": "0x200"
+        }
+    },
+    "AUGUST_CYW43012_PSA": {
+        "inherits": ["NSPE_Target", "AUGUST_CYW43012"],
+        "extra_labels_add": ["PSA", "MBED_SPM"],
+        "components_add": ["SPM_MAILBOX", "FLASHIAP"],
+        "device_has_remove": ["TRNG", "CRC"],
+        "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
+        "hex_filename": "psa_release_1.0.hex",
+        "overrides": {
+            "secure-rom-start": "0x10000000",
+            "secure-rom-size": "0x80000",
+            "non-secure-rom-start": "0x10080000",
+            "non-secure-rom-size": "0x78000",
+            "secure-ram-start": "0x08000000",
+            "secure-ram-size": "0x10000",
+            "non-secure-ram-start": "0x08010000",
+            "non-secure-ram-size": "0x37500",
+            "shared-ram-start": "0x08047500",
+            "shared-ram-size": "0x100",
+            "public-ram-start": "0x08047600",
+            "public-ram-size": "0x200"
+        }
+    },
     "CYW943012P6EVB_01_M0": {
         "inherits": ["MCU_PSOC6_M0"],
         "extra_labels_add": ["PSOC6_01", "CY8C62XX", "CYW943012P6EVB_01"],
@@ -8238,7 +8346,7 @@
     "CYW943012P6EVB_01": {
         "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
-        "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW43012", "CORDIO", "CY8C62XX"],
+        "extra_labels_add": ["PSOC6_01", "WICED_SRC", "CYW43XXX", "CYW43012", "CORDIO", "CY8C62XX"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1", "MBED_TICKLESS"],
         "detect_code": ["1906"],
         "hex_filename": "psoc6_01_cm0p_sleep.hex",

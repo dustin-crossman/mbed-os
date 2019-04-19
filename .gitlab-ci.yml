@@ -1,0 +1,15 @@
+stages:
+  - test
+before_script:
+    - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
+    
+# Compile TARGET_PSOC6_PSA
+test_mbed_064_psa:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - mbedls -m 1907:CY8CPROTO_064_SB 
+    - mbed test --compile -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *psa* -vv
+    - mbed test --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
+    - mbed test --run -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv

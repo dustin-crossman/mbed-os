@@ -246,7 +246,7 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
                                 "--header-size", sign_args.get("header_size"), "--pad-header", "--align",
                                 sign_args.get("align"), "--version", sign_args.get("version"), "--image-id",
                                 sign_args.get("id"), "--rollback_counter", sign_args.get("rollback_counter"),
-                                "--slot-size", sign_args.get("slot_size"), "--overwrite-only", binf, binf_signed],
+                                "--slot-size", sign_args.get("slot_size"), "--overwrite-only", sign_args.get("pad"), binf, binf_signed],
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # catch stderr outputs

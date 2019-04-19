@@ -123,7 +123,17 @@
         "ppp-thread-stacksize": {
             "help": "Thread stack size for PPP",
             "value": 768
-        }
+        },
+        "tcpsocket-readflag": {
+                "help": "TCP socket Read Flag",
+                "value": 1,
+                "macro_name": "TCPSOCKET_READ_FLAG" 
+        },
+        "tcpsocket-sendflag": {
+                "help": "TCP socket send Flag",
+                "value": 2,
+                "macro_name": "TCPSOCKET_WRITE_FLAG" 
+        }        
     },
     "target_overrides": {
         "REALTEK_RTL8195AM": {
@@ -162,6 +172,17 @@
         },
         "RZ_A1_EMAC": {
             "tcpip-thread-stacksize": 1328,
+            "default-thread-stacksize": 640,
+            "ppp-thread-stacksize": 896,
+            "memp-num-tcp-seg": 32,
+            "tcp-mss": 1440,
+            "tcp-snd-buf": "(8 * TCP_MSS)",
+            "tcp-wnd": "(TCP_MSS * 8)",
+            "pbuf-pool-size": 16,
+            "mem-size": 51200
+        },
+        "CYW943012P6EVB_01": {
+            "tcpip-thread-stacksize": 8192,
             "default-thread-stacksize": 640,
             "ppp-thread-stacksize": 896,
             "memp-num-tcp-seg": 32,

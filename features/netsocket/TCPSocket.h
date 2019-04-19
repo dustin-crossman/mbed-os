@@ -186,6 +186,11 @@ public:
      */
     virtual nsapi_error_t listen(int backlog = 1);
 
+    /* Get TCP Socket Event *
+       * @param : void
+       * @return : Event Flag READ, WRITE, FINISHED
+       */
+      uint32_t get_event( void);
 protected:
     friend class TCPServer;
     virtual nsapi_protocol_t get_proto();

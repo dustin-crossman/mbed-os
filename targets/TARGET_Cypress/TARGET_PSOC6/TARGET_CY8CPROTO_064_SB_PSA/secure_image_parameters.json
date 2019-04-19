@@ -4,7 +4,7 @@
                     "VERSION" : "0.1",
                     "ROLLBACK_COUNTER" : "0",
                     "IMAGE_ID" : "5",
-                    "SLOT_SIZE" : "0x80000",
+                    "SLOT_SIZE" : "0x30000",
                     "PAD" : "--pad"
                 }
             },
