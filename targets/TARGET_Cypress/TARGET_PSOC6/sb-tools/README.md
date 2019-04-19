@@ -28,6 +28,9 @@ These files are relevant to CY8CPROTO_064_SB or CY8CPROTO_064_SB_M0_PSA, CY8CPRO
 		CypressBootloader_CM0p.jwt and CypressBootloader_CM0p.hex must be used in pair from the same directory
 		while creation of provisioning packet (.packets/prov_cmd.jwt) and performing of provisioning.
 
+*   Run etrance exam:
+        Execute entrance_exam_runner.py
+
 * 	Perform provisioning:
 		Execute prod_provision_device.py
 		If arguments for the script are not specified it will run with the default arguments.
