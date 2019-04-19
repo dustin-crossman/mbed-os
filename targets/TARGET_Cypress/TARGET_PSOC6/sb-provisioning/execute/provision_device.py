@@ -15,6 +15,7 @@ limitations under the License.
 """
 import os
 from time import sleep
+from execute.enums import ProtectionState
 from execute.sys_call import get_prov_details, provision_keys_and_policies
 from execute.p6_memory_map import FLASH_ADDRESS, FLASH_SIZE
 from execute.gen_data_from_json import ENTRANCE_EXAM_FW_STATUS_REG, ENTRANCE_EXAM_FW_STATUS_MASK, \
@@ -32,7 +33,7 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
            all data necessary for provisioning, including policy, authorization
            packets and keys).
     :param cy_bootloader_hex: Path to Cypress Bootloader program file.
-    :return: True if provisioning passed, otherwise False
+    :return: True if provisioning passed, otherwise False.
     """
     tool.set_frequency(200)
 
@@ -48,7 +49,7 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
         json_file.write(key)
 
     # Check whether device is in SECURE mode
-    if tool.read32(CYREG_CPUSS_PROTECTION) != 3:
+    if tool.read32(CYREG_CPUSS_PROTECTION) != ProtectionState.secure:
         print(f'FAIL: Device is not in SECURE mode, error code: {hex(tool.read32(CYREG_IPC2_STRUCT_DATA))}')
         print('Read Secure Hash from eFUSEs:')  # 00 expected on virgin device
         got_factory_hash = ''
@@ -61,6 +62,7 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
         return False
 
     print(os.linesep + 'Erase main flash and TOC3:')
+    print('erasing...')
     tool.erase(FLASH_ADDRESS, FLASH_SIZE)
     reset_device(tool)
 

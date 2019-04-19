@@ -18,8 +18,57 @@ from execute.gen_data_from_json import ENTRANCE_EXAM_SRAM_ADDR, ENTRANCE_EXAM_SR
 from execute.p6_reg import CYREG_IPC2_STRUCT_ACQUIRE, CYREG_IPC2_STRUCT_DATA, CYREG_IPC2_STRUCT_NOTIFY, \
     CYREG_IPC2_STRUCT_LOCK_STATUS
 
-PROVISION_KEYS_AND_POLICIES_OPCODE = 0x33  # Opcode of ProvisionKeysAndPolicies system call
-GET_PROV_DETAILS_OPCODE = 0x37  # Opcode of GetProvDetails() API system call
+PROVISION_KEYS_AND_POLICIES_OPCODE = 0x33  # ProvisionKeysAndPolicies API opcode
+GET_PROV_DETAILS_OPCODE = 0x37  # GetProvDetails() API opcode
+REGION_HASH_OPCODE = 0x31  # RegionHash() API opcode
+
+
+def region_hash(tool, address, length, mode, exp_value):
+    """
+    Procedure calls RegionHash syscall over IPC and read response.
+    :param tool:
+    :param address:
+    :param length:
+    :param mode:
+    :param exp_value:
+    :return:
+    """
+    # Acquire IPC structure
+    tool.write32(CYREG_IPC2_STRUCT_ACQUIRE, 0x80000000)
+    ipc_acquire = 0
+    while (ipc_acquire & 0x80000000) == 0:
+        ipc_acquire = tool.read32(CYREG_IPC2_STRUCT_ACQUIRE)
+
+    # Set RAM address and Opcode
+    op_code = (REGION_HASH_OPCODE << 24) + (exp_value << 16) + (mode << 8) + 0
+    tool.write32(CYREG_IPC2_STRUCT_DATA, ENTRANCE_EXAM_SRAM_ADDR)
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR, op_code)
+
+    scratch_addr = ENTRANCE_EXAM_SRAM_ADDR + 0x08
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x04, scratch_addr)
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x08, length)
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x0C, address)
+
+    # IPC_STRUCT[ipc_id].IPC_NOTIFY -
+    tool.write32(CYREG_IPC2_STRUCT_NOTIFY, 0x00000001)
+
+    # Wait on response
+    response = 0x80000000
+    while (response & 0x80000000) != 0:
+        response = tool.read32(CYREG_IPC2_STRUCT_LOCK_STATUS)
+    response = tool.read32(ENTRANCE_EXAM_SRAM_ADDR)
+
+    if (response & 0xFF000000) == 0xa0000000:
+        print('Region compare complete')
+        return True
+    else:
+        print('Region compare error response:')
+        print(hex(CYREG_IPC2_STRUCT_DATA), hex(tool.read32(CYREG_IPC2_STRUCT_DATA)))
+        print(hex(ENTRANCE_EXAM_SRAM_ADDR), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR)))
+        print(hex(ENTRANCE_EXAM_SRAM_ADDR + 0x04), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR + 0x04)))
+        print(hex(ENTRANCE_EXAM_SRAM_ADDR + 0x08), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR + 0x08)))
+        print(hex(ENTRANCE_EXAM_SRAM_ADDR + 0x0C), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR + 0x0C)))
+        return False
 
 
 def get_prov_details(tool, key_id):
@@ -40,6 +89,7 @@ def get_prov_details(tool, key_id):
     op_code = GET_PROV_DETAILS_OPCODE << 24
     tool.write32(CYREG_IPC2_STRUCT_DATA, ENTRANCE_EXAM_SRAM_ADDR)  # IPC_STRUCT.DATA
     tool.write32(ENTRANCE_EXAM_SRAM_ADDR, op_code)  # SRAM_SCRATCH
+
     scratch_addr = ENTRANCE_EXAM_SRAM_ADDR + 0x08
     tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x04, scratch_addr)
     tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x08, key_id)
