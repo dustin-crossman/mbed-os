@@ -6,11 +6,22 @@
 * is a wrapper around the lower level PDL API.
 * 
 ********************************************************************************
-* Copyright (c) 2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
 
 #include <string.h> /* For memcpy */
 #include "cy_hal_sdhc.h"
@@ -881,7 +892,7 @@ cy_rslt_t cy_sdio_send_cmd(const cy_sdio_t *obj, cy_transfer_t direction, cy_sdi
 #endif
 
 
-cy_rslt_t cy_sdio_bulk_transfer(const cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length, uint32_t* response)
+cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length, uint32_t* response)
 {
     cy_rslt_t                    ret = CY_RSLT_SUCCESS;
     uint32_t                     retry = 50UL;
@@ -1002,7 +1013,7 @@ cy_rslt_t cy_sdio_bulk_transfer(const cy_sdio_t *obj, cy_transfer_t direction, u
 }
 
 
-cy_rslt_t cy_sdio_transfer_async(const cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length)
+cy_rslt_t cy_sdio_transfer_async(cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length)
 {
     cy_rslt_t ret = CY_RSLT_SUCCESS;
     /* TODO: implement */

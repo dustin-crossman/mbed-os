@@ -1,18 +1,40 @@
 /***************************************************************************//**
 * \file cy_hal_comp.h
 *
-* \brief
-* Provides a high level interface for interacting with the Cypress Comparator. 
-* This interface abstracts out the chip specific details. If any chip specific
-* functionality is necessary, or performance is critical the low level functions
-* can be used directly.
-* 
+* Provides a high level interface for interacting with the Cypress Comparator.
+* This interface abstracts out the chip specific details.
+* If any chip specific functionality is necessary, or performance is critical,
+* the low level functions can be used directly.
+*
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_comp COMP (Comparator)
+* \ingroup group_hal
+* \{
+* High level interface for interacting with the Cypress Comparator.
+*
+* \defgroup group_hal_comp_macros Macros
+* \defgroup group_hal_comp_functions Functions
+* \defgroup group_hal_comp_data_structures Data Structures
+* \defgroup group_hal_comp_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -24,6 +46,11 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
+/**
+* \addtogroup group_hal_comp_enums
+* \{
+*/
 
 /** Comparator interrupt triggers */
 typedef enum {
@@ -47,19 +74,35 @@ typedef enum {
     CY_COMP_OUTPUT_SYNC,   //!< Level output after synchronous edge detection
 } cy_comp_output_t;
 
+/** \} group_hal_comp_enums */
+
+
+/**
+* \addtogroup group_hal_comp_data_structures
+* \{
+*/
+
 /** Configuration options for the comparator */
-typedef struct 
+typedef struct
 {
-	cy_comp_power_t power;   //!< Power mode to operate in (0=off, 1=low, 2=medium, 3=high)
-	cy_comp_output_t output; //!< Output configuration (0=pulse, 1=direct, 2=sync)
-	bool hysteresis;         //!< Should this use hysteresis
-	bool deepsleep;          //!< Does this need to operate in deepsleep
+    cy_comp_power_t power;   //!< Power mode to operate in (0=off, 1=low, 2=medium, 3=high)
+    cy_comp_output_t output; //!< Output configuration (0=pulse, 1=direct, 2=sync)
+    bool hysteresis;         //!< Should this use hysteresis
+    bool deepsleep;          //!< Does this need to operate in deepsleep
 } cy_comp_config_t;
 
 /** Handler for comparator interrupts */
 typedef void (*cy_comp_irq_handler)(void *handler_arg, cy_comp_irq_event_t event);
 
-/** Initialize the comparator peripheral. 
+/** \} group_hal_comp_data_structures */
+
+
+/**
+* \addtogroup group_hal_comp_functions
+* \{
+*/
+
+/** Initialize the comparator peripheral.
  *
  * @param[out] obj  The comparator object
  * @param[in]  vinp The vplus pin
@@ -78,7 +121,7 @@ cy_rslt_t cy_comp_free(cy_comp_t *obj);
 
 /** Reconfigure the comparator object
  *
- * @param[in,out] obj  The comparator object 
+ * @param[in,out] obj  The comparator object
  * @param[in]     cfg  Configuration to apply to the comparator
  * @return The status of the power request
  */
@@ -110,6 +153,10 @@ cy_rslt_t cy_comp_register_irq(cy_comp_t *obj, cy_comp_irq_handler handler, void
  */
 cy_rslt_t cy_cy_comp_irq_enable(cy_comp_t *obj, cy_comp_irq_event_t event, bool enable);
 
+/** \} group_hal_comp_functions */
+
 #if defined(__cplusplus)
 }
 #endif
+
+/** \} group_hal_comp */

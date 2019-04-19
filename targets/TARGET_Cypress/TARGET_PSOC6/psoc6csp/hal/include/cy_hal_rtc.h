@@ -2,17 +2,40 @@
 * \file cy_hal_rtc.h
 *
 * \brief
-* Provides a high level interface for interacting with the Cypress RealTimeClock. 
+* Provides a high level interface for interacting with the Cypress Real-Time Clock.
 * This interface abstracts out the chip specific details. If any chip specific
 * functionality is necessary, or performance is critical the low level functions
 * can be used directly.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_rtc RTC (Real-Time Clock)
+* \ingroup group_hal
+* \{
+* High level interface for interacting with the Cypress RTC.
+*
+* \defgroup group_hal_rtc_macros Macros
+* \defgroup group_hal_rtc_functions Functions
+* \defgroup group_hal_rtc_data_structures Data Structures
+* \defgroup group_hal_rtc_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -25,14 +48,35 @@
 extern "C" {
 #endif
 
+/**
+* \addtogroup group_hal_rtc_enums
+* \{
+*/
+
 /** RTC interrupt triggers */
 typedef enum {
-	/* TODO: Fill in */
-	CY_RTC_TBD,
+    /** TODO: Fill in */
+    CY_RTC_TBD,
 } cy_rtc_irq_event_t;
+
+/** \} group_hal_rtc_enums */
+
+
+/**
+* \addtogroup group_hal_rtc_data_structures
+* \{
+*/
 
 /** Handler for RTC interrupts */
 typedef void (*cy_rtc_irq_handler)(void *handler_arg, cy_rtc_irq_event_t event);
+
+/** \} group_hal_rtc_data_structures */
+
+
+/**
+* \addtogroup group_hal_rtc_functions
+* \{
+*/
 
 /** Initialize the RTC peripheral
  *
@@ -106,6 +150,10 @@ cy_rslt_t cy_rtc_register_irq(cy_rtc_t *obj, cy_rtc_irq_handler handler, void *h
  */
 cy_rslt_t cy_rtc_irq_enable(cy_rtc_t *obj, cy_rtc_irq_event_t event, bool enable);
 
+/** \} group_hal_rtc_functions */
+
 #if defined(__cplusplus)
 }
 #endif
+
+/** \} group_hal_rtc */

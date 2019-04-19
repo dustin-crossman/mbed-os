@@ -2,17 +2,40 @@
 * \file cy_hal_spi.h
 *
 * \brief
-* Provides a high level interface for interacting with the Cypress SPI. 
+* Provides a high level interface for interacting with the Cypress SPI.
 * This interface abstracts out the chip specific details. If any chip specific
 * functionality is necessary, or performance is critical the low level functions
 * can be used directly.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_spi SPI (Serial Peripheral Interface)
+* \ingroup group_hal
+* \{
+* High level interface for interacting with the Cypress SPI.
+*
+* \defgroup group_hal_spi_macros Macros
+* \defgroup group_hal_spi_functions Functions
+* \defgroup group_hal_spi_data_structures Data Structures
+* \defgroup group_hal_spi_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -25,14 +48,10 @@
 extern "C" {
 #endif
 
-/** SPI interrupt triggers */
-typedef enum {
-	/* TODO: Fill in */
-	CY_SPI_TBD,
-} cy_spi_irq_event_t;
-
-/** Handler for SPI interrupts */
-typedef void (*cy_spi_irq_handler)(void *handler_arg, cy_spi_irq_event_t event);
+/**
+* \addtogroup group_hal_spi_enums
+* \{
+*/
 
 /** SPI operating modes */
 typedef enum
@@ -40,16 +59,41 @@ typedef enum
     /** Standard motorola SPI operation */
     CY_SPI_MOTOROLA,
     /** TI SPI operation, where the slave select is a pulse. In this mode,
-      * the pulse coincides with the first bit 
+      * the pulse coincides with the first bit
       */
     CY_SPI_TI_COINCIDES,
     /** National SPI operation. This is a half-duplex mode of operation. */
     CY_SPI_NATIONAL,
     /** TI SPI operation, where the slave select is a pulse. In this mode,
-      * the pulse precedes with the first bit 
+      * the pulse precedes with the first bit
       */
     CY_SPI_TI_PRECEDES,
 } cy_spi_mode_t;
+
+/** SPI interrupt triggers */
+typedef enum {
+    /** TODO: Fill in */
+    CY_SPI_TBD,
+} cy_spi_irq_event_t;
+
+/** \} group_hal_spi_enums */
+
+
+/**
+* \addtogroup group_hal_spi_data_structures
+* \{
+*/
+
+/** Handler for SPI interrupts */
+typedef void (*cy_spi_irq_handler)(void *handler_arg, cy_spi_irq_event_t event);
+
+/** \} group_hal_spi_data_structures */
+
+
+/**
+* \addtogroup group_hal_spi_functions
+* \{
+*/
 
 /** Initialize the SPI peripheral
  *
@@ -103,7 +147,7 @@ cy_rslt_t cy_spi_frequency(cy_spi_t *obj, uint32_t hz);
  */
 cy_rslt_t cy_spi_read(cy_spi_t *obj, uint8_t* value);
 
-/** Write a byte out 
+/** Write a byte out
  *
  * @param[in] obj   The SPI peripheral to use for sending
  * @param[in] value The value to send
@@ -171,6 +215,10 @@ cy_rslt_t cy_spi_register_irq(cy_spi_t *obj, cy_spi_irq_handler handler, void *h
  */
 cy_rslt_t cy_spi_irq_enable(cy_spi_t *obj, cy_spi_irq_event_t event, bool enable);
 
+/** \} group_hal_spi_functions */
+
 #if defined(__cplusplus)
 }
 #endif
+
+/** \} group_hal_spi */
