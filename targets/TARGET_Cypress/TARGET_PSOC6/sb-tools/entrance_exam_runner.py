@@ -27,7 +27,7 @@ def main():
     """
     Provides high level support for entrance exam procedure.
     """
-    target = get_target_name(ACCESS_PORT)
+    target = get_target_name(TOOL_NAME, ACCESS_PORT)
     if not target:
         print('Invalid access port.')
         sys.exit(1)
