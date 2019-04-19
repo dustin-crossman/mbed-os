@@ -26,12 +26,12 @@ REGION_HASH_OPCODE = 0x31  # RegionHash() API opcode
 def region_hash(tool, address, length, mode, exp_value):
     """
     Procedure calls RegionHash syscall over IPC and read response.
-    :param tool:
+    :param tool: Programming/debugging tool used for communication with device.
     :param address:
     :param length:
     :param mode:
     :param exp_value:
-    :return:
+    :return: True if syscall successfully, otherwise False
     """
     # Acquire IPC structure
     tool.write32(CYREG_IPC2_STRUCT_ACQUIRE, 0x80000000)
@@ -76,7 +76,7 @@ def get_prov_details(tool, key_id):
     Calls GetProvDetails syscall over IPC.
     :param tool: Programming/debugging tool used for communication with device.
     :param key_id: Public key ID.
-    :return: True if get provision details successfully, otherwise False
+    :return: True if get provision details successfully, otherwise False.
     """
     # Acquire IPC structure
     tool.write32(CYREG_IPC2_STRUCT_ACQUIRE, 0x80000000)

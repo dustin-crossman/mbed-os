@@ -57,7 +57,7 @@ def main(prov_cmd_jwt, cy_bootloader_hex, pub_key_json, pub_key_pem):
     :param pub_key_pem: File where to save public key in PEM format.
     """
     # Verify arguments
-    target = get_target_name(ACCESS_PORT)
+    target = get_target_name(TOOL_NAME, ACCESS_PORT)
     if not target:
         print('Invalid access port.')
         sys.exit(1)
