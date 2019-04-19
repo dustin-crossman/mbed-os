@@ -15,7 +15,7 @@ limitations under the License.
 """
 import os
 from time import sleep
-from execute.helpers import check_mode
+from execute.helper import check_mode
 from execute.enums import ProtectionState
 from execute.gen_data_from_json import ENTRANCE_EXAM_FW_STATUS_REG, ENTRANCE_EXAM_FW_STATUS_MASK, \
     ENTRANCE_EXAM_FW_STATUS_VAL, ENTRANCE_EXAM_REGION_HASH_ADDR, ENTRANCE_EXAM_REGION_HASH_SIZE, \
@@ -30,7 +30,7 @@ def entrance_exam(tool):
     :return: True if entrance exam passed, otherwise False.
     """
     # Check the device life-cycle stage
-    print('Check device protection state')
+    print('Check device protection state:')
     if not check_mode(tool, ProtectionState.secure):
         return False
 
