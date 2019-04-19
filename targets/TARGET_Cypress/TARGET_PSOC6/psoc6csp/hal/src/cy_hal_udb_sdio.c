@@ -26,7 +26,7 @@
 
 #include "cy_hal_hwmgr.h"
 
-#if defined(CY_IP_MXUDB)
+#if defined(CY8C6247BZI_D54) /* TODO: BSP-525 */
 
 #include <stdlib.h>
 #include "cy_hal_sdio.h"
@@ -886,4 +886,4 @@ cy_rslt_t cy_sdio_irq_enable(cy_sdio_t *obj, cy_sdio_irq_event_t event, bool ena
 }
 
 
-#endif /* defined(CY_IP_MXUDB) */
+#endif /* defined(CY8C6247BZI_D54) */

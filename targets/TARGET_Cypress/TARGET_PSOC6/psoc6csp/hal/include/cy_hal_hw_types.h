@@ -41,9 +41,9 @@
 #include "cy_hal_pin_package.h"
 #include <stdbool.h>
 
-#if defined(CY_IP_MXUDB)
+#if defined(CY8C6247BZI_D54) /* TODO: BSP-525 */
     #include "SDIO_HOST.h"
-#endif /* defined(CY_IP_MXUDB) */
+#endif /* defined(CY8C6247BZI_D54) */
 
 #ifdef __cplusplus
 extern "C" {
@@ -266,7 +266,7 @@ typedef struct {
     bool                        enableLedControl;
     cy_stc_sd_host_context_t    context;
 
-#elif defined(CY_IP_MXUDB)
+#elif defined(CY8C6247BZI_D54) /* TODO: BSP-525 */
     cy_resource_inst_t    resource;
     cy_gpio_t             pin_clk;
     cy_gpio_t             pin_cmd;
@@ -287,6 +287,8 @@ typedef struct {
     
     stc_sdio_irq_cb_t*          pfuCb;
     uint32_t                    irqCause;
+#else
+    void *empty;
 #endif /* defined(CY_IP_MXSDHC) */
 } cy_sdio_t;
 
