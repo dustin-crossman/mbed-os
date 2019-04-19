@@ -28,17 +28,24 @@ These files are relevant to CY8CPROTO_064_SB or CY8CPROTO_064_SB_M0_PSA, CY8CPRO
 		CypressBootloader_CM0p.jwt and CypressBootloader_CM0p.hex must be used in pair from the same directory
 		while creation of provisioning packet (.packets/prov_cmd.jwt) and performing of provisioning.
 
+*   Run entrance exam:
+		python.exe entrance_exam_runner.py
+
 * 	Perform provisioning:
-        Execute prod_provision_device.py
-        If arguments for the script are not specified it will run with the default arguments.
-        Default arguments can be overridden with a custom:
-            --prov-jwt FILENAME     Path to provisioning JWT file (packet which contains all
-                                    data necessary for provisioning, including policy, authorization packets and keys)
-            --hex FILENAME          Path to Cypress Bootloader HEX binary file
-            --pubkey-json FILENAME  File where to save public key in JSON format
-            --pubkey-pem FILENAME   File where to save public key in PEM format
-        Pay attention to mode in which device left after provisioning.
-		
+		Execute provision_device_runner.py
+		If arguments for the script are not specified it will run with the default arguments.
+		Default arguments can be overridden with a custom:
+			--prov-jwt FILENAME     Path to provisioning JWT file (packet which contains all
+									data necessary for provisioning, including policy, authorization packets and keys)
+			--hex FILENAME          Path to Cypress Bootloader HEX binary file
+			--pubkey-json FILENAME  File where to save public key in JSON format
+			--pubkey-pem FILENAME   File where to save public key in PEM format
+
+        Example:
+			python.exe provision_device_runner.py --prov-jwt packet/prov_cmd.jwt --hex prebuild/CyBootloader_Release/CypressBootloader_CM0p.hex --pubkey-json keys/dev_pub_key.json --pubkey-pem keys/dev_pub_key.pem
+
+		Pay attention to mode in which device left after provisioning.
+
 * 	Run tests with command:
 
 		mbed test --run -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -v

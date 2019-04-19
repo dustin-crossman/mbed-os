@@ -16,27 +16,11 @@ limitations under the License.
 import os
 import sys
 import click
-from enum import Enum
+from execute.helper import get_target_name
+from execute.enums import DebugCore
 from execute.provision_device import provision_execution
 from execute.programmer.programmer import ProgrammingTool
 from prepare.provisioning_lib.cyprov_pem import PemKey
-
-
-class DebugCore(Enum):
-    """
-    CM0 access port.
-    """
-    debug_cm0_ap = 0
-
-    """
-    CM4 access port.
-    """
-    debug_cm4_ap = 1
-
-    """
-    SYS access port.
-    """
-    debug_sys_ap = 2
 
 
 TOOL_NAME = 'pyocd'  # Programming/debugging tool used for communication with device
@@ -72,13 +56,9 @@ def main(prov_cmd_jwt, cy_bootloader_hex, pub_key_json, pub_key_pem):
     :param pub_key_json: File where to save public key in JSON format.
     :param pub_key_pem: File where to save public key in PEM format.
     """
-    if ACCESS_PORT == DebugCore.debug_cm0_ap:
-        target = 'cy8c64xx_cm0'
-    elif ACCESS_PORT == DebugCore.debug_cm4_ap:
-        target = 'cy8c64xx_cm4'
-    elif ACCESS_PORT == DebugCore.debug_sys_ap:
-        target = 'cy8c64xx_cm4_full'
-    else:
+    # Verify arguments
+    target = get_target_name(TOOL_NAME, ACCESS_PORT)
+    if not target:
         print('Invalid access port.')
         sys.exit(1)
 
@@ -93,7 +73,7 @@ def main(prov_cmd_jwt, cy_bootloader_hex, pub_key_json, pub_key_pem):
             pem = PemKey(pub_key_json)
             pem.save(pub_key_pem, private_key=False)
     else:
-        sys.exit(3)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
