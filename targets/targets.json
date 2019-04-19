@@ -1920,7 +1920,6 @@
             "XIP_BOOT_HEADER_DCD_ENABLE=1",
             "SKIP_SYSCLK_INIT",
             "FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE",
-            "SDRAM_IS_SHAREABLE",
             "MBED_MPU_CUSTOM"
         ],
         "inherits": ["Target"],
@@ -3906,7 +3905,7 @@
     },
     "SDP_K1": {
         "inherits": ["FAMILY_STM32"],
-        "core": "Cortex-M4",
+        "core": "Cortex-M4F",
         "supported_form_factors": ["ARDUINO"],
         "extra_labels_add": [
             "STM32F4",
@@ -5205,7 +5204,7 @@
     "ARM_MPS2_M0": {
         "inherits": ["ARM_MPS2_Target"],
         "core": "Cortex-M0",
-        "supported_toolchains": ["ARM"],
+        "supported_toolchains": ["ARM", "GCC_ARM", "IAR"],
         "extra_labels": ["ARM_SSG", "MPS2", "MPS2_M0"],
         "macros": [
             "CMSDK_CM0",
@@ -5226,14 +5225,16 @@
             "SPI",
             "SPISLAVE",
             "TSC",
-            "MPU"
+            "USTICKER"
         ],
-        "release_versions": ["2"]
+        "release_versions": ["2", "5"],
+        "copy_method": "mps2",
+        "reset_method": "reboot.txt"
     },
     "ARM_MPS2_M0P": {
         "inherits": ["ARM_MPS2_Target"],
         "core": "Cortex-M0+",
-        "supported_toolchains": ["ARM"],
+        "supported_toolchains": ["ARM", "GCC_ARM", "IAR"],
         "extra_labels": ["ARM_SSG", "MPS2", "MPS2_M0P"],
         "macros": ["CMSDK_CM0plus"],
         "device_has": [
@@ -5250,14 +5251,16 @@
             "SPI",
             "SPISLAVE",
             "TSC",
-            "MPU"
+            "USTICKER"
         ],
-        "release_versions": ["2"]
+        "release_versions": ["2", "5"],
+        "copy_method": "mps2",
+        "reset_method": "reboot.txt"
     },
     "ARM_MPS2_M3": {
         "inherits": ["ARM_MPS2_Target"],
         "core": "Cortex-M3",
-        "supported_toolchains": ["ARM"],
+        "supported_toolchains": ["ARM", "GCC_ARM", "IAR"],
         "extra_labels": ["ARM_SSG", "MPS2", "MPS2_M3"],
         "macros": ["CMSDK_CM3"],
         "device_has": [
@@ -5274,14 +5277,17 @@
             "SPI",
             "SPISLAVE",
             "TSC",
-            "MPU"
+            "MPU",
+            "USTICKER"
         ],
-        "release_versions": ["2"]
+        "release_versions": ["2", "5"],
+        "copy_method": "mps2",
+        "reset_method": "reboot.txt"
     },
     "ARM_MPS2_M4": {
         "inherits": ["ARM_MPS2_Target"],
         "core": "Cortex-M4F",
-        "supported_toolchains": ["ARM"],
+        "supported_toolchains": ["ARM", "GCC_ARM", "IAR"],
         "extra_labels": ["ARM_SSG", "MPS2", "MPS2_M4"],
         "macros": ["CMSDK_CM4"],
         "device_has": [
@@ -5298,14 +5304,17 @@
             "SPI",
             "SPISLAVE",
             "TSC",
-            "MPU"
+            "MPU",
+            "USTICKER"
         ],
-        "release_versions": ["2"]
+        "release_versions": ["2", "5"],
+        "copy_method": "mps2",
+        "reset_method": "reboot.txt"
     },
     "ARM_MPS2_M7": {
         "inherits": ["ARM_MPS2_Target"],
-        "core": "Cortex-M7",
-        "supported_toolchains": ["ARM"],
+        "core": "Cortex-M7FD",
+        "supported_toolchains": ["ARM", "GCC_ARM", "IAR"],
         "extra_labels": ["ARM_SSG", "MPS2", "MPS2_M7"],
         "macros": ["CMSDK_CM7"],
         "device_has": [
@@ -5322,9 +5331,12 @@
             "SPI",
             "SPISLAVE",
             "TSC",
-            "MPU"
+            "MPU",
+            "USTICKER"
         ],
-        "release_versions": ["2"]
+        "release_versions": ["2", "5"],
+        "copy_method": "mps2",
+        "reset_method": "reboot.txt"
     },
     "ARM_IOTSS_Target": {
         "inherits": ["Target"],
@@ -6775,7 +6787,7 @@
     },
     "SAMG55J19": {
         "inherits": ["Target"],
-        "core": "Cortex-M4",
+        "core": "Cortex-M4F",
         "extra_labels": ["Atmel", "SAM_CortexM4", "SAMG55"],
         "macros": [
             "__SAMG55J19__",
@@ -7916,7 +7928,7 @@
     },
     "TMPM46B": {
         "inherits": ["Target"],
-        "core": "Cortex-M4",
+        "core": "Cortex-M4F",
         "is_disk_virtual": true,
         "extra_labels": ["TOSHIBA"],
         "macros": ["__TMPM46B__"],
@@ -7998,13 +8010,13 @@
     },
     "FVP_MPS2_M4": {
         "inherits": ["FVP_MPS2"],
-        "core": "Cortex-M4",
+        "core": "Cortex-M4F",
         "macros_add": ["CMSDK_CM4"],
         "device_has_add": ["MPU"]
     },
     "FVP_MPS2_M7": {
         "inherits": ["FVP_MPS2"],
-        "core": "Cortex-M7",
+        "core": "Cortex-M7FD",
         "macros_add": ["CMSDK_CM7"],
         "device_has_add": ["MPU"]
     },
@@ -8113,7 +8125,7 @@
     },
     "TMPM4G9": {
         "inherits": ["Target"],
-        "core": "Cortex-M4",
+        "core": "Cortex-M4F",
         "is_disk_virtual": true,
         "extra_labels": ["TOSHIBA"],
         "macros": ["__TMPM4G9__"],
@@ -8519,7 +8531,7 @@
     "GD32_F307VG": {
         "inherits": ["GD32_Target"],
         "supported_form_factors": ["ARDUINO"],
-        "core": "Cortex-M4",
+        "core": "Cortex-M4F",
         "extra_labels_add": ["GD32F30X", "GD32F307VG", "GD_EMAC"],
         "device_has_add": [
             "RTC",
@@ -8574,7 +8586,7 @@
     "GD32_F450ZI": {
         "inherits": ["GD32_Target"],
         "supported_form_factors": ["ARDUINO"],
-        "core": "Cortex-M4",
+        "core": "Cortex-M4F",
         "extra_labels_add": ["GD32F4XX", "GD32F450ZI", "GD_EMAC"],
         "device_has_add": [
             "RTC",
@@ -8603,7 +8615,7 @@
     "GD32_E103VB": {
         "inherits": ["GD32_Target"],
         "supported_form_factors": ["ARDUINO"],
-        "core": "Cortex-M4",
+        "core": "Cortex-M4F",
         "extra_labels_add": ["GD32E10X", "GD32E103VB"],
         "device_has_add": [
             "RTC",
@@ -8624,7 +8636,7 @@
 	},
     "TT_M4G9": {
 		"inherits": ["Target"],
-		"core": "Cortex-M4",
+		"core": "Cortex-M4F",
 		"is_disk_virtual": true,
 		"extra_labels": ["TT"],
 		"macros": ["__TT_M4G9__"],
