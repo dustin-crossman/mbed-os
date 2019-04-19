@@ -15,7 +15,7 @@ limitations under the License.
 """
 import sys
 from execute.enums import DebugCore
-from execute.helpers import get_target_name
+from execute.helper import get_target_name
 from execute.programmer.programmer import ProgrammingTool
 from execute.entrance_exam import entrance_exam
 

@@ -16,7 +16,7 @@ limitations under the License.
 import os
 import sys
 import click
-from execute.helpers import get_target_name
+from execute.helper import get_target_name
 from execute.enums import DebugCore
 from execute.provision_device import provision_execution
 from execute.programmer.programmer import ProgrammingTool

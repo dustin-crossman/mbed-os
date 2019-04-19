@@ -27,11 +27,11 @@ def region_hash(tool, address, length, mode, exp_value):
     """
     Procedure calls RegionHash syscall over IPC and read response.
     :param tool: Programming/debugging tool used for communication with device.
-    :param address:
-    :param length:
-    :param mode:
-    :param exp_value:
-    :return: True if syscall successfully, otherwise False
+    :param address: Region hash address.
+    :param length: Region hash size.
+    :param mode: Region hash mode.
+    :param exp_value: Region hash expected value.
+    :return: True if syscall executed successfully, otherwise False.
     """
     # Acquire IPC structure
     tool.write32(CYREG_IPC2_STRUCT_ACQUIRE, 0x80000000)
