@@ -155,6 +155,7 @@ void host_network_process_ethernet_data(wiced_buffer_t buffer, wwd_interface_t i
 {
 	emac_mem_buf_t *mem_buf = NULL;
     MBED_ASSERT(interface == WWD_STA_INTERFACE);
+    struct pbuf *pbuffer = NULL;
 
     WICED_EMAC &emac = WICED_EMAC::get_instance();
 
@@ -168,14 +169,11 @@ void host_network_process_ethernet_data(wiced_buffer_t buffer, wwd_interface_t i
     uint16_t size = host_buffer_get_current_piece_size(buffer);
 
     if (size > 0) {
-        /* Allocate a memory buffer chain from buffer pool */
-        mem_buf = emac.memory_manager->alloc_heap(size, 0);
-        if (mem_buf != NULL) {
-            memcpy(static_cast<uint8_t *>(emac.memory_manager->get_ptr(mem_buf)), static_cast<uint8_t *>(data), size);
-            emac.emac_link_input_cb(mem_buf);
-        }
+    	mem_buf = buffer->parent;
+    	pbuffer = (struct pbuf *)buffer->parent;
+    	pbuffer->payload = data;
+    	emac.emac_link_input_cb(mem_buf);
     }
-    host_buffer_release(buffer, WWD_NETWORK_RX);
 }
 
 void wiced_emac_wwd_wifi_link_state_changed(bool state_up)
