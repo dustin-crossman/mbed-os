@@ -54,7 +54,7 @@
 <intAttribute key="org.eclipse.cdt.launch.ATTR_BUILD_BEFORE_LAUNCH_ATTR" value="2"/>
 <stringAttribute key="org.eclipse.cdt.launch.COREFILE_PATH" value=""/>
 <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_REGISTER_GROUPS" value=""/>
-<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="{{elf_location}}"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="{% if device.PROGRAM_NAME is defined and device.PROGRAM_NAME|length %}{{build_dir}}/{{name}}{{device.PROGRAM_NAME}}{% else %}{{elf_location}}{% endif %}"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="{{name}}"/>
 <booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="false"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value=""/>
