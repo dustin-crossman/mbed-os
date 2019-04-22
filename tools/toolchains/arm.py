@@ -29,6 +29,14 @@ from tools.targets import CORE_ARCH
 from tools.toolchains.mbed_toolchain import mbedToolchain, TOOLCHAIN_PATHS
 from tools.utils import mkdir, NotSupportedException, run_cmd
 
+ARMC5_MIGRATION_WARNING = (
+    "Warning: We noticed that you are using Arm Compiler 5. "
+    "We are deprecating the use of Arm Compiler 5 soon. "
+    "Please upgrade your environment to Arm Compiler 6 "
+    "which is free to use with Mbed OS. For more information, "
+    "please visit https://os.mbed.com/docs/mbed-os/latest/tools/index.html"
+)
+
 
 class ARM(mbedToolchain):
     LINKER_EXT = '.sct'
@@ -44,6 +52,7 @@ class ARM(mbedToolchain):
         "Cortex-M7", "Cortex-M7F", "Cortex-M7FD", "Cortex-A9"
     ]
     ARMCC_RANGE = (LooseVersion("5.06"), LooseVersion("5.07"))
+    ARMCC_PRODUCT_RE = re.compile(b"Product: (.*)")
     ARMCC_VERSION_RE = re.compile(b"Component: ARM Compiler (\d+\.\d+)")
 
     @staticmethod
@@ -103,11 +112,20 @@ class ARM(mbedToolchain):
 
         self.SHEBANG += " --cpu=%s" % cpu
 
+        self.product_name = None
+
     def version_check(self):
-        stdout, _, retcode = run_cmd([self.cc[0], "--vsn"], redirect=True)
+        # The --ide=mbed removes an instability with checking the version of
+        # the ARMC6 binary that comes with Mbed Studio.
+        # NOTE: the --ide=mbed argument is only for use with Mbed OS
+        stdout, _, retcode = run_cmd(
+            [self.cc[0], "--vsn", "--ide=mbed"],
+            redirect=True
+        )
         msg = None
         min_ver, max_ver = self.ARMCC_RANGE
-        match = self.ARMCC_VERSION_RE.search(stdout.encode("utf-8"))
+        output = stdout.encode("utf-8")
+        match = self.ARMCC_VERSION_RE.search(output)
         if match:
             found_version = LooseVersion(match.group(1).decode("utf-8"))
         else:
@@ -132,6 +150,19 @@ class ARM(mbedToolchain):
                 "severity": "WARNING",
             })
 
+        msg = None
+        match = self.ARMCC_PRODUCT_RE.search(output)
+        if match:
+            self.product_name = match.group(1).decode("utf-8")
+        else:
+            self.product_name = None
+
+        if not match or len(match.groups()) != 1:
+            msg = (
+                "Could not detect product name: defaulting to professional "
+                "version of ARMC6"
+            )
+
     def _get_toolchain_labels(self):
         if getattr(self.target, "default_toolchain", "ARM") == "uARM":
             return ["ARM", "ARM_MICRO"]
@@ -153,7 +184,7 @@ class ARM(mbedToolchain):
     def parse_output(self, output):
         msg = None
         for line in output.splitlines():
-            match = ARM.DIAGNOSTIC_PATTERN.match(line)
+            match = self.DIAGNOSTIC_PATTERN.match(line)
             if match is not None:
                 if msg is not None:
                     self.notify.cc_info(msg)
@@ -275,7 +306,14 @@ class ARM(mbedToolchain):
 
                 return new_scatter
 
-    def link(self, output, objects, libraries, lib_dirs, scatter_file):
+    def get_link_command(
+            self,
+            output,
+            objects,
+            libraries,
+            lib_dirs,
+            scatter_file
+    ):
         base, _ = splitext(output)
         map_file = base + ".map"
         args = ["-o", output, "--info=totals", "--map", "--list=%s" % map_file]
@@ -294,6 +332,13 @@ class ARM(mbedToolchain):
             link_files = self.get_link_file(cmd[1:])
             cmd = [cmd_linker, '--via', link_files]
 
+        return cmd
+
+    def link(self, output, objects, libraries, lib_dirs, scatter_file):
+        cmd = self.get_link_command(
+            output, objects, libraries, lib_dirs, scatter_file
+        )
+
         self.notify.cc_verbose("Link: %s" % ' '.join(cmd))
         self.default_cmd(cmd)
 
@@ -304,12 +349,15 @@ class ARM(mbedToolchain):
             param = objects
         self.default_cmd([self.ar, '-r', lib_path] + param)
 
+    def get_binary_commands(self, bin_arg, bin, elf):
+        return [self.elf2bin, bin_arg, '-o', bin, elf]
+
     def binary(self, resources, elf, bin):
         _, fmt = splitext(bin)
         # On .hex format, combine multiple .hex files (for multiple load
         # regions) into one
         bin_arg = {".bin": "--bin", ".hex": "--i32combined"}[fmt]
-        cmd = [self.elf2bin, bin_arg, '-o', bin, elf]
+        cmd = self.get_binary_commands(bin_arg, bin, elf)
 
         # remove target binary file/path
         if exists(bin):
@@ -359,9 +407,11 @@ class ARM_STD(ARM):
             build_profile=build_profile
         )
         if int(target.build_tools_metadata["version"]) > 0:
-            #check only for ARMC5 because ARM_STD means using ARMC5, and thus 
+            # check only for ARMC5 because ARM_STD means using ARMC5, and thus
             # supported_toolchains must include ARMC5
-            if "ARMC5" not in target.supported_toolchains:
+            if not set(target.supported_toolchains).intersection(
+                    set(("ARMC5", "ARM"))
+            ):
                 raise NotSupportedException(
                     "ARM compiler 5 support is required for ARM build"
                 )
@@ -372,6 +422,7 @@ class ARM_STD(ARM):
                 raise NotSupportedException(
                     "ARM/uARM compiler support is required for ARM build"
                 )
+
 
 class ARM_MICRO(ARM):
 
@@ -394,7 +445,7 @@ class ARM_MICRO(ARM):
             # At this point we already know that we want to use ARMC5+Microlib
             # so check for if they are supported For, AC6+Microlib we still
             # use ARMC6 class
-            if not set(("ARMC5","uARM")).issubset(set(
+            if not set(("ARMC5", "uARM")).issubset(set(
                     target.supported_toolchains
             )):
                 raise NotSupportedException(
@@ -429,6 +480,10 @@ class ARMC6(ARM_STD):
         "Cortex-A9"
     ]
     ARMCC_RANGE = (LooseVersion("6.10"), LooseVersion("7.0"))
+    LD_DIAGNOSTIC_PATTERN = re.compile(
+        '(?P<severity>Warning|Error): (?P<message>.+)'
+    )
+    DIAGNOSTIC_PATTERN = re.compile('((?P<file>[^:]+):(?P<line>\d+):)(?P<col>\d+):? (?P<severity>warning|[eE]rror|fatal error): (?P<message>.+)')
 
     @staticmethod
     def check_executable():
@@ -546,11 +601,20 @@ class ARMC6(ARM_STD):
         self.ar = join(TOOLCHAIN_PATHS["ARMC6"], "armar")
         self.elf2bin = join(TOOLCHAIN_PATHS["ARMC6"], "fromelf")
 
+        # Adding this for safety since this inherits the `version_check`
+        # function but does not call the constructor of ARM_STD, so the
+        # `product_name` variable is not initialized.
+        self.product_name = None
+
     def _get_toolchain_labels(self):
         if getattr(self.target, "default_toolchain", "ARM") == "uARM":
             return ["ARM", "ARM_MICRO", "ARMC6"]
         else:
             return ["ARM", "ARM_STD", "ARMC6"]
+
+    @property
+    def is_mbed_studio_armc6(self):
+        return self.product_name and "Mbed Studio" in self.product_name
 
     def parse_dependencies(self, dep_path):
         return mbedToolchain.parse_dependencies(self, dep_path)
@@ -559,38 +623,105 @@ class ARMC6(ARM_STD):
         return "#error [NOT_SUPPORTED]" in output
 
     def parse_output(self, output):
-        pass
+        for line in output.splitlines():
+            match = self.LD_DIAGNOSTIC_PATTERN.match(line)
+            if match is not None:
+                self.notify.cc_info({
+                    'severity': match.group('severity').lower(),
+                    'message': match.group('message'),
+                    'text': '',
+                    'target_name': self.target.name,
+                    'toolchain_name': self.name,
+                    'col': 0,
+                    'file': "",
+                    'line': 0
+                })
+            match = self.DIAGNOSTIC_PATTERN.search(line)
+            if match is not None:
+                self.notify.cc_info({
+                    'severity': match.group('severity').lower(),
+                    'file': match.group('file'),
+                    'line': match.group('line'),
+                    'col': match.group('col'),
+                    'message': match.group('message'),
+                    'text': '',
+                    'target_name': self.target.name,
+                    'toolchain_name': self.name
+                })
 
     def get_config_option(self, config_header):
         return ["-include", config_header]
 
     def get_compile_options(self, defines, includes, for_asm=False):
-        
+
         opts = ['-D%s' % d for d in defines]
+
         if self.RESPONSE_FILES:
             opts += ['@{}'.format(self.get_inc_file(includes))]
         else:
             opts += ["-I%s" % i for i in includes if i]
-        
+
         config_header = self.get_config_header()
         if config_header:
             opts.extend(self.get_config_option(config_header))
         if for_asm:
-            return [
+            opts = [
                 "--cpreproc",
                 "--cpreproc_opts=%s" % ",".join(self.flags['common'] + opts)
             ]
+
+        if self.is_mbed_studio_armc6:
+            # NOTE: the --ide=mbed argument is only for use with Mbed OS
+            opts.insert(0, "--ide=mbed")
+
         return opts
 
     def assemble(self, source, object, includes):
-        cmd_pre = copy(self.asm)
+        # Preprocess first, then assemble
+        root, _ = splitext(object)
+        tempfile = root + '.E'
+
+        # Build preprocess assemble command
+        cmd_pre = copy(self.cc)
         cmd_pre.extend(self.get_compile_options(
-            self.get_symbols(True), includes, for_asm=True))
-        cmd_pre.extend(["-o", object, source])
-        return [cmd_pre]
+            self.get_symbols(True), includes, for_asm=False))
+        cmd_pre.extend(["-E", "-MT", object, "-o", tempfile, source])
+
+        # Build main assemble command
+        cmd = self.asm + ["-o", object, tempfile]
+
+        # Return command array, don't execute
+        return [cmd_pre, cmd]
 
     def compile(self, cc, source, object, includes):
         cmd = copy(cc)
         cmd.extend(self.get_compile_options(self.get_symbols(), includes))
         cmd.extend(["-o", object, source])
         return [cmd]
+
+    def get_link_command(
+            self,
+            output,
+            objects,
+            libraries,
+            lib_dirs,
+            scatter_file
+    ):
+        cmd = ARM.get_link_command(
+            self, output, objects, libraries, lib_dirs, scatter_file
+        )
+
+        if self.is_mbed_studio_armc6:
+            # NOTE: the --ide=mbed argument is only for use with Mbed OS
+            cmd.insert(1, "--ide=mbed")
+
+        return cmd
+
+    def get_binary_commands(self, bin_arg, bin, elf):
+        cmd = ARM.get_binary_commands(self, bin_arg, bin, elf)
+
+        if self.is_mbed_studio_armc6:
+            # NOTE: the --ide=mbed argument is only for use with Mbed OS
+            cmd.insert(1, "--ide=mbed")
+
+        return cmd
