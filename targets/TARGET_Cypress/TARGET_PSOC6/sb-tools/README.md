@@ -15,14 +15,14 @@ These files are relevant to CY8CPROTO_064_SB or CY8CPROTO_064_SB_M0_PSA, CY8CPRO
 *   Create provisioning packets:
 		Execute from ./prepare folder:	
 		
-		** In case of compilation for CY8CPROTO_064_SB_M0_PSA and CY8CPROTO_064_SB_PSA:		
+		** In case of compilation for CY8CPROTO_064_SB (CM4 only):		
 		python.exe provisioning_packet.py --policy policy_1stage_CM4.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey USERAPP_CM4_KEY.json	
 
 		** In case of compilation for CY8CPROTO_064_SB_M0_PSA and CY8CPROTO_064_SB_PSA:
 		python.exe provisioning_packet.py --policy policy_2stage_CM0p.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
 
-		Prebuild folder contains CyBootloader_Debug and CyBootloader_Release with corresponding hex and jwt files.
-		* Debug enables logs print to terminal.
+		Prebuild folder contains CyBootloader_WithLogs and CyBootloader_Release with corresponding hex and jwt files.
+		* WithLogs enables logs print to terminal.
 		* Release does not print to terminal and boots up silently.
 
 		CypressBootloader_CM0p.jwt and CypressBootloader_CM0p.hex must be used in pair from the same directory
@@ -48,4 +48,4 @@ TROUBLESHOOTING:
 
 1. In case of messeges like "unable to find device" execute "mbedls -m 1907:CY8CPROTO_064_SB", then check with "mbedls" if device is detected as CY8CPROTO_064_SB with code 1907.
 2. Keys, from ./keys folder is used for signing images by default, these keys should be used for provisioning.
-3. Use CyBootloader from CyBootloader_Debug folder. It produces logs, which is useful to undestand if CyBootloader works correctly.
+3. Use CyBootloader from CyBootloader_WithLogs folder. It produces logs, which is useful to undestand if CyBootloader works correctly.

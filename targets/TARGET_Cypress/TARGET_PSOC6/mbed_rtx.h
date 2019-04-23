@@ -43,7 +43,7 @@
 #endif
 #elif defined(TARGET_CY8CPROTO_064_SB)
 #ifndef INITIAL_SP
-#define INITIAL_SP              (0x08001000 + 0x0001F000)  /* Ram origin + length */
+#define INITIAL_SP              (0x08002000 + 0x0001E000)  /* Ram origin + length */
 #endif
 #elif defined(TARGET_CY8CPROTO_064_M0_PSA)
 #ifndef INITIAL_SP
