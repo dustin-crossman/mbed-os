@@ -143,11 +143,11 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
 
             while ((randomsize > 0) && (CY_CRYPTO_SUCCESS == status))
             {
-                uint32_t randombits = (uint32_t)CY_CRYPTO_MIN(randomsize, CY_CRYPTO_HW_REGS_WIDTH);
+                uint32_t randombits = (uint32_t)CY_CRYPTO_MIN(randomsize, (int32_t)CY_CRYPTO_HW_REGS_WIDTH);
 
                 status = Cy_Crypto_Core_Trng(base, CY_ECC_CONFIG_TR_GARO_CTL, CY_ECC_CONFIG_TR_FIRO_CTL,
                                                   randombits, &(tmpRegPtr)[i]);
-                randomsize -= CY_CRYPTO_HW_REGS_WIDTH;
+                randomsize -= (int32_t)CY_CRYPTO_HW_REGS_WIDTH;
                 i++;
 
                 if (CY_CRYPTO_SUCCESS != status)
