@@ -1,5 +1,5 @@
 /*
- * $ Copyright Cypress Semiconductor $
+ * $ Copyright Cypress Semiconductor Apache2 $
  */
 
 #include "whd_chip_constants.h"

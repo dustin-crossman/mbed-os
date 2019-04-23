@@ -10,11 +10,22 @@
 * the resource types consumed by the HAL driver functions.
 * 
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
 
 /**
 * \addtogroup group_hal
@@ -42,7 +53,6 @@
 #include "cy_hal_pdmpcm.h"
 #include "cy_hal_pwm.h"
 #include "cy_hal_qspi.h"
-#include "cy_hal_rng.h"
 #include "cy_hal_rtc.h"
 #include "cy_hal_sdhc.h"
 #include "cy_hal_sdio.h"
@@ -53,3 +63,8 @@
 #include "cy_hal_wdt.h"
 #include "cy_hal_crc.h"
 #include "cy_hal_crc_impl.h"
+#include "cy_hal_trng.h"
+#include "cy_hal_trng_impl.h"
+
+/** \} group_hal */
+

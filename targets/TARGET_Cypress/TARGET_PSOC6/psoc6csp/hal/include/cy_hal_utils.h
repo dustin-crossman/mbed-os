@@ -5,11 +5,34 @@
 * Provides utility functions for working with the PSoC 6 HAL implementation.
 * 
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_utils PSoC 6 Utility Functions
+* \ingroup group_hal_psoc6
+* \{
+* Utility functions for working with the PSoC 6 HAL implementation.
+*
+* \defgroup group_hal_utils_macros Macros
+* \defgroup group_hal_utils_functions Functions
+* \defgroup group_hal_utils_data_structures Data Structures
+* \defgroup group_hal_utils_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -19,9 +42,11 @@
 extern "C" {
 #endif
 
-/*******************************************************************************
-*       Defines
-*******************************************************************************/
+/**
+* \addtogroup group_hal_utils_macros
+* \{
+*/
+
 #define CY_GET_PIN(pin)         ((uint32_t)(pin & 0xFFFFUL))  /**< Macro to extract the pin number */
 #define CY_GET_PORT(pin)        ((uint32_t)((uint32_t)(pin >> 16) & 0xFFUL)) /**< Macro to extract the port number */
 
@@ -34,9 +59,13 @@ extern "C" {
  */
 #define CY_UTILS_GET_RESOURCE(pin, mappings) cy_utils_get_resource(pin, mappings, sizeof(mappings)/sizeof(cy_resource_pin_mapping_t))
 
-/*******************************************************************************
-*       Functions
-*******************************************************************************/
+/** \} group_hal_utils_macros */
+
+
+/**
+* \addtogroup group_hal_utils_functions
+* \{
+*/
 
 /** Converts the provided gpio pin to a resource instance object
  *
@@ -58,6 +87,10 @@ static inline cy_resource_inst_t cy_utils_get_gpio_resource(cy_gpio_t pin)
  */
 const cy_resource_pin_mapping_t *cy_utils_get_resource(cy_gpio_t pin, const cy_resource_pin_mapping_t* mappings, size_t count);
 
+/** \} group_hal_utils_functions */
+
 #if defined(__cplusplus)
 }
 #endif
+
+/** \} group_hal_utils */

@@ -99,6 +99,22 @@ uint32_t host_platform_resource_size(whd_driver_t whd_drv, whd_resource_type_t r
     return WHD_SUCCESS;
 }
 
+resource_result_t resource_read ( const resource_hnd_t* resource, uint32_t offset, uint32_t maxsize, uint32_t* size, void* buffer )
+{
+    if ( offset > resource->size )
+    {
+        return RESOURCE_OFFSET_TOO_BIG;
+    }
+ 
+    *size = MIN( maxsize, resource->size - offset );
+ 
+    if (resource->location == RESOURCE_IN_MEMORY)
+    {
+        memcpy(buffer, &resource->val.mem.data[offset], *size);
+    }
+    return RESOURCE_SUCCESS;
+}
+
 uint32_t host_get_resource_block(whd_driver_t whd_drv, whd_resource_type_t type, const uint8_t **data,
                                  uint32_t *size_out)
 {

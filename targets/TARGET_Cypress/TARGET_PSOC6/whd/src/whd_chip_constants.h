@@ -1,5 +1,5 @@
 /*
- * $ Copyright Cypress Semiconductor $
+ * $ Copyright Cypress Semiconductor Apache2 $
  */
 
 #ifndef INCLUDED_CHIP_CONSTANTS_H_

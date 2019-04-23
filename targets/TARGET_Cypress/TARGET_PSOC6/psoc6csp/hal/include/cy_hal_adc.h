@@ -2,17 +2,40 @@
 * \file cy_hal_adc.h
 *
 * \brief
-* Provides a high level interface for interacting with the Cypress Analog to 
-* Digital Converter. This interface abstracts out the chip specific details. 
-* If any chip specific functionality is necessary, or performance is critical 
+* Provides a high level interface for interacting with the Cypress Analog to
+* Digital Converter. This interface abstracts out the chip specific details.
+* If any chip specific functionality is necessary, or performance is critical
 * the low level functions can be used directly.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_adc ADC (Analog to Digital Converter)
+* \ingroup group_hal
+* \{
+* High level interface for interacting with the Cypress ADC.
+*
+* \defgroup group_hal_adc_macros Macros
+* \defgroup group_hal_adc_functions Functions
+* \defgroup group_hal_adc_data_structures Data Structures
+* \defgroup group_hal_adc_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -25,8 +48,21 @@
 extern "C" {
 #endif
 
+/**
+* \addtogroup group_hal_adc_macros
+* \{
+*/
+
 /** Maximum value that the ADC can return */
-#define MAX_VALUE 0x0FFF
+#define CY_ADC_MAX_VALUE 0x0FFF
+
+/** \} group_hal_adc_macros */
+
+
+/**
+* \addtogroup group_hal_adc_functions
+* \{
+*/
 
 /** Initialize the adc peripheral
  *
@@ -52,6 +88,10 @@ cy_rslt_t cy_adc_free(cy_adc_t *obj);
  */
 cy_rslt_t cy_adc_read_u16(const cy_adc_t *obj, uint16_t *value);
 
+/** \} group_hal_adc_functions */
+
 #if defined(__cplusplus)
 }
 #endif
+
+/** \} group_hal_adc */

@@ -2,16 +2,38 @@
 * \file cy_result.h
 *
 * \brief
-* Basic function result handling. Defines a simple type for conveying 
+* Basic function result handling. Defines a simple type for conveying
 * information about whether something succeeded or details about any issues
 * that were detected.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2017-2018 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_result Result Type
+* \ingroup group_abstraction
+* \{
+* Basic function result handling. Defines a simple type for conveying
+* information about whether something succeeded or details about any issues
+* that were detected.
+*
+* \defgroup group_result_macros Macros
+*/
 
 #pragma once
 
@@ -20,6 +42,11 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
+/**
+* \addtogroup group_result_macros
+* \{
+*/
 
 /** Mask for the bit at position "x" */
 #define CY_BIT_MASK(x)                     ((1U << (x)) - 1)
@@ -60,16 +87,32 @@ extern "C" {
 /** Get the value of the module identifier field */
 #define CY_RSLT_GET_MODULE(x)              (((x) >> CY_RSLT_MODULE_POSITION) & CY_RSLT_MODULE_MASK)
 
+
+/**** DRIVER Module codes: 0x0000 - 0x00FF ****/
+/** Base identifier for peripheral driver library */
+#define CY_RSLT_MODULE_DRIVERS_PDL_BASE           (0x0000)
+/** Base identifier for peripheral driver library */
+#define CY_RSLT_MODULE_DRIVERS_WHD_BASE           (0x0080)
+
+/**** ABSTRACTION Module codes: 0x0100 - 0x01FF ****/
 /** Base identifier for chip support modules */
-#define CY_RSLT_MODULE_CHIP_BASE           (0)
+#define CY_RSLT_MODULE_ABSTRACTION_HAL_BASE       (0x0100)
 /** Base identifier for board support modules */
-#define CY_RSLT_MODULE_BOARD_BASE          (2048)
-/** Base identifier for RTOS modules */
-#define CY_RSLT_MODULE_RTOS_BASE           (4096)
-/** Base identifier for network stack modules */
-#define CY_RSLT_MODULE_NETWORK_BASE        (6144)
-/** Base identifier for middleware modules */
-#define CY_RSLT_MODULE_MIDDLEWARE_BASE     (8192)
+#define CY_RSLT_MODULE_ABSTRACTION_BSP            (0x0180)
+/** Base identifier for board support modules */
+#define CY_RSLT_MODULE_ABSTRACTION_FS             (0x0181)
+/** Base identifier for board support modules */
+#define CY_RSLT_MODULE_ABSTRACTION_RESOURCE       (0x0182)
+/** Base identifier for board support modules */
+#define CY_RSLT_MODULE_ABSTRACTION_BUFFER         (0x0183)
+/** Base identifier for board support modules */
+#define CY_RSLT_MODULE_ABSTRACTION_OS             (0x0184)
+/** Base identifier for board support modules */
+#define CY_RSLT_MODULE_ABSTRACTION_ENV            (0x0185)
+
+/**** Middleware Module codes: 0x0100 - 0x01FF ****/
+
+
 
 /** Provides the result of an operation as a structured bitfield */
 typedef uint32_t cy_rslt_t;
@@ -83,7 +126,10 @@ typedef uint32_t cy_rslt_t;
     (((code) & CY_RSLT_CODE_MASK) << CY_RSLT_CODE_POSITION) | \
     (((type) & CY_RSLT_TYPE_MASK) << CY_RSLT_TYPE_POSITION))
 
+/** \} group_result_macros */
 
 #ifdef __cplusplus
-} ;
+}
 #endif
+
+/** \} group_result */

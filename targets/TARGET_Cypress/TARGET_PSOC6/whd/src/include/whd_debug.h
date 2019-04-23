@@ -1,5 +1,5 @@
 /*
- * $ Copyright Cypress Semiconductor $
+ * $ Copyright Cypress Semiconductor Apache2 $
  */
 
 #ifndef INCLUDED_WHD_DEBUG_H

@@ -2,20 +2,31 @@
 * File Name: cy_hal_udb_sdio.c
 *
 * Description:
-* Provides a high level interface for interacting with the Cypress DB SDIO. 
+* Provides a high level interface for interacting with the Cypress UDB SDIO.
 * This is a wrapper around the lower level UDB SDIO API.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
 
 
 #include "cy_hal_hwmgr.h"
 
-#if defined(CY_IP_MXUDB)
+#if defined(CY8C6247BZI_D54) /* TODO: BSP-525 */
 
 #include <stdlib.h>
 #include "cy_hal_sdio.h"
@@ -23,13 +34,27 @@
 #include "cy_hal_interconnect.h"
 #include "SDIO_HOST_cfg.h"
 
-#define SDIO_PINS_NC    ((cy_gpio_t) CY_NC_PIN_VALUE)
-
-#define SDIO_STS_IDLE                    (SDIO_STS_CMD_IDLE | SDIO_STS_DAT_IDLE)
-
+/* Not connected pin define */
+#define SDIO_PINS_NC       ((cy_gpio_t) CY_NC_PIN_VALUE)
 
 
-/* Configuration structures for SDIO pins */
+#define CY_SDIO_CLK_DIV_VALUE   ((uint8_t) 0xFF)
+
+/* Not configured clock divider define*/
+#define CY_SDIO_CLK_DIV_NC      ((cy_en_divider_types_t) CY_SDIO_CLK_DIV_VALUE)
+
+/* The 64b block transition mode define */
+#define CY_HAL_SDIO_64B      (64u)
+
+/* The 1 byte transition mode define */
+#define CY_HAL_SDIO_1B       (1u)
+
+/* Temporary buffer for 64b mode while read operation */
+static uint8_t temp_dma_buffer[2*1024];
+
+/*******************************************************************************
+*       Configuration structures for SDIO pins
+*******************************************************************************/
 const cy_stc_gpio_pin_config_t pin_cmd_config = 
 {
     .outVal = 1,
@@ -88,7 +113,7 @@ static void *cy_hal_sdio_callback_args = NULL;
 
 
 /*******************************************************************************
-*       Dispatcher Interrupt Service Routine
+*       Dispatcher Interrupt Callbacks Service Routine
 *******************************************************************************/
 static void cy_sdio_interrupts_dispatcher_IRQHandler(void)
 {
@@ -98,6 +123,7 @@ static void cy_sdio_interrupts_dispatcher_IRQHandler(void)
     }
 }
 
+
 /*******************************************************************************
 *       Internal functions
 *******************************************************************************/
@@ -105,31 +131,34 @@ static cy_rslt_t cy_free_pins(cy_sdio_t *obj);
 
 static cy_rslt_t cy_free_pins(cy_sdio_t *obj)
 {
-    cy_rslt_t retVal = CY_RSC_INVALID;
+    cy_rslt_t retVal = CY_RSLT_SUCCESS;
 
-    retVal = cy_gpio_free(obj->pin_clk);
+    if (obj->pin_clk != SDIO_PINS_NC)
+    {
+        retVal = cy_gpio_free(obj->pin_clk);
+    }
     
-    if (retVal == CY_RSLT_SUCCESS)
+    if ((retVal == CY_RSLT_SUCCESS) && (obj->pin_cmd != SDIO_PINS_NC))
     {
         retVal = cy_gpio_free(obj->pin_cmd);
     }
 
-    if (retVal == CY_RSLT_SUCCESS)
+    if ((retVal == CY_RSLT_SUCCESS) && (obj->pin_data0 != SDIO_PINS_NC))
     {
         retVal = cy_gpio_free(obj->pin_data0);
     }
     
-    if (retVal == CY_RSLT_SUCCESS)
+    if ((retVal == CY_RSLT_SUCCESS) && (obj->pin_data1 != SDIO_PINS_NC))
     {
         retVal = cy_gpio_free(obj->pin_data1);
     }
     
-    if (retVal == CY_RSLT_SUCCESS)
+    if ((retVal == CY_RSLT_SUCCESS) && (obj->pin_data2 != SDIO_PINS_NC))
     {
         retVal = cy_gpio_free(obj->pin_data2);
     }
     
-    if (retVal == CY_RSLT_SUCCESS)
+    if ((retVal == CY_RSLT_SUCCESS) && (obj->pin_data3 != SDIO_PINS_NC))
     {
         retVal = cy_gpio_free(obj->pin_data3);
     }
@@ -139,35 +168,35 @@ static cy_rslt_t cy_free_pins(cy_sdio_t *obj)
 
 static cy_rslt_t cy_free_clocks(cy_sdio_t *obj)
 {
-    cy_rslt_t retVal;
+    cy_rslt_t retVal = CY_RSLT_SUCCESS;
 
-    /* Free clock divider resource*/
-    cy_resource_inst_t udbClkRsc;
-    
-    //TODO it would be nice to have cy_free_clocks() in system hal? 
-    
-    udbClkRsc.type = CY_RSC_CLOCK;
-    udbClkRsc.block_num = obj->clock.div_num;
-    udbClkRsc.channel_num = 0;
-
-    retVal = cy_hwmgr_set_unconfigured(udbClkRsc.type, udbClkRsc.block_num, udbClkRsc.channel_num);
-    
-    if (retVal == CY_RSLT_SUCCESS)
+    if (obj->clock.div_num != CY_SDIO_CLK_DIV_NC)
     {
-        retVal = cy_hwmgr_free(&udbClkRsc);
+        /* Free clock divider resource*/
+        cy_resource_inst_t udbClkRsc;
+        
+        udbClkRsc.type = CY_RSC_CLOCK;
+        udbClkRsc.block_num = obj->clock.div_num;
+        udbClkRsc.channel_num = 0;
+        
+        retVal = cy_hwmgr_set_unconfigured(udbClkRsc.type, udbClkRsc.block_num, udbClkRsc.channel_num);
+        
+        if (retVal == CY_RSLT_SUCCESS)
+        {
+            retVal = cy_hwmgr_free(&udbClkRsc);
+        }
     }
-
+    
     return retVal;
 }
 
+
 static cy_rslt_t cy_free_dmas(cy_sdio_t *obj)
 {
-    cy_rslt_t retVal;
+    cy_rslt_t retVal = CY_RSLT_SUCCESS;
 
     /* Free clock divider resource*/
     cy_resource_inst_t dmaRsc;
-    
-    //TODO it would be nice to have cy_dma_free() ? 
     
     dmaRsc.type = CY_RSC_DMA;
     
@@ -175,9 +204,12 @@ static cy_rslt_t cy_free_dmas(cy_sdio_t *obj)
     dmaRsc.block_num = 0;
     dmaRsc.channel_num = 0;
 
-    retVal = cy_hwmgr_set_unconfigured(dmaRsc.type, dmaRsc.block_num, dmaRsc.channel_num);
+    if (obj->dma0Ch0.resource.type != CY_RSC_INVALID)
+    {
+        retVal = cy_hwmgr_set_unconfigured(dmaRsc.type, dmaRsc.block_num, dmaRsc.channel_num);
+    }
     
-    if (retVal == CY_RSLT_SUCCESS)
+    if ((retVal == CY_RSLT_SUCCESS) && (obj->dma0Ch0.resource.type != CY_RSC_INVALID))
     {
         retVal = cy_hwmgr_free(&dmaRsc);
     }
@@ -186,38 +218,45 @@ static cy_rslt_t cy_free_dmas(cy_sdio_t *obj)
     dmaRsc.block_num = 0;
     dmaRsc.channel_num = 1;
 
-    retVal = cy_hwmgr_set_unconfigured(dmaRsc.type, dmaRsc.block_num, dmaRsc.channel_num);
-    
-    if (retVal == CY_RSLT_SUCCESS)
+    if ((retVal == CY_RSLT_SUCCESS) && (obj->dma0Ch1.resource.type != CY_RSC_INVALID))
     {
-        retVal = cy_hwmgr_free(&dmaRsc);
+        retVal = cy_hwmgr_set_unconfigured(dmaRsc.type, dmaRsc.block_num, dmaRsc.channel_num);
+    
+        if (retVal == CY_RSLT_SUCCESS)
+        {
+            retVal = cy_hwmgr_free(&dmaRsc);
+        }
     }
     
     /* Release DMA1 CH1 */
     dmaRsc.block_num = 1;
     dmaRsc.channel_num = 1;
 
-    retVal = cy_hwmgr_set_unconfigured(dmaRsc.type, dmaRsc.block_num, dmaRsc.channel_num);
-    
-    if (retVal == CY_RSLT_SUCCESS)
+    if ((retVal == CY_RSLT_SUCCESS) && (obj->dma1Ch1.resource.type != CY_RSC_INVALID))
     {
-        retVal = cy_hwmgr_free(&dmaRsc);
+        retVal = cy_hwmgr_set_unconfigured(dmaRsc.type, dmaRsc.block_num, dmaRsc.channel_num);
+    
+        if (retVal == CY_RSLT_SUCCESS)
+        {
+            retVal = cy_hwmgr_free(&dmaRsc);
+        }
     }
-
+    
     /* Release DMA1 CH1 */
     dmaRsc.block_num = 1;
     dmaRsc.channel_num = 3;
 
-    retVal = cy_hwmgr_set_unconfigured(dmaRsc.type, dmaRsc.block_num, dmaRsc.channel_num);
-    
-    if (retVal == CY_RSLT_SUCCESS)
+    if ((retVal == CY_RSLT_SUCCESS) && (obj->dma1Ch3.resource.type != CY_RSC_INVALID))
     {
-        retVal = cy_hwmgr_free(&dmaRsc);
-    }
+        retVal = cy_hwmgr_set_unconfigured(dmaRsc.type, dmaRsc.block_num, dmaRsc.channel_num);
     
+        if (retVal == CY_RSLT_SUCCESS)
+        {
+            retVal = cy_hwmgr_free(&dmaRsc);
+        }
+    }
     return retVal;
 }
-
 
 
 /** Initialize the SDIO peripheral
@@ -258,7 +297,13 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
     obj->pin_data1 = SDIO_PINS_NC;
     obj->pin_data2 = SDIO_PINS_NC;
     obj->pin_data3 = SDIO_PINS_NC;
-
+    obj->dma0Ch0.resource.type = CY_RSC_INVALID;
+    obj->dma0Ch1.resource.type = CY_RSC_INVALID;
+    obj->dma1Ch1.resource.type = CY_RSC_INVALID;
+    obj->dma1Ch3.resource.type = CY_RSC_INVALID;
+    
+    obj->clock.div_type = CY_SDIO_CLK_DIV_NC;
+    
     /* Reserve clock */
     cy_resource_inst_t udbClkRsc = { CY_RSC_CLOCK, 0, 0 };
     retVal = cy_hwmgr_reserve(&udbClkRsc);
@@ -386,14 +431,17 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
     /* Reserve the clk pin */
     if (retVal == CY_RSLT_SUCCESS)
     {
-        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(obj->pin_clk);
+        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(clk);
         retVal = cy_hwmgr_reserve(&pinRsc);
         if (retVal == CY_RSLT_SUCCESS)
         {
             retVal = cy_hwmgr_is_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num, &isConfigured);
             if (retVal == CY_RSLT_SUCCESS && !isConfigured)
             {
-                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(obj->pin_clk), CY_GET_PIN(obj->pin_clk), &pin_clk_config);
+                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(clk), CY_GET_PIN(clk), &pin_clk_config);
+
+                obj->pin_clk = clk;
+
                 cy_hwmgr_set_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num);
             }
         }
@@ -402,14 +450,17 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
     /* Reserve the cmd pin */
     if (retVal == CY_RSLT_SUCCESS)
     {
-        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(obj->pin_cmd);
+        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(cmd);
         retVal = cy_hwmgr_reserve(&pinRsc);
         if (retVal == CY_RSLT_SUCCESS)
         {
             retVal = cy_hwmgr_is_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num, &isConfigured);
             if (retVal == CY_RSLT_SUCCESS && !isConfigured)
             {
-                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(obj->pin_cmd), CY_GET_PIN(obj->pin_cmd), &pin_cmd_config);
+                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(cmd), CY_GET_PIN(cmd), &pin_cmd_config);
+
+                obj->pin_cmd = cmd;
+
                 cy_hwmgr_set_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num);
             }
         }
@@ -418,14 +469,17 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
     /* Reserve the data0 pin */
     if (retVal == CY_RSLT_SUCCESS)
     {
-        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(obj->pin_data0);
+        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(data0);
         retVal = cy_hwmgr_reserve(&pinRsc);
         if (retVal == CY_RSLT_SUCCESS)
         {
             retVal = cy_hwmgr_is_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num, &isConfigured);
             if (retVal == CY_RSLT_SUCCESS && !isConfigured)
             {
-                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(obj->pin_data0), CY_GET_PIN(obj->pin_data0), &pin_data_config);
+                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(data0), CY_GET_PIN(data0), &pin_data_config);
+
+                obj->pin_data0 = data0;
+
                 cy_hwmgr_set_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num);
             }
         }
@@ -434,14 +488,16 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
     /* Reserve the data1 pin */
     if (retVal == CY_RSLT_SUCCESS)
     {
-        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(obj->pin_data1);
+        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(data1);
         retVal = cy_hwmgr_reserve(&pinRsc);
         if (retVal == CY_RSLT_SUCCESS)
         {
             retVal = cy_hwmgr_is_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num, &isConfigured);
             if (retVal == CY_RSLT_SUCCESS && !isConfigured)
             {
-                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(obj->pin_data1), CY_GET_PIN(obj->pin_data1), &pin_data_config);
+                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(data1), CY_GET_PIN(data1), &pin_data_config);
+
+                obj->pin_data1 = data1;
                 cy_hwmgr_set_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num);
             }
         }
@@ -450,14 +506,16 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
     /* Reserve the data2 pin */
     if (retVal == CY_RSLT_SUCCESS)
     {
-        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(obj->pin_data2);
+        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(data2);
         retVal = cy_hwmgr_reserve(&pinRsc);
         if (retVal == CY_RSLT_SUCCESS)
         {
             retVal = cy_hwmgr_is_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num, &isConfigured);
             if (retVal == CY_RSLT_SUCCESS && !isConfigured)
             {
-                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(obj->pin_data2), CY_GET_PIN(obj->pin_data2), &pin_data_config);
+                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(data2), CY_GET_PIN(data2), &pin_data_config);
+
+                obj->pin_data2 = data2;
                 cy_hwmgr_set_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num);
             }
         }
@@ -466,14 +524,16 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
     /* Reserve the data3 pin */
     if (retVal == CY_RSLT_SUCCESS)
     {
-        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(obj->pin_data3);
+        cy_resource_inst_t pinRsc = cy_utils_get_gpio_resource(data3);
         retVal = cy_hwmgr_reserve(&pinRsc);
         if (retVal == CY_RSLT_SUCCESS)
         {
             retVal = cy_hwmgr_is_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num, &isConfigured);
             if (retVal == CY_RSLT_SUCCESS && !isConfigured)
             {
-                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(obj->pin_data3), CY_GET_PIN(obj->pin_data3), &pin_data_config);
+                Cy_GPIO_Pin_Init(CY_GET_PORTADDR(data3), CY_GET_PIN(data3), &pin_data_config);
+
+                obj->pin_data3 = data3;
                 cy_hwmgr_set_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num);
             }
         }
@@ -497,11 +557,37 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
                 obj->resource.block_num = udbRsc.block_num;
                 obj->resource.channel_num = udbRsc.channel_num;
 
-                //TODO not sure is that correct way here - does the user need to pull pfuCb into the object?
-                SDIO_Init(obj->pfuCb);
+                SDIO_Init((stc_sdio_irq_cb_t *) &cy_sdio_interrupts_dispatcher_IRQHandler);
+                
+                /* Register two DMA interrupt handler functions 
+                *  TODO: 
+                *  1. Need to do this in the DMA hal (once it is implemented)
+                *  2. Figure out how to aware rtoses about these handler executions.
+                *
+                *   __asm__( "PUSH {lr}" ); 
+                *   __asm__( "bl _tx_thread_context_save" );
+                *   handler(); \
+                *   __asm__( "b  _tx_thread_context_restore" ); 
+                *  ...
+                */
+                
+                /* Set default interrupt priority of 7 (lowest possible priority) */
+                cy_stc_sysint_t irqCfg = {udb_interrupts_0_IRQn, 7};
+                Cy_SysInt_Init(&irqCfg, &SDIO_IRQ);
+                NVIC_EnableIRQ(udb_interrupts_0_IRQn);
+                
+                /* Setup write DMA interrupt handler */
+                cy_stc_sysint_t irqDma1_1 = {cpuss_interrupts_dw1_1_IRQn, 7};
+                Cy_SysInt_Init(&irqDma1_1, &SDIO_WRITE_DMA_IRQ);
+                NVIC_EnableIRQ(cpuss_interrupts_dw1_1_IRQn);
+                
+                /* Setup read DMA interrupt handler */
+                cy_stc_sysint_t irqDma1_3 = {cpuss_interrupts_dw1_3_IRQn, 7};
+                Cy_SysInt_Init(&irqDma1_3, &SDIO_READ_DMA_IRQ);
+                NVIC_EnableIRQ(cpuss_interrupts_dw1_3_IRQn);
 
-                obj->frequency_hz = 400000U; /* SDIO_Init() configures the SDIO to 40 kHz */
-                obj->block_size   = 64;      /* SDIO_Init() block byte count to 64 */
+                obj->frequency_hz = 400000U;        /* SDIO_Init() configures the SDIO to 40 kHz */
+                obj->block_size   = CY_HAL_SDIO_64B;
                 
                 /* Connect UDB to DMA */
                 Cy_TrigMux_Connect(TRIG0_IN_TR_GROUP14_OUTPUT1, TRIG0_OUT_CPUSS_DW0_TR_IN1, false, TRIGGER_TYPE_LEVEL);
@@ -555,10 +641,15 @@ cy_rslt_t cy_sdio_free(cy_sdio_t *obj)
         retVal = cy_free_dmas(obj);
     }
     
-    if (retVal == CY_RSLT_SUCCESS)
+    if ((retVal == CY_RSLT_SUCCESS) && (obj->resource.type != CY_RSC_INVALID))
     {
         /* All other resources were released so need to release UDB resource */
         retVal = cy_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
+        
+        if (retVal == CY_RSLT_SUCCESS)
+        {
+            retVal = cy_hwmgr_free(&(obj->resource));
+        }
     }
 
     return retVal;
@@ -567,7 +658,7 @@ cy_rslt_t cy_sdio_free(cy_sdio_t *obj)
 /** Configure the SDIO block.
  *
  * @param[in,out] obj    The SDIO object
- * @param[in]     config The sdio configuration to apply
+ * @param[in]     config The SDIO configuration to apply
  * @return The status of the configure request
  */
 cy_rslt_t cy_sdio_configure(cy_sdio_t *obj, const cy_sdio_cfg_t *config)
@@ -595,29 +686,31 @@ cy_rslt_t cy_sdio_configure(cy_sdio_t *obj, const cy_sdio_cfg_t *config)
  * @param[out]    response  The response from the SDIO device
  * @return The status of the configure request
  */
-cy_rslt_t cy_sdio_send_cmd(const cy_sdio_t *obj, cy_transfer_t direction, cy_sdio_command_t command, uint32_t argument, uint32_t* response)
+cy_rslt_t cy_sdio_send_cmd(const cy_sdio_t *obj, cy_transfer_t direction, \
+                          cy_sdio_command_t command, uint32_t argument, uint32_t* response)
 {
     if ((NULL == obj) && (command == SDIO_CMD_IO_RW_EXTENDED))
     {
         return CY_RSLT_SDIO_BAD_PARAM_ARGUMENT;
     }
+    
+    uint32_t cmdResponse;
+    stc_sdio_cmd_t cmd;
+    en_sdio_result_t status;
+    cy_rslt_t retVal = CY_RSLT_SUCCESS;
 
     if (response != NULL)
     {
         *response = 0;
     }
-    
-    stc_sdio_cmd_t cmd;
-    en_sdio_result_t status;
-    cy_rslt_t retVal = CY_RSLT_SUCCESS;
 
     cmd.u32CmdIdx = (uint32_t) command;
     cmd.u32Arg = argument;
-    cmd.pu32Response = response;
-    cmd.pu8Data = NULL;               /* Not used */
+    cmd.pu32Response = &cmdResponse;
+    cmd.pu8Data = NULL;              /* Not used */
     cmd.bRead = (direction != CY_READ) ? false : true;
     cmd.u16BlockCnt = 0U;            /* Not used */
-    cmd.u16BlockSize = 0U;          /* Not used */
+    cmd.u16BlockSize = 0U;           /* Not used */
 
     status = SDIO_SendCommandAndWait(&cmd);
 
@@ -625,6 +718,11 @@ cy_rslt_t cy_sdio_send_cmd(const cy_sdio_t *obj, cy_transfer_t direction, cy_sdi
     {
         /* Return values are mapped on defines located in the hal sdio header */
         retVal = CY_RSLT_SDIO_FUNC_RET_ERROR(status);
+    }
+
+    if (response != NULL)
+    {
+        *response = cmdResponse;
     }
 
     return retVal;
@@ -641,7 +739,7 @@ cy_rslt_t cy_sdio_send_cmd(const cy_sdio_t *obj, cy_transfer_t direction, cy_sdi
  * @param[out]    response  The response from the SDIO device
  * @return The status of the configure request
  */
-cy_rslt_t cy_sdio_bulk_transfer(const cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length, uint32_t* response)
+cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length, uint32_t* response)
 {
     if (NULL == obj)
     {
@@ -650,15 +748,48 @@ cy_rslt_t cy_sdio_bulk_transfer(const cy_sdio_t *obj, cy_transfer_t direction, u
 
     stc_sdio_cmd_t cmd;
     en_sdio_result_t status;
+    uint32_t cmdResponse;
     cy_rslt_t retVal;
+
+    if (response != NULL)
+    {
+        *response = 0;
+    }
 
     cmd.u32CmdIdx = (uint32_t) SDIO_CMD_IO_RW_EXTENDED;
     cmd.u32Arg = argument;
-    cmd.pu32Response = response;
+    cmd.pu32Response = &cmdResponse;
+
+    /* Note that this implementation uses 8b address */
     cmd.pu8Data = (uint8_t *) data;
     cmd.bRead = (direction != CY_READ) ? false : true;
-    cmd.u16BlockCnt = (uint16_t) ((length + obj->block_size - 1)/obj->block_size);
-    cmd.u16BlockSize = obj->block_size; 
+
+    if (length >= CY_HAL_SDIO_64B)
+    {
+        cmd.u16BlockCnt = (uint16_t) ((length + CY_HAL_SDIO_64B - 1)/CY_HAL_SDIO_64B);
+        cmd.u16BlockSize = CY_HAL_SDIO_64B; 
+
+        /* Update object info */
+        obj->block_size = CY_HAL_SDIO_64B;
+        
+        if (direction == CY_READ)
+        {
+            /* In this mode, we may be reading more than the requested size to round
+             * up to the nearest multiple of block size. So, providing temp buffer
+             * instead of the original buffer to avoid memory corruption
+             */
+            cmd.pu8Data = (uint8_t *)temp_dma_buffer;
+        }
+    }
+    else
+    {
+        /* Data will be sent as one packet */
+        cmd.u16BlockCnt = CY_HAL_SDIO_1B;
+        cmd.u16BlockSize = length;
+        
+        /* Update object info */
+        obj->block_size = length;
+    }
 
     status = SDIO_SendCommandAndWait(&cmd);
 
@@ -670,6 +801,16 @@ cy_rslt_t cy_sdio_bulk_transfer(const cy_sdio_t *obj, cy_transfer_t direction, u
     else
     {
         retVal = CY_RSLT_SUCCESS;
+    }
+
+    if ((direction == CY_READ) && (cmd.u16BlockSize == CY_HAL_SDIO_64B))
+    {
+        memcpy((uint32_t*) data, temp_dma_buffer, (size_t) length);
+    }
+
+    if (response != NULL)
+    {
+        *response = cmdResponse;
     }
 
     return retVal;
@@ -684,7 +825,7 @@ cy_rslt_t cy_sdio_bulk_transfer(const cy_sdio_t *obj, cy_transfer_t direction, u
  * @param[in]     length    The number of bytes to send
  * @return The status of the configure request
  */
-cy_rslt_t cy_sdio_transfer_async(const cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length)
+cy_rslt_t cy_sdio_transfer_async(cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length)
 {
     if (NULL == obj)
     {
@@ -693,17 +834,43 @@ cy_rslt_t cy_sdio_transfer_async(const cy_sdio_t *obj, cy_transfer_t direction, 
 
     stc_sdio_cmd_t cmd;
     en_sdio_result_t status;
+    uint32_t cmdResponse;
     cy_rslt_t retVal;
 
     cmd.u32CmdIdx = (uint32_t) SDIO_CMD_IO_RW_EXTENDED;
     cmd.u32Arg = argument;
-    cmd.pu32Response = NULL;
+    cmd.pu32Response = &cmdResponse;
+    
+    /* Note that this implementation uses 8b address */
     cmd.pu8Data = (uint8_t *) data;
     cmd.bRead = (direction != CY_READ) ? false : true;
-    
-    /* Note that if (length != 1) then blocking operation would be done */
-    cmd.u16BlockCnt = (uint16_t) (length/obj->block_size);
-    cmd.u16BlockSize = obj->block_size; 
+
+    if (length >= CY_HAL_SDIO_64B)
+    {
+        cmd.u16BlockCnt = (uint16_t) ((length + CY_HAL_SDIO_64B - 1)/CY_HAL_SDIO_64B);
+        cmd.u16BlockSize = CY_HAL_SDIO_64B; 
+
+        /* Update object info */
+        obj->block_size = CY_HAL_SDIO_64B;
+        
+        if (direction == CY_READ)
+        {
+            /* In this mode, we may be reading more than the requested size to round
+             * up to the nearest multiple of block size. So, providing temp buffer
+             * instead of the original buffer to avoid memory corruption
+             */
+            cmd.pu8Data = (uint8_t *)temp_dma_buffer;
+        }
+    }
+    else
+    {
+        /* Data will be sent as one packet */
+        cmd.u16BlockCnt = CY_HAL_SDIO_1B;
+        cmd.u16BlockSize = length;
+        
+        /* Update object info */
+        obj->block_size = length;
+    }
 
     status = SDIO_SendCommandAndWait(&cmd);
 
@@ -715,6 +882,11 @@ cy_rslt_t cy_sdio_transfer_async(const cy_sdio_t *obj, cy_transfer_t direction, 
     else
     {
         retVal = CY_RSLT_SUCCESS;
+    }
+
+    if ((direction == CY_READ) && (cmd.u16BlockSize == CY_HAL_SDIO_64B))
+    {
+        memcpy((uint32_t *) data, temp_dma_buffer, (size_t) length);
     }
 
     return retVal;
@@ -729,15 +901,19 @@ cy_rslt_t cy_sdio_transfer_async(const cy_sdio_t *obj, cy_transfer_t direction, 
  */
 cy_rslt_t cy_sdio_is_busy(const cy_sdio_t *obj, bool *busy)
 {
+    if (obj == NULL)
+    {
+        return CY_RSLT_SDIO_BAD_PARAM_ARGUMENT;
+    }
+    
+    en_sdio_result_t retVal = SDIO_GetSemaphoreStatus(busy);
 
-    *busy = (0 == (SDIO_STATUS_REG & SDIO_STS_IDLE));
-
-    return CY_RSLT_SUCCESS;
+    return ((Ok != retVal) ? CY_RSLT_SDIO_SEMA_NOT_INITED : CY_RSLT_SUCCESS);
 }
 
 /** Abort an SDIO transfer
  *
- * @param[in] obj The SDIO peripheral to stop
+ * @param[in] obj The SDIO peripheral to stop. Resets UDB block
  * @return The status of the abort_async request
  */
 cy_rslt_t cy_sdio_abort_async(const cy_sdio_t *obj)
@@ -760,38 +936,10 @@ cy_rslt_t cy_sdio_register_irq(cy_sdio_t *obj, cy_sdio_irq_handler handler, void
     cy_hal_sdio_callback = handler;
     cy_hal_sdio_callback_args = handler_arg;
 
-    /* Set default interrupt priority of 7 (lowest possible priority) */
-    cy_stc_sysint_t irqCfg = {udb_interrupts_0_IRQn, 7};
-    Cy_SysInt_Init(&irqCfg, &cy_sdio_interrupts_dispatcher_IRQHandler);
-    NVIC_EnableIRQ(udb_interrupts_0_IRQn);
-    
-    
-    /* Register two DMA interrupt handler functions 
-    *  TODO: 
-    *  1. Need to do this in the DMA hal (once it is implemented)
-    *  2. Figure out how to aware rtoses about these handler executions.
-    *
-    *   __asm__( "PUSH {lr}" ); 
-    *   __asm__( "bl _tx_thread_context_save" );
-    *   handler(); \
-    *   __asm__( "b  _tx_thread_context_restore" ); 
-    *  ...
-    */
-    
-    /* Setup write DMA interrupt handler */
-    cy_stc_sysint_t irqDma1_1 = {cpuss_interrupts_dw1_1_IRQn, 7};
-    Cy_SysInt_Init(&irqDma1_1, &SDIO_WRITE_DMA_IRQ);
-    NVIC_EnableIRQ(cpuss_interrupts_dw1_1_IRQn);
-    
-    /* Setup read DMA interrupt handler */
-    cy_stc_sysint_t irqDma1_3 = {cpuss_interrupts_dw1_3_IRQn, 7};
-    Cy_SysInt_Init(&irqDma1_3, &SDIO_READ_DMA_IRQ);
-    NVIC_EnableIRQ(cpuss_interrupts_dw1_3_IRQn);
-    
     return CY_RSLT_SUCCESS;
 }
 
-/** Configure sdio interrupt.
+/** Configure SDIO interrupt.
  *
  * @param[in] obj      The SDIO object
  * @param[in] event    The SDIO IRQ type
@@ -808,8 +956,7 @@ cy_rslt_t cy_sdio_irq_enable(cy_sdio_t *obj, cy_sdio_irq_event_t event, bool ena
         {
             cy_hal_sdio_config_struct->irqCause |= event;
         }
-
-        /* Enable SDIO chip interrupt */
+        
         SDIO_EnableChipInt();
     }
     else
@@ -820,12 +967,11 @@ cy_rslt_t cy_sdio_irq_enable(cy_sdio_t *obj, cy_sdio_irq_event_t event, bool ena
         {
             cy_hal_sdio_config_struct->irqCause &= ~event;
         }
-
-        /* Disable SDIO chip interrupt */
+        
         SDIO_DisableChipInt();
     }
     return CY_RSLT_SUCCESS;
 }
 
 
-#endif /* defined(CY_IP_MXUDB) */
+#endif /* defined(CY8C6247BZI_D54) */

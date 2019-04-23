@@ -3,16 +3,39 @@
 *
 * \brief
 * Provides a high level interface for interacting with the Cypress Digital to
-* Analog Converter. This interface abstracts out the chip specific details. If 
-* any chip specific functionality is necessary, or performance is critical the 
+* Analog Converter. This interface abstracts out the chip specific details. If
+* any chip specific functionality is necessary, or performance is critical the
 * low level functions can be used directly.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_dac DAC (Digital to Analog Converter)
+* \ingroup group_hal
+* \{
+* High level interface for interacting with the Cypress DAC.
+*
+* \defgroup group_hal_dac_macros Macros
+* \defgroup group_hal_dac_functions Functions
+* \defgroup group_hal_dac_data_structures Data Structures
+* \defgroup group_hal_dac_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -24,6 +47,11 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
+/**
+* \addtogroup group_hal_dac_functions
+* \{
+*/
 
 /** Initialize the dac peripheral
  *
@@ -65,6 +93,10 @@ cy_rslt_t cy_dac_write(const cy_dac_t *obj, uint16_t millivolts);
  */
 cy_rslt_t analogout_read(cy_dac_t *obj, uint16_t *millivolts);
 
+/** \} group_hal_dac_functions */
+
 #if defined(__cplusplus)
 }
 #endif
+
+/** \} group_hal_dac */

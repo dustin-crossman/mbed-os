@@ -6,11 +6,22 @@
 * Crypto block.
 * 
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
 
 #pragma once
 
@@ -23,15 +34,32 @@ extern "C" {
 
 /** Block count for CRYPTO blocks */
 #if defined(CY_IP_MXCRYPTO_INSTANCES)
-    #define CY_CRC_INST_COUNT      CY_IP_MXCRYPTO_INSTANCES
+    #define CY_HAL_CRYPTO_INST_COUNT      CY_IP_MXCRYPTO_INSTANCES
 #elif defined(CPUSS_CRYPTO_PRESENT)
-    #define CY_CRC_INST_COUNT      1u
+    #define CY_HAL_CRYPTO_INST_COUNT      1u
 #else
-    #define CY_CRC_INST_COUNT      0u
+    #define CY_HAL_CRYPTO_INST_COUNT      0u
 #endif
 
 /** The start address of the CRYPTO blocks */
-extern CRYPTO_Type* CY_CRYPTO_BASE_ADDRESSES[CY_CRC_INST_COUNT];
+extern CRYPTO_Type* CY_HAL_CRYPTO_BASE_ADDRESSES[CY_HAL_CRYPTO_INST_COUNT];
+
+/** Reserve the Crypto block and enable it.
+ *
+ * @param[out]  base Base address to the Crypto block.
+ * @param[out]  obj resource inst for the function (eg. CRC, TRNG) in the Crypto block. 
+ * @return The status of the reserve request.
+ */
+cy_rslt_t cy_crypto_reserve(CRYPTO_Type** base, cy_resource_inst_t *resource);
+
+/** Free the Crypto block and disable it.
+ *
+ * @param[in]  base Base address to the Crypto block.
+ * @param[in]  obj resource inst for the funtion in Crypto block. 
+
+ * @return The status of the free request.
+ */
+cy_rslt_t cy_crypto_free(CRYPTO_Type* base, const cy_resource_inst_t *resource);
 
 #if defined(__cplusplus)
 }

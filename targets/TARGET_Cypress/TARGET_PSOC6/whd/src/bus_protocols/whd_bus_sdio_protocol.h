@@ -1,5 +1,5 @@
 /*
- * $ Copyright Cypress Semiconductor $
+ * $ Copyright Cypress Semiconductor Apache2 $
  */
 #ifndef INCLUDED_SDIO_WHD_BUS_PROTOCOL_H
 #define INCLUDED_SDIO_WHD_BUS_PROTOCOL_H

@@ -1,5 +1,5 @@
 /*
- * $ Copyright Cypress Semiconductor $
+ * $ Copyright Cypress Semiconductor Apache2 $
  */
 #ifndef INCLUDED__WHD_BUS_COMMON_H
 #define INCLUDED_WHD_BUS_COMMON_H

@@ -1,5 +1,5 @@
 /*
- * $ Copyright Cypress Semiconductor $
+ * $ Copyright Cypress Semiconductor Apache2 $
  */
 
 #ifndef INCLUDED_WHD_BUS_PROTOCOL_INTERFACE_H_

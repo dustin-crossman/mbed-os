@@ -11,11 +11,12 @@
 
 #include <string.h>
 #include <stdint.h>
-#ifdef MODUSTOOLBOX
-#include "generated_mac_address.txt"
-#else
-#include "../generated_mac_address.txt"
-#endif
+// #ifdef MODUSTOOLBOX
+// #include "generated_mac_address.txt"
+// #else
+// #include "../generated_mac_address.txt"
+// #endif
+#define NVRAM_GENERATED_MAC_ADDRESS        "macaddr=00:A0:50:d4:99:5b"
 
 #ifdef __cplusplus
 extern "C" {

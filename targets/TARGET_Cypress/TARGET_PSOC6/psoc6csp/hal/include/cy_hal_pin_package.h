@@ -5,11 +5,34 @@
 * Provides definitions for the pinout for each supported device.
 * 
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_pin_package PSoC 6 Pin Packages
+* \ingroup group_hal_psoc6
+* \{
+* Definitions for the pinout for each supported device
+*
+* \defgroup group_hal_pin_package_macros Macros
+* \defgroup group_hal_pin_package_functions Functions
+* \defgroup group_hal_pin_package_data_structures Data Structures
+* \defgroup group_hal_pin_package_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -19,7 +42,12 @@
 extern "C" {
 #endif /* __cplusplus */
 
-/* Port names */
+/**
+* \addtogroup group_hal_pin_package_enums
+* \{
+*/
+
+/** Port names */
 typedef enum {
     CY_PORT_0  = 0x0,
     CY_PORT_1  = 0x1,
@@ -39,7 +67,22 @@ typedef enum {
     CY_PORT_15 = 0xF,
 } cy_port_t;
 
+/** \} group_hal_pin_package_enums */
+
+
+/**
+* \addtogroup group_hal_pin_package_data_structures
+* \{
+*/
+
+/** GPIO pin configuration object */
 typedef uint8_t cy_gpio_cfg_t; // 4bit hsiom, 4bit mode
+
+/** \} group_hal_pin_package_data_structures */
+
+
+/** \cond INTERNAL */
+
 #define CY_GPIO_CFG_CREATE(hsiom, mode)  ((cy_gpio_cfg_t)(((hsiom) << 4) + (mode)))
 #define CY_GPIO_CFG_GET_MODE(x)  ((uint8_t)((x) & 0x0F))
 #define CY_GPIO_CFG_GET_HSIOM(x) ((en_hsiom_sel_t)(((x) >> 4) & 0x0F))
@@ -50,6 +93,8 @@ typedef uint8_t cy_gpio_cfg_t; // 4bit hsiom, 4bit mode
 #define CY_PIN_IN_FUNCTION(hsiom)            CY_GPIO_CFG_CREATE(hsiom, CY_GPIO_DM_HIGHZ)
 #define CY_PIN_PULLUP_FUNCTION(hsiom)        CY_GPIO_CFG_CREATE(hsiom, CY_GPIO_DM_PULLUP)
 #define CY_PIN_ANALOG_FUNCTION(hsiom)        CY_GPIO_CFG_CREATE(HSIOM_SEL_GPIO, CY_GPIO_DM_ANALOG)
+
+/** \endcond */
 
 #include "cy_device.h"
 
@@ -92,3 +137,5 @@ typedef uint8_t cy_gpio_cfg_t; // 4bit hsiom, 4bit mode
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */
+
+/** \} group_hal_adc */

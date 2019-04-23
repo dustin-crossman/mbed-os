@@ -2,17 +2,40 @@
 * \file cy_hal_pdmpcm.h
 *
 * \brief
-* Provides a high level interface for interacting with the Cypress PDM/PCM. 
+* Provides a high level interface for interacting with the Cypress PDM/PCM.
 * This interface abstracts out the chip specific details. If any chip specific
 * functionality is necessary, or performance is critical the low level functions
 * can be used directly.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_pdmpcm PDM/PCM (PDM-PCM Converter)
+* \ingroup group_hal
+* \{
+* High level interface for interacting with the Cypress PDM/PCM.
+*
+* \defgroup group_hal_pdmpcm_macros Macros
+* \defgroup group_hal_pdmpcm_functions Functions
+* \defgroup group_hal_pdmpcm_data_structures Data Structures
+* \defgroup group_hal_pdmpcm_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -25,21 +48,41 @@
 extern "C" {
 #endif
 
-/** Describes the current configuration of a PDM/PCM */
-typedef struct 
-{
-	//TODO: define
-	void * cfg;
-} cy_pdm_pcm_cfg_t;
+/**
+* \addtogroup group_hal_pdmpcm_enums
+* \{
+*/
 
 /** PDM/PCM interrupt triggers */
 typedef enum {
-	/* TODO: Fill in */
-	CY_PDM_PCM_TBD,
+    /** TODO: Fill in */
+    CY_PDM_PCM_TBD,
 } cy_pdm_pcm_irq_event_t;
+
+/** \} group_hal_pdmpcm_enums */
+
+/**
+* \addtogroup group_hal_pdmpcm_data_structures
+* \{
+*/
+
+/** Describes the current configuration of a PDM/PCM */
+typedef struct
+{
+    /** TODO: define */
+    void * cfg;
+} cy_pdm_pcm_cfg_t;
 
 /** Handler for PDM/PCM interrupts */
 typedef void (*cy_pdm_pcm_irq_handler)(void *handler_arg, cy_pdm_pcm_irq_event_t event);
+
+/** \} group_hal_pdmpcm_data_structures */
+
+
+/**
+* \addtogroup group_hal_pdmpcm_functions
+* \{
+*/
 
 /** Initialize the PDM/PCM peripheral
  *
@@ -125,6 +168,10 @@ cy_rslt_t cy_pdm_pcm_register_irq(cy_pdm_pcm_t *obj, cy_i2c_irq_handler handler,
  */
 cy_rslt_t cy_pdm_pcm_irq_enable(cy_pdm_pcm_t *obj, cy_pdm_pcm_irq_event_t event, bool enable);
 
+/** \} group_hal_pdmpcm_functions */
+
 #if defined(__cplusplus)
 }
 #endif
+
+/** \} group_hal_pdmpcm */

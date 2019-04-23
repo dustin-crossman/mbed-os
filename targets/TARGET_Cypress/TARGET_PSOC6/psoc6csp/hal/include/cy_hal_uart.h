@@ -2,17 +2,40 @@
 * \file cy_hal_uart.h
 *
 * \brief
-* Provides a high level interface for interacting with the Cypress UART. 
+* Provides a high level interface for interacting with the Cypress UART.
 * This interface abstracts out the chip specific details. If any chip specific
 * functionality is necessary, or performance is critical the low level functions
 * can be used directly.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_uart UART (Universal Asynchronous Receiver-Transmitter)
+* \ingroup group_hal
+* \{
+* High level interface for interacting with the Cypress UART.
+*
+* \defgroup group_hal_uart_macros Macros
+* \defgroup group_hal_uart_functions Functions
+* \defgroup group_hal_uart_data_structures Data Structures
+* \defgroup group_hal_uart_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -25,8 +48,32 @@
 extern "C" {
 #endif
 
+/**
+* \addtogroup group_hal_uart_macros
+* \{
+*/
+
 /** Failed to initial clock for uart. */
 #define CY_UART_CLOCK_ERROR 1
+
+/** The requested resource type is invalid */
+#define CY_RSLT_ERR_CSP_UART_INVALID_PIN (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_UART, 0))
+
+/** \} group_hal_uart_macros */
+
+
+/**
+* \addtogroup group_hal_uart_enums
+* \{
+*/
+
+/** UART Parity */
+typedef enum
+{
+    CY_UART_PARITY_NONE,   /**< UART has no parity check   */
+    CY_UART_PARITY_EVEN,   /**< UART has even parity check */
+    CY_UART_PARITY_ODD,    /**< UART has odd parity check  */
+} cy_uart_parity_t;
 
 /** Enum to enable/disable/report interrupt cause flags. */
 typedef enum
@@ -40,16 +87,13 @@ typedef enum
     CY_UART_IRQ_RX_ERROR            = 1 << 6, //!< An error occurred in rx
 } cy_uart_irq_event_t;
 
-/** UART callback function type */
-typedef void (*cy_uart_irq_handler_t)(void *handler_arg, cy_uart_irq_event_t event);
+/** \} group_hal_uart_enums */
 
-/** UART Parity */
-typedef enum
-{
-    CY_UART_PARITY_NONE,   /**< UART has no parity check   */
-    CY_UART_PARITY_EVEN,   /**< UART has even parity check */
-    CY_UART_PARITY_ODD,    /**< UART has odd parity check  */
-} cy_uart_parity_t;
+
+/**
+* \addtogroup group_hal_uart_data_structures
+* \{
+*/
 
 /** Initial UART configuration */
 typedef struct
@@ -61,8 +105,16 @@ typedef struct
     uint32_t rx_buffer_size; //!< The number of bytes in the rx software buffer
 } cy_hal_uart_cfg_t;
 
-/** The requested resource type is invalid */
-#define CY_RSLT_ERR_CSP_UART_INVALID_PIN (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_UART, 0))
+/** UART callback function type */
+typedef void (*cy_uart_irq_handler_t)(void *handler_arg, cy_uart_irq_event_t event);
+
+/** \} group_hal_uart_data_structures */
+
+
+/**
+* \addtogroup group_hal_uart_functions
+* \{
+*/
 
 /** Initialize the uart peripheral. It sets the default parameters for uart
  *  peripheral, and configures its specifieds pins.
@@ -71,7 +123,7 @@ typedef struct
  * @param[in]  tx  The TX pin name
  * @param[in]  rx  The RX pin name
  * @param[in]  clk The clock to use can be shared, if not provided a new clock will be allocated
- * @param[in]  cfg The uart configuration data for data bits, stop bits and parity, 
+ * @param[in]  cfg The uart configuration data for data bits, stop bits and parity,
  *                  if not provided, default values of (8, 1, none) will be used
  * @return The status of the init request
  */
@@ -232,6 +284,10 @@ cy_rslt_t cy_uart_register_irq(cy_uart_t *obj, cy_uart_irq_handler_t handler, vo
  */
 cy_rslt_t cy_uart_irq_enable(cy_uart_t *obj, cy_uart_irq_event_t event, bool enable);
 
+/** \} group_hal_uart_functions */
+
 #if defined(__cplusplus)
 }
 #endif
+
+/** \} group_hal_uart */

@@ -1,5 +1,5 @@
 #
-# $ Copyright Cypress Semiconductor $
+# $ Copyright Cypress Semiconductor Apache2 $
 #
 
 NAME := WHD_for_$(RTOS)

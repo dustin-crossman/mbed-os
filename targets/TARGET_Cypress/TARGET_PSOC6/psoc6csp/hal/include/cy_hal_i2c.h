@@ -2,17 +2,40 @@
 * \file cy_hal_i2c.h
 *
 * \brief
-* Provides a high level interface for interacting with the Cypress I2C. 
+* Provides a high level interface for interacting with the Cypress I2C.
 * This interface abstracts out the chip specific details. If any chip specific
 * functionality is necessary, or performance is critical the low level functions
 * can be used directly.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_i2c I2C (Inter-Integrated Circuit)
+* \ingroup group_hal
+* \{
+* High level interface for interacting with the Cypress I2C.
+*
+* \defgroup group_hal_i2c_macros Macros
+* \defgroup group_hal_i2c_functions Functions
+* \defgroup group_hal_i2c_data_structures Data Structures
+* \defgroup group_hal_i2c_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -25,11 +48,24 @@
 extern "C" {
 #endif
 
+/**
+* \addtogroup group_hal_i2c_macros
+* \{
+*/
+
 /** Failed to initial clock for i2c. */
 #define CY_I2C_CLOCK_ERROR 1
 
 /** The requested resource type is invalid */
 #define CY_RSLT_ERR_CSP_I2C_INVALID_PIN (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_I2C, 0))
+
+/** \} group_hal_i2c_macros */
+
+
+/**
+* \addtogroup group_hal_i2c_enums
+* \{
+*/
 
 /** Enum to enable/disable/report interrupt cause flags. */
 typedef enum
@@ -43,6 +79,14 @@ typedef enum
     CY_I2C_IRQ_RX_ERROR            = 1 << 6, //!< An error occurred in rx
 } cy_i2c_irq_event_t;
 
+/** \} group_hal_i2c_enums */
+
+
+/**
+* \addtogroup group_hal_i2c_data_structures
+* \{
+*/
+
 /** I2C callback function type */
 typedef void (*cy_i2c_irq_handler_t)(void *handler_arg, cy_i2c_irq_event_t event);
 
@@ -52,10 +96,18 @@ typedef void (*cy_i2c_irq_handler)(void *handler_arg, cy_i2c_irq_event_t event);
 /** Initial I2C configuration */
 typedef struct
 {
-	bool is_slave; //!< I2C mode, is the device a master or slave
-	uint16_t address; //!< Address of this device
-	uint32_t frequency_hz; //!< Frequency that the I2C bus runs at
+    bool is_slave; //!< I2C mode, is the device a master or slave
+    uint16_t address; //!< Address of this device
+    uint32_t frequency_hz; //!< Frequency that the I2C bus runs at
 } cy_hal_i2c_cfg_t;
+
+/** \} group_hal_i2c_data_structures */
+
+
+/**
+* \addtogroup group_hal_i2c_functions
+* \{
+*/
 
 /** Initialize the I2C peripheral. It sets the default parameters for I2C
  *  peripheral, and configures its specifieds pins.
@@ -197,6 +249,10 @@ cy_rslt_t cy_i2c_register_irq(cy_i2c_t *obj, cy_i2c_irq_handler handler, void *h
  */
 cy_rslt_t cy_i2c_irq_enable(cy_i2c_t *obj, cy_i2c_irq_event_t event, bool enable);
 
+/** \} group_hal_i2c_functions */
+
 #if defined(__cplusplus)
 }
 #endif
+
+/** \} group_hal_i2c */

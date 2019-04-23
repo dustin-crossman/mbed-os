@@ -6,11 +6,23 @@
 * a wrapper around the lower level PDL API.
 * 
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
 #include <stdlib.h>
 #include "cy_hal_i2c.h"
 #include "cy_hal_hwmgr.h"
@@ -548,7 +560,7 @@ cy_rslt_t cy_i2c_set_config(cy_i2c_t *obj, const cy_hal_i2c_cfg_t *cfg)
         config_structure.i2cMode = CY_SCB_I2C_MASTER;
     }
     config_structure.slaveAddress  = cfg->address;
-	//uint32_t frequency_hz; //!< Frequency that the I2C bus runs at TODO: frequency_hz is not in scb structure
+	Cy_SCB_I2C_SetDataRate(obj->base, cfg->frequency_hz, Cy_SysClk_PeriphGetFrequency(CY_SYSCLK_DIV_8_BIT, 0UL));
 
     Cy_SCB_I2C_Init(obj->base, &config_structure, &(obj->context));
     cy_rslt_t result = cy_hwmgr_set_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);    
@@ -569,7 +581,7 @@ cy_rslt_t cy_i2c_master_send(cy_i2c_t *obj, uint16_t dev_addr, const uint8_t *da
         while (size > 0) {
             status = Cy_SCB_I2C_MasterWriteByte(obj->base, *data, timeout, &obj->context);
             if (status != CY_SCB_I2C_SUCCESS) {
-                break;;
+                break;
             }
             ++byte_count;
             --size;
@@ -625,27 +637,98 @@ cy_rslt_t cy_i2c_master_recv(cy_i2c_t *obj, uint16_t dev_addr, uint8_t *data, ui
 
 cy_rslt_t cy_i2c_slave_send(cy_i2c_t *obj, const uint8_t *data, uint16_t size, uint32_t timeout)
 {
-	// TODO
-    //Cy_SCB_I2C_SlaveConfigReadBuf(obj->base, data, size, &obj->context);
-    return CY_RSLT_TYPE_FATAL;
+	if (obj->context.state == CY_SCB_I2C_IDLE) {
+        Cy_SCB_I2C_SlaveConfigReadBuf(obj->base, (uint8_t *)data, size, &obj->context);
+    }
+    return CY_RSLT_SUCCESS;
 }
 
 cy_rslt_t cy_i2c_slave_recv(cy_i2c_t *obj, uint8_t *data, uint16_t size, uint32_t timeout)
 {
-	// TODO
-    //Cy_SCB_I2C_SlaveConfigWriteBuf(obj->base, data, size, &obj->context);
-    return CY_RSLT_TYPE_FATAL;
+    if (obj->context.state == CY_SCB_I2C_IDLE) {	
+        Cy_SCB_I2C_SlaveConfigWriteBuf(obj->base, (uint8_t *)data, size, &obj->context);
+    }
+    return CY_RSLT_SUCCESS;
 }
 
 cy_rslt_t cy_i2c_mem_write(cy_i2c_t *obj, uint16_t address, uint16_t mem_addr, uint16_t mem_addr_size, const uint8_t *data, uint16_t size, uint32_t timeout)
 {
-	return CY_RSLT_TYPE_FATAL;
-    
+	cy_en_scb_i2c_status_t status = CY_SCB_I2C_SUCCESS;
+    int byte_count = 0;
+    address >>= 1;
+
+    /* Start transaction, send address. */
+    if (obj->context.state == CY_SCB_I2C_IDLE) {
+        status = Cy_SCB_I2C_MasterSendStart(obj->base, address, CY_SCB_I2C_WRITE_XFER, timeout, &obj->context);
+    }
+    /* Send mem_addr - start address in slave memory */
+    if (status == CY_SCB_I2C_SUCCESS) {
+        status = Cy_SCB_I2C_MasterWriteByte(obj->base, (uint8_t)((mem_addr & 0xFF00) >> 8), timeout, &obj->context);
+    }
+    if (status == CY_SCB_I2C_SUCCESS) {
+        status = Cy_SCB_I2C_MasterWriteByte(obj->base, (uint8_t)(mem_addr & 0x00FF), timeout, &obj->context);
+    }
+    if (status == CY_SCB_I2C_SUCCESS) {
+        while (size > 0) {
+            status = Cy_SCB_I2C_MasterWriteByte(obj->base, *data, timeout, &obj->context);
+            if (status != CY_SCB_I2C_SUCCESS) {
+                break;
+            }
+            ++byte_count;
+            --size;
+            ++data;
+        }
+        /* SCB in I2C mode is very time sensitive. In practice we have to request STOP after */
+        /* each block, otherwise it may break the transmission */
+        Cy_SCB_I2C_MasterSendStop(obj->base, timeout, &obj->context);
+    }
+    if (status != CY_SCB_I2C_SUCCESS) {
+        Cy_SCB_I2C_MasterSendStop(obj->base, timeout, &obj->context);
+    }
+    return status;    
 }
 
 cy_rslt_t cy_i2c_mem_read(cy_i2c_t *obj, uint16_t address, uint16_t mem_addr, uint16_t mem_addr_size, uint8_t *data, uint16_t size, uint32_t timeout)
 {
-	return CY_RSLT_TYPE_FATAL;
+	cy_en_scb_i2c_status_t status = CY_SCB_I2C_SUCCESS;
+    cy_en_scb_i2c_command_t ack = CY_SCB_I2C_ACK;
+    int byte_count = 0;
+    address >>= 1;
+
+    /* Start transaction, send address */
+    if (obj->context.state == CY_SCB_I2C_IDLE) {
+        status = Cy_SCB_I2C_MasterSendStart(obj->base, address, CY_SCB_I2C_READ_XFER, timeout, &obj->context);
+    }
+     /* Send mem_addr - start address in slave memory */
+    if (status == CY_SCB_I2C_SUCCESS) {
+        status = Cy_SCB_I2C_MasterWriteByte(obj->base, (uint8_t)((mem_addr & 0xFF00) >> 8), timeout, &obj->context);
+    }
+    if (status == CY_SCB_I2C_SUCCESS) {
+        status = Cy_SCB_I2C_MasterWriteByte(obj->base, (uint8_t)(mem_addr & 0x00FF), timeout, &obj->context);
+    }
+    if (status == CY_SCB_I2C_SUCCESS) {
+        while (size > 0) {
+            if (size == 1) {
+                ack = CY_SCB_I2C_NAK;
+            }
+            status = Cy_SCB_I2C_MasterReadByte(obj->base, ack, (uint8_t *)data, timeout, &obj->context);
+            if (status != CY_SCB_I2C_SUCCESS) {
+                break;
+            }
+            ++byte_count;
+            --size;
+            ++data;
+        }
+        /* SCB in I2C mode is very time sensitive. In practice we have to request STOP after */
+        /* each block, otherwise it may break the transmission */
+        Cy_SCB_I2C_MasterSendStop(obj->base, timeout, &obj->context);
+    }
+
+    if (status != CY_SCB_I2C_SUCCESS) {
+        Cy_SCB_I2C_MasterSendStop(obj->base, timeout, &obj->context);
+    }
+
+    return status;
 }
 
 cy_rslt_t cy_i2c_transfer_async(cy_i2c_t *obj, const void *tx, size_t tx_size, void *rx, size_t rx_size, uint16_t address)
@@ -700,6 +783,7 @@ cy_rslt_t cy_i2c_abort_async(cy_i2c_t *obj)
 
 static cy_i2c_irq_event_t cy_convert_interrupt_cause(uint32_t pdl_cause)
 {    
+    // TODO: Verify events
     cy_i2c_irq_event_t cause = CY_I2C_IRQ_NONE;
     if (pdl_cause == CY_I2C_IRQ_TX_TRANSMIT_IN_FIFO)
     {
@@ -741,7 +825,7 @@ cy_rslt_t cy_i2c_register_irq(cy_i2c_t *obj, cy_i2c_irq_handler handler, void *h
     Cy_SCB_I2C_RegisterEventCallback(obj->base, cy_i2c_cb_wrapper_table[idx], &(obj->context));
     if (NVIC_GetEnableIRQ(CY_SCB_IRQ_N[idx]) == 0)
     {
-        /* default interrupt priority of 7 (lowest possible priority). */
+        /* Default interrupt priority of 7 (lowest possible priority). */
         cy_stc_sysint_t irqCfg = {CY_SCB_IRQ_N[idx], 7};
 
         Cy_SysInt_Init(&irqCfg, cy_i2c_interrupts_dispatcher_table[idx]);

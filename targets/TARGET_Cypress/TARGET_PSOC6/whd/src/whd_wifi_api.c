@@ -1,5 +1,5 @@
 /*
- * $ Copyright Cypress Semiconductor $
+ * $ Copyright Cypress Semiconductor Apache2 $
  */
 
 /** @file
@@ -346,9 +346,9 @@ uint32_t whd_wifi_set_up(whd_interface_t ifp)
         WPRINT_MACRO( ("WLAN CLM         : %s\r\n", version) );
     }
 
-    WPRINT_MACRO( ("WHD VERSION      : " WHD_VERSION "\n") );
-    WPRINT_MACRO( ("WHD BRANCH       : " WHD_BRANCH "\n") );
-    WPRINT_MACRO( ("WHD COMMIT DATE  : " WHD_DATE "\n") );
+    // WPRINT_MACRO( ("WHD VERSION      : " WHD_VERSION "\n") );
+    // WPRINT_MACRO( ("WHD BRANCH       : " WHD_BRANCH "\n") );
+    // WPRINT_MACRO( ("WHD COMMIT DATE  : " WHD_DATE "\n") );
 
     /* Update wlan status */
     whd_driver->internal_info.whd_wlan_status.state = WLAN_UP;

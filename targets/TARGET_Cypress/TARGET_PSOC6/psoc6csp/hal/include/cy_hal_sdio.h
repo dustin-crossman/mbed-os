@@ -2,17 +2,40 @@
 * \file cy_hal_sdio.h
 *
 * \brief
-* Provides a high level interface for interacting with the Cypress SDIO interface. 
+* Provides a high level interface for interacting with the Cypress SDIO interface.
 * This interface abstracts out the chip specific details. If any chip specific
 * functionality is necessary, or performance is critical the low level functions
 * can be used directly.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_sdio SDIO (Secure Digital Input Output)
+* \ingroup group_hal
+* \{
+* High level interface for interacting with the Cypress SDIO interface.
+*
+* \defgroup group_hal_sdio_macros Macros
+* \defgroup group_hal_sdio_functions Functions
+* \defgroup group_hal_sdio_data_structures Data Structures
+* \defgroup group_hal_sdio_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -26,6 +49,11 @@ extern "C" {
 #endif
 
 
+/**
+* \addtogroup group_hal_sdio_macros
+* \{
+*/
+
 #define SDIO_RET_NO_ERRORS           (0x00)     /**< No error*/
 #define SDIO_RET_NO_SP_ERRORS        (0x01)     /**< Non-specific error code*/
 #define SDIO_RET_CMD_CRC_ERROR       (0x02)     /**< There was a CRC error on the Command/Response*/
@@ -34,30 +62,40 @@ extern "C" {
 #define SDIO_RET_DAT_CRC_ERROR       (0x10)     /**< There was a data CRC Error*/
 #define SDIO_RET_CMD_TIMEOUT         (0x20)     /**< The command didn't finish before the timeout period was over*/
 #define SDIO_RET_DAT_TIMEOUT         (0x40)     /**< The data didn't finish before the timeout period was over*/
-#define SDIO_RET_RESP_FLAG_ERROR     (0x80)      /**< There was an error in the resposne flag for command 53*/ 
+#define SDIO_RET_RESP_FLAG_ERROR     (0x80)      /**< There was an error in the resposne flag for command 53*/
 
 #define CY_SDIO_CLOCK_ERROR          (0x100)   /**< Failed to initial clock for SDIO */
 #define CY_SDIO_BAD_ARGUMENT         (0x200)   /**< Bad argument passed for SDIO */
-
+#define CY_SDIO_SEMA_NOT_INITED      (0x400)   /**< Semaphore is not initiated */
 
 /* HAL return value defines */
 
 /** Incorrect parameter value define */
 #define CY_RSLT_SDIO_BAD_PARAM_ARGUMENT        CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, \
-                                                             CY_RSLT_MODULE_SDIO, \
-                                                             CY_SDIO_BAD_ARGUMENT)
+                                                              CY_RSLT_MODULE_SDIO, \
+                                                              CY_SDIO_BAD_ARGUMENT)
 
 /** Clock initialization error define */
 #define CY_RSLT_SDIO_CLOCK_ERROR              CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, \
                                                              CY_RSLT_MODULE_SDIO, \
                                                              CY_SDIO_CLOCK_ERROR)
                                                              
-                                                             
+/** Semaphore not initiated error define */
+#define CY_RSLT_SDIO_SEMA_NOT_INITED         CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, \
+                                                             CY_RSLT_MODULE_SDIO, \
+                                                             CY_SDIO_SEMA_NOT_INITED)
                                                              
 /** Error define based on SDIO lower function return value */
 #define CY_RSLT_SDIO_FUNC_RET_ERROR(retVal)   CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, \
                                                              CY_RSLT_MODULE_SDIO, (retVal))
 
+/** \} group_hal_sdio_macros */
+
+
+/**
+* \addtogroup group_hal_sdio_enums
+* \{
+*/
 
 /** Commands that can be issued */
 typedef enum
@@ -78,13 +116,6 @@ typedef enum
     CY_WRITE //!> Write to the card
 } cy_transfer_t;
 
-/** SDIO controller initial configuration */
-typedef struct
-{
-    uint32_t frequency_hz; //!< Clock frequency, in hertz
-    uint16_t block_size; //!< Block size
-} cy_sdio_cfg_t;
-
 /** Events that can cause an SDIO interrupt */
 typedef enum {
     CY_SDIO_CMD_COMPLETE, //!> Command Complete
@@ -96,7 +127,7 @@ typedef enum {
     CY_SDIO_CARD_INSERTION, //!> This bit is set if the Card Inserted in the Present State
     CY_SDIO_CARD_REMOVAL, //!> This bit is set if the Card Inserted in the Present State
     CY_SDIO_CARD_INTERRUPT, //!> The synchronized value of the DAT[1] interrupt input for SD mode
-    CY_SDIO_INT_A, 
+    CY_SDIO_INT_A,
     CY_SDIO_INT_B,
     CY_SDIO_INT_C,
     CY_SDIO_RE_TUNE_EVENT, //!> This bit is set if the Re-Tuning Request changes from 0 to 1
@@ -106,8 +137,31 @@ typedef enum {
     CY_SDIO_ALL_INTERRUPTS, //!> Is used to enable/disable all interrupts
 } cy_sdio_irq_event_t;
 
+/** \} group_hal_sdio_enums */
+
+
+/**
+* \addtogroup group_hal_sdio_data_structures
+* \{
+*/
+
+/** SDIO controller initial configuration */
+typedef struct
+{
+    uint32_t frequency_hz; //!< Clock frequency, in hertz
+    uint16_t block_size; //!< Block size
+} cy_sdio_cfg_t;
+
 /** Handler for SDIO interrupts */
 typedef void (*cy_sdio_irq_handler)(void *handler_arg, cy_sdio_irq_event_t event);
+
+/** \} group_hal_sdio_data_structures */
+
+
+/**
+* \addtogroup group_hal_sdio_functions
+* \{
+*/
 
 /** Initialize the SDIO peripheral
  *
@@ -159,7 +213,7 @@ cy_rslt_t cy_sdio_send_cmd(const cy_sdio_t *obj, cy_transfer_t direction, cy_sdi
  * @param[out]    response  The response from the SDIO device
  * @return The status of the configure request
  */
-cy_rslt_t cy_sdio_bulk_transfer(const cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length, uint32_t* response);
+cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length, uint32_t* response);
 
 /** Performs a bulk asynchronus data transfer (CMD=53) to the SDIO block.
  *
@@ -170,7 +224,7 @@ cy_rslt_t cy_sdio_bulk_transfer(const cy_sdio_t *obj, cy_transfer_t direction, u
  * @param[in]     length    The number of bytes to send
  * @return The status of the configure request
  */
-cy_rslt_t cy_sdio_transfer_async(const cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length);
+cy_rslt_t cy_sdio_transfer_async(cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length);
 
 /** Checks if the specified SDIO is in use
  *
@@ -205,6 +259,10 @@ cy_rslt_t cy_sdio_register_irq(cy_sdio_t *obj, cy_sdio_irq_handler handler, void
  */
 cy_rslt_t cy_sdio_irq_enable(cy_sdio_t *obj, cy_sdio_irq_event_t event, bool enable);
 
+/** \} group_hal_sdio_functions */
+
 #if defined(__cplusplus)
 }
 #endif
+
+/** \} group_hal_sdio */

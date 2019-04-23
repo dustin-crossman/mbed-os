@@ -1,5 +1,5 @@
 /*
- * $ Copyright Cypress Semiconductor $
+ * $ Copyright Cypress Semiconductor Apache2 $
  */
 #ifndef INCLUDED_WHD_RESOURCE_API_H_
 #define INCLUDED_WHD_RESOURCE_API_H_

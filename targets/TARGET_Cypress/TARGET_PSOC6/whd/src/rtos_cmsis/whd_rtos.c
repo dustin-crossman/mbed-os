@@ -1,20 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor $
+ * $ Copyright Cypress Semiconductor Apache2 $
  */
 
 /** @file
  *  Implementation of whd_rtos_cmsis.c for CMSIS
  *
  */
-
-#include "whd_rtos_cmsis.h"
-
+#include "whd_rtos.h"
 
 /******************************************************
 *             Function definitions
 ******************************************************/
 
-whd_result_t whd_rtos_cmsis_create_thread(whd_thread_type_t *thread, void (*entry_function)(
+whd_result_t whd_rtos_create_thread_with_arg(whd_thread_type_t *thread, void (*entry_function)(
                                               uint32_t), const char *name, /*@null@*/ void *stack, uint32_t stack_size, uint32_t priority,
                                           uint32_t arg)
 {
@@ -48,7 +46,7 @@ whd_result_t whd_rtos_cmsis_create_thread(whd_thread_type_t *thread, void (*entr
  *
  * @returns WHD_SUCCESS on success, error otherwise
  */
-whd_result_t whd_rtos_cmsis_finish_thread(whd_thread_type_t *thread)
+whd_result_t whd_rtos_finish_thread(whd_thread_type_t *thread)
 {
     osStatus_t status;
 
@@ -72,7 +70,7 @@ whd_result_t whd_rtos_cmsis_finish_thread(whd_thread_type_t *thread)
  *
  * @returns WHD_SUCCESS on success, error otherwise
  */
-whd_result_t whd_rtos_cmsis_delete_terminated_thread(whd_thread_type_t *thread)
+whd_result_t whd_rtos_delete_terminated_thread(whd_thread_type_t *thread)
 {
     osStatus_t status;
     if (*thread == NULL)
@@ -94,7 +92,7 @@ whd_result_t whd_rtos_cmsis_delete_terminated_thread(whd_thread_type_t *thread)
  *
  * @returns WHD_SUCCESS on success, error otherwise
  */
-whd_result_t whd_rtos_cmsis_join_thread(whd_thread_type_t *thread)
+whd_result_t whd_rtos_join_thread(whd_thread_type_t *thread)
 {
     osStatus_t status;
     if (*thread == NULL)
@@ -115,7 +113,7 @@ whd_result_t whd_rtos_cmsis_join_thread(whd_thread_type_t *thread)
  *
  * @returns WHD_SUCCESS on success, error otherwise
  */
-whd_result_t whd_rtos_cmsis_init_semaphore(/*@out@*/ whd_semaphore_type_t *semaphore)   /*@modifies *semaphore@*/
+whd_result_t whd_rtos_init_semaphore(/*@out@*/ whd_semaphore_type_t *semaphore)   /*@modifies *semaphore@*/
 {
     *semaphore = osSemaphoreNew(1, 1, NULL);
     if (*semaphore == NULL)
@@ -142,7 +140,7 @@ whd_result_t whd_rtos_cmsis_init_semaphore(/*@out@*/ whd_semaphore_type_t *semap
  * @param will_set_in_isr : True if the semaphore will be set in an ISR. Currently only used for NoOS/NoNS
  *
  */
-whd_result_t whd_rtos_cmsis_get_semaphore(whd_semaphore_type_t *semaphore, uint32_t timeout_ms,
+whd_result_t whd_rtos_get_semaphore(whd_semaphore_type_t *semaphore, uint32_t timeout_ms,
                                           whd_bool_t will_set_in_isr)
 {
     osStatus_t result;
@@ -193,7 +191,7 @@ whd_result_t whd_rtos_cmsis_get_semaphore(whd_semaphore_type_t *semaphore, uint3
  *                        : error if an error occurred
  *
  */
-whd_result_t whd_rtos_cmsis_set_semaphore(whd_semaphore_type_t *semaphore, whd_bool_t called_from_ISR)
+whd_result_t whd_rtos_set_semaphore(whd_semaphore_type_t *semaphore, whd_bool_t called_from_ISR)
 {
     osStatus_t result;
     UNUSED_PARAMETER(called_from_ISR);
@@ -234,7 +232,7 @@ whd_result_t whd_rtos_cmsis_set_semaphore(whd_semaphore_type_t *semaphore, whd_b
  *                        : error if an error occurred
  *
  */
-whd_result_t whd_rtos_cmsis_deinit_semaphore(whd_semaphore_type_t *semaphore)
+whd_result_t whd_rtos_deinit_semaphore(whd_semaphore_type_t *semaphore)
 {
     osStatus_t result;
     if (*semaphore == NULL)
@@ -257,7 +255,7 @@ whd_result_t whd_rtos_cmsis_deinit_semaphore(whd_semaphore_type_t *semaphore)
  *
  * @returns Time in milliseconds since RTOS started.
  */
-whd_time_t whd_rtos_cmsis_get_time(void)    /*@modifies internalState@*/
+whd_time_t whd_rtos_get_time(void)    /*@modifies internalState@*/
 {
     return osKernelGetSysTimerCount();
 }
@@ -269,7 +267,7 @@ whd_time_t whd_rtos_cmsis_get_time(void)    /*@modifies internalState@*/
  *                        : error if an error occurred
  *
  */
-whd_result_t whd_rtos_cmsis_delay_milliseconds(uint32_t num_ms)
+whd_result_t whd_rtos_delay_milliseconds(uint32_t num_ms)
 {
     osStatus_t result;
     result = osDelay( (uint32_t )num_ms );

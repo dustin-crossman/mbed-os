@@ -2,17 +2,41 @@
 * \file cy_hal_system.h
 *
 * \brief
-* Provides a high level interface for interacting with the Cypress power 
-* management and system clock configuration. This interface abstracts out the 
-* chip specific details. If any chip specific functionality is necessary, or 
+* Provides a high level interface for interacting with the Cypress power
+* management and system clock configuration. This interface abstracts out the
+* chip specific details. If any chip specific functionality is necessary, or
 * performance is critical the low level functions can be used directly.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
+
+/**
+* \addtogroup group_hal_system SYSTEM (Power Management and System Clock)
+* \ingroup group_hal
+* \{
+* High level interface for interacting with the Cypress power management
+* and system clock configuration.
+*
+* \defgroup group_hal_system_macros Macros
+* \defgroup group_hal_system_functions Functions
+* \defgroup group_hal_system_data_structures Data Structures
+* \defgroup group_hal_system_enums Enumerated Types
+*/
 
 #pragma once
 
@@ -25,19 +49,32 @@
 extern "C" {
 #endif
 
+/**
+* \addtogroup group_hal_system_macros
+* \{
+*/
+
 /** Enter a critical section */
 #define core_util_critical_section_enter() \
     uint32_t _last_irq_status_ = Cy_SysLib_EnterCriticalSection()
 /** Exit a critical section */
 #define core_util_critical_section_exit() \
      Cy_SysLib_ExitCriticalSection(_last_irq_status_)
-	 
+
+/** \} group_hal_system_macros */
+
+
+/**
+* \addtogroup group_hal_system_functions
+* \{
+*/
+
 /** Send the device to sleep
  *
  * The processor is setup ready for sleep, and sent to sleep using __WFI(). In this mode, the
  * system clock to the core is stopped until a reset or an interrupt occurs.
 
- * @return Returns CY_RSLT_SUCCESS if the processor successfully entered and exited sleep, 
+ * @return Returns CY_RSLT_SUCCESS if the processor successfully entered and exited sleep,
  * otherwise error
  */
 cy_rslt_t cy_system_sleep(void);
@@ -48,7 +85,7 @@ cy_rslt_t cy_system_sleep(void);
  * has the same sleep features as sleep plus it powers down peripherals and clocks. All state
  * is still maintained.
 
- * @return Returns CY_RSLT_SUCCESS if the processor successfully entered and exited sleep, 
+ * @return Returns CY_RSLT_SUCCESS if the processor successfully entered and exited sleep,
  * otherwise error
  */
 cy_rslt_t cy_system_deepsleep(void);
@@ -70,14 +107,14 @@ cy_rslt_t cy_system_unregister_callback(cy_stc_syspm_callback_t const *handler);
 
 /** Sets the specified clock's frequency and enables it.
  *  This will turn on any additional clocks needed to drive this.
- * 
+ *
  * @param[in]  clock        The high frequency clock to configure
  * @param[in]  frequency_hz The frequency to run the clock at
  * @return The status of the clock_frequency request
  */
 cy_rslt_t cy_system_clock_frequency(uint8_t clock, uint32_t frequency_hz);
 
-/** Divides the clock driving the CM4 from what system clock 0 is 
+/** Divides the clock driving the CM4 from what system clock 0 is
  *  running at
  *
  * @param[in]  divider The amount to divide the system clock by
@@ -85,7 +122,7 @@ cy_rslt_t cy_system_clock_frequency(uint8_t clock, uint32_t frequency_hz);
  */
 cy_rslt_t cy_system_cm4_divider(uint8_t divider);
 
-/** Divides the clock driving the peripherals from what system 
+/** Divides the clock driving the peripherals from what system
  *  clock 0 is running at
  *
  * @param[in]  divider The amount to divide the system clock by
@@ -93,7 +130,7 @@ cy_rslt_t cy_system_cm4_divider(uint8_t divider);
  */
 cy_rslt_t cy_system_peri_divider(uint8_t divider);
 
-/** Divides the clock driving the CM0 from what peri clock is 
+/** Divides the clock driving the CM0 from what peri clock is
  *  running at
  *
  * @param[in]  divider The amount to divide the peri clock by
@@ -101,6 +138,10 @@ cy_rslt_t cy_system_peri_divider(uint8_t divider);
  */
 cy_rslt_t cy_system_cm0_divider(uint8_t divider);
 
+/** \} group_hal_system_functions */
+
 #if defined(__cplusplus)
 }
 #endif
+
+/** \} group_hal_system */

@@ -1,5 +1,5 @@
 /*
- * $ Copyright Cypress Semiconductor $
+ * $ Copyright Cypress Semiconductor Apache2 $
  */
 
 /** @file
@@ -48,26 +48,6 @@ extern "C"
 *             Function declarations
 ******************************************************/
 
-/* Thread management functions */
-
-/**
- * Create a thread
- *
- * Implemented in the Port Layer RTOS interface which is specific to the
- * RTOS in use.
- * WHD uses this function to create a new thread and start it running.
- *
- * @param thread         : pointer to a variable which will receive the new thread handle
- * @param entry_function : function pointer which points to the main function for the new thread
- * @param name           : a string thread name used for a debugger
- * @param stack_size     : the size of the thread stack in bytes
- * @param priority       : the priority of the thread
- *
- * @return WHD_SUCCESS or Error code
- */
-extern whd_result_t whd_rtos_create_thread(/*@out@*/ whd_thread_type_t *thread, void (*entry_function)(
-                                                         whd_thread_arg_t arg), const char *name, /*@null@*/ void *stack, uint32_t stack_size, uint32_t priority) /*@modifies *thread@*/;
-
 /**
  * Create a thread with specific thread argument
  *
@@ -86,25 +66,6 @@ extern whd_result_t whd_rtos_create_thread(/*@out@*/ whd_thread_type_t *thread, 
 extern whd_result_t whd_rtos_create_thread_with_arg(/*@out@*/ whd_thread_type_t *thread, void (*entry_function)(
                                                                   whd_thread_arg_t arg), const char *name, /*@null@*/ void *stack, uint32_t stack_size, uint32_t priority, whd_thread_arg_t arg);
 
-/**
- * Note: different RTOS have different parameters for creating threads.
- * Use this function carefully if portability is important.
- * Create a thread with RTOS specific thread argument (E.g. specify time-slicing behavior)
- *
- * Implemented in the Port Layer RTOS interface which is specific to the
- * RTOS in use.
- *
- * @param thread         : pointer to a variable which will receive the new thread handle
- * @param entry_function : function pointer which points to the main function for the new thread
- * @param name           : a string thread name used for a debugger
- * @param stack_size     : the size of the thread stack in bytes
- * @param priority       : the priority of the thread
- * @param arg            : the argument to pass to the new thread
- * @param config        : os specific thread configuration
- * @return WHD result code
- */
-extern whd_result_t whd_rtos_create_configed_thread(/*@out@*/ whd_thread_type_t *thread, void (*entry_function)(
-                                                                  uint32_t), const char *name, /*@null@*/ void *stack, uint32_t stack_size, uint32_t priority, whd_rtos_thread_config_type_t *config);
 
 /**
  * Exit a thread
@@ -259,77 +220,6 @@ extern whd_time_t whd_rtos_get_time(void);
  *
  */
 extern whd_result_t whd_rtos_delay_milliseconds(uint32_t num_ms);
-
-/* Message queue management functions */
-/*@allocates *queue@*//*@defines **queue@*/
-extern whd_result_t whd_rtos_init_queue(/*@special@*//*@out@*/ whd_queue_type_t *queue, void *buffer,
-                                                               uint32_t buffer_size,
-                                                               uint32_t message_size);
-
-extern whd_result_t whd_rtos_push_to_queue(whd_queue_type_t *queue, void *message, uint32_t timeout_ms);
-
-extern whd_result_t whd_rtos_pop_from_queue(whd_queue_type_t *queue, void *message, uint32_t timeout_ms);
-
-extern whd_result_t whd_rtos_deinit_queue(/*@special@*/ whd_queue_type_t *queue); /*@releases *queue@*/
-
-extern whd_result_t whd_rtos_init_mutex(whd_mutex_type_t *mutex);
-extern whd_result_t whd_rtos_lock_mutex(whd_mutex_type_t *mutex);
-extern whd_result_t whd_rtos_unlock_mutex(whd_mutex_type_t *mutex);
-extern whd_result_t whd_rtos_deinit_mutex(whd_mutex_type_t *mutex);
-
-unsigned long whd_rtos_get_tickrate(void);
-
-/* Support timers for WHD */
-typedef void (whd_rtos_timer_handler_t)(void *);
-typedef int (whd_rtos_init_timer_t)(void *timer, uint32_t time_ms, whd_rtos_timer_handler_t function, void *arg);
-typedef int (whd_rtos_start_timer_t)(void *timer);
-typedef int (whd_rtos_stop_timer_t)(void *timer);
-typedef int (whd_rtos_deinit_timer_t)(void *timer);
-typedef int (whd_rtos_is_timer_running_t)(void *timer);
-typedef int (whd_rtos_alloc_timer_t)(void **timer);
-typedef int (whd_rtos_free_timer_t)(void **timer);
-
-typedef struct
-{
-    /* order of operations should be: first allocate, then init, then start/stop/is_running any number of times,
-     * then deinit, then free */
-    whd_rtos_alloc_timer_t *whd_rtos_alloc_timer;
-
-    /* These functions behave identically to the whd_rtos.h functions */
-    whd_rtos_init_timer_t *whd_rtos_init_timer;
-
-    whd_rtos_start_timer_t *whd_rtos_start_timer;
-    whd_rtos_stop_timer_t *whd_rtos_stop_timer;
-    whd_rtos_is_timer_running_t *whd_rtos_is_timer_running;
-
-    whd_rtos_deinit_timer_t *whd_rtos_deinit_timer;
-
-    /* call after successful deinit */
-    whd_rtos_free_timer_t *whd_rtos_free_timer;
-} whd_rtos_timer_ifc_t;
-
-extern const whd_rtos_timer_ifc_t *whd_rtos_timer_ifc;
-
-/**
- * Register a timer interface for WHD to use.
- *
- * @return whd_result_t : WHD_SUCCESS if successful
- *                        : Error code if an error occurred
- *
- */
-extern whd_result_t whd_rtos_register_timer_ifc(const whd_rtos_timer_ifc_t *whd_rtos_timer_ifc);
-
-/**
- * Unregister a timer interface WHD was using.
- *
- * @return whd_result_t : WHD_SUCCESS if successful
- *                        : Error code if an error occurred
- *
- */
-extern whd_result_t whd_rtos_unregister_timer_ifc(const whd_rtos_timer_ifc_t *whd_rtos_timer_ifc);
-
-#define HOST_RTOS_TIMER_IFC whd_rtos_timer_ifc
-#define HOST_RTOS_TIMER_IFC_CALL(func) (*(HOST_RTOS_TIMER_IFC->func) )
 
 /** @} */
 

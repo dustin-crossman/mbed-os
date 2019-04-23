@@ -7,15 +7,30 @@
 * allocated.
 * 
 ********************************************************************************
-* Copyright (c) 2018-2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
 
 #include "cy_hal_hwmgr.h"
 #include "cy_hal_system.h"
 #include "cmsis_compiler.h"
+
+/*******************************************************************************
+*       Defines
+*******************************************************************************/
 
 #ifdef CY_IP_MXS40PASS_SAR_INSTANCES
     #define CY_BLOCK_COUNT_ADC  CY_IP_MXS40PASS_SAR_INSTANCES
@@ -85,7 +100,7 @@
     #endif
     
     #define CY_BLOCK_COUNT_DMA      3
-    #define CY_CHANNEL_COUNT_DMA    (CPUSS_DMAC_CH_NR + CPUSS_DW0_CH_NR + CPUSS_DW1_CH_NR)
+    #define CY_CHANNEL_COUNT_DMA    (CPUSS_DW0_CH_NR + CPUSS_DW1_CH_NR + CPUSS_DMAC_CH_NR)
 #endif
 
     #define CY_BLOCK_COUNT_FLASH    1
@@ -268,6 +283,10 @@
 #define CY_BYTE_NUM_SHIFT (3)
 #define CY_BIT_NUM_MASK (0x07)
 
+/*******************************************************************************
+*       Variables
+*******************************************************************************/
+
 static const uint8_t cy_block_offsets_clock[4] =
 {
     0, // 8-bit dividers
@@ -279,8 +298,8 @@ static const uint8_t cy_block_offsets_clock[4] =
 static const uint8_t cy_block_offsets_dma[] =
 {
     0,
-    CPUSS_DMAC_CH_NR,
-    CPUSS_DMAC_CH_NR + CPUSS_DW0_CH_NR,
+    CPUSS_DW0_CH_NR,
+    CPUSS_DW0_CH_NR + CPUSS_DW1_CH_NR,
 };
 
 static const uint8_t cy_block_offsets_gpio[] =
@@ -380,7 +399,7 @@ extern cy_resource_pin_mapping_t* cy_resource_pin_mapping;
 static const uint16_t cy_resource_offsets[] = 
 {
     CY_OFFSET_ADC,
-	CY_OFFSET_BLE,
+    CY_OFFSET_BLE,
     CY_OFFSET_CAN,
     CY_OFFSET_CLOCK,
     CY_OFFSET_CRC,
@@ -409,6 +428,10 @@ static const uint32_t cy_has_channels =
     (1 << CY_RSC_DMA)   |
     (1 << CY_RSC_GPIO)  |
     (1 << CY_RSC_TCPWM) ;
+
+/*******************************************************************************
+*       Utility helper functions
+*******************************************************************************/
 
 static inline uint16_t cy_uses_channels(cy_resource_t type)
 {
@@ -503,7 +526,7 @@ static inline cy_rslt_t cy_is_set(const uint8_t* used, cy_resource_t type, uint8
 {
     uint16_t bitPosition;
     cy_rslt_t status = cy_get_bit_position(type, block, channel, &bitPosition);
-    if(status == CY_RSLT_SUCCESS)
+    if (status == CY_RSLT_SUCCESS)
     {
         uint8_t byte = bitPosition >> CY_BYTE_NUM_SHIFT;
         uint8_t bit = bitPosition & CY_BIT_NUM_MASK;
@@ -516,7 +539,7 @@ static inline cy_rslt_t cy_set_bit(uint8_t* used, cy_resource_t type, uint8_t bl
 {
     uint16_t bitPosition;
     cy_rslt_t status = cy_get_bit_position(type, block, channel, &bitPosition);
-    if(status == CY_RSLT_SUCCESS)
+    if (status == CY_RSLT_SUCCESS)
     {
         uint8_t byte = bitPosition >> CY_BYTE_NUM_SHIFT;
         uint8_t bit = bitPosition & CY_BIT_NUM_MASK;
@@ -529,7 +552,7 @@ static inline cy_rslt_t cy_clear_bit(uint8_t* used, cy_resource_t type, uint8_t 
 {
     uint16_t bitPosition;
     cy_rslt_t status = cy_get_bit_position(type, block, channel, &bitPosition);
-    if(status == CY_RSLT_SUCCESS)
+    if (status == CY_RSLT_SUCCESS)
     {
         uint8_t byte = bitPosition >> CY_BYTE_NUM_SHIFT;
         uint8_t bit = bitPosition & CY_BIT_NUM_MASK;
@@ -538,35 +561,16 @@ static inline cy_rslt_t cy_clear_bit(uint8_t* used, cy_resource_t type, uint8_t 
     return status;
 }
 
-cy_rslt_t cy_hwmgr_set_configured(cy_resource_t type, uint8_t block, uint8_t channel)
-{
-    core_util_critical_section_enter();
-    cy_rslt_t status = cy_set_bit(cy_configured, type, block, channel);
-    core_util_critical_section_exit();
-    return status;
-}
-
-cy_rslt_t cy_hwmgr_set_unconfigured(cy_resource_t type, uint8_t block, uint8_t channel)
-{
-    core_util_critical_section_enter();
-    cy_rslt_t status = cy_clear_bit(cy_configured, type, block, channel);
-    core_util_critical_section_exit();
-    return status;
-}
-
-cy_rslt_t cy_hwmgr_is_configured(cy_resource_t type, uint8_t block, uint8_t channel, bool* isConfigured)
-{
-    // This doesn't modify anything, so no need for a critical section
-    cy_rslt_t status = cy_is_set(cy_configured, type, block, channel, isConfigured);
-    return status;
-}
+/*******************************************************************************
+*       Hardware Manager API
+*******************************************************************************/
 
 cy_rslt_t cy_hwmgr_reserve(const cy_resource_inst_t* obj)
 {
     core_util_critical_section_enter();
     bool isSet;
     cy_rslt_t rslt = cy_is_set(cy_used, obj->type, obj->block_num, obj->channel_num, &isSet);
-    if(rslt == CY_RSLT_SUCCESS && isSet)
+    if (rslt == CY_RSLT_SUCCESS && isSet)
     {
         rslt = CY_RSLT_ERR_CSP_HWMGR_INUSE;
     }
@@ -585,16 +589,63 @@ cy_rslt_t cy_hwmgr_free(const cy_resource_inst_t* obj)
     core_util_critical_section_enter();
     bool isUsed;
     cy_rslt_t rslt = cy_is_set(cy_used, obj->type, obj->block_num, obj->channel_num, &isUsed);
-    if(rslt == CY_RSLT_SUCCESS && !isUsed)
+    if (rslt == CY_RSLT_SUCCESS && !isUsed)
     {
         rslt = CY_RSLT_WARN_CSP_HWMGR_UNUSED; 
     }
-    if(rslt == CY_RSLT_SUCCESS)
+    if (rslt == CY_RSLT_SUCCESS)
     {
         rslt = cy_clear_bit(cy_used, obj->type, obj->block_num, obj->channel_num);
     }
     core_util_critical_section_exit();
     return rslt;
+}
+
+cy_rslt_t cy_hwmgr_allocate(cy_resource_t type, cy_resource_inst_t* obj)
+{
+    uint16_t offsetStartOfRsc = cy_get_resource_offset(type);
+    uint16_t offsetEndOfRsc = ((1u + type) < sizeof(cy_resource_offsets)/sizeof(cy_resource_offsets[0]))
+        ? cy_get_resource_offset((cy_resource_t)(type + 1))
+        : CY_TOTAL_ALLOCATABLE_ITEMS;
+    bool usesChannels = cy_uses_channels(type);
+
+    uint16_t count = offsetEndOfRsc - offsetStartOfRsc;
+    uint8_t block = 0;
+    uint8_t channel = 0;
+    for (uint16_t i = 0; i < count; i++)
+    {
+        cy_resource_inst_t res = { type, block, channel };
+        if (CY_RSLT_SUCCESS == cy_hwmgr_reserve(&res))
+        {
+            obj->type = type;
+            obj->block_num = block;
+            obj->channel_num = channel;
+            return CY_RSLT_SUCCESS;
+        }
+        else
+        {
+            if (usesChannels)
+            {
+                const uint8_t* blockOffsets = cy_get_block_offsets(type);
+                uint16_t blocks = cy_get_block_offset_length(type);
+                if ((block + 1) < blocks && blockOffsets[block + 1] == (i + 1))
+                {
+                    block++;
+                    channel = 0;
+                }
+                else
+                {
+                    channel++;
+                }
+            }
+            else
+            {
+                block++;
+            }
+        }
+    }
+
+    return CY_RSLT_ERR_CSP_HWMGR_NONE_FREE;
 }
 
 cy_rslt_t cy_hwmgr_allocate_clock(cy_clock_divider_t* obj, cy_clock_divider_types_t div, bool accept_larger)
@@ -632,22 +683,28 @@ cy_rslt_t cy_hwmgr_free_clock(cy_clock_divider_t* obj)
 
 cy_rslt_t cy_hwmgr_allocate_dma(cy_resource_inst_t* obj)
 {
-    static uint8_t counts[] = { CPUSS_DMAC_CH_NR, CPUSS_DW0_CH_NR, CPUSS_DW1_CH_NR };
+    return cy_hwmgr_allocate(CY_RSC_DMA, obj);
+}
 
-    for (int i = 0; i < CY_BLOCK_COUNT_DMA; i ++)
-    {
-        for (int j =  0; j < counts[i]; j++)
-        {
-            cy_resource_inst_t res = { CY_RSC_DMA, i, j };
-            bool reserved = (CY_RSLT_SUCCESS == cy_hwmgr_reserve(&res));
-            if (reserved)
-            {
-                obj->type = CY_RSC_DMA;
-                obj->block_num = i;
-                obj->channel_num = j;
-                return CY_RSLT_SUCCESS;
-            }
-        }
-    }
-    return CY_RSLT_ERR_CSP_HWMGR_NONE_FREE;
+cy_rslt_t cy_hwmgr_set_configured(cy_resource_t type, uint8_t block, uint8_t channel)
+{
+    core_util_critical_section_enter();
+    cy_rslt_t status = cy_set_bit(cy_configured, type, block, channel);
+    core_util_critical_section_exit();
+    return status;
+}
+
+cy_rslt_t cy_hwmgr_set_unconfigured(cy_resource_t type, uint8_t block, uint8_t channel)
+{
+    core_util_critical_section_enter();
+    cy_rslt_t status = cy_clear_bit(cy_configured, type, block, channel);
+    core_util_critical_section_exit();
+    return status;
+}
+
+cy_rslt_t cy_hwmgr_is_configured(cy_resource_t type, uint8_t block, uint8_t channel, bool* isConfigured)
+{
+    // This doesn't modify anything, so no need for a critical section
+    cy_rslt_t status = cy_is_set(cy_configured, type, block, channel, isConfigured);
+    return status;
 }
