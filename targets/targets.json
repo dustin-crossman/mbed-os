@@ -129,6 +129,31 @@
         "components": ["PSA_SRV_IMPL", "PSA_SRV_IPC", "SPE"],
         "public": false
     },
+    "SB_Target": {
+        "public": false,
+        "config": {
+            "sb-rom-start": {
+                "help": "Starting address of SB ROM",
+                "value": null,
+                "conflicts": ["target.mbed_rom_size"]
+            },
+            "sb-rom-size": {
+                "help": "Size in bytes of SB ROM",
+                "value": null,              
+                "conflicts": ["target.mbed_rom_size"]
+            },
+            "sb-ram-start": {
+                "help": "Start in bytes of SB RAM",
+                "value": null,
+                "conflicts": ["target.mbed_ram_start"]
+            },
+            "sb-ram-size": {
+                "help": "Size in bytes of SB RAM",
+                "value": null,
+                "conflicts": ["target.mbed_ram_size"]
+            }
+        }        
+    },
     "CM4_UARM": {
         "inherits": ["Target"],
         "core": "Cortex-M4",
@@ -8096,7 +8121,7 @@
         }
     },
     "CY8CPROTO_064_SB": {
-        "inherits": ["MCU_PSOC6_M4"],
+        "inherits": ["MCU_PSOC6_M4", "SB_Target"],
         "features": ["BLE"],
         "supported_form_factors": ["ARDUINO"],
         "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW4343X", "CORDIO", "CY8C62XX"],
@@ -8108,7 +8133,11 @@
             "function": "PSOC6Code.sign_image"
         },
         "overrides": {
-            "network-default-interface-type": "WIFI"
+            "network-default-interface-type": "WIFI",
+            "sb-rom-start": "0x10002400",
+            "sb-rom-size": "0x4FC00",
+            "sb-ram-start": "0x08002000",
+            "sb-ram-size": "0x1E000"
         }
     },
     "CY8CPROTO_064_SB_M0_PSA": {
