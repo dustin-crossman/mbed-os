@@ -203,7 +203,7 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
                 img_start_addr = "0x10080000"
             else:
                 # NSPE image flash address start
-                img_start_addr = "0x10000000"
+                img_start_addr = "0x10002000"
                 target = {"name": part, "core": "cm4"}
 
     # create binary file from mbed elf for the following processing
