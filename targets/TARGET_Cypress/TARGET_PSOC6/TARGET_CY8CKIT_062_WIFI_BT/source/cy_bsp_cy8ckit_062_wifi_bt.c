@@ -70,6 +70,7 @@ whd_interface_t* get_whd_interface(void)
     return &ifp;
 }
 
+
 void wlan_irq_handler(void *arg, cy_gpio_irq_event_t event)
 {
     //TODO: Switch MCU to LP mode here.
