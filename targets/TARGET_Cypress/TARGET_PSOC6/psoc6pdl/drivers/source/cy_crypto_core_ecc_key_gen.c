@@ -107,7 +107,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakeKeyPair(CRYPTO_Type *base,
         ***************************************************************/
         if (GetRandomDataFunc != NULL)
         {
-            (void)GetRandomDataFunc( randomDataInfo, (uint8_t*)key->k, ((bitsize + 7U) >> 3U) );
+            (void)GetRandomDataFunc( randomDataInfo, (uint8_t*)key->k, CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize) );
         }
         else
         {
@@ -231,6 +231,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
         tmpResult = CY_CRYPTO_SUCCESS;
 
         uint32_t bitsize = eccDp->size;
+        uint32_t bytesize = CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize);
 
         uint32_t p_temp = 8u;     /* temporal values */
         uint32_t p_d = 10u;       /* private key */
@@ -238,7 +239,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
         /* generate random string */
         if (GetRandomDataFunc != NULL)
         {
-            (void)GetRandomDataFunc( randomDataInfo, key, ((bitsize + 7U) >> 3U) );
+            (void)GetRandomDataFunc( randomDataInfo, key, bytesize );
         }
         else
         {
