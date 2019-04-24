@@ -73,7 +73,7 @@
         "coreLoadImage": "false"
       },
       "program": {
-        "PROGRAM_NAME": "-combined.hex"
+        "PROGRAM_NAME": ".hex"
       }
     },
     
