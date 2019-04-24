@@ -69,6 +69,8 @@ static uint16_t ip_cksum (uint32_t sum, uint8_t *val8, uint32_t count );
 static uint16_t ipv4_tcp_hdr_cksum(uint8_t *ip, uint8_t *tcp, uint16_t tcp_len);
 static uint16_t tcp_hdr_chksum (uint32_t sum, uint8_t *tcp_hdr, uint16_t tcp_len);
 
+
+
 /******************************************************
  *               Variable Definitions
  ******************************************************/
@@ -305,7 +307,7 @@ static uint16_t tcp_hdr_chksum (uint32_t sum, uint8_t *tcp_hdr, uint16_t tcp_len
 int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_offload )
 {
     int datalen = 0;
-    connect->index = 0;
+    connect->index = 1;
     connect->ip_addr_type = 0;
     uint32_t srcip;
     uint32_t destip;
@@ -324,9 +326,9 @@ int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_of
 
     keep_alive_offload->seqnum = keep_alive_offload->seqnum - 1;
 
-    printf("keep alive Seq num:%lu\n",    keep_alive_offload->seqnum );
-    printf("keep alive Ack num:%lu\n",    keep_alive_offload->acknum );
-    printf("keep alive Rcv Window:%lu\n", keep_alive_offload->rx_window );
+    DEBUG_PRINTF(("keep alive Seq num:%lu\n",    keep_alive_offload->seqnum ));
+    DEBUG_PRINTF(("keep alive Ack num:%lu\n",    keep_alive_offload->acknum ));
+    DEBUG_PRINTF(("keep alive Rcv Window:%lu\n", keep_alive_offload->rx_window ));
 
 
     connect->request_len = tcp_keepalive_pkt(&connect->data[datalen], keep_alive_offload );

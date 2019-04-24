@@ -83,27 +83,18 @@
 *  P13_3, P13_5, P13_7 reserved for LED
 */
 #define CYCFG_ASSIGNED_PORTS      SRM_PORT(0, 0x03),\
-                                  SRM_PORT(1, 0x1b),\
-                                  SRM_PORT(2, 0xff),\
-                                  SRM_PORT(3, 0x3f),\
-                                  SRM_PORT(4, 0x03),\
-                                  SRM_PORT(5, 0x6e),\
-                                  SRM_PORT(6, 0xf8),\
-                                  SRM_PORT(7, 0x21),\
-                                  SRM_PORT(8, 0x1b),\
-                                  SRM_PORT(9, 0x39),\
-                                  SRM_PORT(10, 0x02),\
+                                  SRM_PORT(2, 0x3f),\
+                                  SRM_PORT(5, 0x0e),\
+                                  SRM_PORT(6, 0xd0),\
                                   SRM_PORT(11, 0xfc),\
-                                  SRM_PORT(12, 0xc0),\
-                                  SRM_PORT(13, 0xab),\
-                                  SRM_PORT(14, 0x00)
+                                  SRM_PORT(12, 0xc0)
 
 /*
-*  8-bit divider 0 reserved for I2C
+*  8-bit divider 0 reserved for SDIO
 *  8-bit divider 1 reserved for PWM
 *  8-bit divider 2 reserved for CLK_PUMP
 *  8-bit divider 3 reserved for SAR ADC
-*  8-bit divider 4 reserved for SDIO
+*  8-bit divider 4 reserved for I2C
 *  16-bit divider 0 reserved for BT_UART
 *  16-bit divider 1 reserved for UART
 */

@@ -37,9 +37,6 @@
 #include "cy_crypto_core_hw_vu.h"
 #include <string.h>
 
-#define CY_CRYPTO_VU_SIZE_FLD_MASK    (0x00001fffuL)
-#define CY_CRYPTO_VU_DATA_FLD_MASK    (0x00003fffuL)
-#define CY_CRYPTO_VU_DATA_FLD_POS     (16u)
 
 /**
 * \addtogroup group_crypto_lld_vu_functions
@@ -293,34 +290,7 @@ __STATIC_INLINE uint16_t Cy_Crypto_Core_Vu_RegDataPtrRead(CRYPTO_Type *base, uin
 *******************************************************************************/
 __STATIC_INLINE uint32_t * Cy_Crypto_Core_Vu_RegMemPointer(CRYPTO_Type *base, uint32_t srcReg)
 {
-    return (uint32_t *)((uint32_t)REG_CRYPTO_MEM_BUFF(base) + (4u * (uint32_t)Cy_Crypto_Core_Vu_RegDataPtrRead(base, srcReg)));
-}
-
-/*******************************************************************************
-* Function Name: Cy_Crypto_Wait_Vu_ForComplete
-****************************************************************************//**
-*
-* Waits until VU instruction will be completed
-*
-* \param base
-* The pointer to the CRYPTO instance.
-*
-*******************************************************************************/
-__STATIC_INLINE void Cy_Crypto_Core_Vu_WaitForComplete(CRYPTO_Type *base)
-{
-    /* Wait until the VU instruction is complete */
-    if (CY_CRYPTO_HW_V1)
-    {
-        while (0uL != _FLD2VAL(CRYPTO_STATUS_VU_BUSY, REG_CRYPTO_STATUS(base)))
-        {
-        }
-    }
-    else
-    {
-        while (0uL != _FLD2VAL(CRYPTO_V2_STATUS_BUSY, REG_CRYPTO_STATUS(base)))
-        {
-        }
-    }
+    return (uint32_t *)((uint32_t)REG_CRYPTO_VU_CTL1(base) + (4u * (uint32_t)Cy_Crypto_Core_Vu_RegDataPtrRead(base, srcReg)));
 }
 
 /*******************************************************************************

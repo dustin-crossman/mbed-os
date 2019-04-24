@@ -284,6 +284,12 @@ wiced_result_t wiced_wlan_connectivity_deinit( void );
  */
 wiced_result_t wiced_wlan_connectivity_resume_after_deep_sleep( void );
 
+/* Register for Wake up Events before going to sleep
+ *
+ * @note: The WICED core should have already been initialized when this is called
+ * @return @ref wiced_result_t
+ */
+wiced_result_t wiced_wlan_register_link_events(void );
 /** @} */
 
 

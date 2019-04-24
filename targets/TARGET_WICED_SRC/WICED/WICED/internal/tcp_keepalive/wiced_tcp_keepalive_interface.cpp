@@ -34,6 +34,9 @@
 #include "wiced_tcp_keepalive_interface.h"
 #include "wiced_tcp_keepalive.h"
 
+static const wwd_event_num_t tko_events[]   = { WLC_E_TKO, WLC_E_NONE };
+const uint8_t databuf[128] = {0};
+void* wwd_callback_handler ( const wwd_event_header_t* event_header, const uint8_t* event_data, /*@null@*/ void* handler_user_data );
 
 struct tcp_pcb *g_socket_tcp = NULL;
 int tcp_keepalive_enable(WiFiInterface *wifi, tcp_keepalive_socket_params_t *tcp_keepalive_params)
@@ -49,6 +52,8 @@ int tcp_keepalive_enable(WiFiInterface *wifi, tcp_keepalive_socket_params_t *tcp
     SocketAddress peer_addr;
     struct tcp_pcb *tcp_sock_info = NULL;
     struct tcp_pcb *tcp_sock_info_new = NULL;
+    wwd_event_handler_t    handler = wwd_callback_handler;
+    void *user_data = (void *)&databuf[0];
 
     int result;
 
@@ -116,17 +121,18 @@ int tcp_keepalive_enable(WiFiInterface *wifi, tcp_keepalive_socket_params_t *tcp
     DEBUG_PRINTF(("RX seq no %lu\n", tcp_sock_info->rcv_nxt));
     DEBUG_PRINTF(("rx window size %d\n", tcp_sock_info->rcv_wnd));
 
+    wwd_management_set_event_handler( tko_events, handler, user_data, WWD_STA_INTERFACE );
     /* Disable tko */
     result = tko_enable(false);
     if (TCP_KEEPALIVE_SUCCESS != result) {
-    	DEBUG_PRINTF(("tko_enable failed result = %d\n", result));
+    	DEBUG_PRINTF_ERROR(("tko_enable failed result = %d\n", result));
         return result;
     }
 
     /* Get tko params */
     result = tko_param(tcp_keepalive_params->keepalive_interval, tcp_keepalive_params->keepalive_retry_count, tcp_keepalive_params->keepalive_retry_interval);
     if (TCP_KEEPALIVE_SUCCESS != result) {
-    	DEBUG_PRINTF(("tko_param failed result = %d\n", result));
+    	DEBUG_PRINTF_ERROR(("tko_param failed result = %d\n", result));
         return result;
     }
 
@@ -199,6 +205,7 @@ int tcp_keepalive_enable(WiFiInterface *wifi, tcp_keepalive_socket_params_t *tcp
 
 int tcp_keepalive_disable(void)
 {
+	wwd_management_set_event_handler( tko_events, NULL, NULL, WWD_STA_INTERFACE );
 	return tko_enable(false);
 }
 
@@ -268,14 +275,14 @@ void tcp_socket_snd_rcv_callback (void* params)
 	if ( socketptr != NULL )
 	{
 		flags = socketptr->get_event();
-		if ((flags & TCPSOCKET_READ_FLAG) != 0)
+		if ((flags & socketptr->get_tcp_socket_read_flag() ) != 0)
 		{
 		  	if ( tcpkeep_alive->callbacks.receive != NULL )
 		  	{
 		  		tcpkeep_alive->callbacks.receive(tcpkeep_alive, tcpkeep_alive->callback_arg );
 		  	}
 		}
-		if ((flags & TCPSOCKET_WRITE_FLAG ) != 0 )
+		if ((flags & socketptr->get_tcp_socket_write_flag() ) != 0 )
 		{
 		  	if ( tcpkeep_alive->callbacks.send != NULL )
 		  	{
@@ -299,4 +306,25 @@ nsapi_error_t get_tcp_socket_parameters( TCPSocket *socket, void **tcpsock_info 
 	}
 	*tcpsock_info = g_socket_tcp;
 	return response;
+}
+
+void* wwd_callback_handler ( const wwd_event_header_t* event_header, const uint8_t* event_data, /*@null@*/ void* handler_user_data )
+{
+	if ( event_header != NULL )
+	{
+		switch (event_header->event_type)
+		{
+			case WLC_E_TKO:
+				if ( event_data != NULL )
+				{
+					DEBUG_PRINTF_ERROR(("WLC_E_TKO Event Received.. failed index:%d\n", *event_data));
+					DEBUG_PRINTF_ERROR(("Disable Keep Alive\n"));
+					/* tcp_keepalive_disable(); */
+				}
+			break;
+			default:
+				break;
+		} /* end of switch */
+	}
+	return handler_user_data;
 }

@@ -3,15 +3,15 @@
                 "boot0" : { 
                     "VERSION" : "0.1",
                     "ROLLBACK_COUNTER" : "0",
-                    "IMAGE_ID" : "3",
-                    "SLOT_SIZE" : "0x20000",
+                    "IMAGE_ID" : "1",
+                    "SLOT_SIZE" : "0x50000",
                     "PAD" : "--pad"
                 },
                 "boot1" : {
                     "VERSION" : "0.1",
                     "ROLLBACK_COUNTER" : "0",
-                    "IMAGE_ID" : "3",
-                    "SLOT_SIZE" : "0x30000",
+                    "IMAGE_ID" : "1",
+                    "SLOT_SIZE" : "0x50000",
                     "PAD" : "--pad"
                 }
             },
@@ -26,6 +26,6 @@
                 }
             },
 
-    "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/sb-provisioning/",
+    "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/",
     "priv_key_file": "/keys/MCUBOOT_CM0P_KEY_PRIV.pem"
 }
