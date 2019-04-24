@@ -29,12 +29,19 @@
 #include "cy_sysclk.h"
 #include "cy_systick.h"
 #include "cy_gpio.h"
+#include "cy_syspm.h"
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-#define CY_CFG_SYSCLK_CLKLF_FREQ_HZ 32000
+#define CY_CFG_SYSCLK_CLKLF_FREQ_HZ 32768
+#define CY_CFG_PWR_VDDA_MV 3300
+#define CY_CFG_PWR_VDDD_MV 3300
+#define CY_CFG_PWR_VBACKUP_MV 3300
+#define CY_CFG_PWR_VDD_NS_MV 3300
+#define CY_CFG_PWR_VDDIO0_MV 3300
+#define CY_CFG_PWR_VDDIO1_MV 3300
 
 void init_cycfg_platform(void);
 
