@@ -624,8 +624,8 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
     stcCmdConfig.u32Argument =  pstcCmd->u32Arg;
     
     /*Determine the type of response and if we need to do any checks*/
-    /*Command 0 and 8 have no response, so don't wait for one*/
-    if(pstcCmd->u32CmdIdx == 0 || pstcCmd->u32CmdIdx == 8)
+    /*Command 0 and 7 have no response, so don't wait for one*/
+    if(pstcCmd->u32CmdIdx == 0 || pstcCmd->u32CmdIdx == 7)
     {
         bCmdIndexCheck        = false;
         bCmdCrcCheck          = false;
