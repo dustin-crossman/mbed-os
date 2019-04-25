@@ -147,6 +147,7 @@ typedef struct
     uint8_t id;
     bool upgrade;
     bool encrypt;
+    uint8_t encrypt_key_id;
     uint32_t monotonic;
     cy_jwt_mem_region_t boot_area;
     cy_jwt_mem_region_t upgrade_area;

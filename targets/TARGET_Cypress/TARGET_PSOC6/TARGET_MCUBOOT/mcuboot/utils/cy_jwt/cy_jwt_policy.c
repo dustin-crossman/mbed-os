@@ -1276,6 +1276,15 @@ int Cy_JWT_BnUPolicyParse(cJSON *bnu_json, bnu_policy_t *bnu_policy, uint32_t ma
                 }
             }
 
+            item = Cy_JWT_FindJsonItemByKey("encrypt_key_id", policy);
+            if(NULL != item)
+            {
+                if(1 == bnu_policy->present.bnu_img_policy.encrypt)
+                {
+                    bnu_policy->bnu_img_policy.encrypt_key_id = item->valueint;
+                }
+            }
+
             item = Cy_JWT_FindJsonItemByKey("backup", policy);
             if(NULL != item)
             {

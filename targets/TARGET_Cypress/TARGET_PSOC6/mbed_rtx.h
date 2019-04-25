@@ -55,11 +55,11 @@
 #endif
 #elif defined(CY_M0_PSA_MB)
 #ifndef INITIAL_SP
-#define INITIAL_SP              (0x08010000 + 0x00012000)  /* Ram origin + length */ 
+#define INITIAL_SP              (0x08008300 + 0x00017D00)  /* Ram origin + length */ 
 #endif
 #elif defined(CY_M4_PSA_MB)
 #ifndef INITIAL_SP
-#define INITIAL_SP              (0x08000000 + 0x0000FD00)  /* Ram origin + length */ 
+#define INITIAL_SP              (0x08000000 + 0x00008000)  /* Ram origin + length */ 
 #endif
 #endif
 #endif  /* MBED_MBED_RTX_H */

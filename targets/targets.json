@@ -8148,7 +8148,7 @@
         "inherits": ["CY8CPROTO_064_SB_M0_PSA"],
         "extra_labels_add": ["MCUBOOT"],
         "macros_add": [
-            "MCUBOOT_POLICY=0",
+            "MCUBOOT_POLICY=1",
             "MCUBOOT_LOG_LEVEL=3",
             "MCUBOOT_USE_FLASHBOOT_CRYPTO",
             "CY8CKIT_001",
@@ -8161,13 +8161,13 @@
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
-            "non-secure-ram-size": "0xFD00",
-            "shared-ram-start": "0x0800FD00",
+            "non-secure-ram-size": "0x8000",
+            "shared-ram-start": "0x08008000",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0800FE00", 
+            "public-ram-start": "0x08008100", 
             "public-ram-size": "0x200",
-            "secure-ram-start": "0x08010000",
-            "secure-ram-size": "0x12000"
+            "secure-ram-start": "0x08008300",
+            "secure-ram-size": "0x17D00"
         }
     },
     "CY8CPROTO_064_SB_PSA": {
@@ -8206,13 +8206,13 @@
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
-            "non-secure-ram-size": "0xFD00",
-            "shared-ram-start": "0x0800FD00",
+            "non-secure-ram-size": "0x8000",
+            "shared-ram-start": "0x08008000",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0800FE00", 
+            "public-ram-start": "0x08008100", 
             "public-ram-size": "0x200",
-            "secure-ram-start": "0x08010000",
-            "secure-ram-size": "0x12000"
+            "secure-ram-start": "0x08008300",
+            "secure-ram-size": "0x17D00"
         }
     },
     "CY8CMOD_062_4343W": {

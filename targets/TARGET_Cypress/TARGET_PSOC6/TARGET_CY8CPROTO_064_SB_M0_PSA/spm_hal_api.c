@@ -60,7 +60,7 @@
 
 #define CY_BL_CM4_ROM_LOOP_ADDR (0x16004000UL)
 #define CY_BOOTLOADER_IMG_ID_CM0P		(0UL)
-#define CY_BOOTLOADER_IMG_ID_TEE_CM0P	(1UL)
+#define CY_BOOTLOADER_IMG_ID_SPE_CM0P	(1UL)
 #define CY_BOOTLOADER_IMG_ID_CYTF_CM0P	(2UL)
 #define CY_BOOTLOADER_IMG_ID_OEMTF_CM0P	(3UL)
 #define CY_BOOTLOADER_IMG_ID_CM4		(4UL)
@@ -209,21 +209,39 @@ void spm_hal_start_nspe(void)
     uint32_t jwtLen;
     char *jwt;
     rc = Cy_JWT_GetProvisioningDetails(FB_POLICY_JWT, &jwt, &jwtLen);
+    if(0 != rc)
+    {
+         BOOT_LOG_ERR("1: Policy parsing failed with code %i", rc);
+    }
     if(0 == rc)
     {
         rc = Cy_JWT_ParseProvisioningPacket(jwt, &bnu_policy,
-                CY_BOOTLOADER_MASTER_IMG_ID);
+//                CY_BOOTLOADER_MASTER_IMG_ID);
+                  CY_BOOTLOADER_IMG_ID_SPE_CM0P); /* SPE IMG ID = 1*/
     }
     if(0 != rc)
     {
-         BOOT_LOG_ERR("Policy parsing failed with code %i", rc);
+         BOOT_LOG_ERR("2: Policy parsing failed with code %i", rc);
+
+         part_map[0].area.fa_off     = MCUBOOT_POLICY_FLASH_AREA_0_START-FLASH_DEVICE_BASE;
+         part_map[0].area.fa_size    = MCUBOOT_POLICY_FLASH_AREA_SIZE;
+
+         part_map[1].area.fa_off     = MCUBOOT_POLICY_FLASH_AREA_1_START-FLASH_DEVICE_BASE;
+         part_map[1].area.fa_size    = MCUBOOT_POLICY_FLASH_AREA_SIZE;
+
+         bnu_policy.bnu_img_policy.boot_auth[0]      = MCUBOOT_POLICY_BOOT_AUTH;
+         bnu_policy.bnu_img_policy.upgrade_auth[0]   = MCUBOOT_POLICY_UPGRADE_AUTH;
+         bnu_policy.bnu_img_policy.id                = MCUBOOT_POLICY_IMG_ID;
+         bnu_policy.bnu_img_policy.upgrade           = MCUBOOT_POLICY_UPGRADE;
     }
+    else
+    {
+        part_map[0].area.fa_off     = bnu_policy.bnu_img_policy.boot_area.start-FLASH_DEVICE_BASE;
+        part_map[0].area.fa_size    = bnu_policy.bnu_img_policy.boot_area.size;
 
-    part_map[0].area.fa_off     = bnu_policy.bnu_img_policy.boot_area.start-FLASH_DEVICE_BASE;
-    part_map[0].area.fa_size    = bnu_policy.bnu_img_policy.boot_area.size;
-
-    part_map[1].area.fa_off     = bnu_policy.bnu_img_policy.upgrade_area.start-FLASH_DEVICE_BASE;
-    part_map[1].area.fa_size    = bnu_policy.bnu_img_policy.upgrade_area.size;
+        part_map[1].area.fa_off     = bnu_policy.bnu_img_policy.upgrade_area.start-FLASH_DEVICE_BASE;
+        part_map[1].area.fa_size    = bnu_policy.bnu_img_policy.upgrade_area.size;
+    }
 #else /* (MCUBOOT_POLICY_JWT != MCUBOOT_POLICY_JWT) */
     /* (MCUBOOT_POLICY_JWT == MCUBOOT_POLICY_HDR) */
     part_map[0].area.fa_off     = MCUBOOT_POLICY_FLASH_AREA_0_START-FLASH_DEVICE_BASE;
