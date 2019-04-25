@@ -28,6 +28,7 @@
 #include "cy_hal.h"
 #include "whd_wifi_api.h"
 #include "cy_network_buffer.h"
+#include "SDIO_HOST.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -40,7 +41,11 @@ extern "C" {
 #define COUNTRY                 WHD_COUNTRY_AUSTRALIA
 #define DEFAULT_OOB_PIN		    0
 #define WLAN_INTR_PRIORITY	    1
-#define WLAN_POWER_UP_DELAY_MS  185 
+#define WLAN_POWER_UP_DELAY_MS  185
+
+#define SDIO_ENUMERATION_TRIES  500
+#define SDIO_RETRY_DELAY_MS     1
+#define SDIO_BUS_LEVEL_MAX_RETRIES 5
 
 static whd_buffer_funcs_t buffer_ops =
 {
@@ -56,7 +61,6 @@ extern whd_netif_funcs_t netif_ops;
 extern whd_resource_source_t resource_ops;
 
 whd_driver_t whd_drv;
-whd_interface_t ifp;
 
 static uint8_t thread_stack[THREAD_STACK_SIZE];
 
@@ -65,15 +69,80 @@ whd_driver_t* get_whd_driver(void)
     return &whd_drv;
 }
 
-whd_interface_t* get_whd_interface(void)
-{
-    return &ifp;
-}
-
-
 void wlan_irq_handler(void *arg, cy_gpio_irq_event_t event)
 {
     //TODO: Switch MCU to LP mode here.
+} 
+
+static cy_rslt_t init_sdio_wlan(cy_sdio_t *sdio_obj)
+{
+    /* WiFi into reset */
+    cy_rslt_t result = cy_gpio_init(CY_WIFI_WL_REG_ON, CY_GPIO_DIR_OUTPUT, CY_GPIO_DM_PULLUP, 0);
+    if(result == CY_RSLT_SUCCESS)
+    {
+        Cy_SysLib_Delay(10);
+        /* Init SDIO Host */
+        result = cy_sdio_init(sdio_obj, CY_WIFI_SDIO_CMD, CY_WIFI_SDIO_CLK, CY_WIFI_SDIO_DATA_0, CY_WIFI_SDIO_DATA_1, CY_WIFI_SDIO_DATA_2, CY_WIFI_SDIO_DATA_3);
+        if(result != CY_RSLT_SUCCESS)
+        {
+            Cy_SysLib_Delay(10);
+            /* WiFi out of reset */
+            cy_gpio_write(CY_WIFI_WL_REG_ON, true);
+            Cy_SysLib_Delay(WLAN_POWER_UP_DELAY_MS);
+
+            SDIO_Reset();
+        }  
+    }
+    return result;
+}
+static cy_rslt_t sdio_try_cmd(const cy_sdio_t *obj, cy_transfer_t direction, \
+                          cy_sdio_command_t command, uint32_t argument, uint32_t* response)
+{
+    uint8_t loop_count = 0;
+    cy_rslt_t result = CY_RSLT_BSP_ERR_WIFI_SDIO_ENUM_TIMEOUT;
+    do
+    {
+        result = cy_sdio_send_cmd(obj, direction, command, argument, response);
+    }
+    while(result != CY_RSLT_SUCCESS && loop_count <= SDIO_BUS_LEVEL_MAX_RETRIES);
+
+    return result;
+}
+
+cy_rslt_t sdio_enumerate(const cy_sdio_t *sdio_obj)
+{
+    cy_rslt_t result = CY_RSLT_BSP_ERR_WIFI_SDIO_ENUM_TIMEOUT;
+    uint32_t loop_count = 0;
+    uint32_t rel_addr;
+    uint32_t response_ignored = 0;
+    uint32_t no_argument = 0;
+
+    do
+    {
+        //TODO: The wiced code ignores result for the following 2 calls.
+        //TODO: Need to check if bus level retries are needed for each call.
+
+        /* Send CMD0 to set it to idle state */
+        sdio_try_cmd(sdio_obj, CY_WRITE, SDIO_CMD_GO_IDLE_STATE, no_argument, &response_ignored /*ignored*/);
+
+        /* CMD5. */
+        sdio_try_cmd(sdio_obj, CY_READ, SDIO_CMD_IO_SEND_OP_COND, no_argument, &response_ignored /*ignored*/);
+
+        /* Send CMD3 to get RCA. */
+        result = sdio_try_cmd(sdio_obj, CY_READ, SDIO_CMD_SEND_RELATIVE_ADDR, no_argument, &rel_addr);
+        if(result != CY_RSLT_SUCCESS)
+        {
+            Cy_SysLib_Delay(SDIO_RETRY_DELAY_MS);
+        }
+        loop_count++;
+    } while (result != CY_RSLT_SUCCESS && loop_count <= SDIO_ENUMERATION_TRIES);
+
+    if(result == CY_RSLT_SUCCESS)
+    {
+        /* Send CMD7 with the returned RCA to select the card */
+        result = sdio_try_cmd(sdio_obj, CY_WRITE, SDIO_CMD_SELECT_CARD, rel_addr, &response_ignored);
+    }
+    return result;
 }
 
 static cy_rslt_t init_wlan_wakeup(void)
@@ -87,12 +156,10 @@ static cy_rslt_t init_wlan_wakeup(void)
     return result;
 }
 
-static cy_rslt_t sdio_bus_initialize(whd_driver_t *whd_driver)
+static cy_rslt_t sdio_bus_initialize(whd_driver_t *whd_driver, const cy_sdio_t *sdio_obj)
 {
     whd_sdio_config_t whd_sdio_config;
-    cy_sdio_t sdio_obj;
-
-    cy_rslt_t result = cy_sdio_init(&sdio_obj, CY_WIFI_SDIO_CMD, CY_WIFI_SDIO_CLK, CY_WIFI_SDIO_DATA_0, CY_WIFI_SDIO_DATA_1, CY_WIFI_SDIO_DATA_2, CY_WIFI_SDIO_DATA_3);
+    cy_rslt_t result = sdio_enumerate(sdio_obj);
     if(result == CY_RSLT_SUCCESS)
     {
         whd_sdio_config.sdio_1bit_mode = WHD_FALSE;
@@ -104,6 +171,7 @@ static cy_rslt_t sdio_bus_initialize(whd_driver_t *whd_driver)
 
 cy_rslt_t init_cycfg_wlan_hw(void)
 {
+    cy_sdio_t sdio_obj;
     whd_init_config_t whd_init_config;
     whd_init_config.thread_stack_size = ( uint32_t ) THREAD_STACK_SIZE;
     whd_init_config.thread_stack_start = &thread_stack;
@@ -111,21 +179,19 @@ cy_rslt_t init_cycfg_wlan_hw(void)
     whd_init_config.oob_gpio_pin = DEFAULT_OOB_PIN;
     whd_init_config.country = COUNTRY;
 
-    cy_rslt_t result = cy_gpio_init(CY_WIFI_WL_REG_ON, CY_GPIO_DIR_OUTPUT, CY_GPIO_DM_PULLUP, 1);
+    cy_rslt_t result = init_sdio_wlan(&sdio_obj);
     if(result != CY_RSLT_SUCCESS)
     {
         return result;
     }
 
-    Cy_SysLib_Delay(WLAN_POWER_UP_DELAY_MS);
-
     uint32_t ret = whd_init(&whd_drv, &whd_init_config, &resource_ops, &buffer_ops, &netif_ops);
     if(ret != WHD_SUCCESS)
     {
-        return CY_RSLT_BSP_ERR_WIFI_INIT;
+        return CY_RSLT_BSP_ERR_WIFI_INIT_FAILED;
     }
 
-    result = sdio_bus_initialize(&whd_drv);
+    result = sdio_bus_initialize(&whd_drv, &sdio_obj);
     if(result != CY_RSLT_SUCCESS)
     {
         return result;
@@ -135,12 +201,6 @@ cy_rslt_t init_cycfg_wlan_hw(void)
     if(result != CY_RSLT_SUCCESS)
     {
         return result;
-    }
-
-    ret = whd_wifi_on(whd_drv, &ifp /* OUT */);
-    if(ret != WHD_SUCCESS)
-    {
-        return CY_RSLT_BSP_ERR_WIFI_INIT;
     }
 //TODO: Need to deinitialize wifi if error.
     return CY_RSLT_SUCCESS;
