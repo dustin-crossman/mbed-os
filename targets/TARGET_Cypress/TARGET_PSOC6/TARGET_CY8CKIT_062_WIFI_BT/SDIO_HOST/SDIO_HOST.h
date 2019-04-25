@@ -1,16 +1,14 @@
-#if !defined(CY_SDIO_H)
-#define CY_SDIO_H
 /***************************************************************************//**
-* \file cy_sdio_host.h
+* \file SDIO_HOST.h
 * \version 1.00
 *
 * \brief
-*  This file provides types definition, constants and funciton definition for 
+*  This file provides types definition, constants and function definition for 
 *  the SDIO driver.
 *
 *******************************************************************************
 * \copyright
-* Copyright 2016, Cypress Semiconductor Corporation.  All rights reserved.
+* Copyright 2016-2019, Cypress Semiconductor Corporation.  All rights reserved.
 * You may use this file only in accordance with the license, terms, conditions,
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
@@ -28,6 +26,7 @@
 
 /**
 * \defgroup group_udb_sdio UDB_SDIO
+* \ingroup group_bsp_cy8kit_062_wifi_bt
 * \{
 *  SDIO - Secure Digital Input Output Is a standard for communicating with various
     external devices such as Wifi and bluetooth devices. 
@@ -37,7 +36,7 @@
 * \}
 * \defgroup group_udb_sdio_API API Reference
 * \{
-* \defgroup group_udb_sdio_macro Macro
+* \defgroup group_udb_sdio_macros Macros
 * \defgroup group_udb_sdio_functions Functions
 * \defgroup group_udb_sdio_data_structures Data Structures
 * \}
@@ -58,10 +57,15 @@
 **
 * \section group_udb_sdio_section_more_information More Information
 *
+* \} group_udb_sdio_general_description
 */
 
+#if !defined(CY_SDIO_H)
+#define CY_SDIO_H
+
 #include "SDIO_HOST_cfg.h"
-    
+#include "cmsis_os2.h"
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -70,6 +74,11 @@ extern "C" {
 /***************************************
 *            API Constants
 ***************************************/
+
+/**
+* \addtogroup group_udb_sdio_macros
+* \{
+*/
 
 #define SDIO_CMD_TIMEOUT                (100000u)    /**< Value used for firmware timeout*/
 #define SDIO_DAT_TIMEOUT                (500000u) /**< Value used for firmware timeout*/
@@ -117,9 +126,11 @@ extern "C" {
 \defgroup group_sdio_crc Constants for 7bit CRC for command
 */
 /* @{*/
-#define SDIO_CRC7_POLY                   (0x12u)    /** < Value of CRC polynomial*/
-#define SDIO_CRC_UPPER_BIT               (0x80u)    /** < Upper bit to test if it is high*/
+#define SDIO_CRC7_POLY                   (0x12u)    /**< Value of CRC polynomial*/
+#define SDIO_CRC_UPPER_BIT               (0x80u)    /**< Upper bit to test if it is high*/
 /*@} group_sdio_crc */
+
+/** \} group_udb_sdio_macros */
 
 
 /***************************************
@@ -127,7 +138,7 @@ extern "C" {
 ***************************************/
 
 /**
-* \addtogroup group_sdio_data_structures
+* \addtogroup group_udb_sdio_data_structures
 * \{
 */
 
@@ -230,16 +241,18 @@ typedef struct stc_sdio_cmd
 
 }stc_sdio_cmd_t;
 
-/** \} group_sdio_data_structures */
+/** \} group_udb_sdio_data_structures */
 
 /***************************************
 *        Function Prototypes
 ***************************************/
 
 /**
-* \addtogroup group_sdio_functions
+* \addtogroup group_udb_sdio_functions
 * \{
 */
+
+/** \cond INTERNAL */
 
 /* Main functions*/ 
 void                SDIO_Init(stc_sdio_irq_cb_t* pfuCb);
@@ -254,6 +267,7 @@ void                SDIO_EnableChipInt(void);
 void                SDIO_DisableChipInt(void);
 
 /*Low Level Functions*/
+en_sdio_result_t    SDIO_GetSemaphoreStatus(bool* status);
 void                SDIO_SendCommand(stc_sdio_cmd_config_t *pstcCmdConfig);
 en_sdio_result_t    SDIO_GetResponse(uint8_t bCmdIndexCheck, uint8_t bCmdCrcCheck, uint8_t u8CmdIdx, uint32_t* pu32Response, uint8_t* pu8ResponseBuf);
 void                SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig);
@@ -273,10 +287,16 @@ void                SDIO_WRITE_DMA_IRQ(void);
 
 void                SDIO_Crc7Init(void);
 
+/** \endcond */
+
+/** \} group_udb_sdio_functions */
+
 
 /***************************************
 *       Hardware Registers
 ***************************************/
+
+/** \cond INTERNAL */
 
 #define SDIO_CONTROL_REG   (* (reg8 *) \
 SDIO_HOST_bSDIO_CtrlReg__CONTROL_REG)
@@ -374,10 +394,14 @@ SDIO_HOST_bSDIO_Read_DP__F0_F1_REG)
 #define SDIO_BYTE_COUNT_REG     (* (reg8 *) \
 SDIO_HOST_bSDIO_byteCounter__PERIOD_REG)
 
+/** \endcond */
+
 #if defined(__cplusplus)
 }
 #endif
 
 #endif /* (CY_SDIO_H) */
+
+/** \} group_udb_sdio */
 
 /* [] END OF FILE */

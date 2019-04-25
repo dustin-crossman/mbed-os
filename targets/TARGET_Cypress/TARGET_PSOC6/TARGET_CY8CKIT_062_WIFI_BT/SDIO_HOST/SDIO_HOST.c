@@ -17,9 +17,6 @@
 
 //#define SEMAPHORE
 
-#ifdef SEMAPHORE
-    #include "RTOS/wwd_rtos_interface.h"
-#endif
 
 /*Globals Needed for DMA */
 /*DMA channel structures*/
@@ -48,8 +45,10 @@ static uint32_t yCounts;
 
 /* declare a semaphore*/
 #ifdef SEMAPHORE
-static host_semaphore_type_t        sdio_transfer_finished_semaphore;
+    static osSemaphoreId_t        sdio_transfer_finished_semaphore;
 #endif
+
+static uint32_t udb_initialized = 0;
 
 /*******************************************************************************
 * Function Name: SDIO_Init
@@ -66,11 +65,11 @@ static host_semaphore_type_t        sdio_transfer_finished_semaphore;
 *******************************************************************************/
 void SDIO_Init(stc_sdio_irq_cb_t* pfuCb)
 {
-
-#ifdef SEMAPHORE
-    wwd_result_t result;
-#endif
-
+    if ( !udb_initialized )
+    {
+        udb_initialized = 1;
+        SDIO_Host_Config_UDBs();
+    }
 
     /*Set Number of Blocks to 1 initially, this will be updated later*/
     SDIO_SetNumBlocks(1);
@@ -121,13 +120,18 @@ void SDIO_Init(stc_sdio_irq_cb_t* pfuCb)
     SDIO_EnableIntClock();
     SDIO_EnableSdClk();
 
-
-     /*Initalize the semaphore*/
 #ifdef SEMAPHORE
-    result = host_rtos_init_semaphore( &sdio_transfer_finished_semaphore );
-    if(result != WWD_SUCCESS)
+    /* Initialize the semaphore */
+    sdio_transfer_finished_semaphore = osSemaphoreNew(1, 1, NULL);
+    
+    if (!sdio_transfer_finished_semaphore)
     {
-        while(1);
+        while(1)
+        {
+            
+            
+            
+        }
     }
 #endif
 }
@@ -541,6 +545,35 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
     }
 }
 
+/*******************************************************************************
+* Function Name: SDIO_GetSemaphoreStatus
+****************************************************************************//**
+*
+* This function the current semaphore status
+*
+* \param status
+* Pointer to boolean where the semaphore status will be stored.
+* true if semaphore is acquired, false if semaphore is not acquired.
+*
+* \return
+* Error if semaphore was not initialized (SDIO_Init() was not called) 
+* \ref en_sdio_result_t
+*
+*******************************************************************************/
+en_sdio_result_t SDIO_GetSemaphoreStatus(bool* status)
+{
+    en_sdio_result_t retVal = Error;
+    
+#ifdef SEMAPHORE
+    if (!udb_initialized)
+    {
+        *status = (0 == osSemaphoreGetCount(&sdio_transfer_finished_semaphore));
+        retVal = Ok;
+    }
+#endif
+
+    return retVal;
+}
 
 /*******************************************************************************
 * Function Name: SDIO_SendCommandAndWait
@@ -563,10 +596,6 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
     stc_sdio_cmd_config_t   stcCmdConfig;
     stc_sdio_data_config_t  stcDataConfig;
     
-#ifdef SEMAPHORE
-    wwd_result_t result;
-#endif
-
     /*variable used for holding timeout value*/
 #ifndef SEMAPHORE
     uint32_t    u32Timeout = 0;
@@ -716,9 +745,16 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                         if(u32Timeout == SDIO_DAT_TIMEOUT)
 
             #else
-                         result = host_rtos_get_semaphore( &sdio_transfer_finished_semaphore, 10, WICED_TRUE );
-                         enRetTmp = SDIO_CheckForEvent(SdCmdEventTransferDone);
-                      /*if it was a read it is possible there is still extra data hanging out, trigger the
+                        osStatus_t result;
+                        
+                    
+                        if (!sdio_transfer_finished_semaphore)
+                        {
+                            result = osSemaphoreAcquire(&sdio_transfer_finished_semaphore, 10);
+                        }
+                        
+                        enRetTmp = SDIO_CheckForEvent(SdCmdEventTransferDone);
+                        /*if it was a read it is possible there is still extra data hanging out, trigger the
                            DMA again. This can result in extra data being transfered so the read buffer should be
                            3 bytes bigger than needed*/
                         if(pstcCmd->bRead == true)
@@ -727,7 +763,7 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                         }
 
 
-                        if(result != WWD_SUCCESS)
+                        if(result != osOK)
             #endif
                         {
                             enRet |= DataTimeout;
@@ -1173,7 +1209,7 @@ void SDIO_IRQ(void)
     {
         if(NULL != gstcInternalData.pstcCallBacks.pfnCardIntCb)
         {
-              gstcInternalData.pstcCallBacks.pfnCardIntCb();
+            gstcInternalData.pstcCallBacks.pfnCardIntCb();
         }
     }
     
@@ -1198,7 +1234,7 @@ void SDIO_IRQ(void)
         }
         /*set the done flag*/
 #ifdef SEMAPHORE
-        host_rtos_set_semaphore( &sdio_transfer_finished_semaphore, WICED_TRUE );
+        osSemaphoreRelease(&sdio_transfer_finished_semaphore);
 #else
         gstcInternalData.stcEvents.u8TransComplete++;
 #endif
@@ -1218,7 +1254,7 @@ void SDIO_IRQ(void)
         }
         /*Okay we're done so set the done flag*/
 #ifdef SEMAPHORE
-        host_rtos_set_semaphore( &sdio_transfer_finished_semaphore, WICED_TRUE );
+        osSemaphoreRelease(&sdio_transfer_finished_semaphore);
 #else
         gstcInternalData.stcEvents.u8TransComplete++;
 #endif

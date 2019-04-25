@@ -49,8 +49,6 @@
 /* The 1 byte transition mode define */
 #define CY_HAL_SDIO_1B       (1u)
 
-/* Temporary buffer for 64b mode while read operation */
-static uint8_t temp_dma_buffer[2*1024];
 
 /*******************************************************************************
 *       Configuration structures for SDIO pins
@@ -557,20 +555,6 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
                 obj->resource.block_num = udbRsc.block_num;
                 obj->resource.channel_num = udbRsc.channel_num;
 
-                SDIO_Init((stc_sdio_irq_cb_t *) &cy_sdio_interrupts_dispatcher_IRQHandler);
-                
-                /* Register two DMA interrupt handler functions 
-                *  TODO: 
-                *  1. Need to do this in the DMA hal (once it is implemented)
-                *  2. Figure out how to aware rtoses about these handler executions.
-                *
-                *   __asm__( "PUSH {lr}" ); 
-                *   __asm__( "bl _tx_thread_context_save" );
-                *   handler(); \
-                *   __asm__( "b  _tx_thread_context_restore" ); 
-                *  ...
-                */
-                
                 /* Set default interrupt priority of 7 (lowest possible priority) */
                 cy_stc_sysint_t irqCfg = {udb_interrupts_0_IRQn, 7};
                 Cy_SysInt_Init(&irqCfg, &SDIO_IRQ);
@@ -588,17 +572,22 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
 
                 obj->frequency_hz = 400000U;        /* SDIO_Init() configures the SDIO to 40 kHz */
                 obj->block_size   = CY_HAL_SDIO_64B;
+
+                 /* Connect UDB to DMA */
+                 Cy_TrigMux_Connect(TRIG0_IN_TR_GROUP14_OUTPUT1, TRIG0_OUT_CPUSS_DW0_TR_IN1, false, TRIGGER_TYPE_LEVEL);
+                 Cy_TrigMux_Connect(TRIG0_IN_TR_GROUP14_OUTPUT4, TRIG0_OUT_CPUSS_DW0_TR_IN0, false, TRIGGER_TYPE_LEVEL);
+                 Cy_TrigMux_Connect(TRIG1_IN_TR_GROUP14_OUTPUT0, TRIG1_OUT_CPUSS_DW1_TR_IN1, false, TRIGGER_TYPE_LEVEL);
+                 Cy_TrigMux_Connect(TRIG1_IN_TR_GROUP14_OUTPUT5, TRIG1_OUT_CPUSS_DW1_TR_IN3, false, TRIGGER_TYPE_LEVEL);
+                 
+                 Cy_TrigMux_Connect(TRIG14_IN_UDB_TR_UDB0, TRIG14_OUT_TR_GROUP1_INPUT43, false, TRIGGER_TYPE_LEVEL);
+                 Cy_TrigMux_Connect(TRIG14_IN_UDB_TR_UDB1, TRIG14_OUT_TR_GROUP0_INPUT44, false, TRIGGER_TYPE_LEVEL);
+                 Cy_TrigMux_Connect(TRIG14_IN_UDB_TR_UDB3, TRIG14_OUT_TR_GROUP0_INPUT47, false, TRIGGER_TYPE_LEVEL);
+                 Cy_TrigMux_Connect(TRIG14_IN_UDB_TR_UDB7, TRIG14_OUT_TR_GROUP1_INPUT48, false, TRIGGER_TYPE_LEVEL);
+
+                stc_sdio_irq_cb_t   irq_cbs;
+                irq_cbs.pfnCardIntCb = cy_sdio_interrupts_dispatcher_IRQHandler;
                 
-                /* Connect UDB to DMA */
-                Cy_TrigMux_Connect(TRIG0_IN_TR_GROUP14_OUTPUT1, TRIG0_OUT_CPUSS_DW0_TR_IN1, false, TRIGGER_TYPE_LEVEL);
-                Cy_TrigMux_Connect(TRIG0_IN_TR_GROUP14_OUTPUT4, TRIG0_OUT_CPUSS_DW0_TR_IN0, false, TRIGGER_TYPE_LEVEL);
-                Cy_TrigMux_Connect(TRIG1_IN_TR_GROUP14_OUTPUT0, TRIG1_OUT_CPUSS_DW1_TR_IN1, false, TRIGGER_TYPE_LEVEL);
-                Cy_TrigMux_Connect(TRIG1_IN_TR_GROUP14_OUTPUT5, TRIG1_OUT_CPUSS_DW1_TR_IN3, false, TRIGGER_TYPE_LEVEL);
-                
-                Cy_TrigMux_Connect(TRIG14_IN_UDB_TR_UDB0, TRIG14_OUT_TR_GROUP1_INPUT43, false, TRIGGER_TYPE_LEVEL);
-                Cy_TrigMux_Connect(TRIG14_IN_UDB_TR_UDB1, TRIG14_OUT_TR_GROUP0_INPUT44, false, TRIGGER_TYPE_LEVEL);
-                Cy_TrigMux_Connect(TRIG14_IN_UDB_TR_UDB3, TRIG14_OUT_TR_GROUP0_INPUT47, false, TRIGGER_TYPE_LEVEL);
-                Cy_TrigMux_Connect(TRIG14_IN_UDB_TR_UDB7, TRIG14_OUT_TR_GROUP1_INPUT48, false, TRIGGER_TYPE_LEVEL);
+                SDIO_Init(&irq_cbs);
                 
                 retVal = cy_hwmgr_set_configured(udbRsc.type, udbRsc.block_num, udbRsc.channel_num);
             }
@@ -668,12 +657,17 @@ cy_rslt_t cy_sdio_configure(cy_sdio_t *obj, const cy_sdio_cfg_t *config)
         return CY_RSLT_SDIO_BAD_PARAM_ARGUMENT;
     }
 
-    SDIO_SetSdClkFrequency(config->frequency_hz);
-    SDIO_SetBlockSize(config->block_size);
-
-    obj->frequency_hz = config->frequency_hz;
-    obj->block_size   = config->block_size;
+    if (config->frequency_hz != 0)
+    {
+        SDIO_SetSdClkFrequency(config->frequency_hz);
+        obj->frequency_hz = config->frequency_hz;
+    }
     
+    if (config->block_size != 0)
+    {
+        SDIO_SetBlockSize(config->block_size);
+        obj->block_size   = config->block_size;
+    }
     return CY_RSLT_SUCCESS;
 }
 
@@ -771,15 +765,6 @@ cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_
 
         /* Update object info */
         obj->block_size = CY_HAL_SDIO_64B;
-        
-        if (direction == CY_READ)
-        {
-            /* In this mode, we may be reading more than the requested size to round
-             * up to the nearest multiple of block size. So, providing temp buffer
-             * instead of the original buffer to avoid memory corruption
-             */
-            cmd.pu8Data = (uint8_t *)temp_dma_buffer;
-        }
     }
     else
     {
@@ -801,11 +786,6 @@ cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_
     else
     {
         retVal = CY_RSLT_SUCCESS;
-    }
-
-    if ((direction == CY_READ) && (cmd.u16BlockSize == CY_HAL_SDIO_64B))
-    {
-        memcpy((uint32_t*) data, temp_dma_buffer, (size_t) length);
     }
 
     if (response != NULL)
@@ -852,15 +832,7 @@ cy_rslt_t cy_sdio_transfer_async(cy_sdio_t *obj, cy_transfer_t direction, uint32
 
         /* Update object info */
         obj->block_size = CY_HAL_SDIO_64B;
-        
-        if (direction == CY_READ)
-        {
-            /* In this mode, we may be reading more than the requested size to round
-             * up to the nearest multiple of block size. So, providing temp buffer
-             * instead of the original buffer to avoid memory corruption
-             */
-            cmd.pu8Data = (uint8_t *)temp_dma_buffer;
-        }
+
     }
     else
     {
@@ -882,11 +854,6 @@ cy_rslt_t cy_sdio_transfer_async(cy_sdio_t *obj, cy_transfer_t direction, uint32
     else
     {
         retVal = CY_RSLT_SUCCESS;
-    }
-
-    if ((direction == CY_READ) && (cmd.u16BlockSize == CY_HAL_SDIO_64B))
-    {
-        memcpy((uint32_t *) data, temp_dma_buffer, (size_t) length);
     }
 
     return retVal;
