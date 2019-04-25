@@ -8249,7 +8249,7 @@
     },
     "AUGUST_CYW43012_M0": {
         "inherits": ["MCU_PSOC6_M0"],
-        "extra_labels_add": ["AUGUST_CYW43012"],
+        "extra_labels_add": ["PSOC6_01", "AUGUST_CYW43012"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "post_binary_hook": {
             "function": "PSOC6Code.complete"
