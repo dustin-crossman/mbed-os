@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-#define THREAD_STACK_SIZE   	(1024 + 1400)
+#define THREAD_STACK_SIZE   	5000
 #define THREAD_PRIORITY   	    0
 //TODO: Need to use priority from whd_rtos.h when available
 //#define THREAD_PRIORITY   	RTOS_HIGHEST_PRIORITY
@@ -83,7 +83,7 @@ static cy_rslt_t init_sdio_wlan(cy_sdio_t *sdio_obj)
         Cy_SysLib_Delay(10);
         /* Init SDIO Host */
         result = cy_sdio_init(sdio_obj, CY_WIFI_SDIO_CMD, CY_WIFI_SDIO_CLK, CY_WIFI_SDIO_DATA_0, CY_WIFI_SDIO_DATA_1, CY_WIFI_SDIO_DATA_2, CY_WIFI_SDIO_DATA_3);
-        if(result != CY_RSLT_SUCCESS)
+        if(result == CY_RSLT_SUCCESS)
         {
             Cy_SysLib_Delay(10);
             /* WiFi out of reset */
