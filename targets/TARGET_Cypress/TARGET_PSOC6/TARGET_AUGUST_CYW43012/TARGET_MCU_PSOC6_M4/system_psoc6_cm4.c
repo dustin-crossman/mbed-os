@@ -291,12 +291,8 @@ void mbed_sdk_init(void)
     /* Placed here as it must be done after proper LIBC initialization. */
     SystemInit();
 
-#ifdef __CM0P_PRESENT
-    #if (__CM0P_PRESENT == 0)
     /* Set up the device based on configurator selections */
     init_cycfg_all();
-    #endif /* (__CM0P_PRESENT) */
-#endif
 
     /* Enable global interrupts */
     __enable_irq();

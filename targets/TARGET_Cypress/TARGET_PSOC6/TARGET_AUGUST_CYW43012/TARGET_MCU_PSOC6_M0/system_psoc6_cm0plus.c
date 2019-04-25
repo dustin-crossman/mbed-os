@@ -176,8 +176,6 @@ void mbed_sdk_init(void)
     /* Initialize system and clocks. */
     /* Placed here as it must be done after proper LIBC initialization. */
     SystemInit();
-    /* Set up the device based on configurator selections */
-    init_cycfg_all();
 }
 
 #if defined(COMPONENT_SPM_MAILBOX)
