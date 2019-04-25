@@ -83,6 +83,9 @@
       },
       "debug": {
         "coreLoadImage": "false"
+      },
+      "program": {
+        "PROGRAM_NAME": ".hex"
       }
     },
     
