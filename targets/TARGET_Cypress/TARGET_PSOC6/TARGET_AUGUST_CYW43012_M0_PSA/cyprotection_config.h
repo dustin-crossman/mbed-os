@@ -2,7 +2,7 @@
 * 
 * \copyright
 
-* (c) 2018, Cypress Semiconductor Corporation
+* (c) 2019, Cypress Semiconductor Corporation
 * or a subsidiary of Cypress Semiconductor Corporation. All rights
 * reserved.
 *
@@ -41,15 +41,16 @@ CY_PROT_PCMASK7)
 CY_PROT_PCMASK3 + CY_PROT_PCMASK4)
 
 #define ALL_SUBREGIONS (0x0)
+#define SECURE_IMAGE_HEADER_SIZE (0x400)
 
 const cy_smpu_region_config_t flash_spm_smpu_config[] = {
     {   /* FLASH_PC1_SPM */
-        .address = (uint32_t *)PSA_SECURE_ROM_START, /* 0x10000000 */
+        .address = (uint32_t *)(PSA_SECURE_ROM_START - SECURE_IMAGE_HEADER_SIZE), /* 0x10080000, include header of SPE image */
         .regionSize = CY_PROT_SIZE_512KB, /* 0x80000 */
-        .subregions = ALL_SUBREGIONS,
+        .subregions = (CY_PROT_SUBREGION_DIS7 | CY_PROT_SUBREGION_DIS6), /* disable regions 6, 7, end protection on 0x100E0000 */
         .userPermission = CY_PROT_PERM_RWX,
         .privPermission = CY_PROT_PERM_RWX,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .prot_region = PROT_SMPU_SMPU_STRUCT5,
@@ -57,16 +58,19 @@ const cy_smpu_region_config_t flash_spm_smpu_config[] = {
         .privMstPermission = CY_PROT_PERM_RW,
         .pcMstMask = CY_PROT_PCMASK1,
     }
-};
+};                                   
 
 const cy_smpu_region_config_t sram_spm_smpu_config[] = {
     {   /* SRAM_SPM_PRIV - must include SRAM_SPM_PUB area */
-        .address = (uint32_t *)PSA_SECURE_RAM_START, /* 0x08020000 */
-        .regionSize = CY_PROT_SIZE_64KB, /* 0x10000 */
-        .subregions = ALL_SUBREGIONS, /* 0xC0, /*Size 0xC000 ALL_SUBREGIONS,*/
+        .address = (uint32_t *)PSA_NON_SECURE_RAM_START, /* 0x08000000 */
+        .regionSize = CY_PROT_SIZE_256KB, /* 0x40000 */
+        /* 0xC3 - disable regions 0, 1 (NSPE RAM) 6, 7 (DAP RAM, FLASHBOOT etc)
+           protect SPE, CyBootloader. End protection at 0x08030000 */
+        .subregions = (CY_PROT_SUBREGION_DIS7 | CY_PROT_SUBREGION_DIS6 | 
+                       CY_PROT_SUBREGION_DIS1 | CY_PROT_SUBREGION_DIS0),
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RWX,
-        .secure = true,
+        .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
         .prot_region = PROT_SMPU_SMPU_STRUCT9,
@@ -83,7 +87,7 @@ const cy_stc_smpu_cfg_t default_smpu_master_config = {
     .subregions = ALL_SUBREGIONS, /* Not used */
     .userPermission = CY_PROT_PERM_R,
     .privPermission = CY_PROT_PERM_RW,
-    .secure = true,
+    .secure = false,
     .pcMatch = false,
     .pcMask = CY_PROT_PCMASK1,
 };
