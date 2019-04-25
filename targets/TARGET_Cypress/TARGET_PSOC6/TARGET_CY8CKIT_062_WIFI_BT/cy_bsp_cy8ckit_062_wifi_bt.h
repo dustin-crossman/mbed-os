@@ -58,6 +58,7 @@
 #include "cy_result.h"
 #include "cy_pdl.h"
 #include "cy_abstraction_board.h"
+#include "whd_wifi_api.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -158,7 +159,7 @@ extern "C" {
 #define AOUT               NC
 
 /** \endcond */
-cy_rslt_t init_cycfg_wlan_hw(void);
+whd_driver_t* get_whd_driver(void);
 
 
 #if defined(__cplusplus)

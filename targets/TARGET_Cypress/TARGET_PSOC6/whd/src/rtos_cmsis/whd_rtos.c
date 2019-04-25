@@ -115,7 +115,7 @@ whd_result_t whd_rtos_join_thread(whd_thread_type_t *thread)
  */
 whd_result_t whd_rtos_init_semaphore(/*@out@*/ whd_semaphore_type_t *semaphore)   /*@modifies *semaphore@*/
 {
-    *semaphore = osSemaphoreNew(1, 1, NULL);
+    *semaphore = osSemaphoreNew(1, 0, NULL);
     if (*semaphore == NULL)
     {
         WPRINT_WHD_ERROR( (" semaphore init failed \n") );

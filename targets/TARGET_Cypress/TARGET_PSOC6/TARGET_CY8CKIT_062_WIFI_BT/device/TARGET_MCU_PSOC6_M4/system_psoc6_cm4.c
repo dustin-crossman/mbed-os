@@ -299,13 +299,25 @@ void mbed_sdk_init(void)
 #endif
 
     /* Set up the device based on configurator selections */
-    cy_board_init();
+    init_cycfg_all();
 
     /* Enable global interrupts */
     __enable_irq();
 }
 
 
+/*******************************************************************************
+* Function Name: mbed_main
+****************************************************************************//**
+*
+* Mbed's post-memory-initialization function.
+* Used here to initialize common parts of the Cypress libraries.
+*
+*******************************************************************************/
+void mbed_main(void)
+{
+	cy_board_init();
+}
 
 /*******************************************************************************
 * Function Name: Cy_SystemInit
