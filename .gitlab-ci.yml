@@ -45,9 +45,10 @@ pyocd_wrapper:
     - pip install six
     - pip install setuptools_scm_git_archive
     - pip install setuptools_scm
+    - pip install libusb
     - echo "[INFO] Installing pyocd"
     - cd pyocd
-    - python pyocd/setup.py install
+    - python setup.py install
     - cd ..
     - echo "[INFO] Start tests"
     - cd targets\TARGET_Cypress\TARGET_PSOC6\sb-tools\test
