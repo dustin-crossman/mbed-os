@@ -1,6 +1,6 @@
 TEST_BIN = "test_data/test.bin"
-BLINKY_HEX = "test_data/blinky.hex"
-FROM_CHIP_HEX = "test_data/from_chip.hex"
+BLINKY_SMALL_HEX = "test_data/blinky_small.hex"
+BLINKY_LARGE_HEX = "test_data/blinky_large.hex"
 
 
 def create_test_bin():

@@ -11,6 +11,7 @@ from execute.programmer.exceptions import ExtendedTransferFaultError
 
 TOOL = 'pyocd'
 TARGET = 'cy8c64xx_cm4'
+PROBE_ID = '1A06199701047400'
 
 # PSoC6 BLE Memory Regions
 RAM_ADDR = 0x08000000
@@ -35,7 +36,7 @@ class TestReadWrite(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tool = ProgrammingTool.create(TOOL)
-        cls.tool.connect(TARGET)
+        cls.tool.connect(TARGET, probe_id=PROBE_ID)
         create_test_bin()
         print('[INFO] Program Main region with test data')
         cls.tool.program(TEST_BIN, address=MAIN_ADDR)
@@ -168,7 +169,7 @@ class TestProgramming(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tool = ProgrammingTool.create(TOOL)
-        cls.tool.connect(TARGET)
+        cls.tool.connect(TARGET, probe_id=PROBE_ID)
         create_test_bin()
 
     @classmethod
@@ -204,10 +205,10 @@ class TestProgramming(unittest.TestCase):
 
     def test_program_hex(self):
         intel_hex = IntelHex()
-        intel_hex.loadhex(BLINKY_HEX)
+        intel_hex.loadhex(BLINKY_SMALL_HEX)
         arr = intel_hex.gets(MAIN_ADDR, 0x400)
         self.tool.erase(MAIN_ADDR, 0x400)
-        self.tool.program(BLINKY_HEX)
+        self.tool.program(BLINKY_SMALL_HEX)
         match = False
         i = 0
         while i < len(arr):
@@ -223,7 +224,7 @@ class TestControlAPIs(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tool = ProgrammingTool.create(TOOL)
-        cls.tool.connect(TARGET)
+        cls.tool.connect(TARGET, probe_id=PROBE_ID)
 
     @classmethod
     def tearDownClass(cls):
@@ -263,12 +264,12 @@ class TestControlAPIs(unittest.TestCase):
         self.tool.erase(MAIN_ADDR, 0xC000)
         self.tool.set_frequency(100)
         time_before_program = time.time()
-        self.tool.program(FROM_CHIP_HEX)
+        self.tool.program(BLINKY_LARGE_HEX)
         time1 = time.time() - time_before_program
         self.tool.set_frequency(1200)
         self.tool.erase(MAIN_ADDR, 0xC000)
         time_before_program = time.time()
-        self.tool.program(FROM_CHIP_HEX)
+        self.tool.program(BLINKY_LARGE_HEX)
         time2 = time.time() - time_before_program
         self.assertGreater(time1, time2)
 
@@ -280,4 +281,5 @@ class TestControlAPIs(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    ret = not unittest.runner.run(unittest.suite).wasSuccessful()
+    sys.exit(ret)

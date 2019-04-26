@@ -15,11 +15,12 @@ class Pyocd(ProgrammerBase):
         self.target = None
         self.probe = None
 
-    def connect(self, target_name=None, interface=None):
+    def connect(self, target_name=None, interface=None, probe_id=None):
         """
         Connects to target using default debug interface.
         :param target_name: The target name.
         :param interface: Debug interface.
+        :param probe_id: Probe serial number.
         :return: True if connected successfully, otherwise False.
         """
         if interface:
@@ -31,7 +32,7 @@ class Pyocd(ProgrammerBase):
                 }
             else:
                 options = {}
-            self.session = ConnectHelper.session_with_chosen_probe(blocking=True, options=options)
+            self.session = ConnectHelper.session_with_chosen_probe(blocking=True, options=options, board_id=probe_id)
             if self.session is None:
                 return False
             self.board = self.session.board
