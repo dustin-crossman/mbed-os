@@ -111,18 +111,6 @@ class Pyocd(ProgrammerBase):
             raise ValueError('Target is not initialized.')
         self.target.reset_and_halt(reset_type=reset_type)
 
-    def set_core(self, core_number):
-        """
-        Selects CPU core by number.
-        :param core_number: The core number.
-        """
-        if self.target is None:
-            raise ValueError('Target is not initialized.')
-        # self.target.selected_core = core_number
-        if core_number not in self.target.cores:
-            raise ValueError("Invalid core number")
-        self.target._selected_core = core_number
-
     def read8(self, address):
         """
         Reads 8-bit value from specified memory location.
