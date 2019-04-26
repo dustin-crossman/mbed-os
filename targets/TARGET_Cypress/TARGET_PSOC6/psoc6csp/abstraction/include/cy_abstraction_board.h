@@ -1,24 +1,36 @@
-/*******************************************************************************
-* File Name: cy_abstraction_board.h
+/***************************************************************************//**
+* \file cy_abstraction_board.h
 *
-* Description:
+* \brief
 * Basic abstraction layer for dealing with boards containing a Cypress MCU. This
 * API provides convenience methods for initializing and manipulating different
 * hardware found on the board.
-* 
+*
 ********************************************************************************
-* Copyright (c) 2017-2018 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
 
 /**
 * \addtogroup group_abstraction_board Board abstraction
 * \ingroup group_abstraction
 * \{
-* TODO: Board abstraction high-level description
-* to be set in abstraction/include/cy_abstraction_board.h
+* Basic abstraction layer for dealing with boards containing a Cypress MCU. This
+* API provides convenience methods for initializing and manipulating different
+* hardware found on the board.
 *
 * \defgroup group_abstraction_board_macros Macros
 * \defgroup group_abstraction_board_functions Functions
@@ -39,12 +51,12 @@ extern "C" {
 * \{
 */
 
-/** TODO */
-#define CYBRD_RSLT_INVALID_INDEX (CY_RSLT_CREATE(CY_RSLT_ERROR, CY_RSLT_MODULE_BOARD_BASE, 0))
-/** TODO */
-#define CYBRD_RSLT_ALREADY_ENABLED (CY_RSLT_CREATE(CY_RSLT_ERROR, CY_RSLT_MODULE_BOARD_BASE, 1))
-/** TODO */
-#define CYBRD_RSLT_NOT_ENABLED (CY_RSLT_CREATE(CY_RSLT_ERROR, CY_RSLT_MODULE_BOARD_BASE, 2))
+/** The specified resource number is not valid */
+#define CYBRD_RSLT_INVALID_INDEX (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_BSP, 0))
+/** The specified resource is already enabled */
+#define CYBRD_RSLT_ALREADY_ENABLED (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_BSP, 1))
+/** The specified resource is not enabled */
+#define CYBRD_RSLT_NOT_ENABLED (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_BSP, 2))
 
 /** \} group_abstraction_board_macros */
 
@@ -55,16 +67,16 @@ extern "C" {
 */
 
 /**
- * \brief initialize all hardware on the board
+ * \brief Initialize all hardware on the board
  * \returns CY_RSLT_SUCCESS if the board is sucessfully initialized, if there is
- *          a problem initializing any hardware it returns an error code specific 
- *          to the hardware module that had a problem.  
+ *          a problem initializing any hardware it returns an error code specific
+ *          to the hardware module that had a problem.
  */
 cy_rslt_t cy_board_init(void);
 
 /**
  * \brief Returns the number of LEDs in the system
- * \returns The number of LEDs physically on the board that the user can use.  
+ * \returns The number of LEDs physically on the board that the user can use.
  */
 uint32_t cy_board_led_count(void);
 
@@ -98,7 +110,7 @@ cy_rslt_t cy_board_led_disable(uint32_t which);
 
 /**
  * \brief Returns the number of switches in the system.
- * \returns The number of switches physically on the board that the user can use.  
+ * \returns The number of switches physically on the board that the user can use.
  */
 uint32_t cy_board_switch_count(void);
 

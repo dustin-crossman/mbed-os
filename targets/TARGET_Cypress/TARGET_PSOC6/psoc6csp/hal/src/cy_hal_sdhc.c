@@ -30,7 +30,8 @@
 #include "cy_sd_host.h"
 #include "cy_gpio.h"
 #include "cy_hal_pin_package.h"
-
+#include "cy_hal_hwmgr.h"
+#include "cy_hal_interconnect.h"
 
 #ifdef CY_IP_MXSDHC
 
@@ -204,6 +205,19 @@ static cy_en_sd_host_status_t Cy_SD_Host_PollTransferComplete(SDHC_Type *base)
     return ret;
 }
 
+/* Disconnect (interconnect) pin and free it (hwmgr) as resource */
+static cy_rslt_t cy_sdhc_free_pin(cy_gpio_t pin)
+{
+    cy_resource_inst_t rsc;
+    cy_rslt_t result = cy_disconnect_pin(pin);
+    if (CY_RSLT_SUCCESS == result)
+    {
+        rsc = cy_utils_get_gpio_resource(pin);
+        result = cy_hwmgr_free(&rsc);
+    }
+    return result;
+}
+
 
 cy_rslt_t cy_sdhc_init(cy_sdhc_t *obj,
                     cy_gpio_t cmd,
@@ -223,125 +237,322 @@ cy_rslt_t cy_sdhc_init(cy_sdhc_t *obj,
                     cy_gpio_t ledCtrl,
                     cy_gpio_t cardEmmcReset)
 {
-    cy_rslt_t ret = CY_RSLT_SUCCESS;
-    cy_en_sd_host_status_t driverRet = CY_SD_HOST_SUCCESS;
-    GPIO_PRT_Type *port;
-    const uint32_t outputVal = 0UL;
+    cy_rslt_t result = CY_RSLT_SUCCESS;
     cy_stc_sd_host_init_config_t   hostConfig;
+    cy_resource_inst_t pin_rsc;
+    const cy_resource_pin_mapping_t *map;
 
-    /* Enable the SDHC block. */
-    Cy_SD_Host_Enable(obj->base);
-
-    /* Configure GPIO pins. */
-    port = Cy_GPIO_PortToAddr(CY_PORT(cmd));
-    Cy_GPIO_Pin_FastInit(port, CY_PIN(cmd), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
-
-    port = Cy_GPIO_PortToAddr(CY_PORT(clk));
-    Cy_GPIO_Pin_FastInit(port, CY_PIN(clk), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
-
-    port = Cy_GPIO_PortToAddr(CY_PORT(data0));
-    Cy_GPIO_Pin_FastInit(port, CY_PIN(data0), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
-
-    if (NC != data1)
+    /* Reserve SDHC */
+    map = CY_UTILS_GET_RESOURCE(cmd, cy_pin_map_sdhc_card_cmd);
+    if (NULL != map)
     {
-        port = Cy_GPIO_PortToAddr(CY_PORT(data1));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(data1), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
+        obj->resource = *map->inst;
+        result = cy_hwmgr_reserve(&obj->resource);
     }
 
-    if (NC != data2)
+    /* Reserve and configure GPIO pins. */
+    if (result == CY_RSLT_SUCCESS)
     {
-        port = Cy_GPIO_PortToAddr(CY_PORT(data2));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(data2), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
+        pin_rsc = cy_utils_get_gpio_resource(cmd);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(cmd, cy_pin_map_sdhc_card_cmd);
+            result = cy_connect_pin(map);
+        }
     }
 
-    if (NC != data3)
+    if (result == CY_RSLT_SUCCESS)
     {
-        port = Cy_GPIO_PortToAddr(CY_PORT(data3));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(data3), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
+        pin_rsc = cy_utils_get_gpio_resource(clk);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(clk, cy_pin_map_sdhc_clk_card);
+            result = cy_connect_pin(map);
+        }
+    }
+    
+    if (result == CY_RSLT_SUCCESS)
+    {
+        pin_rsc = cy_utils_get_gpio_resource(data0);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(data0, cy_pin_map_sdhc_card_dat_3to0);
+            result = cy_connect_pin(map);
+        }
+    }
+    
+    if ((NC != data1) && (CY_RSLT_SUCCESS == result))
+    {
+        pin_rsc = cy_utils_get_gpio_resource(data1);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(data1, cy_pin_map_sdhc_card_dat_3to0);
+            result = cy_connect_pin(map);
+        }
     }
 
-    if (NC != data4)
+    if ((NC != data2) && (CY_RSLT_SUCCESS == result))
     {
-        port = Cy_GPIO_PortToAddr(CY_PORT(data4));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(data4), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
+        pin_rsc = cy_utils_get_gpio_resource(data2);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(data2, cy_pin_map_sdhc_card_dat_3to0);
+            result = cy_connect_pin(map);
+        }
     }
 
-    if (NC != data5)
+    if ((NC != data3) && (CY_RSLT_SUCCESS == result))
     {
-        port = Cy_GPIO_PortToAddr(CY_PORT(data5));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(data5), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
+        pin_rsc = cy_utils_get_gpio_resource(data3);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(data3, cy_pin_map_sdhc_card_dat_3to0);
+            result = cy_connect_pin(map);
+        }
     }
 
-    if (NC != data6)
+    if ((NC != data4) && (CY_RSLT_SUCCESS == result))
     {
-        port = Cy_GPIO_PortToAddr(CY_PORT(data6));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(data6), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
+        pin_rsc = cy_utils_get_gpio_resource(data4);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(data4, cy_pin_map_sdhc_card_dat_7to4);
+            result = cy_connect_pin(map);
+        }
     }
 
-    if (NC != data7)
+    if ((NC != data5) && (CY_RSLT_SUCCESS == result))
     {
-        port = Cy_GPIO_PortToAddr(CY_PORT(data7));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(data7), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
+        pin_rsc = cy_utils_get_gpio_resource(data5);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(data5, cy_pin_map_sdhc_card_dat_7to4);
+            result = cy_connect_pin(map);
+        }
     }
 
-    if (NC != cardDetect)
+    if ((NC != data6) && (CY_RSLT_SUCCESS == result))
     {
-        port = Cy_GPIO_PortToAddr(CY_PORT(cardDetect));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(cardDetect), CY_GPIO_DM_HIGHZ, outputVal, HSIOM_SEL_ACT_14);
+        pin_rsc = cy_utils_get_gpio_resource(data6);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(data6, cy_pin_map_sdhc_card_dat_7to4);
+            result = cy_connect_pin(map);
+        }
     }
 
-    if (NC != ioVoltSel)
+    if ((NC != data7) && (CY_RSLT_SUCCESS == result))
     {
-        port = Cy_GPIO_PortToAddr(CY_PORT(ioVoltSel));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(ioVoltSel), CY_GPIO_DM_STRONG_IN_OFF, outputVal, HSIOM_SEL_ACT_14);
+        pin_rsc = cy_utils_get_gpio_resource(data7);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(data7, cy_pin_map_sdhc_card_dat_7to4);
+            result = cy_connect_pin(map);
+        }
+    }
+    
+    if ((NC != cardDetect) && (CY_RSLT_SUCCESS == result))
+    {
+        pin_rsc = cy_utils_get_gpio_resource(cardDetect);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(cardDetect, cy_pin_map_sdhc_card_detect_n);
+            result = cy_connect_pin(map);
+        }
+    }
+    
+    if ((NC != ioVoltSel) && (CY_RSLT_SUCCESS == result))
+    {
+        pin_rsc = cy_utils_get_gpio_resource(ioVoltSel);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(ioVoltSel, cy_pin_map_sdhc_io_volt_sel);
+            result = cy_connect_pin(map);
+        }
+    }
+    
+    if ((NC != cardIfPwrEn) && (CY_RSLT_SUCCESS == result))
+    {
+        pin_rsc = cy_utils_get_gpio_resource(cardIfPwrEn);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(cardIfPwrEn, cy_pin_map_sdhc_card_if_pwr_en);
+            result = cy_connect_pin(map);
+        }
+    }
+    
+    if ((NC != cardMechWriteProt) && (CY_RSLT_SUCCESS == result))
+    {
+        pin_rsc = cy_utils_get_gpio_resource(cardMechWriteProt);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(cardMechWriteProt, cy_pin_map_sdhc_card_mech_write_prot);
+            result = cy_connect_pin(map);
+        }
+    }
+    
+    if ((NC != ledCtrl) && (CY_RSLT_SUCCESS == result))
+    {
+        pin_rsc = cy_utils_get_gpio_resource(ledCtrl);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(ledCtrl, cy_pin_map_sdhc_led_ctrl);
+            result = cy_connect_pin(map);
+        }
+    }
+    
+    if ((NC != cardEmmcReset) && (CY_RSLT_SUCCESS == result))
+    {
+        pin_rsc = cy_utils_get_gpio_resource(cardEmmcReset);
+        result = cy_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {    
+            map = CY_UTILS_GET_RESOURCE(cardEmmcReset, cy_pin_map_sdhc_card_emmc_reset_n);
+            result = cy_connect_pin(map);
+        }
+    }
+    
+    if (CY_RSLT_SUCCESS == result)
+    {
+        /* Enable the SDHC block. */
+        Cy_SD_Host_Enable(obj->base);
+    
+        /* Configure SD Host to operate */
+        hostConfig.dmaType = obj->dmaType;
+        hostConfig.enableLedControl = obj->enableLedControl;
+        hostConfig.emmc = obj->emmc;
+        obj->context.cardType = CY_SD_HOST_NOT_EMMC;
+
+        result = Cy_SD_Host_Init(obj->base, &hostConfig, &obj->context);
     }
 
-    if (NC != cardIfPwrEn)
-    {
-        port = Cy_GPIO_PortToAddr(CY_PORT(cardIfPwrEn));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(cardIfPwrEn), CY_GPIO_DM_STRONG_IN_OFF, outputVal, HSIOM_SEL_ACT_14);
-    }
-
-    if (NC != cardMechWriteProt)
-    {
-        port = Cy_GPIO_PortToAddr(CY_PORT(cardMechWriteProt));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(cardMechWriteProt), CY_GPIO_DM_HIGHZ, outputVal, HSIOM_SEL_ACT_14);
-    }
-
-    if (NC != ledCtrl)
-    {
-        port = Cy_GPIO_PortToAddr(CY_PORT(ledCtrl));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(ledCtrl), CY_GPIO_DM_STRONG_IN_OFF, outputVal, HSIOM_SEL_ACT_14);
-    }
-
-    if (NC != cardEmmcReset)
-    {
-        port = Cy_GPIO_PortToAddr(CY_PORT(cardEmmcReset));
-        Cy_GPIO_Pin_FastInit(port, CY_PIN(cardEmmcReset), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
-    }
-
-    /* Configure SD Host to operate */
-    hostConfig.dmaType = obj->dmaType;
-    hostConfig.enableLedControl = obj->enableLedControl;
-    hostConfig.emmc = obj->emmc;
-    obj->context.cardType = CY_SD_HOST_NOT_EMMC;
-
-    driverRet = Cy_SD_Host_Init(obj->base, &hostConfig, &obj->context);
-
-    if (CY_SD_HOST_SUCCESS != driverRet)
-    {
-        ret = CY_RSLT_TYPE_ERROR;
-    }
-
-    return ret;
+    if (CY_SD_HOST_SUCCESS != result)
+        {
+            result = CY_RSLT_TYPE_ERROR;
+        }
+    return result;
 }
 
 
 cy_rslt_t cy_sdhc_free(cy_sdhc_t *obj)
 {
+    cy_rslt_t result = CY_RSLT_SUCCESS;
+    bool configured = false;
+
+    /* Free SDHC */
+    if (CY_RSC_INVALID != obj->resource.type)
+    {
+        result = cy_hwmgr_free(&obj->resource);
+    }
+
+    /* Free pins */
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_cmd);
+    }
+
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_clk);
+    }
+
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_data0);
+    }
+
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_data1);
+    }
+
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_data2);
+    }
+
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_data3);
+    }
+
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_data4);
+    }
+
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_data5);
+    }
+    
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_data6);
+    }
+    
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_data7);
+    }
+    
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_cardDetect);
+    }
+    
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_ioVoltSel);
+    }
+    
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_cardIfPwrEn);
+    }
+    
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_cardMechWriteProt);
+    }
+    
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_ledCtrl);
+    }
+    
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_sdhc_free_pin(obj->pin_cardEmmcReset);
+    }
+
     Cy_SD_Host_DeInit(obj->base);
 
-    return CY_RSLT_SUCCESS;
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cy_hwmgr_is_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num, &configured);
+        if ((CY_RSLT_SUCCESS == result) && configured)
+        {
+            result = cy_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
+        }
+    }
+
+    return result;
 }
 
 
@@ -353,22 +564,30 @@ cy_rslt_t cy_sdhc_configure(cy_sdhc_t *obj, const cy_sdhc_config_t *config)
     cy_en_sd_host_card_capacity_t cardCapacity;
     uint32_t rca = 0UL;
     cy_en_sd_host_card_type_t cardType = CY_SD_HOST_UNUSABLE;
-    
-    /** Initialize the SDIO/SD/eMMC card configuration structure */
-    stcSdcardCfg.lowVoltageSignaling = config->lowVoltageSignaling;
-    stcSdcardCfg.busWidth = convert_buswidth(config->busWidth);
-    stcSdcardCfg.cardType = &cardType;
-    stcSdcardCfg.rca = &rca;
-    stcSdcardCfg.cardCapacity = &cardCapacity;
-    
-    /** Initialize the card */
-    driverRet = Cy_SD_Host_InitCard(obj->base, &stcSdcardCfg, &obj->context);
-    
-    if (CY_SD_HOST_SUCCESS != driverRet)
-    {
-        ret = CY_RSLT_TYPE_ERROR;
-    }
+    bool configured = false;
 
+    ret = cy_hwmgr_is_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num, &configured);
+    
+    if ((CY_RSLT_SUCCESS == ret) && !configured)
+    {
+        /** Initialize the SDIO/SD/eMMC card configuration structure */
+        stcSdcardCfg.lowVoltageSignaling = config->lowVoltageSignaling;
+        stcSdcardCfg.busWidth = convert_buswidth(config->busWidth);
+        stcSdcardCfg.cardType = &cardType;
+        stcSdcardCfg.rca = &rca;
+        stcSdcardCfg.cardCapacity = &cardCapacity;
+
+        /** Initialize the card */
+        driverRet = Cy_SD_Host_InitCard(obj->base, &stcSdcardCfg, &obj->context);
+        if ((CY_SD_HOST_SUCCESS != driverRet) && (ret == CY_RSLT_SUCCESS))
+        {
+            ret = CY_RSLT_TYPE_ERROR;
+        }
+        else
+        {
+            ret = cy_hwmgr_set_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
+        }
+    }
     return ret;
 }
 

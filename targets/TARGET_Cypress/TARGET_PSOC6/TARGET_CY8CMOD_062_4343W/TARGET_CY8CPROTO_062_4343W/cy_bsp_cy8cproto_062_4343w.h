@@ -1,12 +1,14 @@
-/*******************************************************************************
-* File Name: cy_bsp_cy8cproto_062_4343w.h
+/***************************************************************************//**
+* \file cy_bsp_cy8cproto_062_4343w.h
 *
 * Description:
 * Provides APIs for interacting with the hardware contained on the Cypress
 * CY8CPROTO-062-4343W prototyping kit.
-* 
+*
 ********************************************************************************
-* Copyright 2017-2019 Cypress Semiconductor Corporation
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,7 +21,7 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-********************************************************************************/
+*******************************************************************************/
 
 /**
 * \addtogroup group_bsp_cy8cproto_062_4343w CY8CPROTO-062-4343W

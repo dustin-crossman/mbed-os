@@ -28,7 +28,7 @@ const cy_resource_pin_mapping_t *cy_utils_get_resource(cy_gpio_t pin, const cy_r
 {
     for (uint32_t i = 0; i < count; i++)
     {
-        if (pin == mappings->pin)
+        if (pin == mappings[i].pin)
         {
             return &mappings[i];
         }

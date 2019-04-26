@@ -192,6 +192,7 @@ typedef struct {
     cy_gpio_t                   pin;
     cy_clock_divider_t          clock;
     uint32_t                    clock_hz;
+    bool                        dedicated_clock;
 #else
     void *empty;
 #endif
@@ -226,12 +227,10 @@ typedef struct {
 /** RNG object */
 typedef struct {
 #if defined(CY_IP_MXCRYPTO_INSTANCES) || defined(CPUSS_CRYPTO_PRESENT)
-    /* TODO: define */
-    void * TODO_define;
-#else
-    void *empty;
+    CRYPTO_Type*                base;
+    cy_resource_inst_t          resource;
 #endif
-} cy_rng_t;
+} cy_trng_t;
 
 /** RTC object */
 typedef struct {
@@ -247,10 +246,27 @@ typedef struct {
 typedef struct {
 #ifdef CY_IP_MXSDHC
     SDHC_Type*                  base;
+    cy_resource_inst_t          resource;
     bool                        emmc;
     cy_en_sd_host_dma_type_t    dmaType;
     bool                        enableLedControl;
     cy_stc_sd_host_context_t    context;
+    cy_gpio_t             pin_clk;
+    cy_gpio_t             pin_cmd;
+    cy_gpio_t             pin_data0;
+    cy_gpio_t             pin_data1;
+    cy_gpio_t             pin_data2;
+    cy_gpio_t             pin_data3;
+    cy_gpio_t             pin_data4;
+    cy_gpio_t             pin_data5;
+    cy_gpio_t             pin_data6;
+    cy_gpio_t             pin_data7;
+    cy_gpio_t             pin_cardDetect;
+    cy_gpio_t             pin_ioVoltSel;
+    cy_gpio_t             pin_cardIfPwrEn;
+    cy_gpio_t             pin_cardMechWriteProt;
+    cy_gpio_t             pin_ledCtrl;
+    cy_gpio_t             pin_cardEmmcReset;
 #else
     void *empty;
 #endif

@@ -41,8 +41,8 @@ static const cy_stc_scb_i2c_config_t default_i2c_config = {
         .i2cMode                   = CY_SCB_I2C_MASTER,
         .useRxFifo                 = true,
         .useTxFifo                 = true,
-        .slaveAddress              = 0,
-        .slaveAddressMask          = 0,
+        .slaveAddress              = 0UL,
+        .slaveAddressMask          = 0UL,
         .acceptAddrInFifo          = false,
         .ackGeneralAddr            = false,
         .enableWakeFromSleep       = false
@@ -454,7 +454,7 @@ cy_rslt_t cy_i2c_init(cy_i2c_t *obj, cy_gpio_t sda, cy_gpio_t scl, const cy_cloc
     /* Reserve the I2C */
     const cy_resource_pin_mapping_t *sda_map = CY_UTILS_GET_RESOURCE(sda, cy_pin_map_scb_i2c_sda);
     const cy_resource_pin_mapping_t *scl_map = CY_UTILS_GET_RESOURCE(scl, cy_pin_map_scb_i2c_scl);
-    if (NULL == sda_map || NULL == scl_map || sda_map->inst->block_num != scl_map->inst->block_num)
+    if ((NULL == sda_map) || (NULL == scl_map) || (sda_map->inst->block_num != scl_map->inst->block_num))
     {
         return CY_RSLT_ERR_CSP_I2C_INVALID_PIN;
     }
@@ -495,12 +495,8 @@ cy_rslt_t cy_i2c_init(cy_i2c_t *obj, cy_gpio_t sda, cy_gpio_t scl, const cy_cloc
     }
     if (result == CY_RSLT_SUCCESS)
     {
-        cy_en_sysclk_status_t clock_assign_result = Cy_SysClk_PeriphAssignDivider(
+        result = Cy_SysClk_PeriphAssignDivider(
             (en_clk_dst_t)((uint8_t)PCLK_SCB0_CLOCK + obj->resource.block_num), obj->clock.div_type, obj->clock.div_num);
-
-        result = clock_assign_result == CY_SYSCLK_SUCCESS
-            ? CY_RSLT_SUCCESS
-            : CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_I2C, CY_I2C_CLOCK_ERROR);
     }    
     if (result == CY_RSLT_SUCCESS)
     {
@@ -570,8 +566,6 @@ cy_rslt_t cy_i2c_set_config(cy_i2c_t *obj, const cy_hal_i2c_cfg_t *cfg)
 cy_rslt_t cy_i2c_master_send(cy_i2c_t *obj, uint16_t dev_addr, const uint8_t *data, uint16_t size, uint32_t timeout)
 {
 	cy_en_scb_i2c_status_t status = CY_SCB_I2C_SUCCESS;
-    int byte_count = 0;
-    dev_addr >>= 1;
 
     /* Start transaction, send dev_addr. */
     if (obj->context.state == CY_SCB_I2C_IDLE) {
@@ -583,7 +577,6 @@ cy_rslt_t cy_i2c_master_send(cy_i2c_t *obj, uint16_t dev_addr, const uint8_t *da
             if (status != CY_SCB_I2C_SUCCESS) {
                 break;
             }
-            ++byte_count;
             --size;
             ++data;
         }
@@ -603,8 +596,6 @@ cy_rslt_t cy_i2c_master_recv(cy_i2c_t *obj, uint16_t dev_addr, uint8_t *data, ui
 {
 	cy_en_scb_i2c_status_t status = CY_SCB_I2C_SUCCESS;
     cy_en_scb_i2c_command_t ack = CY_SCB_I2C_ACK;
-    int byte_count = 0;
-    dev_addr >>= 1;
 
     /* Start transaction, send dev_addr */
     if (obj->context.state == CY_SCB_I2C_IDLE) {
@@ -619,7 +610,6 @@ cy_rslt_t cy_i2c_master_recv(cy_i2c_t *obj, uint16_t dev_addr, uint8_t *data, ui
             if (status != CY_SCB_I2C_SUCCESS) {
                 break;
             }
-            ++byte_count;
             --size;
             ++data;
         }
@@ -654,8 +644,6 @@ cy_rslt_t cy_i2c_slave_recv(cy_i2c_t *obj, uint8_t *data, uint16_t size, uint32_
 cy_rslt_t cy_i2c_mem_write(cy_i2c_t *obj, uint16_t address, uint16_t mem_addr, uint16_t mem_addr_size, const uint8_t *data, uint16_t size, uint32_t timeout)
 {
 	cy_en_scb_i2c_status_t status = CY_SCB_I2C_SUCCESS;
-    int byte_count = 0;
-    address >>= 1;
 
     /* Start transaction, send address. */
     if (obj->context.state == CY_SCB_I2C_IDLE) {
@@ -674,7 +662,6 @@ cy_rslt_t cy_i2c_mem_write(cy_i2c_t *obj, uint16_t address, uint16_t mem_addr, u
             if (status != CY_SCB_I2C_SUCCESS) {
                 break;
             }
-            ++byte_count;
             --size;
             ++data;
         }
@@ -692,8 +679,6 @@ cy_rslt_t cy_i2c_mem_read(cy_i2c_t *obj, uint16_t address, uint16_t mem_addr, ui
 {
 	cy_en_scb_i2c_status_t status = CY_SCB_I2C_SUCCESS;
     cy_en_scb_i2c_command_t ack = CY_SCB_I2C_ACK;
-    int byte_count = 0;
-    address >>= 1;
 
     /* Start transaction, send address */
     if (obj->context.state == CY_SCB_I2C_IDLE) {
@@ -715,7 +700,6 @@ cy_rslt_t cy_i2c_mem_read(cy_i2c_t *obj, uint16_t address, uint16_t mem_addr, ui
             if (status != CY_SCB_I2C_SUCCESS) {
                 break;
             }
-            ++byte_count;
             --size;
             ++data;
         }
@@ -739,19 +723,12 @@ cy_rslt_t cy_i2c_transfer_async(cy_i2c_t *obj, const void *tx, size_t tx_size, v
 
     obj->rx_config.slaveAddress = address >> 1;
     obj->tx_config.slaveAddress = address >> 1;
-    // obj->events = event;
-    // obj->handler = handler;
-    // if (i2c_irq_setup_channel(obj) < 0) {
-    //     return;
-    // }
 
     obj->rx_config.buffer = rx;
     obj->rx_config.bufferSize = rx_size;
-    //obj->rx_config.xferPending = !stop;
 
     obj->tx_config.buffer = (void *)tx;
     obj->tx_config.bufferSize = tx_size;
-    // obj->tx_config.xferPending = rx_size || !stop;
 
     if (tx_size) {
         /* Write first, then read, or write only. */
@@ -783,35 +760,45 @@ cy_rslt_t cy_i2c_abort_async(cy_i2c_t *obj)
 
 static cy_i2c_irq_event_t cy_convert_interrupt_cause(uint32_t pdl_cause)
 {    
-    // TODO: Verify events
     cy_i2c_irq_event_t cause = CY_I2C_IRQ_NONE;
-    if (pdl_cause == CY_I2C_IRQ_TX_TRANSMIT_IN_FIFO)
-    {
-        cause = CY_I2C_IRQ_TX_TRANSMIT_IN_FIFO;
-    }
-    else if (pdl_cause == CY_I2C_IRQ_NONE)
-    {
-        cause = CY_I2C_IRQ_NONE;
-    }
-    else if (pdl_cause == CY_I2C_IRQ_TX_DONE)
-    {
-        cause = CY_I2C_IRQ_TX_DONE;
-    }
-    else if (pdl_cause == CY_I2C_IRQ_TX_ERROR)
-    {
-        cause = CY_I2C_IRQ_TX_ERROR;
-    }
-    else if (pdl_cause == CY_I2C_IRQ_RX_FULL)
-    {
-        cause = CY_I2C_IRQ_RX_FULL;
-    }
-    else if (pdl_cause == CY_I2C_IRQ_RX_DONE)
-    {
-        cause = CY_I2C_IRQ_RX_DONE;
-    }
-    else if (pdl_cause == CY_I2C_IRQ_RX_ERROR)
-    {
-        cause = CY_I2C_IRQ_RX_ERROR;
+    switch(pdl_cause)
+    {        
+        case CY_SCB_I2C_SLAVE_READ_EVENT:
+        	cause = CY_I2C_SLAVE_READ_EVENT;
+        	break;
+        case CY_SCB_I2C_SLAVE_WRITE_EVENT:
+        	cause = CY_I2C_SLAVE_WRITE_EVENT;
+        	break;
+        case CY_SCB_I2C_SLAVE_RD_IN_FIFO_EVENT:
+        	cause = CY_I2C_SLAVE_RD_IN_FIFO_EVENT;
+        	break;
+        case CY_SCB_I2C_SLAVE_RD_BUF_EMPTY_EVENT:
+        	cause = CY_I2C_SLAVE_RD_BUF_EMPTY_EVENT;
+        	break;
+        case CY_SCB_I2C_SLAVE_RD_CMPLT_EVENT:
+        	cause = CY_I2C_SLAVE_RD_CMPLT_EVENT;
+        	break;
+        case CY_SCB_I2C_SLAVE_WR_CMPLT_EVENT:
+        	cause = CY_I2C_SLAVE_WR_CMPLT_EVENT;
+        	break;
+        case CY_SCB_I2C_SLAVE_ERR_EVENT:
+        	cause = CY_I2C_SLAVE_ERR_EVENT;
+        	break;
+        case CY_SCB_I2C_MASTER_WR_IN_FIFO_EVENT:
+        	cause = CY_I2C_MASTER_WR_IN_FIFO_EVENT;
+        	break;
+        case CY_SCB_I2C_MASTER_WR_CMPLT_EVENT:
+        	cause = CY_I2C_MASTER_WR_CMPLT_EVENT;
+        	break;
+        case CY_SCB_I2C_MASTER_RD_CMPLT_EVENT:
+        	cause = CY_I2C_MASTER_RD_CMPLT_EVENT;
+        	break;
+        case CY_SCB_I2C_MASTER_ERR_EVENT:
+        	cause = CY_I2C_MASTER_ERR_EVENT;
+        	break;		
+        default:
+            cause = CY_I2C_IRQ_NONE;
+        	break;
     }
     return cause;
 }
@@ -823,7 +810,7 @@ cy_rslt_t cy_i2c_register_irq(cy_i2c_t *obj, cy_i2c_irq_handler handler, void *h
     cy_i2c_user_callbacks[idx] = handler;
     cy_i2c_callback_args[idx] = handler_arg;
     Cy_SCB_I2C_RegisterEventCallback(obj->base, cy_i2c_cb_wrapper_table[idx], &(obj->context));
-    if (NVIC_GetEnableIRQ(CY_SCB_IRQ_N[idx]) == 0)
+    if (NVIC_GetEnableIRQ(CY_SCB_IRQ_N[idx]) == 0UL)
     {
         /* Default interrupt priority of 7 (lowest possible priority). */
         cy_stc_sysint_t irqCfg = {CY_SCB_IRQ_N[idx], 7};

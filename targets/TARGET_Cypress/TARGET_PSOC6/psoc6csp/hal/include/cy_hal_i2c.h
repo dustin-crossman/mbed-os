@@ -70,13 +70,18 @@ extern "C" {
 /** Enum to enable/disable/report interrupt cause flags. */
 typedef enum
 {
-    CY_I2C_IRQ_NONE                = 0,      //!< Disable all interrupt call backs
-    CY_I2C_IRQ_TX_TRANSMIT_IN_FIFO = 1 << 1, //!< All tx data from transmit has been moved to uart FIFO
-    CY_I2C_IRQ_TX_DONE             = 1 << 2, //!< All tx data has been transmitted
-    CY_I2C_IRQ_TX_ERROR            = 1 << 3, //!< An error occurred in tx
-    CY_I2C_IRQ_RX_FULL             = 1 << 4, //!< The rx software buffer is full, additional data are store into fifo buffer.
-    CY_I2C_IRQ_RX_DONE             = 1 << 5, //!< All rx data has been received
-    CY_I2C_IRQ_RX_ERROR            = 1 << 6, //!< An error occurred in rx
+    CY_I2C_IRQ_NONE                 = 0,      //!< Disable all interrupt call backs
+    CY_I2C_SLAVE_READ_EVENT         = 1 << 1,
+    CY_I2C_SLAVE_WRITE_EVENT        = 1 << 2,
+    CY_I2C_SLAVE_RD_IN_FIFO_EVENT   = 1 << 3,
+    CY_I2C_SLAVE_RD_BUF_EMPTY_EVENT = 1 << 4,
+    CY_I2C_SLAVE_RD_CMPLT_EVENT     = 1 << 5,
+    CY_I2C_SLAVE_WR_CMPLT_EVENT     = 1 << 6,
+    CY_I2C_SLAVE_ERR_EVENT          = 1 << 7,
+    CY_I2C_MASTER_WR_IN_FIFO_EVENT  = 1 << 17,
+    CY_I2C_MASTER_WR_CMPLT_EVENT    = 1 << 18,
+    CY_I2C_MASTER_RD_CMPLT_EVENT    = 1 << 19,
+    CY_I2C_MASTER_ERR_EVENT         = 1 << 20,
 } cy_i2c_irq_event_t;
 
 /** \} group_hal_i2c_enums */

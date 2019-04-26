@@ -76,16 +76,16 @@ typedef enum {
 */
 
 /** GPIO pin configuration object */
-typedef uint8_t cy_gpio_cfg_t; // 4bit hsiom, 4bit mode
+typedef uint16_t cy_gpio_cfg_t; // 8bit hsiom, 8bit mode
 
 /** \} group_hal_pin_package_data_structures */
 
 
 /** \cond INTERNAL */
 
-#define CY_GPIO_CFG_CREATE(hsiom, mode)  ((cy_gpio_cfg_t)(((hsiom) << 4) + (mode)))
-#define CY_GPIO_CFG_GET_MODE(x)  ((uint8_t)((x) & 0x0F))
-#define CY_GPIO_CFG_GET_HSIOM(x) ((en_hsiom_sel_t)(((x) >> 4) & 0x0F))
+#define CY_GPIO_CFG_CREATE(hsiom, mode)  ((cy_gpio_cfg_t)(((hsiom) << 8) + (mode)))
+#define CY_GPIO_CFG_GET_MODE(x)  ((uint8_t)((x) & 0xFF))
+#define CY_GPIO_CFG_GET_HSIOM(x) ((en_hsiom_sel_t)(((x) >> 8) & 0xFF))
 
 #define CY_PIN_OUT_FUNCTION(hsiom)           CY_GPIO_CFG_CREATE(hsiom, CY_GPIO_DM_STRONG_IN_OFF)
 #define CY_PIN_OUT_BUF_FUNCTION(hsiom)       CY_GPIO_CFG_CREATE(hsiom, CY_GPIO_DM_STRONG)
