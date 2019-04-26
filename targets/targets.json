@@ -8446,7 +8446,13 @@
             "MBEDTLS_PSA_CRYPTO_C",
             "MBEDTLS_ENTROPY_NV_SEED",
             "CY_IPC_DEFAULT_CFG_DISABLE",
-            "PU_ENABLE"
+            "PU_ENABLE",
+            "MCUBOOT_POLICY=1",
+            "MCUBOOT_LOG_LEVEL=3",
+            "MCUBOOT_USE_FLASHBOOT_CRYPTO",
+            "CY8CKIT_001",
+            "CONFIG_FLASH_PAGE_LAYOUT",
+            "IMAGE_0"
         ],
         "deliver_to_target": "AUGUST_CYW43012_PSA",
         "delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_AUGUST_CYW43012_PSA/prebuilt",
@@ -8454,18 +8460,18 @@
             "function": "PSOC6Code.sign_image"
         },
         "overrides": {
-            "non-secure-rom-start": "0x10000000",
+            "non-secure-rom-start": "0x10000400",
             "non-secure-rom-size": "0x30000",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
-            "non-secure-ram-start": "0x08002000",
-            "non-secure-ram-size": "0xDD00",
-            "shared-ram-start": "0x0800FD00",
+            "non-secure-ram-start": "0x08000000",
+            "non-secure-ram-size": "0x8000",
+            "shared-ram-start": "0x08008000",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0800FE00", 
+            "public-ram-start": "0x08008100", 
             "public-ram-size": "0x200",
-            "secure-ram-start": "0x08010000",
-            "secure-ram-size": "0x10000"
+            "secure-ram-start": "0x08008300",
+            "secure-ram-size": "0x17D00"
         }
     },
     "AUGUST_CYW43012_PSA": {
@@ -8476,21 +8482,21 @@
         "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
         "hex_filename": "psa_release_1.0.hex",
         "post_binary_hook": {
-            "function": "PSOC6Code.complete"
+            "function": "PSOC6Code.sign_complete"
         },
         "overrides": {
-            "non-secure-rom-start": "0x10000000",
+            "non-secure-rom-start": "0x10000400",
             "non-secure-rom-size": "0x30000",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
-            "non-secure-ram-start": "0x08002000",
-            "non-secure-ram-size": "0xDD00",
-            "shared-ram-start": "0x0800FD00",
+            "non-secure-ram-start": "0x08000000",
+            "non-secure-ram-size": "0x8000",
+            "shared-ram-start": "0x08008000",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0800FE00", 
+            "public-ram-start": "0x08008100", 
             "public-ram-size": "0x200",
-            "secure-ram-start": "0x08010000",
-            "secure-ram-size": "0x10000"
+            "secure-ram-start": "0x08008300",
+            "secure-ram-size": "0x17D00"
         }
     },
     "CYW943012P6EVB_01_M0": {
