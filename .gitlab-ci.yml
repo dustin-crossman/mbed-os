@@ -45,6 +45,7 @@ pyocd_wrapper:
     - pip install six
     - pip install setuptools_scm_git_archive
     - pip install setuptools_scm
+    - pip install libusb
     - echo "[INFO] Installing pyocd"
     - cd pyocd
     - python setup.py install
