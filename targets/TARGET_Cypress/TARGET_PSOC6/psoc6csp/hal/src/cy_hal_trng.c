@@ -1,8 +1,8 @@
 /*******************************************************************************
-* File Name: cy_hal_crc.c
+* File Name: cy_hal_trng.c
 *
 * Description:
-* Provides a high level interface for interacting with the Cypress CRC. This is
+* Provides a high level interface for interacting with the Cypress TRNG. This is
 * a wrapper around the lower level PDL API.
 * 
 ********************************************************************************
@@ -25,33 +25,33 @@
 
 #include "cy_hal_hwmgr.h"
 #include "cy_hal_crypto_common.h"
-#include "cy_hal_crc_impl.h"
 #include "cy_crypto_core_crc.h"
+#include "cy_hal_trng_impl.h"
 
 /*******************************************************************************
 *       Functions
 *******************************************************************************/
-cy_rslt_t cy_crc_init(cy_crc_t *obj)
+cy_rslt_t cy_trng_init(cy_trng_t *obj)
 {
     if(NULL == obj)
-        return CY_RSLT_CSP_ERR_CRC_BAD_ARGUMENT;
-    
-    memset(obj, 0, sizeof(cy_crc_t));
-    obj->resource.type = CY_RSC_CRC;
+        return CY_RSLT_CSP_ERR_TRNG_BAD_ARGUMENT;
+
+    memset(obj, 0, sizeof(cy_trng_t));
+    obj->resource.type = CY_RSC_TRNG;
     return cy_crypto_reserve(&(obj->base), &(obj->resource));
 }
 
-cy_rslt_t cy_crc_free(cy_crc_t *obj)
+cy_rslt_t cy_trng_free(cy_trng_t *obj)
 {
     if(NULL == obj)
-        return CY_RSLT_CSP_ERR_CRC_BAD_ARGUMENT;
+        return CY_RSLT_CSP_ERR_TRNG_BAD_ARGUMENT;
 
     cy_rslt_t result = CY_RSLT_SUCCESS; 
     if (obj->resource.type != CY_RSC_INVALID)
     {
         result = cy_crypto_free(obj->base, &(obj->resource));
         if(result == CY_RSLT_SUCCESS)
-            memset(obj, 0, sizeof(cy_crc_t));
+            memset(obj, 0, sizeof(cy_trng_t));
     }
     return result;
 }

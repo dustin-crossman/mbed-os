@@ -46,7 +46,7 @@ static const cy_stc_smif_config_t default_qspi_config =
 {
     .mode = (uint32_t)CY_SMIF_NORMAL,
     .deselectDelay = QSPI_DESELECT_DELAY,
-    .rxClockSel = (uint32_t)CY_SMIF_SEL_INV_INTERNAL_CLK,
+    .rxClockSel = (uint32_t)CY_SMIF_SEL_INTERNAL_CLK,
     .blockEvent = (uint32_t)CY_SMIF_BUS_ERROR,
 };
 
@@ -405,7 +405,7 @@ static cy_rslt_t qspi_command_transfer(cy_qspi_t *obj, const cy_qspi_command_t *
         }
     }
 
-    if (CY_RSLT_SUCCESS != result)
+    if (CY_RSLT_SUCCESS == result)
     {
         if (!command->address.disabled)
         {

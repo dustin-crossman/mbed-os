@@ -34,15 +34,32 @@ extern "C" {
 
 /** Block count for CRYPTO blocks */
 #if defined(CY_IP_MXCRYPTO_INSTANCES)
-    #define CY_CRC_INST_COUNT      CY_IP_MXCRYPTO_INSTANCES
+    #define CY_HAL_CRYPTO_INST_COUNT      CY_IP_MXCRYPTO_INSTANCES
 #elif defined(CPUSS_CRYPTO_PRESENT)
-    #define CY_CRC_INST_COUNT      1u
+    #define CY_HAL_CRYPTO_INST_COUNT      1u
 #else
-    #define CY_CRC_INST_COUNT      0u
+    #define CY_HAL_CRYPTO_INST_COUNT      0u
 #endif
 
 /** The start address of the CRYPTO blocks */
-extern CRYPTO_Type* CY_CRYPTO_BASE_ADDRESSES[CY_CRC_INST_COUNT];
+extern CRYPTO_Type* CY_HAL_CRYPTO_BASE_ADDRESSES[CY_HAL_CRYPTO_INST_COUNT];
+
+/** Reserve the Crypto block and enable it.
+ *
+ * @param[out]  base Base address to the Crypto block.
+ * @param[out]  obj resource inst for the function (eg. CRC, TRNG) in the Crypto block. 
+ * @return The status of the reserve request.
+ */
+cy_rslt_t cy_crypto_reserve(CRYPTO_Type** base, cy_resource_inst_t *resource);
+
+/** Free the Crypto block and disable it.
+ *
+ * @param[in]  base Base address to the Crypto block.
+ * @param[in]  obj resource inst for the funtion in Crypto block. 
+
+ * @return The status of the free request.
+ */
+cy_rslt_t cy_crypto_free(CRYPTO_Type* base, const cy_resource_inst_t *resource);
 
 #if defined(__cplusplus)
 }

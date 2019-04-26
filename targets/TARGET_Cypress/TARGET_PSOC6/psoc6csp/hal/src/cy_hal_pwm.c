@@ -57,15 +57,20 @@ cy_rslt_t cy_pwm_init(cy_pwm_t *obj, cy_gpio_t pin, const cy_clock_divider_t *cl
     if (NULL == obj)
         return CYCSP_PWM_RSLT_BAD_ARGUMENT;
     memset(obj, 0, sizeof(cy_pwm_t));
-    obj->resource.block_num = CY_RSC_INVALID;
+    obj->resource.type = CY_RSC_INVALID;
     obj->pin = CY_NC_PIN_VALUE_GPIO_VALUE;
-    obj->clock.div_num = CY_RSC_INVALID;
+    obj->dedicated_clock = false;
     cy_rslt_t result;
     const cy_resource_pin_mapping_t *map = CY_UTILS_GET_RESOURCE(pin, cy_pin_map_tcpwm_line);
+    if (NULL == map)
+        map = CY_UTILS_GET_RESOURCE(pin, cy_pin_map_tcpwm_line_compl);
     if (NULL == map)
         return CYCSP_PWM_RSLT_BAD_ARGUMENT;
     
     cy_resource_inst_t pwm_inst = *map->inst;
+    if (CY_RSLT_SUCCESS != (result = cy_hwmgr_reserve(&pwm_inst)))
+        return result;
+
     obj->resource = pwm_inst;
     obj->base = cy_internal_pwm_data[pwm_inst.block_num].base;
     en_clk_dst_t pclk = (en_clk_dst_t)(cy_internal_pwm_data[pwm_inst.block_num].clock_dst + pwm_inst.channel_num);
@@ -76,12 +81,13 @@ cy_rslt_t cy_pwm_init(cy_pwm_t *obj, cy_gpio_t pin, const cy_clock_divider_t *cl
         {
             if (NULL != clk)
             {
-                obj->clock_hz = cy_PeriClkFreqHz / (1 + Cy_SysClk_PeriphGetDivider(obj->clock.div_type, obj->clock.div_num));
+                obj->clock_hz = cy_PeriClkFreqHz / (1 + Cy_SysClk_PeriphGetDivider(clk->div_type, clk->div_num));
                 if (CY_SYSCLK_SUCCESS != Cy_SysClk_PeriphAssignDivider(pclk, clk->div_type, clk->div_num))
                     result = CYCSP_PWM_RSLT_FAILED_CLOCK;
             }
             else if (CY_RSLT_SUCCESS == (result = cy_hwmgr_allocate_clock(&(obj->clock), CY_SYSCLK_DIV_16_BIT, false)))
             {
+                obj->dedicated_clock = true;
                 uint32_t div = cy_PeriClkFreqHz / 1000000u;
                 if (0 == div ||
                     CY_SYSCLK_SUCCESS != Cy_SysClk_PeriphSetDivider(obj->clock.div_type, obj->clock.div_num, div - 1) ||
@@ -89,7 +95,9 @@ cy_rslt_t cy_pwm_init(cy_pwm_t *obj, cy_gpio_t pin, const cy_clock_divider_t *cl
                     CY_SYSCLK_SUCCESS != Cy_SysClk_PeriphAssignDivider(pclk, obj->clock.div_type, obj->clock.div_num))
                     result = CYCSP_PWM_RSLT_FAILED_CLOCK;
                 else
+                {
                     obj->clock_hz = cy_PeriClkFreqHz / div;
+                }
             }
             bool configured;
             if (CY_RSLT_SUCCESS == result &&
@@ -145,32 +153,45 @@ cy_rslt_t cy_pwm_free(cy_pwm_t *obj)
         return CYCSP_PWM_RSLT_BAD_ARGUMENT;
     if (obj->pin != CY_NC_PIN_VALUE)
     {
-        result = cy_gpio_free(obj->pin);
+        ret = cy_gpio_free(obj->pin);
         if (ret == CY_RSLT_SUCCESS)
-            ret = result;
-        obj->pin = CY_NC_PIN_VALUE_GPIO_VALUE;
+            obj->pin = CY_NC_PIN_VALUE_GPIO_VALUE;
     }
+
     if (NULL != obj->base)
     {
         Cy_TCPWM_PWM_Disable(obj->base, obj->resource.channel_num);
         result = cy_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
         if (ret == CY_RSLT_SUCCESS)
             ret = result;
+
         result = cy_hwmgr_free(&(obj->resource));
+        if (result == CY_RSLT_SUCCESS)
+        {
+            obj->base = NULL;
+            obj->resource.type = CY_RSC_INVALID;
+        }
+
         if (ret == CY_RSLT_SUCCESS)
             ret = result;
-        obj->base = NULL;
-        obj->resource.block_num = CY_RSC_INVALID;
     }
-    if (CY_RSC_INVALID != obj->clock.div_num)
+
+    if (obj->dedicated_clock)
     {
         if (CY_SYSCLK_SUCCESS != Cy_SysClk_PeriphDisableDivider(obj->clock.div_type, obj->clock.div_num) &&
             ret == CY_RSLT_SUCCESS)
+        {
             ret = CYCSP_PWM_RSLT_FAILED_CLOCK;
-        result = cy_hwmgr_free_clock(&(obj->clock));
-        if (ret == CY_RSLT_SUCCESS)
-            ret = result;
-        obj->clock.div_num = CY_RSC_INVALID;
+        }
+        else
+        {
+            result = cy_hwmgr_free_clock(&(obj->clock));
+            if (result == CY_RSLT_SUCCESS)
+                obj->dedicated_clock = false;
+
+            if (ret == CY_RSLT_SUCCESS)
+                ret = result;
+        }
     }
     return ret;
 }

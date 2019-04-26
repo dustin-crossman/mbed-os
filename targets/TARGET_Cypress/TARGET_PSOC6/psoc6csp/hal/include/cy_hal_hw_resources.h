@@ -63,7 +63,7 @@ typedef enum
     CY_RSC_OPAMP,     /*!< Opamp */
     CY_RSC_PDM,       /*!< PCM/PDM communications block */
     CY_RSC_SMIF,      /*!< Quad-SPI communications block */
-    CY_RSC_RNG,       /*!< Hardware random number generator */
+    CY_RSC_TRNG,      /*!< Hardware random number generator */
     CY_RSC_RTC,       /*!< Real time clock */
     CY_RSC_SCB,       /*!< Serial Communications Block */
     CY_RSC_SDHC,      /*!< SD Host Controller */

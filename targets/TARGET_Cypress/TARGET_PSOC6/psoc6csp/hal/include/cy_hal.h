@@ -53,7 +53,6 @@
 #include "cy_hal_pdmpcm.h"
 #include "cy_hal_pwm.h"
 #include "cy_hal_qspi.h"
-#include "cy_hal_rng.h"
 #include "cy_hal_rtc.h"
 #include "cy_hal_sdhc.h"
 #include "cy_hal_sdio.h"
@@ -64,5 +63,8 @@
 #include "cy_hal_wdt.h"
 #include "cy_hal_crc.h"
 #include "cy_hal_crc_impl.h"
+#include "cy_hal_trng.h"
+#include "cy_hal_trng_impl.h"
 
 /** \} group_hal */
+
