@@ -276,10 +276,10 @@ class TestControlAPIs(unittest.TestCase):
     def test_connection(self):
         self.tool.disconnect()
         self.assertFalse(self.tool.session.is_open)
-        self.tool.connect(TARGET)
+        self.tool.connect(TARGET, probe_id=PROBE_ID)
         self.assertTrue(self.tool.session.is_open)
 
 
 if __name__ == '__main__':
-    ret = not unittest.runner.run(unittest.suite).wasSuccessful()
+    ret = not unittest.main().wasSuccessful()
     sys.exit(ret)
