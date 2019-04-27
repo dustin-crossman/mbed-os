@@ -1,19 +1,19 @@
 stages:
-  - test
   - func_test
-#before_script:
-#    - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-provisioning/requirements.txt
+  - test
+before_script:
+    - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-provisioning/requirements.txt
     
 # Compile TARGET_PSOC6_PSA
-#test_mbed_064_psa:
-#  stage: test
-#  tags:
-#    - MBED_TEST
-#  script:
-#    - mbedls -m 1907:CY8CPROTO_064_SB 
-#    - mbed test --compile -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *psa* -vv
-#    - mbed test --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
-#    - mbed test --run -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
+test_mbed_064_psa:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - mbedls -m 1907:CY8CPROTO_064_SB 
+    - mbed test --compile -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *psa* -vv
+    - mbed test --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
+    - mbed test --run -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
 
 cache:
   paths:
@@ -52,13 +52,3 @@ pyocd_wrapper:
     - echo "[INFO] Start tests"
     - cd targets\TARGET_Cypress\TARGET_PSOC6\sb-tools\test
     - python -m unittest -v test_pyocd_wrapper.py
-
-
-# Create provisioning packet
-#test_prov_packet:
-#  stage: test
-#  tags:
-#    - MBED_TEST
-#  script:
-#    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-provisioning/prepare
-#    - python provisioning_packet.py --policy policy_1stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
