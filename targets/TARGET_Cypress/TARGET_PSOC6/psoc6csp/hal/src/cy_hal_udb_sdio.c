@@ -755,13 +755,16 @@ cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_
     cmd.pu32Response = &cmdResponse;
 
     /* Note that this implementation uses 8b address */
-    cmd.pu8Data = (uint8_t *) data;
+    	cmd.pu8Data = (uint8_t *) data;
     cmd.bRead = (direction != CY_READ) ? false : true;
 
+    uint8_t tempBuffer[length + CY_HAL_SDIO_64B - 1];
     if (length >= CY_HAL_SDIO_64B)
     {
-        cmd.u16BlockCnt = (uint16_t) ((length + CY_HAL_SDIO_64B - 1)/CY_HAL_SDIO_64B);
-        cmd.u16BlockSize = CY_HAL_SDIO_64B; 
+    		cmd.u16BlockCnt = (uint16_t) ((length + CY_HAL_SDIO_64B - 1)/CY_HAL_SDIO_64B);
+        cmd.u16BlockSize = CY_HAL_SDIO_64B;
+        if (cmd.bRead)
+        		cmd.pu8Data = tempBuffer;
 
         /* Update object info */
         obj->block_size = CY_HAL_SDIO_64B;
@@ -786,6 +789,11 @@ cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_
     else
     {
         retVal = CY_RSLT_SUCCESS;
+    }
+
+    if(retVal == CY_RSLT_SUCCESS && length >= CY_HAL_SDIO_64B && cmd.bRead)
+    {
+    		memcpy((uint8_t *)data, tempBuffer, (size_t)length);
     }
 
     if (response != NULL)
