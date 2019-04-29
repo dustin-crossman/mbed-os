@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-#ifndef WICED_EMAC_H_
-#define WICED_EMAC_H_
+#ifndef WHD_EMAC_H_
+#define WHD_EMAC_H_
 
 #include "EMAC.h"
 #include "EMACInterface.h"
 #include "WiFiInterface.h"
+#include "whd_int.h"
 
 #include "rtos/Semaphore.h"
 #include "rtos/Mutex.h"
 
-class WICED_EMAC : public EMAC {
+class WHD_EMAC : public EMAC {
 public:
-    WICED_EMAC();
+    WHD_EMAC();
+    WHD_EMAC(whd_interface_role_t itype);
 
-    static WICED_EMAC &get_instance();
+    static WHD_EMAC &get_instance();
+
+    static WHD_EMAC &get_instance(whd_interface_role_t role);
 
     /**
      * Return maximum transmission unit
@@ -154,7 +158,17 @@ public:
     emac_link_input_cb_t emac_link_input_cb; /**< Callback for incoming data */
     emac_link_state_change_cb_t emac_link_state_cb;
     EMACMemoryManager *memory_manager;
-    
+    bool powered_up;
+    bool link_state;
+    whd_interface_role_t interface_type;
+    whd_driver_t drvp;
+    whd_interface_t ifp;
+    whd_mac_t multicast_addr;
+    struct whd_resource_source *resource_ops = NULL;
+    whd_buffer_funcs_t *buffer_ops = NULL;
+    whd_netif_funcs_t *netif_ops = NULL;
+    whd_init_config_t *whd_init_config = NULL;
+
 };
 
-#endif /* WICED_EMAC_H_ */
+#endif /* WHD_EMAC_H_ */

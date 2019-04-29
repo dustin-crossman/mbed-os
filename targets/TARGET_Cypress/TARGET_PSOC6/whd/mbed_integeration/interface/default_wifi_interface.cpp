@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-#include "WicedInterface.h"
+#include "WhdSTAInterface.h"
 
 WiFiInterface *WiFiInterface::get_target_default_instance()
 {
-    static WicedInterface wifi;
+    static WhdSTAInterface wifi;
     return &wifi;
 }

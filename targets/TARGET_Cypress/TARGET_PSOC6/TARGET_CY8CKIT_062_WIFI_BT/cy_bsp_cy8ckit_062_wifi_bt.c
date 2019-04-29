@@ -47,6 +47,8 @@ extern "C" {
 #define SDIO_RETRY_DELAY_MS     1
 #define SDIO_BUS_LEVEL_MAX_RETRIES 5
 
+extern void host_network_process_ethernet_data(whd_buffer_t buffer, whd_interface_t role);
+
 static whd_buffer_funcs_t buffer_ops =
 {
     .whd_host_buffer_get = cy_host_buffer_get,
@@ -57,7 +59,11 @@ static whd_buffer_funcs_t buffer_ops =
     .whd_buffer_add_remove_at_front = cy_buffer_add_remove_at_front,
 };
 
-extern whd_netif_funcs_t netif_ops;
+whd_netif_funcs_t netif_ops =
+{
+    .whd_network_process_ethernet_data = host_network_process_ethernet_data,
+};
+
 extern whd_resource_source_t resource_ops;
 
 whd_driver_t whd_drv;

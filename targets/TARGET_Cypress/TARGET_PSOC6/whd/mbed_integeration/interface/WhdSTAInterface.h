@@ -1,4 +1,4 @@
-/* Wiced implementation of NetworkInterfaceAPI
+/* WHD implementation of NetworkInterfaceAPI
  * Copyright (c) 2017 ARM Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-#ifndef WICED_INTERFACE_H
-#define WICED_INTERFACE_H
+#ifndef WHD_STA_INTERFACE_H
+#define WHD_STA_INTERFACE_H
 
 #include "mbed.h"
 #include "EthernetInterface.h"
 #include "netsocket/OnboardNetworkStack.h"
-#include "wiced_emac.h"
+#include "whd_emac.h"
 
 
-/** WicedInterface class
- *  Implementation of the NetworkStack for the Wiced
+/** WhdSTAInterface class
+ *  Implementation of the NetworkStack for the WHD
  */
-class WicedInterface : public WiFiInterface, public EMACInterface
+class WhdSTAInterface : public WiFiInterface, public EMACInterface
 {
 public:
 
-    WicedInterface(
-            EMAC &emac = WICED_EMAC::get_instance(),
+    WhdSTAInterface(
+            WHD_EMAC &emac = WHD_EMAC::get_instance(),
             OnboardNetworkStack &stack = OnboardNetworkStack::get_default_instance());
+
+    
+    static WhdSTAInterface *get_default_instance();
 
     /** Start the interface
      *
@@ -108,6 +111,7 @@ private:
     char _ssid[33]; /* The longest possible name (defined in 802.11) +1 for the \0 */
     char _pass[64]; /* The longest allowed passphrase + 1 */
     nsapi_security_t _security;
+    WHD_EMAC& _whd_emac;
 };
 
 #endif
