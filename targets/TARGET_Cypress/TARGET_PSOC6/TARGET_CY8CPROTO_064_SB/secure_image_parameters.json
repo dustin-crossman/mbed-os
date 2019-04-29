@@ -4,11 +4,11 @@
                     "VERSION" : "0.1",
                     "ROLLBACK_COUNTER" : "0",
                     "IMAGE_ID" : "4",
-                    "SLOT_SIZE" : "0x20000",
+                    "SLOT_SIZE" : "0x50000",
                     "PAD" : "--pad"
                 }
             },
 
-    "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/sb-provisioning/",
+    "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/",
     "priv_key_file": "/keys/USERAPP_CM4_KEY_PRIV.pem"
 }

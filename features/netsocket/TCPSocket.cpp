@@ -43,6 +43,11 @@ nsapi_protocol_t TCPSocket::get_proto()
     return NSAPI_TCP;
 }
 
+uint32_t TCPSocket::get_event()
+{
+	return _event_flag.get();
+}
+
 nsapi_error_t TCPSocket::connect(const SocketAddress &address)
 {
     _lock.lock();

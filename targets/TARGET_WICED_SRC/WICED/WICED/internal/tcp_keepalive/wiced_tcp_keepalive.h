@@ -41,6 +41,7 @@
 #include "wwd_structures.h"
 #include "wwd_bcmendian.h"
 #include "wwd_sdpcm.h"
+#include "wwd_events.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,6 +57,13 @@ extern "C" {
 
 //Uncomment below line to debug TCP KEEPALIVE
 //#define TCP_KEEPALIVE_DEBUG
+#define TCP_KEEPALIVE_DEBUG_ERROR
+
+#ifdef TCP_KEEPALIVE_DEBUG_ERROR
+#define DEBUG_PRINTF_ERROR(x) printf x
+#else
+#define DEBUG_PRINTF_ERROR(x)
+#endif
 
 #ifdef TCP_KEEPALIVE_DEBUG
 #define DEBUG_PRINTF(x) printf x
@@ -66,9 +74,6 @@ extern "C" {
 /******************************************************
  *                    Constants
  ******************************************************/
-
-#define TCP_KEEPALIVE_ERROR   (-1)
-#define TCP_KEEPALIVE_SUCCESS (0)
 
 /******************************************************
  *                   Enumerations
@@ -118,6 +123,10 @@ int tko_enable (bool enable);
 int tko_param (uint16_t keepalive_interval, uint16_t keepalive_retry_count, uint16_t keepalive_retry_interval);
 int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_offload );
 int tcp_client_connect ( tcp_keep_alive_t* keep_alive_offload);
+
+/* TCP socket callback */
+void tcp_socket_snd_rcv_callback (void* params);
+
 
 #ifdef __cplusplus
 } /*extern "C" */
