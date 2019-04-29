@@ -55,6 +55,7 @@ public:
 
     void on_host_stack_inactivity();
 
+	void update_uart_baud_rate(int baud);
 private:
 private:
     void on_controller_irq();
