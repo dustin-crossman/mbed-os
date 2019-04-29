@@ -283,7 +283,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Cmac(CRYPTO_Type *base,
                                           uint8_t *cmac,
                                           cy_stc_crypto_aes_state_t *aesState)
 {
-    cy_stc_crypto_aes_buffers_t  *aesBuffers = (cy_stc_crypto_aes_buffers_t *)(REG_CRYPTO_MEM_BUFF(base));
+    cy_stc_crypto_aes_buffers_t  *aesBuffers = (cy_stc_crypto_aes_buffers_t *)(Cy_Crypto_Core_GetVuMemoryAddress(base));
     cy_stc_crypto_cmac_buffers_t *cmacBuffers =
         (cy_stc_crypto_cmac_buffers_t *)((uint8_t*)aesBuffers + sizeof(cy_stc_crypto_aes_buffers_t));
 

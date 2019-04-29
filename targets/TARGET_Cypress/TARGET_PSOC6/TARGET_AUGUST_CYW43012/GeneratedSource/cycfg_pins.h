@@ -33,6 +33,24 @@
 extern "C" {
 #endif
 
+#define ioss_0_port_0_pin_0_PORT GPIO_PRT0
+#define ioss_0_port_0_pin_0_PIN 0U
+#define ioss_0_port_0_pin_0_NUM 0U
+#define ioss_0_port_0_pin_0_DRIVEMODE CY_GPIO_DM_ANALOG
+#define ioss_0_port_0_pin_0_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_0_pin_0_HSIOM
+	#define ioss_0_port_0_pin_0_HSIOM HSIOM_SEL_GPIO
+#endif
+#define ioss_0_port_0_pin_0_IRQ ioss_interrupts_gpio_0_IRQn
+#define ioss_0_port_0_pin_1_PORT GPIO_PRT0
+#define ioss_0_port_0_pin_1_PIN 1U
+#define ioss_0_port_0_pin_1_NUM 1U
+#define ioss_0_port_0_pin_1_DRIVEMODE CY_GPIO_DM_ANALOG
+#define ioss_0_port_0_pin_1_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_0_pin_1_HSIOM
+	#define ioss_0_port_0_pin_1_HSIOM HSIOM_SEL_GPIO
+#endif
+#define ioss_0_port_0_pin_1_IRQ ioss_interrupts_gpio_0_IRQn
 #define MOT_CUR_FILT_PORT GPIO_PRT10
 #define MOT_CUR_FILT_PIN 1U
 #define MOT_CUR_FILT_NUM 1U
@@ -223,7 +241,7 @@ extern "C" {
 #define SDIO_DATA_0_PORT GPIO_PRT2
 #define SDIO_DATA_0_PIN 0U
 #define SDIO_DATA_0_NUM 0U
-#define SDIO_DATA_0_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_DATA_0_DRIVEMODE CY_GPIO_DM_STRONG
 #define SDIO_DATA_0_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_0_HSIOM
 	#define ioss_0_port_2_pin_0_HSIOM HSIOM_SEL_GPIO
@@ -233,7 +251,7 @@ extern "C" {
 #define SDIO_DATA_1_PORT GPIO_PRT2
 #define SDIO_DATA_1_PIN 1U
 #define SDIO_DATA_1_NUM 1U
-#define SDIO_DATA_1_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_DATA_1_DRIVEMODE CY_GPIO_DM_STRONG
 #define SDIO_DATA_1_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_1_HSIOM
 	#define ioss_0_port_2_pin_1_HSIOM HSIOM_SEL_GPIO
@@ -243,7 +261,7 @@ extern "C" {
 #define SDIO_DATA_2_PORT GPIO_PRT2
 #define SDIO_DATA_2_PIN 2U
 #define SDIO_DATA_2_NUM 2U
-#define SDIO_DATA_2_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_DATA_2_DRIVEMODE CY_GPIO_DM_STRONG
 #define SDIO_DATA_2_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_2_HSIOM
 	#define ioss_0_port_2_pin_2_HSIOM HSIOM_SEL_GPIO
@@ -253,7 +271,7 @@ extern "C" {
 #define SDIO_DATA_3_PORT GPIO_PRT2
 #define SDIO_DATA_3_PIN 3U
 #define SDIO_DATA_3_NUM 3U
-#define SDIO_DATA_3_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_DATA_3_DRIVEMODE CY_GPIO_DM_STRONG
 #define SDIO_DATA_3_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_3_HSIOM
 	#define ioss_0_port_2_pin_3_HSIOM HSIOM_SEL_GPIO
@@ -263,7 +281,7 @@ extern "C" {
 #define SDIO_CMD_PORT GPIO_PRT2
 #define SDIO_CMD_PIN 4U
 #define SDIO_CMD_NUM 4U
-#define SDIO_CMD_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_CMD_DRIVEMODE CY_GPIO_DM_STRONG
 #define SDIO_CMD_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_4_HSIOM
 	#define ioss_0_port_2_pin_4_HSIOM HSIOM_SEL_GPIO
@@ -273,7 +291,7 @@ extern "C" {
 #define SDIO_CLK_PORT GPIO_PRT2
 #define SDIO_CLK_PIN 5U
 #define SDIO_CLK_NUM 5U
-#define SDIO_CLK_DRIVEMODE CY_GPIO_DM_ANALOG
+#define SDIO_CLK_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
 #define SDIO_CLK_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_2_pin_5_HSIOM
 	#define ioss_0_port_2_pin_5_HSIOM HSIOM_SEL_GPIO
@@ -581,6 +599,8 @@ extern "C" {
 #define MOT_CUR_PGA_POS_HSIOM ioss_0_port_9_pin_5_HSIOM
 #define MOT_CUR_PGA_POS_IRQ ioss_interrupts_gpio_9_IRQn
 
+extern const cy_stc_gpio_pin_config_t ioss_0_port_0_pin_0_config;
+extern const cy_stc_gpio_pin_config_t ioss_0_port_0_pin_1_config;
 extern const cy_stc_gpio_pin_config_t MOT_CUR_FILT_config;
 extern const cy_stc_gpio_pin_config_t ioss_0_port_10_pin_2_config;
 extern const cy_stc_gpio_pin_config_t FLASH_CS_config;

@@ -200,14 +200,14 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
             if "_M0_" in part:
                 target = {"name": part, "core": "cm0p"}
                 # SPE image flash address start
-                img_start_addr = "0x10600400"
+                img_start_addr = "0x10080000"
             else:
                 # NSPE image flash address start
-                img_start_addr = "0x10000400"
+                img_start_addr = "0x10002000"
                 target = {"name": part, "core": "cm4"}
 
     # create binary file from mbed elf for the following processing
-    subprocess.Popen(["arm-none-eabi-objcopy.exe", str(mbed_elf_path),
+    subprocess.Popen(["arm-none-eabi-objcopy", str(mbed_elf_path),
                       "-O", "binary", str(mbed_bin_path)])
 
     # preserve original hex file from mbed-os build
@@ -224,11 +224,11 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
         exit(1)
 
     # call imgtool for signature
-    process = subprocess.Popen(["python.exe", sign_args.get("imgtool"), "sign", "--key", sign_args.get("priv_key"),
+    process = subprocess.Popen(["python", sign_args.get("imgtool"), "sign", "--key", sign_args.get("priv_key"),
                                 "--header-size", sign_args.get("header_size"), "--pad-header", "--align",
                                 sign_args.get("align"), "--version", sign_args.get("version"), "--image-id",
                                 sign_args.get("id"), "--rollback_counter", sign_args.get("rollback_counter"),
-                                "--slot-size", sign_args.get("slot_size"), "--overwrite-only", binf, binf_signed],
+                                "--slot-size", sign_args.get("slot_size"), "--overwrite-only", sign_args.get("pad"), binf, binf_signed],
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # catch stderr outputs
@@ -245,7 +245,7 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
     # TODO: resolve img_start_addr acquisition as parameter, not a constant
     # convert signed image binary back to hex format
     if img_start_addr:
-        subprocess.Popen(["arm-none-eabi-objcopy.exe", "--change-address", img_start_addr,  # 0x10600400 for PSA M0
+        subprocess.Popen(["arm-none-eabi-objcopy", "--change-address", img_start_addr,
                           "-I", "binary", "-O", "ihex", binf_signed, str(mbed_hex_path)])
     else:
         toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")

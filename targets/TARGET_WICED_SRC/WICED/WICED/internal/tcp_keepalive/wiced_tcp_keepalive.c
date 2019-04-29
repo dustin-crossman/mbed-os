@@ -38,6 +38,7 @@
 #include <stdbool.h>
 #include "wiced_tcp_keepalive.h"
 
+
 /******************************************************
  *                      Macros
  ******************************************************/
@@ -67,6 +68,8 @@ static uint32_t ip_cksum_partial (uint32_t sum, uint8_t* val8, uint32_t count);
 static uint16_t ip_cksum (uint32_t sum, uint8_t *val8, uint32_t count );
 static uint16_t ipv4_tcp_hdr_cksum(uint8_t *ip, uint8_t *tcp, uint16_t tcp_len);
 static uint16_t tcp_hdr_chksum (uint32_t sum, uint8_t *tcp_hdr, uint16_t tcp_len);
+
+
 
 /******************************************************
  *               Variable Definitions
@@ -117,11 +120,11 @@ int tko_enable (bool enable )
         }
         else
         {
-            DEBUG_PRINTF((" tko disable success\n" ));
+            DEBUG_PRINTF((" tko enable success\n" ));
         }
     }
 
-    return TCP_KEEPALIVE_SUCCESS;
+    return WWD_SUCCESS;
 }
 
 int tcp_keepalive_pkt(uint8_t* buf, tcp_keep_alive_t* keep_alive_offload )
@@ -132,7 +135,7 @@ int tcp_keepalive_pkt(uint8_t* buf, tcp_keep_alive_t* keep_alive_offload )
 
     if (buf == NULL)
     {
-       return TCP_KEEPALIVE_ERROR;
+       return WWD_BADARG;
     }
 
     eth = (wiced_ether_header_t *)buf;
@@ -179,7 +182,7 @@ int tcp_keepalive_pkt(uint8_t* buf, tcp_keep_alive_t* keep_alive_offload )
     }
     else
     {
-        return TCP_KEEPALIVE_ERROR;
+        return WWD_BADARG;
     }
 }
 
@@ -194,7 +197,7 @@ static uint16_t ipv4_hdr_cksum( uint8_t *ip, int ip_len)
 
    if ((ip == NULL) || (ip_len < IPV4_MIN_HEADER_LEN))
    {
-	   return TCP_KEEPALIVE_ERROR;
+	   return WWD_BADARG;
    }
 
    /* partial cksum skipping the hdr_chksum field */
@@ -213,7 +216,7 @@ static uint32_t ip_cksum_partial (uint32_t sum, uint8_t* val8, uint32_t count)
 
    if((val8 == NULL) || ((count % 2) != 0 ))
    {
-	   return TCP_KEEPALIVE_ERROR;
+	   return WWD_BADARG;
    }
 
    count /= 2;
@@ -232,7 +235,7 @@ static uint16_t ip_cksum (uint32_t sum, uint8_t *val8, uint32_t count )
 
    if(val8 == NULL)
    {
-	   return TCP_KEEPALIVE_ERROR;
+	   return WWD_BADARG;
    }
 
    while (count > 1)
@@ -266,7 +269,7 @@ static uint16_t ipv4_tcp_hdr_cksum(uint8_t *ip, uint8_t *tcp, uint16_t tcp_len)
 
    if ( tcp_len < TCP_MIN_HEADER_LEN )
    {
-       return TCP_KEEPALIVE_ERROR;
+       return WWD_BADARG;
    }
 
    /* pseudo header cksum */
@@ -289,7 +292,7 @@ static uint16_t tcp_hdr_chksum (uint32_t sum, uint8_t *tcp_hdr, uint16_t tcp_len
 
    if ( tcp_len < TCP_MIN_HEADER_LEN )
    {
-      return TCP_KEEPALIVE_ERROR;
+      return WWD_BADARG;
    }
 
    /* partial TCP cksum skipping the chksum field */
@@ -304,7 +307,7 @@ static uint16_t tcp_hdr_chksum (uint32_t sum, uint8_t *tcp_hdr, uint16_t tcp_len
 int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_offload )
 {
     int datalen = 0;
-    connect->index = 0;
+    connect->index = 1;
     connect->ip_addr_type = 0;
     uint32_t srcip;
     uint32_t destip;
@@ -323,10 +326,15 @@ int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_of
 
     keep_alive_offload->seqnum = keep_alive_offload->seqnum - 1;
 
+    DEBUG_PRINTF(("keep alive Seq num:%lu\n",    keep_alive_offload->seqnum ));
+    DEBUG_PRINTF(("keep alive Ack num:%lu\n",    keep_alive_offload->acknum ));
+    DEBUG_PRINTF(("keep alive Rcv Window:%lu\n", keep_alive_offload->rx_window ));
+
+
     connect->request_len = tcp_keepalive_pkt(&connect->data[datalen], keep_alive_offload );
     if(connect->request_len == 0xffff)
     {
-        return TCP_KEEPALIVE_ERROR;
+        return WWD_BADARG;
     }
 
     datalen += connect->request_len;
@@ -335,7 +343,7 @@ int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_of
 
     if(connect->request_len == 0xffff)
     {
-        return TCP_KEEPALIVE_ERROR;
+        return WWD_BADARG;
     }
 
     datalen += connect->response_len;
@@ -362,7 +370,7 @@ int tcp_client_connect ( tcp_keep_alive_t* keep_alive_offload)
    connect = (wwd_tko_connect_t *)tko->data;
 
    tko_len = tko_connect_init(connect, keep_alive_offload);
-   if (tko_len == TCP_KEEPALIVE_ERROR)
+   if (tko_len == WWD_BADARG)
    {
        return tko_len;
    }

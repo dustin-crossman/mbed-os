@@ -41,7 +41,7 @@
   },
 
   "targets": {
-    "CY8CPROTO_062_4343W": {
+    "PSOC6_01": {
       "generic": {
         "gdbServerGdbPortNumber": 3334,
         "gdbServerOther": "-p 3333&#13;&#10;--no-deprecation-warning",
@@ -49,51 +49,54 @@
       }
     },
 
-    "CY8CMOD_062_4343W": {
+    "PSOC6_02": {
       "generic": {
         "gdbServerGdbPortNumber": 3334,
         "gdbServerOther": "-p 3333&#13;&#10;--no-deprecation-warning",
         "corePortNumber": 3334
       }
     },
-
-    "CYW943012P6EVB_01": {
+    
+    "CY8CPROTO_064_SB_M0": {
       "generic": {
-        "gdbServerGdbPortNumber": 3334,
-        "gdbServerOther": "-p 3333&#13;&#10;--no-deprecation-warning",
-        "corePortNumber": 3334
+        "gdbServerOther": "-t cy8c64xx_cm0&#13;&#10;--no-deprecation-warning"
+      },
+      "debug": {
+        "coreLoadImage": "false"
       }
     },
-
-    "CY8CKIT_062_WIFI_BT": {
-      "generic": {
-        "gdbServerGdbPortNumber": 3334,
-        "gdbServerOther": "-p 3333&#13;&#10;--no-deprecation-warning",
-        "corePortNumber": 3334
-      }
-    },
-
+    
     "CY8CPROTO_064_SB": {
       "generic": {
-        "gdbServerGdbPortNumber": 3334,
-        "gdbServerOther": "-p 3333&#13;&#10;--no-deprecation-warning",
-        "corePortNumber": 3334
+      },
+      "debug": {
+        "coreLoadImage": "false"
+      },
+      "program": {
+        "PROGRAM_NAME": ".hex"
       }
     },
-
-    "CY8CKIT_062_BLE": {
+    
+    "CY8CPROTO_064_SB_M0_PSA": {
       "generic": {
-        "gdbServerGdbPortNumber": 3334,
-        "gdbServerOther": "-p 3333&#13;&#10;--no-deprecation-warning",
-        "corePortNumber": 3334
+        "gdbServerOther": "-t cy8c64xx_cm0&#13;&#10;--no-deprecation-warning"
+      },
+      "debug": {
+        "coreLoadImage": "false"
+      },
+      "program": {
+        "PROGRAM_NAME": ".hex"
       }
     },
-
-    "CY8CKIT_062_4343W": {
+    
+    "CY8CPROTO_064_SB_PSA": {
       "generic": {
-        "gdbServerGdbPortNumber": 3334,
-        "gdbServerOther": "-p 3333&#13;&#10;--no-deprecation-warning",
-        "corePortNumber": 3334
+      },
+      "debug": {
+        "coreLoadImage": "false"
+      },
+      "program": {
+        "PROGRAM_NAME": "-combined.hex"
       }
     }
   }
