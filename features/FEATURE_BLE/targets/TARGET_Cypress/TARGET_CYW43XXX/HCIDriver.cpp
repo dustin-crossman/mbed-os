@@ -32,19 +32,27 @@ extern const int brcm_patch_ram_length;
 extern const uint8_t brcm_patchram_buf[];
 
 static const uint8_t pre_brcm_patchram_buf[] = {
-    // RESET followed by download mini driver cmd
+    // RESET followed by update uart baudrate
     0x03, 0x0C, 0x00,
+	0x18, 0xFC, 0x06, 0x00, 0x00, 0xC0, 0xC6, 0x2D, 0x00,   //update uart baudrate 3 mbp
+};
+
+static const uint8_t pre_brcm_patchram_buf2[] = {
+	//download mini driver
     0x2E, 0xFC, 0x00,
 };
+
 static const uint8_t post_brcm_patchram_buf[] = {
     // RESET cmd
     0x03, 0x0C, 0x00,
 };
 
 static const int pre_brcm_patch_ram_length = sizeof(pre_brcm_patchram_buf);
+static const int pre_brcm_patch_ram_length2 = sizeof(pre_brcm_patchram_buf2);
 static const int post_brcm_patch_ram_length = sizeof(post_brcm_patchram_buf);
 
 #define HCI_RESET_RAND_CNT        4
+#define HCI_VS_CMD_UPDATE_UART_BAUD_RATE 0xFC18
 #define HCI_VS_CMD_SET_SLEEP_MODE 0xFC27
 
 
@@ -112,6 +120,15 @@ public:
 
             /* decode opcode */
             switch (opcode) {
+				case HCI_VS_CMD_UPDATE_UART_BAUD_RATE:
+					cy_transport_driver.update_uart_baud_rate(3000000);
+#ifdef CY_DEBUG
+					HciReadLocalVerInfoCmd();
+#else
+					set_sleep_mode();
+#endif
+					break;
+
 #ifdef CY_DEBUG
                 case HCI_OPCODE_READ_LOCAL_VER_INFO:
                     uint8_t hci_version;
@@ -136,6 +153,7 @@ public:
                     set_sleep_mode();
                     break;
 #endif
+
                 // Note: Reset is handled by ack_service_pack.
                 case HCI_VS_CMD_SET_SLEEP_MODE:
                     HciWriteLeHostSupport();
@@ -293,18 +311,31 @@ public:
 
 private:
 
-    // send pre_brcm_patchram_buf
+    // send pre_brcm_patchram_buf issue hci reset and update baud rate on 43012
     void prepare_service_pack_transfert(void)
     {
         service_pack_ptr = pre_brcm_patchram_buf;
         service_pack_length = pre_brcm_patch_ram_length;
+        service_pack_next = &HCIDriver::prepare_service_pack_transfert2;
+        service_pack_index = 0;
+        service_pack_transfered = false;
+        send_service_pack_command();
+    }
+
+    // Called one pre_brcm_patchram_buf has been transferred; send pre_brcm_patchram_buf2 update uart baudrate 
+	// on PSoC6 to send hci download minidriver
+    void prepare_service_pack_transfert2(void)
+    {
+		cy_transport_driver.update_uart_baud_rate(3000000);
+        service_pack_ptr = pre_brcm_patchram_buf2;
+        service_pack_length = pre_brcm_patch_ram_length2;
         service_pack_next = &HCIDriver::start_service_pack_transfert;
         service_pack_index = 0;
         service_pack_transfered = false;
         send_service_pack_command();
     }
 
-    // Called once pre_brcm_patchram_buf has been transferred; send brcm_patchram_buf
+    // Called once pre_brcm_patchram_buf2 has been transferred; send brcm_patchram_buf
     void start_service_pack_transfert(void)
     {
         service_pack_ptr = brcm_patchram_buf;
@@ -318,6 +349,7 @@ private:
     // Called once brcm_patchram_buf has been transferred; send post_brcm_patchram_buf
     void post_service_pack_transfert(void)
     {
+		cy_transport_driver.update_uart_baud_rate(115200);
         service_pack_ptr = post_brcm_patchram_buf;
         service_pack_length = post_brcm_patch_ram_length;
         service_pack_next = &HCIDriver::terminate_service_pack_transfert;;
@@ -335,12 +367,7 @@ private:
         service_pack_index = 0;
         service_pack_transfered = true;
         wait_ms(1000);
-#ifdef CY_DEBUG
-        HciReadLocalVerInfoCmd();
-#else
-        set_sleep_mode();
-#endif
-
+		HciUpdateUartBaudRate();
         sleep_manager_unlock_deep_sleep();
     }
 
@@ -394,6 +421,22 @@ private:
                   pBuf[HCI_CMD_HDR_LEN + 9] = 0x00; // resume timeout
                   pBuf[HCI_CMD_HDR_LEN + 10] = 0x00; // break to host
                   pBuf[HCI_CMD_HDR_LEN + 10] = 0x00; // Pulsed host wake
+                  hciCmdSend(pBuf);
+            }
+    }
+
+	//	0x18, 0xFC, 0x06, 0x00, 0x00, 0xC0, 0xC6, 0x2D, 0x00,   //update uart baudrate 3 mbp
+    void HciUpdateUartBaudRate()
+    {
+            uint8_t *pBuf;
+            if ((pBuf = hciCmdAlloc(HCI_VS_CMD_UPDATE_UART_BAUD_RATE, 6)) != NULL)
+            {
+                  pBuf[HCI_CMD_HDR_LEN] = 0x00; // encoded_baud_rate
+                  pBuf[HCI_CMD_HDR_LEN + 1] = 0x00; // use_encoded_form
+                  pBuf[HCI_CMD_HDR_LEN + 2] = 0xC0; // explicit baud rate bit 0-7
+                  pBuf[HCI_CMD_HDR_LEN + 3] = 0xC6; // explicit baud rate bit 8-15
+                  pBuf[HCI_CMD_HDR_LEN + 4] = 0x2D; // explicit baud rate bit 16-23
+                  pBuf[HCI_CMD_HDR_LEN + 5] = 0x00; // explicit baud rate bit 24-31
                   hciCmdSend(pBuf);
             }
     }
