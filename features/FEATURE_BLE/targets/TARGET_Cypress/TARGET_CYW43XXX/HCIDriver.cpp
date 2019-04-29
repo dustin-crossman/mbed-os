@@ -89,7 +89,6 @@ public:
         //Prevent PSoC6 to enter deep-sleep till BT initialization is complete
         sleep_manager_lock_deep_sleep();
         bt_power = 1;
-        wait_ms(500);
     }
 
     virtual void do_terminate() { }
@@ -366,7 +365,6 @@ private:
         service_pack_next = NULL;
         service_pack_index = 0;
         service_pack_transfered = true;
-        wait_ms(1000);
 		HciUpdateUartBaudRate();
         sleep_manager_unlock_deep_sleep();
     }
