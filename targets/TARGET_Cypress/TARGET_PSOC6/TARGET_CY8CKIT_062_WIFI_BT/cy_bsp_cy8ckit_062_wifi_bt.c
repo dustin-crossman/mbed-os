@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-#define THREAD_STACK_SIZE   	(5000)
+#define THREAD_STACK_SIZE   	(5*1024)
 #define THREAD_PRIORITY   	    osPriorityRealtime7
 //TODO: Need to use priority from whd_rtos.h when available
 //#define THREAD_PRIORITY   	RTOS_HIGHEST_PRIORITY
@@ -67,8 +67,6 @@ whd_netif_funcs_t netif_ops =
 extern whd_resource_source_t resource_ops;
 
 whd_driver_t whd_drv;
-
-static uint8_t thread_stack[THREAD_STACK_SIZE];
 
 whd_driver_t* get_whd_driver(void)
 {
@@ -186,7 +184,7 @@ cy_rslt_t init_cycfg_wlan_hw(void)
     cy_sdio_t sdio_obj;
     whd_init_config_t whd_init_config;
     whd_init_config.thread_stack_size = ( uint32_t ) THREAD_STACK_SIZE;
-    whd_init_config.thread_stack_start = &thread_stack;
+    whd_init_config.thread_stack_start = (char*)malloc(THREAD_STACK_SIZE) ;
     whd_init_config.thread_priority = (uint32_t) THREAD_PRIORITY;
     whd_init_config.oob_gpio_pin = DEFAULT_OOB_PIN;
     whd_init_config.country = COUNTRY;
