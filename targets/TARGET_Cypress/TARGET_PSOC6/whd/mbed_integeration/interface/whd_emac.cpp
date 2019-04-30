@@ -167,11 +167,11 @@ void WHD_EMAC::get_ifname(char *name, uint8_t size) const
 
 extern "C"
 {
-void host_network_process_ethernet_data(whd_buffer_t buffer, whd_interface_role_t role)
+void host_network_process_ethernet_data(whd_interface_t role, whd_buffer_t buffer)
 {
 	emac_mem_buf_t *mem_buf = NULL;
 
-    WHD_EMAC &emac = WHD_EMAC::get_instance(role);
+    WHD_EMAC &emac = WHD_EMAC::get_instance();
 
     if (!emac.powered_up && !emac.emac_link_input_cb) {
         // ignore any trailing packets

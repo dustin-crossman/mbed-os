@@ -29,6 +29,7 @@
 //#include "wwd_buffer_interface.h"
 //#include "wwd_ap_common.h"
 
+extern "C" void whd_emac_wifi_link_state_changed(bool state_up, whd_interface_t ifp);
 
 static int whd_toerror(whd_result_t res) {
     switch (res) {
@@ -184,6 +185,11 @@ nsapi_error_t WhdSTAInterface::connect()
 
     /* Use DHCP to get IP address? */
     set_dhcp( (_ip_address[0] ? false : true) );
+
+    if(whd_wifi_is_ready_to_transceive(_whd_emac.ifp) == WHD_SUCCESS)
+    {
+    		whd_emac_wifi_link_state_changed(true, _whd_emac.ifp);
+    }
 
     // bring up
     return _interface->bringup(_dhcp,
