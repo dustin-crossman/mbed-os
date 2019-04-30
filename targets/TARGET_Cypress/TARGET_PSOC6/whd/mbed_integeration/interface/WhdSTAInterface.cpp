@@ -55,7 +55,7 @@ static whd_security_t whd_fromsecurity(nsapi_security_t sec) {
         case NSAPI_SECURITY_NONE:       return WHD_SECURITY_OPEN;
         case NSAPI_SECURITY_WEP:        return WHD_SECURITY_WEP_PSK;
         case NSAPI_SECURITY_WPA:        return WHD_SECURITY_WPA_MIXED_PSK;
-        case NSAPI_SECURITY_WPA2:       return WHD_SECURITY_WPA2_MIXED_PSK;
+        case NSAPI_SECURITY_WPA2:       return WHD_SECURITY_WPA2_AES_PSK;
         case NSAPI_SECURITY_WPA_WPA2:   return WHD_SECURITY_WPA2_MIXED_PSK;
         default:                        return WHD_SECURITY_UNKNOWN;
     }
@@ -117,6 +117,10 @@ nsapi_error_t WhdSTAInterface::connect()
 #define MAX_RETRY_COUNT    ( 5 )
     int i;
 
+    // initialize wiced, this is noop if already init
+        if (!_whd_emac.powered_up)
+            _whd_emac.power_up();
+
     if (!_interface) {
         nsapi_error_t err = _stack.add_ethernet_interface(_emac, true, &_interface);
         if (err != NSAPI_ERROR_OK) {
@@ -125,10 +129,6 @@ nsapi_error_t WhdSTAInterface::connect()
         }
         _interface->attach(_connection_status_cb);
     }
-
-    // initialize wiced, this is noop if already init
-    if (!_whd_emac.powered_up)
-        _whd_emac.power_up();
 
     if ((_ssid == NULL) ||
         (strlen(_ssid) == 0)) {

@@ -170,8 +170,6 @@ extern "C"
 void host_network_process_ethernet_data(whd_buffer_t buffer, whd_interface_role_t role)
 {
 	emac_mem_buf_t *mem_buf = NULL;
-    struct pbuf *pbuffer = NULL;
-    whd_mbed_buffer_t mbuffer = (whd_mbed_buffer_t)buffer;
 
     WHD_EMAC &emac = WHD_EMAC::get_instance(role);
 
@@ -185,10 +183,12 @@ void host_network_process_ethernet_data(whd_buffer_t buffer, whd_interface_role_
     uint16_t size = whd_buffer_get_current_piece_size(emac.drvp, buffer);
 
     if (size > 0) {
-    	mem_buf = mbuffer->parent;
-    	pbuffer = (struct pbuf *)mbuffer->parent;
-    	pbuffer->payload = data;
-    	emac.emac_link_input_cb(mem_buf);
+        /* Allocate a memory buffer chain from buffer pool */
+        mem_buf = emac.memory_manager->alloc_heap(size, 0);
+        if (mem_buf != NULL) {
+            memcpy(static_cast<uint8_t *>(emac.memory_manager->get_ptr(mem_buf)), static_cast<uint8_t *>(data), size);
+            emac.emac_link_input_cb(mem_buf);
+        };
     }
     whd_buffer_release(emac.drvp, buffer, WHD_NETWORK_RX);
 }
