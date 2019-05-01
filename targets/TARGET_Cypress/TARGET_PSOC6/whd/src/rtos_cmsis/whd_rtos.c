@@ -163,7 +163,7 @@ whd_result_t whd_rtos_get_semaphore(whd_semaphore_type_t *semaphore, uint32_t ti
     }
     else if (result == osErrorTimeout)
     {
-        WPRINT_WHD_ERROR( ("semaphore time out ") );
+        WPRINT_WHD_INFO( ("semaphore time out ") );
         return WHD_TIMEOUT;
     }
     else if (result == osErrorResource)
@@ -204,14 +204,9 @@ whd_result_t whd_rtos_set_semaphore(whd_semaphore_type_t *semaphore, whd_bool_t 
 
     result = osSemaphoreRelease(*semaphore);
 
-    if (result == osOK)
+    if ((result == osOK) || (result == osErrorResource))
     {
         return WHD_SUCCESS;
-    }
-    else if (result == osErrorResource)
-    {
-        WPRINT_WHD_ERROR( ("semaphore resource error ") );
-        return WHD_WAIT_ABORTED;
     }
     else if (result == osErrorParameter)
     {
