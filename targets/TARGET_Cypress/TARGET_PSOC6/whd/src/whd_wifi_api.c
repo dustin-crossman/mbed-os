@@ -812,7 +812,6 @@ static void *whd_wifi_join_events_handler(whd_interface_t ifp, const whd_event_h
     if (whd_wifi_is_ready_to_transceive(ifp) == WHD_SUCCESS)
     {
         join_attempt_complete = WHD_TRUE;
-        whd_emac_wifi_link_state_changed(WHD_TRUE, ifp);
     }
 
     if (join_attempt_complete == WHD_TRUE)
