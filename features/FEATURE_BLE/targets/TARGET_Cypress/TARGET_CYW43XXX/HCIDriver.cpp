@@ -409,7 +409,7 @@ private:
             {
                   pBuf[HCI_CMD_HDR_LEN] = 0x01; // no sleep
                   pBuf[HCI_CMD_HDR_LEN + 1] = 0x00; // no idle threshold host (N/A)
-                  pBuf[HCI_CMD_HDR_LEN + 2] = 0x00; // no idle threshold HC (N/A)
+                  pBuf[HCI_CMD_HDR_LEN + 2] = 0x01; // no idle threshold HC (N/A)
                   pBuf[HCI_CMD_HDR_LEN + 3] = 0x00; // BT WAKE
                   pBuf[HCI_CMD_HDR_LEN + 4] = 0x00; // HOST WAKE
                   pBuf[HCI_CMD_HDR_LEN + 5] = 0x00; // Sleep during SCO
@@ -418,7 +418,7 @@ private:
                   pBuf[HCI_CMD_HDR_LEN + 8] = 0x00; // Active connection handling on suspend
                   pBuf[HCI_CMD_HDR_LEN + 9] = 0x00; // resume timeout
                   pBuf[HCI_CMD_HDR_LEN + 10] = 0x00; // break to host
-                  pBuf[HCI_CMD_HDR_LEN + 10] = 0x00; // Pulsed host wake
+                  pBuf[HCI_CMD_HDR_LEN + 11] = 0x00; // Pulsed host wake
                   hciCmdSend(pBuf);
             }
     }
