@@ -1,11 +1,8 @@
 /***************************************************************************//**
-* \file cy_abstraction_chip.h
+* \file cyhal_utils.c
 *
 * \brief
-* Basic abstraction layer for dealing with chips containing a Cypress MCU. This
-* API provides convenience methods for initializing and manipulating different
-* hardware peripherals. Depending on the specific chip being used, not all
-* features may be supported.
+* Provides utility functions for working with the PSoC 6 HAL implementation.
 *
 ********************************************************************************
 * \copyright
@@ -25,6 +22,16 @@
 * limitations under the License.
 *******************************************************************************/
 
-#pragma once
+#include "cyhal_utils.h"
 
-#include "cyhal.h"
+const cyhal_resource_pin_mapping_t *cyhal_utils_get_resource(cyhal_gpio_t pin, const cyhal_resource_pin_mapping_t* mappings, size_t count)
+{
+    for (uint32_t i = 0; i < count; i++)
+    {
+        if (pin == mappings[i].pin)
+        {
+            return &mappings[i];
+        }
+    }
+    return NULL;
+}

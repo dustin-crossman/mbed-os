@@ -52,11 +52,11 @@ extern "C" {
 */
 
 /** The specified resource number is not valid */
-#define CYBRD_RSLT_INVALID_INDEX (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_BSP, 0))
+#define CYBSP_RSLT_INVALID_INDEX (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_BSP, 0))
 /** The specified resource is already enabled */
-#define CYBRD_RSLT_ALREADY_ENABLED (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_BSP, 1))
+#define CYBSP_RSLT_ALREADY_ENABLED (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_BSP, 1))
 /** The specified resource is not enabled */
-#define CYBRD_RSLT_NOT_ENABLED (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_BSP, 2))
+#define CYBSP_RSLT_NOT_ENABLED (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_BSP, 2))
 
 /** \} group_abstraction_board_macros */
 
@@ -84,8 +84,8 @@ uint32_t cy_board_led_count(void);
  * \brief Enables the specified LED, setting the GPIO pin as necessary
  * \param which The specific LED number to enable, must be between 0 and count-1
  * \returns CY_RSLT_SUCCESS if the LED was enabled successfully
- *          CYBRD_RSLT_INVALID_INDEX if the specified LED number is not valid
- *          CYBRD_RSLT_ALREADY_ENABLED if the specified LED number is already enabled
+ *          CYBSP_RSLT_INVALID_INDEX if the specified LED number is not valid
+ *          CYBSP_RSLT_ALREADY_ENABLED if the specified LED number is already enabled
  */
 cy_rslt_t cy_board_led_enable(uint32_t which);
 
@@ -94,8 +94,8 @@ cy_rslt_t cy_board_led_enable(uint32_t which);
  * \param which The specific LED number to set state, must be between 0 and count-1
  * \param on Whether the LED should be turned on (true) or off (false)
  * \returns CY_RSLT_SUCCESS if the LED was enabled successfully
- *          CYBRD_RSLT_INVALID_INDEX if the specified LED number is not valid
- *          CYBRD_RSLT_NOT_ENABLED if the specified LED number has not been enabled
+ *          CYBSP_RSLT_INVALID_INDEX if the specified LED number is not valid
+ *          CYBSP_RSLT_NOT_ENABLED if the specified LED number has not been enabled
  */
 cy_rslt_t cy_board_led_set_state(uint32_t which, bool on);
 
@@ -103,8 +103,8 @@ cy_rslt_t cy_board_led_set_state(uint32_t which, bool on);
  * \brief Disables an LED making the pin available for other purposes.
  * \param which The specific LED number to enable, must be between 0 and count-1
  * \returns CY_RSLT_SUCCESS if the LED was enabled successfully
- *          CYBRD_RSLT_INVALID_INDEX if the specified LED number is not valid
- *          CYBRD_RSLT_NOT_ENABLED if the specified LED number has not been enabled
+ *          CYBSP_RSLT_INVALID_INDEX if the specified LED number is not valid
+ *          CYBSP_RSLT_NOT_ENABLED if the specified LED number has not been enabled
  */
 cy_rslt_t cy_board_led_disable(uint32_t which);
 
@@ -118,8 +118,8 @@ uint32_t cy_board_switch_count(void);
  * \brief Enables the specified switch, setting the GPIO pin as necessary
  * \param which The specific switch number to enable, must be between 0 and count-1
  * \returns CY_RSLT_SUCCESS if the switch was enabled successfully
- *          CYBRD_RSLT_INVALID_INDEX if the specified switch number is not valid
- *          CYBRD_RSLT_ALREADY_ENABLED if the specified switch number is already enabled
+ *          CYBSP_RSLT_INVALID_INDEX if the specified switch number is not valid
+ *          CYBSP_RSLT_ALREADY_ENABLED if the specified switch number is already enabled
  */
 cy_rslt_t cy_board_switch_enable(uint32_t which);
 
@@ -127,8 +127,8 @@ cy_rslt_t cy_board_switch_enable(uint32_t which);
  * \brief Sets the state of the switch.
  * \param which The specific switch number to get state from, must be between 0 and count-1
  * \returns CY_RSLT_SUCCESS if the switch information was retrieved successfully
- *          CYBRD_RSLT_INVALID_INDEX if the specified switch number is not valid
- *          CYBRD_RSLT_NOT_ENABLED if the specified switch number has not been enabled
+ *          CYBSP_RSLT_INVALID_INDEX if the specified switch number is not valid
+ *          CYBSP_RSLT_NOT_ENABLED if the specified switch number has not been enabled
  */
 cy_rslt_t cy_board_switch_get_state(uint32_t which);
 
@@ -138,8 +138,8 @@ cy_rslt_t cy_board_switch_get_state(uint32_t which);
  * \param type The type sets level vs edge and active high vs active low
  * \param callback The function pointer to call when the switch state changes
  * \returns CY_RSLT_SUCCESS if the switch information was retrieved successfully
- *          CYBRD_RSLT_INVALID_INDEX if the specified switch number is not valid
- *          CYBRD_RSLT_NOT_ENABLED if the specified switch number has not been enabled
+ *          CYBSP_RSLT_INVALID_INDEX if the specified switch number is not valid
+ *          CYBSP_RSLT_NOT_ENABLED if the specified switch number has not been enabled
  */
 cy_rslt_t cy_board_switch_set_interrupt(uint32_t which, uint32_t type, void * callback);
 
@@ -147,8 +147,8 @@ cy_rslt_t cy_board_switch_set_interrupt(uint32_t which, uint32_t type, void * ca
  * \brief Disables a switch making the pin available for other purposes.
  * \param which The specific switch number to enable, must be between 0 and count-1
  * \returns CY_RSLT_SUCCESS if the switch was enabled successfully
- *          CYBRD_RSLT_INVALID_INDEX if the specified switch number is not valid
- *          CYBRD_RSLT_NOT_ENABLED if the specified switch number has not been enabled
+ *          CYBSP_RSLT_INVALID_INDEX if the specified switch number is not valid
+ *          CYBSP_RSLT_NOT_ENABLED if the specified switch number has not been enabled
  */
 cy_rslt_t cy_board_switch_disable(uint32_t which);
 

@@ -1,12 +1,9 @@
 /***************************************************************************//**
-* \file cy_abstraction_chip.h
+* \file cyhal_scb_common.h
 *
 * \brief
-* Basic abstraction layer for dealing with chips containing a Cypress MCU. This
-* API provides convenience methods for initializing and manipulating different
-* hardware peripherals. Depending on the specific chip being used, not all
-* features may be supported.
-*
+* Provides a struct definitions for configuration resources in the SCB (UART, I2C, SPI).
+* 
 ********************************************************************************
 * \copyright
 * Copyright 2018-2019 Cypress Semiconductor Corporation
@@ -27,4 +24,20 @@
 
 #pragma once
 
-#include "cyhal.h"
+#include "cy_device.h"
+#include "cy_pdl.h"
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+/** The start address of the SCB blocks */
+extern CySCB_Type* CY_SCB_BASE_ADDRESSES[CY_IP_MXSCB_INSTANCES];
+/** The hardware buffer size of the SCB blocks */
+extern uint16_t CY_SCB_BUFFER_SIZE[CY_IP_MXSCB_INSTANCES];
+/** The interrupt number of the SCB blocks. */
+extern IRQn_Type CY_SCB_IRQ_N[CY_IP_MXSCB_INSTANCES];
+
+#if defined(__cplusplus)
+}
+#endif

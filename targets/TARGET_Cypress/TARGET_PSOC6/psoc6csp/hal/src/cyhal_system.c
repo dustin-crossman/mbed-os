@@ -1,12 +1,12 @@
 /***************************************************************************//**
-* \file cy_abstraction_chip.h
+* \file cyhal_system.c
 *
 * \brief
-* Basic abstraction layer for dealing with chips containing a Cypress MCU. This
-* API provides convenience methods for initializing and manipulating different
-* hardware peripherals. Depending on the specific chip being used, not all
-* features may be supported.
-*
+* Provides a high level interface for interacting with the Cypress power 
+* management and system clock configuration. This interface abstracts out the 
+* chip specific details. If any chip specific functionality is necessary, or 
+* performance is critical the low level functions can be used directly.
+* 
 ********************************************************************************
 * \copyright
 * Copyright 2018-2019 Cypress Semiconductor Corporation
@@ -25,6 +25,14 @@
 * limitations under the License.
 *******************************************************************************/
 
-#pragma once
+#include "cyhal_system.h"
 
-#include "cyhal.h"
+cy_rslt_t cyhal_system_sleep(void)
+{
+    return (cy_rslt_t) Cy_SysPm_CpuEnterSleep(CY_SYSPM_WAIT_FOR_INTERRUPT);
+}
+
+cy_rslt_t cyhal_system_deepsleep(void)
+{
+    return (cy_rslt_t) Cy_SysPm_CpuEnterDeepSleep(CY_SYSPM_WAIT_FOR_INTERRUPT);
+}

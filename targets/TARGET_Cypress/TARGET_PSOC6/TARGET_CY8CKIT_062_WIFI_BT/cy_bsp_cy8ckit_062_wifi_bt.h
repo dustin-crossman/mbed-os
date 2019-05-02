@@ -57,7 +57,7 @@
 #include <stdbool.h>
 #include "cy_result.h"
 #include "cy_pdl.h"
-#include "cy_hal.h"
+#include "cyhal.h"
 #include "cy_abstraction_board.h"
 
 #if defined(__cplusplus)

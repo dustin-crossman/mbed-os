@@ -26,7 +26,7 @@
 #include "cy_bsp_cy8cproto_062_4343w.h"
 #include "cycfg.h"
 #include "cy_result.h"
-#include "cy_hal.h"
+#include "cyhal.h"
 
 #ifdef MBED
 #include "whd_wifi_api.h"
@@ -62,7 +62,7 @@ whd_driver_t* get_whd_driver(uint8_t idx)
     return &whd_drv;
 }
 
-void wlan_irq_handler(void *arg, cy_gpio_irq_event_t event)
+void wlan_irq_handler(void *arg, cyhal_gpio_irq_event_t event)
 {
     //TODO: Switch MCU to LP mode here.
 }
@@ -72,11 +72,11 @@ cy_rslt_t init_wlan_wakeup(void)
 {
     //TODO: confirm correct configuration. Currently configured as per wwd_SDIO_2m.c line 93 ModusToolbox 1.0
     //TODO: confirm PIN. not clear from module schematic or MT1.0 whether this is P2_7.
-    cy_rslt_t result = cy_gpio_init(CY_WIFI_HOST_WAKE, CY_GPIO_DIR_INPUT, CY_GPIO_DRIVE_ANALOG, 0);
+    cy_rslt_t result = cyhal_gpio_init(CY_WIFI_HOST_WAKE, CYHAL_GPIO_DIR_INPUT, CY_GPIO_DRIVE_ANALOG, 0);
     if(result == CY_RSLT_SUCCESS)
     {
-        cy_gpio_register_irq(CY_WIFI_HOST_WAKE, WLAN_INTR_PRIORITY, wlan_irq_handler, NULL);
-        cy_gpio_irq_enable(CY_WIFI_HOST_WAKE, CY_GPIO_IRQ_RISE, true);
+        cyhal_gpio_register_irq(CY_WIFI_HOST_WAKE, WLAN_INTR_PRIORITY, wlan_irq_handler, NULL);
+        cyhal_gpio_irq_enable(CY_WIFI_HOST_WAKE, CYHAL_GPIO_IRQ_RISE, true);
     }
     return result;
 }
@@ -84,9 +84,9 @@ cy_rslt_t init_wlan_wakeup(void)
 cy_rslt_t sdio_bus_initialize(whd_driver_t *whd_driver)
 {
     whd_sdio_config_t whd_sdio_config;
-    cy_sdio_t sdio_obj;
+    cyhal_sdio_t sdio_obj;
 
-    cy_rslt_t result = cy_sdio_init(&sdio_obj, CY_WIFI_SDIO_CMD, CY_WIFI_SDIO_CLK, CY_WIFI_SDIO_DATA_0, CY_WIFI_SDIO_DATA_1, CY_WIFI_SDIO_DATA_2, CY_WIFI_SDIO_DATA_3);
+    cy_rslt_t result = cyhal_sdio_init(&sdio_obj, CY_WIFI_SDIO_CMD, CY_WIFI_SDIO_CLK, CY_WIFI_SDIO_DATA_0, CY_WIFI_SDIO_DATA_1, CY_WIFI_SDIO_DATA_2, CY_WIFI_SDIO_DATA_3);
     if(result == CY_RSLT_SUCCESS)
     {
         whd_sdio_config.sdio_1bit_mode = WHD_FALSE;
@@ -130,7 +130,7 @@ cy_rslt_t init_cycfg_wlan_hw(void)
 *       Functions
 *******************************************************************************/
 
-cy_rslt_t cybrd_init(void)
+cy_rslt_t cybsp_init(void)
 {
     cy_rslt_t result = CY_RSLT_SUCCESS;
     init_cycfg_all();
@@ -140,47 +140,47 @@ cy_rslt_t cybrd_init(void)
     return result;
 }
 
-uint32_t cybrd_led_count(void)
+uint32_t cybsp_led_count(void)
 {
     return 0;
 }
 
-cy_rslt_t cybrd_led_enable(int which)
+cy_rslt_t cybsp_led_enable(int which)
 {
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cybrd_led_set_state(int which, bool on)
+cy_rslt_t cybsp_led_set_state(int which, bool on)
 {
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cybrd_led_disable(int which)
+cy_rslt_t cybsp_led_disable(int which)
 {
     return CY_RSLT_SUCCESS;
 }
 
-uint32_t cybrd_switch_count(void)
+uint32_t cybsp_switch_count(void)
 {
     return 0;
 }
 
-cy_rslt_t cybrd_switch_enable(int which)
+cy_rslt_t cybsp_switch_enable(int which)
 {
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cybrd_switch_get_state(int which)
+cy_rslt_t cybsp_switch_get_state(int which)
 {
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cybrd_switch_set_interrupt(int which, int type, void * callback)
+cy_rslt_t cybsp_switch_set_interrupt(int which, int type, void * callback)
 {
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cybrd_switch_disable(int which)
+cy_rslt_t cybsp_switch_disable(int which)
 {
     return CY_RSLT_SUCCESS;
 }

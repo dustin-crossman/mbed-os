@@ -1,12 +1,12 @@
 /***************************************************************************//**
-* \file cy_abstraction_chip.h
+* \file cyhal_implementation.h
 *
 * \brief
-* Basic abstraction layer for dealing with chips containing a Cypress MCU. This
-* API provides convenience methods for initializing and manipulating different
-* hardware peripherals. Depending on the specific chip being used, not all
-* features may be supported.
-*
+* Provides references for the PSoC 6 specific implementation of the HAL drivers.
+* This includes references to implementation specific header files and any
+* supporting data types. This file should not be used directly. It should only
+* be referenced by HAL drivers to pull in the implementation specific code.
+* 
 ********************************************************************************
 * \copyright
 * Copyright 2018-2019 Cypress Semiconductor Corporation
@@ -25,6 +25,17 @@
 * limitations under the License.
 *******************************************************************************/
 
+/**
+* \addtogroup group_hal_psoc6 PSoC 6 HAL Implementation
+* \{
+* PSoC 6 specific implementation of the HAL drivers
+* \} group_hal_psoc6
+*/
+
 #pragma once
 
-#include "cyhal.h"
+#include "cy_pdl.h"
+#include "cyhal_hw_types.h"
+#include "cyhal_gpio_impl.h"
+#include "cyhal_scb_common.h"
+#include "cyhal_utils.h"
