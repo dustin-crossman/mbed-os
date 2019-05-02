@@ -656,6 +656,8 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
     const uint32_t outputVal = 0UL;
     cy_stc_sd_host_context_t context;
 
+    obj->base = SDHC0;
+
     /* Enable the SDHC block. */
     Cy_SD_Host_Enable(obj->base);
 
@@ -723,9 +725,6 @@ cy_rslt_t cy_sdio_init(cy_sdio_t *obj, cy_gpio_t cmd, cy_gpio_t clk, cy_gpio_t d
 
     /* Change the host SD clock to 400 kHz */
     (void)Cy_SD_Host_SdCardChangeClock(SDHC0, CY_SD_HOST_CLK_400K);
-
-    /* Wait for WiFi chip to be ready */
-    Cy_SysLib_Delay(1000);
 
     return ret;
 }
@@ -887,10 +886,6 @@ cy_rslt_t cy_sdio_send_cmd(const cy_sdio_t *obj, cy_transfer_t direction, cy_sdi
     return ret;
 }
 
-#ifndef WICED_PLATFORM_DOESNT_USE_TEMP_DMA_BUFFER
-    static uint8_t temp_dma_buffer[2048];
-#endif
-
 
 cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length, uint32_t* response)
 {
@@ -901,7 +896,7 @@ cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_
     cy_stc_sd_host_data_config_t dat;
     cy_en_sd_host_status_t       result = CY_SD_HOST_ERROR_TIMEOUT;
     cy_sdio_transfer_mode_t      mode = (64U <= length) ? CY_SDIO_BLOCK_MODE : CY_SDIO_BYTE_MODE;
-
+    uint32_t temp_Buffer[length + 64 - 1];
 
     /* Initialize data constants*/
     dat.autoCommand         = CY_SD_HOST_AUTO_CMD_NONE;
@@ -952,10 +947,17 @@ cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_
         cmd.cmdType                         = CY_SD_HOST_CMD_NORMAL;
         dat.data                            = (uint32_t*)data;
 
+
+
+        dat.read = ( direction == CY_WRITE ) ? false : true;
+
         if( mode == CY_SDIO_BLOCK_MODE )
         {
+
               dat.blockSize         = block_size;
               dat.numberOfBlock     = ( length + block_size - 1 ) / block_size;
+              if (dat.read)
+            	  dat.data = (uint32_t*) temp_Buffer;
         }
         else
         {
@@ -963,18 +965,8 @@ cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_
               dat.numberOfBlock   = 1UL;
         }
 
-        dat.read = ( direction == CY_WRITE ) ? false : true;
 
-#ifndef WICED_PLATFORM_DOESNT_USE_TEMP_DMA_BUFFER
-        if (( direction == CY_READ ) && ( mode == CY_SDIO_BLOCK_MODE ))
-        {
-            /* In this mode, we may be reading more than the requested size to round
-             * up to the nearest multiple of block size. So, providing temp buffer
-             * instead of the original buffer to avoid memory corruption
-             */
-            dat.data       = (uint32_t*)temp_dma_buffer;
-        }
-#endif
+
        /*Disable XFER Done interrupt*/
        obj->base->CORE.NORMAL_INT_SIGNAL_EN_R  &= (uint16_t)~CY_SD_HOST_XFER_COMPLETE;
 
@@ -992,13 +984,6 @@ cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_
        }
     }
 
-#ifndef WICED_PLATFORM_DOESNT_USE_TEMP_DMA_BUFFER
-        if (( direction == CY_READ ) && ( mode == CY_SDIO_BLOCK_MODE ))
-        {
-            memcpy((uint32_t*)data, (const uint32_t*)temp_dma_buffer, (size_t) length );
-        }
-#endif
-
     if (response != NULL )
     {
         (void)Cy_SD_Host_GetResponse(obj->base, response, false);
@@ -1007,6 +992,11 @@ cy_rslt_t cy_sdio_bulk_transfer(cy_sdio_t *obj, cy_transfer_t direction, uint32_
     if (CY_SD_HOST_SUCCESS != result)
     {
         ret = CY_RSLT_TYPE_ERROR;
+    }
+
+    if(result == CY_RSLT_SUCCESS && mode == CY_SDIO_BLOCK_MODE && dat.read)
+    {
+    	memcpy((uint32_t *)data, temp_Buffer, (size_t)length);
     }
 
     return ret;

@@ -27,7 +27,14 @@
 #include "whd_wlioctl.h"
 #include "whd_buffer.h"
 #include "whd_buffer_api.h"
-#include "cy_bsp_cy8ckit_062_wifi_bt.h"
+
+#if defined(CY8C6247BZI_D54)
+    #include "cy_bsp_cy8ckit_062_wifi_bt.h"
+#elif defined(CY8C624ABZI_D44)
+    #include "cy_bsp_cy8cproto_062_4343w.h"
+#else
+    #include "cy_device_common.h"
+#endif
 
 
 WHD_EMAC::WHD_EMAC(whd_interface_role_t role)

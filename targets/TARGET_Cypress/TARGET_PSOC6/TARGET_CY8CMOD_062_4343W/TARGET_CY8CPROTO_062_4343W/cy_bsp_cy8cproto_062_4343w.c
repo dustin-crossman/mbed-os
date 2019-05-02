@@ -23,12 +23,12 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "cy_bsp_cy8ckit_062_wifi_bt.h"
+#include "cy_bsp_cy8cproto_062_4343w.h"
 #include "cycfg.h"
 #include "cy_hal.h"
 
 #include "cy_network_buffer.h"
-#include "SDIO_HOST.h"
+
 
 #if defined(__cplusplus)
 extern "C" {
@@ -81,18 +81,18 @@ void wlan_irq_handler(void *arg, cy_gpio_irq_event_t event)
 static cy_rslt_t init_sdio_wlan(cy_sdio_t *sdio_obj)
 {
     /* WiFi into reset */
-    cy_rslt_t result = cy_gpio_init(CY_WIFI_WL_REG_ON, CY_GPIO_DIR_OUTPUT, CY_GPIO_DM_PULLUP, 0);
+	cy_rslt_t result = cy_gpio_init(CY_WIFI_WL_REG_ON, CY_GPIO_DIR_OUTPUT, CY_GPIO_DM_PULLUP, 0);
 
     result = cy_sdio_init(sdio_obj, CY_WIFI_SDIO_CMD, CY_WIFI_SDIO_CLK, CY_WIFI_SDIO_DATA_0, CY_WIFI_SDIO_DATA_1, CY_WIFI_SDIO_DATA_2, CY_WIFI_SDIO_DATA_3);
     if(result == CY_RSLT_SUCCESS)
     {
+       // Cy_SysLib_Delay(10);
         /* Init SDIO Host */
-        result = cy_gpio_init(CY_WIFI_WL_REG_ON, CY_GPIO_DIR_OUTPUT, CY_GPIO_DM_PULLUP, 1);
+        //
         if(result == CY_RSLT_SUCCESS)
         {
-            /* WiFi out of reset */
-            cy_gpio_write(CY_WIFI_WL_REG_ON, true);
-            Cy_SysLib_Delay(WLAN_POWER_UP_DELAY_MS);
+        	cy_gpio_write(CY_WIFI_WL_REG_ON, true);
+            Cy_SysLib_Delay(250);
         }  
     }
     return result;
@@ -170,7 +170,7 @@ static cy_rslt_t sdio_bus_initialize(whd_driver_t *whd_driver, const cy_sdio_t *
     {
         whd_sdio_config.sdio_1bit_mode = WHD_FALSE;
         whd_sdio_config.high_speed_sdio_clock = WHD_FALSE;
-        whd_bus_sdio_attach(*whd_driver, &whd_sdio_config, sdio_obj);
+        whd_bus_sdio_attach(*whd_driver, &whd_sdio_config, &sdio_obj);
     }
     return result;
 }
