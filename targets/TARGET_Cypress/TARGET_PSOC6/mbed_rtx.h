@@ -47,11 +47,20 @@
 #endif
 #elif defined(TARGET_CY8CPROTO_064_M0_PSA)
 #ifndef INITIAL_SP
-#define INITIAL_SP              (0x08010000 + 0x00010000)  /* Ram origin + length */
+#define INITIAL_SP              (0x0800E000 + 0x00012000)  /* Ram origin + length */
 #endif
 #elif defined(TARGET_CY8CPROTO_064_SB_PSA)
 #ifndef INITIAL_SP
-#define INITIAL_SP              (0x08000000 + 0x0000FD00)  /* Ram origin + length */ 
+//#define INITIAL_SP              (0x08000000 + 0x0000CD00)  /* Ram origin + length */ 
+#define INITIAL_SP              (0x08000000 + 0x00008000)  /* Ram origin + length */ 
+#endif
+#elif defined(TARGET_CY_064_SB_M0_PSA)
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08008300 + 0x00017D00)  /* Ram origin + length */ 
+#endif
+#elif defined(TARGET_CY_064_SB_PSA)
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08000000 + 0x00008000)  /* Ram origin + length */ 
 #endif
 #endif
 #endif  /* MBED_MBED_RTX_H */
