@@ -38,35 +38,39 @@
 #include "lwip/etharp.h"
 #include "WicedInterface.h"
 #include "LWIPStack.h"
+#include "wiced_tcp_keepalive.h"
 
 #define TCP_KEEPALIVE_ERROR   (-1)
 #define TCP_KEEPALIVE_TIMEOUT (-2)
 #define TCP_KEEPALIVE_SUCCESS (0)
 
-typedef struct tcp_keepalive_socket_params tcp_keepalive_socket_params_t;
-typedef int (*tcp_socket_callback_t)( tcp_keepalive_socket_params_t* params, void* arg );
+typedef enum{
+    TCP_KEEPALIVE_OFFLOAD_DISABLED,
+    TCP_KEEPALIVE_OFFLOAD_SUSPENDED,
+    TCP_KEEPALIVE_OFFLOAD_ACTIVE
+} tcp_keepalive_offload_connection_state_t;
 
-struct tcp_keepalive_socket_params
+typedef struct tcp_keepalive_offload_configuration
 {
+    WiFiInterface *wifi_interface;
 	TCPSocket *socket; /* TCP Socket */
 	uint16_t keepalive_interval;
 	uint16_t keepalive_retry_count;
 	uint16_t keepalive_retry_interval;
 	uint16_t remote_port;
 	uint16_t local_port;
-	struct
-	{
-		tcp_socket_callback_t receive;
-		tcp_socket_callback_t send;
-	} callbacks;
-	void* callback_arg;
-};
+} tcp_keepalive_offload_config_t;
 
-int tcp_keepalive_enable(WiFiInterface *wifi, tcp_keepalive_socket_params_t *params );
-int tcp_keepalive_disable(void);
+typedef struct tcp_keepalive_offload_information
+{
+    tcp_keepalive_offload_config_t  tcp_keepalive_offload_config;
+    tcp_keepalive_offload_connection_state_t tcp_keepalive_offload_state;
+    tcp_keepalive_offload_internal_data_t tcp_keepalive_offload_internal_data;
+    struct tcp_pcb *socket_tcb_pcb;
+} tcp_keepalive_offload_info_t;
+
+int tcp_keepalive_offload_enable(tcp_keepalive_offload_info_t *tcp_keepalive_offload_info);
+int tcp_keepalive_offload_disable(tcp_keepalive_offload_info_t *tcp_keepalive_offload_info);
 nsapi_error_t get_tcp_socket_parameters( TCPSocket *socket, void **tcpsock_info );
-
-int tcp_register_socket_callbacks(tcp_keepalive_socket_params_t *params, tcp_socket_callback_t send, tcp_socket_callback_t recv, void * arg);
-int tcp_deregister_socket_callbacks ( tcp_keepalive_socket_params_t *tcp_keep_alive_params );
 
 #endif /* _TCP_KEEPALIVE_H__*/
