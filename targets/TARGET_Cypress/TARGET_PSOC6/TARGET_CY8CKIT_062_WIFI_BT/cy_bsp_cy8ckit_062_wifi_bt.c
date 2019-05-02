@@ -174,7 +174,7 @@ static cy_rslt_t sdio_bus_initialize(whd_driver_t *whd_driver, const cy_sdio_t *
     {
         whd_sdio_config.sdio_1bit_mode = WHD_FALSE;
         whd_sdio_config.high_speed_sdio_clock = WHD_FALSE;
-        whd_bus_sdio_attach(*whd_driver, &whd_sdio_config, &sdio_obj);
+        whd_bus_sdio_attach(*whd_driver, &whd_sdio_config, sdio_obj);
     }
     return result;
 }
