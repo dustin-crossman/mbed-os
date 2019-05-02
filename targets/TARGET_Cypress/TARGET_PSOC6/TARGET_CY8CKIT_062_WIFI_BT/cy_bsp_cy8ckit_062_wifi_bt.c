@@ -81,18 +81,22 @@ void wlan_irq_handler(void *arg, cy_gpio_irq_event_t event)
 static cy_rslt_t init_sdio_wlan(cy_sdio_t *sdio_obj)
 {
     /* WiFi into reset */
-    cy_rslt_t result = cy_gpio_init(CY_WIFI_WL_REG_ON, CY_GPIO_DIR_OUTPUT, CY_GPIO_DM_PULLUP, 0);
-
-    result = cy_sdio_init(sdio_obj, CY_WIFI_SDIO_CMD, CY_WIFI_SDIO_CLK, CY_WIFI_SDIO_DATA_0, CY_WIFI_SDIO_DATA_1, CY_WIFI_SDIO_DATA_2, CY_WIFI_SDIO_DATA_3);
+    cy_rslt_t result = cy_sdio_init(sdio_obj, CY_WIFI_SDIO_CMD, CY_WIFI_SDIO_CLK, CY_WIFI_SDIO_DATA_0, CY_WIFI_SDIO_DATA_1, CY_WIFI_SDIO_DATA_2, CY_WIFI_SDIO_DATA_3);
     if(result == CY_RSLT_SUCCESS)
     {
+        Cy_SysLib_Delay(10);
         /* Init SDIO Host */
         result = cy_gpio_init(CY_WIFI_WL_REG_ON, CY_GPIO_DIR_OUTPUT, CY_GPIO_DM_PULLUP, 1);
         if(result == CY_RSLT_SUCCESS)
         {
+                //low
+            cy_gpio_write(CY_WIFI_WL_REG_ON, false);
+            Cy_SysLib_Delay(10);
             /* WiFi out of reset */
             cy_gpio_write(CY_WIFI_WL_REG_ON, true);
             Cy_SysLib_Delay(WLAN_POWER_UP_DELAY_MS);
+
+            //SDIO_Reset();
         }  
     }
     return result;
