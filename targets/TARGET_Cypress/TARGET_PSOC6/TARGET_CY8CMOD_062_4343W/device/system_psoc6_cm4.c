@@ -270,6 +270,10 @@ void SystemInit(void)
 #endif /* !defined(CY_IPC_DEFAULT_CFG_DISABLE) */
 }
 
+void mbed_main(void)
+{
+    cy_board_init();
+}
 
 /*******************************************************************************
 * Function Name: mbed_sdk_init
