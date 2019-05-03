@@ -10,7 +10,6 @@ test_mbed_064_psa:
   tags:
     - MBED_TEST
   script:
-    - Remove-Item -LiteralPath ".\BUILD" -Force -Recurse -ErrorAction Ignore
     - mbedls -m 1907:CY8CPROTO_064_SB 
     - mbed test --compile -m CY_064_SB_M0_PSA -t GCC_ARM -n *psa* -vv
     - mbed test --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
@@ -23,12 +22,11 @@ cache:
     - pyocd
 
 # Run pyocd wrapper functional tests
-pyocd_wrapper:
+.pyocd_wrapper:
   stage: func_test
   tags:
     - MBED_TEST
   script:
-    - Remove-Item -LiteralPath ".\BUILD" -Force -Recurse -ErrorAction Ignore
     - python -V
     - virtualenv venv
     - .\venv\Scripts\activate.ps1
