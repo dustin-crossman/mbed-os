@@ -607,7 +607,6 @@ class PSOC6Code:
             # Completing main image involves merging M0 image.            
             from tools.targets.PSOC6 import find_cm0_image
             m0hexf = find_cm0_image(t_self, resources, elf, binf, hex_filename)
-            #psoc6_complete(t_self, elf, binf, m0hexf)
             psoc6_sign_image(t_self, elf, binf, m0hexf)
         else:
             psoc6_sign_image(t_self, elf, binf)
