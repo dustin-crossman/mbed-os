@@ -24,7 +24,7 @@
 #include "spm_internal.h"
 #include "cy_device.h"
 
-#ifndef PU_ENABLE
+#ifdef PU_ENABLE
 #include "cyprotection_config.h"
 #endif // PU_ENABLE
 
@@ -59,11 +59,11 @@
 #define PROVISIONING_JWT_ADDR           (0x100FDA00UL)
 
 #define CY_BL_CM4_ROM_LOOP_ADDR (0x16004000UL)
-#define CY_BOOTLOADER_IMG_ID_CM0P		(0UL)
-#define CY_BOOTLOADER_IMG_ID_SPE_CM0P	(1UL)
-#define CY_BOOTLOADER_IMG_ID_CYTF_CM0P	(2UL)
-#define CY_BOOTLOADER_IMG_ID_OEMTF_CM0P	(3UL)
-#define CY_BOOTLOADER_IMG_ID_CM4		(4UL)
+#define CY_BOOTLOADER_IMG_ID_CM0P       (0UL)
+#define CY_BOOTLOADER_IMG_ID_SPE_CM0P   (1UL)
+#define CY_BOOTLOADER_IMG_ID_CYTF_CM0P  (2UL)
+#define CY_BOOTLOADER_IMG_ID_OEMTF_CM0P (3UL)
+#define CY_BOOTLOADER_IMG_ID_CM4        (4UL)
 
 #define CY_BOOTLOADER_MASTER_IMG_ID CY_BOOTLOADER_IMG_ID_OEMTF_CM0P
 
@@ -189,12 +189,8 @@ static void do_boot(struct boot_rsp *rsp)
     /* It is aligned to 0x400 (256 records in vector table*4bytes each) */
     BOOT_LOG_INF("Cy_SysEnableCM4");
 
-    if(1)
-//    if((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL)
-    {
-        IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
-        BOOT_LOG_INF("TEST BIT SET !");
-    }
+    IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
+    BOOT_LOG_INF("TEST BIT SET !");
 
 #if(MCUBOOT_LOG_LEVEL != 0)
     while(!Cy_SCB_UART_IsTxComplete(SCB5))
@@ -211,16 +207,11 @@ static void do_boot(struct boot_rsp *rsp)
 void spm_hal_start_nspe(void)
 {
 #ifdef TARGET_MCUBOOT
-	/* MCUBoot integration starts here */
-	struct boot_rsp rsp;
+    /* MCUBoot integration starts here */
+    struct boot_rsp rsp;
     int rc = 0;
    
     boot_flash_device = (struct device*)&psoc6_flash_device;
-    
-    /* Debugger launch hook */
-//    IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
-//    Cy_SRAM_TestBitLoop();
-//    __BKPT(0);
 
 #if(MCUBOOT_POLICY == MCUBOOT_POLICY_JWT)
     /* Processing of policy in JWT format */
@@ -234,7 +225,6 @@ void spm_hal_start_nspe(void)
     if(0 == rc)
     {
         rc = Cy_JWT_ParseProvisioningPacket(jwt, &bnu_policy,
-//                CY_BOOTLOADER_MASTER_IMG_ID);
                   CY_BOOTLOADER_IMG_ID_SPE_CM0P); /* SPE IMG ID = 1*/
     }
     if(0 != rc)
@@ -276,30 +266,30 @@ void spm_hal_start_nspe(void)
 
     BOOT_LOG_INF("Processing available images");
     rc = boot_go(&rsp);
-	if (rc != 0)
+    if (rc != 0)
     {
         /* indicate M4 image boot failed */
         BOOT_LOG_ERR("Unable to find bootable image");
         while(1);
     }
 
-	/* MCUBoot integration should end before start of CM4 image */
+    /* MCUBoot integration should end before start of CM4 image */
     BOOT_LOG_INF("Jumping to the image in slot 0");
-	do_boot(&rsp);
+    do_boot(&rsp);
 
 #endif /* TARGET_MCUBOOT */
 }
 
 void spm_hal_memory_protection_init(void)
 {
-#ifndef PU_ENABLE //+++ rnok: was #ifdef
+#ifdef PU_ENABLE
     cy_en_prot_status_t status = CY_PROT_SUCCESS;
 
     /* smpu */
     status = smpu_protect((cy_smpu_region_config_t *)flash_spm_smpu_config, sizeof(flash_spm_smpu_config) / sizeof(flash_spm_smpu_config[0]));
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
-    status = smpu_protect((cy_smpu_region_config_t *)sram_spm_smpu_config, sizeof(sram_spm_smpu_config) / sizeof(sram_spm_smpu_config[0]));
-    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+//    status = smpu_protect((cy_smpu_region_config_t *)sram_spm_smpu_config, sizeof(sram_spm_smpu_config) / sizeof(sram_spm_smpu_config[0]));
+//    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
     status = smpu_config_unprotected(&default_smpu_master_config);
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
 
