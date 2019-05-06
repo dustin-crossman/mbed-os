@@ -8092,7 +8092,7 @@
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "detect_code": ["1900"],
         "post_binary_hook": {
-            "function": "PSOC6Code.complete"
+            "function": "PSOC6Code.sign_image"
         }
     },
     "CY8CPROTO_064_SB": {
@@ -8102,7 +8102,7 @@
         "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW4343X", "CORDIO", "CY8C62XX"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "detect_code": ["1907"],
-        "forced_reset_timeout": 5,
+        "forced_reset_timeout": 30,
         "reset_method": "default",
         "post_binary_hook": {
             "function": "PSOC6Code.sign_image"
@@ -8111,17 +8111,23 @@
             "network-default-interface-type": "WIFI"
         }
     },
-    "CY8CPROTO_064_SB_M0_PSA": {
+    "CY_064_SB_M0_PSA": {
         "inherits": ["SPE_Target", "CY8CPROTO_064_SB_M0"],
         "components_add": ["SPM_MAILBOX", "FLASHIAP"],
-        "extra_labels_add": ["PSA", "MBED_SPM"],
+        "extra_labels_add": ["PSA", "MBED_SPM", "MCUBOOT"],
         "macros_add": [
             "MBED_TICKLESS",
             "MBEDTLS_PSA_CRYPTO_SPM",
             "MBEDTLS_PSA_CRYPTO_C",
             "MBEDTLS_ENTROPY_NV_SEED",
             "CY_IPC_DEFAULT_CFG_DISABLE",
-            "PU_ENABLE"
+            "PU_ENABLE",
+            "MCUBOOT_POLICY=1",
+            "MCUBOOT_LOG_LEVEL=3",
+            "MCUBOOT_USE_FLASHBOOT_CRYPTO",
+            "CY8CKIT_001",
+            "CONFIG_FLASH_PAGE_LAYOUT",
+            "IMAGE_0"
         ],
         "deliver_to_target": "CY8CPROTO_064_SB_PSA",
         "delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_CY8CPROTO_064_SB_PSA/prebuilt",
@@ -8129,18 +8135,18 @@
             "function": "PSOC6Code.sign_image"
         },
         "overrides": {
-            "secure-rom-start": "0x10060400",
-            "secure-rom-size": "0x40000",
-            "non-secure-rom-start": "0x10000000",
-            "non-secure-rom-size": "0x60000",
-            "secure-ram-start": "0x08020000",
-            "secure-ram-size": "0xD000",
+            "non-secure-rom-start": "0x10000400",
+            "non-secure-rom-size": "0x30000",
+            "secure-rom-start": "0x10080400",
+            "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
-            "non-secure-ram-size": "0x20000",
-            "shared-ram-start": "0x0802D000",
+            "non-secure-ram-size": "0x8000",
+            "shared-ram-start": "0x08008000",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0802D100", 
-            "public-ram-size": "0x200"
+            "public-ram-start": "0x08008100", 
+            "public-ram-size": "0x200",
+            "secure-ram-start": "0x08008300",
+            "secure-ram-size": "0x17D00"
         }
     },
     "CY8CPROTO_064_SB_PSA": {
@@ -8151,21 +8157,21 @@
         "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
         "hex_filename": "psa_release_1.0.hex",
         "post_binary_hook": {
-            "function": "PSOC6Code.complete"
+            "function": "PSOC6Code.sign_complete"
         },
         "overrides": {
-            "secure-rom-start": "0x10060400",
-            "secure-rom-size": "0x40000",
-            "non-secure-rom-start": "0x10000000",
-            "non-secure-rom-size": "0x60000",
-            "secure-ram-start": "0x08020000",
-            "secure-ram-size": "0xD000",
+            "non-secure-rom-start": "0x10000400",
+            "non-secure-rom-size": "0x30000",
+            "secure-rom-start": "0x10080400",
+            "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
-            "non-secure-ram-size": "0x20000",
-            "shared-ram-start": "0x0802D000",
+            "non-secure-ram-size": "0x8000",
+            "shared-ram-start": "0x08008000",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0802D100", 
-            "public-ram-size": "0x200"
+            "public-ram-start": "0x08008100", 
+            "public-ram-size": "0x200",
+            "secure-ram-start": "0x08008300",
+            "secure-ram-size": "0x17D00"
         }
     },
     "CY8CMOD_062_4343W": {
