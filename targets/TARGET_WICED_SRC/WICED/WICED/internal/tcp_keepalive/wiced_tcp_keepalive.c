@@ -109,25 +109,25 @@ int tko_enable (bool enable )
     result = wwd_sdpcm_send_iovar( SDPCM_SET, buffer, NULL, WWD_STA_INTERFACE );
     if ( result != WWD_SUCCESS )
     {
-        printf("tko %s failed..result:%d\n", (enable == WICED_TRUE ? "enable" : "disable"), result );
+        TCP_KA_ERROR_PRINTF(("tko %s failed..result:%d\n", (enable == WICED_TRUE ? "enable" : "disable"), result ));
         return result;
     }
     else
     {
         if(enable == false)
         {
-            DEBUG_PRINTF((" tko disable success\n" ));
+            TCP_KA_DEBUG_PRINTF((" tko disable success\n" ));
         }
         else
         {
-            DEBUG_PRINTF((" tko enable success\n" ));
+            TCP_KA_DEBUG_PRINTF((" tko enable success\n" ));
         }
     }
 
     return WWD_SUCCESS;
 }
 
-int tcp_keepalive_pkt(uint8_t* buf, tcp_keep_alive_t* keep_alive_offload )
+int tcp_keepalive_pkt(uint8_t* buf, tcp_keepalive_offload_internal_data_t* keep_alive_offload )
 {
     wiced_ether_header_t *eth;
     ipv4_hdr_t *ip;
@@ -304,10 +304,10 @@ static uint16_t tcp_hdr_chksum (uint32_t sum, uint8_t *tcp_hdr, uint16_t tcp_len
 }
 
 
-int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_offload )
+int tko_connect_init(wwd_tko_connect_t* connect, tcp_keepalive_offload_internal_data_t* keep_alive_offload )
 {
     int datalen = 0;
-    connect->index = 1;
+    connect->index = keep_alive_offload->index;
     connect->ip_addr_type = 0;
     uint32_t srcip;
     uint32_t destip;
@@ -326,9 +326,9 @@ int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_of
 
     keep_alive_offload->seqnum = keep_alive_offload->seqnum - 1;
 
-    DEBUG_PRINTF(("keep alive Seq num:%lu\n",    keep_alive_offload->seqnum ));
-    DEBUG_PRINTF(("keep alive Ack num:%lu\n",    keep_alive_offload->acknum ));
-    DEBUG_PRINTF(("keep alive Rcv Window:%lu\n", keep_alive_offload->rx_window ));
+    TCP_KA_DEBUG_PRINTF(("keep alive Seq num:%lu\n",    keep_alive_offload->seqnum ));
+    TCP_KA_DEBUG_PRINTF(("keep alive Ack num:%lu\n",    keep_alive_offload->acknum ));
+    TCP_KA_DEBUG_PRINTF(("keep alive Rcv Window:%lu\n", keep_alive_offload->rx_window ));
 
 
     connect->request_len = tcp_keepalive_pkt(&connect->data[datalen], keep_alive_offload );
@@ -350,7 +350,7 @@ int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_of
     return (offsetof(wwd_tko_connect_t, data) + datalen);
 }
 
-int tcp_client_connect ( tcp_keep_alive_t* keep_alive_offload)
+int tcp_client_connect ( tcp_keepalive_offload_internal_data_t* keep_alive_offload)
 {
    uint32_t len = 0;
    uint8_t *data = NULL;
@@ -385,11 +385,11 @@ int tcp_client_connect ( tcp_keep_alive_t* keep_alive_offload)
    result = wwd_sdpcm_send_iovar( SDPCM_SET, buffer, NULL, WWD_STA_INTERFACE );
    if ( result != WWD_SUCCESS )
    {
-       printf("tko connect failed..result:%d\n", result );
+       TCP_KA_ERROR_PRINTF(("tko connect failed..result:%d\n", result ));
    }
    else
    {
-       DEBUG_PRINTF((" tko connect success\n"));
+       TCP_KA_DEBUG_PRINTF((" tko connect success\n"));
    }
 
    return result;
@@ -428,11 +428,11 @@ int tko_param (uint16_t keepalive_interval, uint16_t keepalive_retry_count, uint
 
     if ( result != WWD_SUCCESS )
     {
-        printf("tko param failed..result:%d\n", result );
+        TCP_KA_ERROR_PRINTF(("tko param failed..result:%d\n", result ));
     }
     else
     {
-        DEBUG_PRINTF((" tko param success\n" ));
+        TCP_KA_DEBUG_PRINTF((" tko param success\n" ));
     }
 
     return result;
