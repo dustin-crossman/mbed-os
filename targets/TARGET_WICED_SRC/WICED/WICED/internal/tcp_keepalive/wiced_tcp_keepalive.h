@@ -55,21 +55,19 @@ extern "C" {
 #define OFFSETOF( type, member )  ( (uintptr_t)&((type *)0)->member )
 #endif /* OFFSETOF */
 
-//Uncomment below line to debug TCP KEEPALIVE
-//#define TCP_KEEPALIVE_DEBUG
-#define TCP_KEEPALIVE_DEBUG_ERROR
+//Uncomment below line to debug TCP KEEPALIVE OFFLOADS
+//#define TCP_KEEPALIVE_OFFLOAD_DEBUG
 
-#ifdef TCP_KEEPALIVE_DEBUG_ERROR
-#define DEBUG_PRINTF_ERROR(x) printf x
-#else
-#define DEBUG_PRINTF_ERROR(x)
-#endif
+#define TCP_KA_ERROR_PRINTF(x) printf x
 
-#ifdef TCP_KEEPALIVE_DEBUG
-#define DEBUG_PRINTF(x) printf x
+#ifdef TCP_KEEPALIVE_OFFLOAD_DEBUG
+#define TCP_KA_DEBUG_PRINTF(x) printf x
 #else
-#define DEBUG_PRINTF(x)
-#endif /* TCP_KEEPALIVE_DEBUG */
+#define TCP_KA_DEBUG_PRINTF(x)
+#endif /* TCP_KEEPALIVE_OFFLOAD_DEBUG */
+
+#define TCP_KEEPALIVE_OFFLOAD_INDEX           0
+#define TCP_KEEPALIVE_OFFLOAD_PACKET_SIZE     128
 
 /******************************************************
  *                    Constants
@@ -96,7 +94,7 @@ typedef struct tcp_pseudo_hdr
   uint16_t tcp_size;
 } tcp_pseudo_hdr_t;
 
-typedef struct tcp_keepalive
+typedef struct tcp_keepalive_offload_internal_data
 {
   uint8_t index;
   uint8_t ipaddr_type;
@@ -109,7 +107,7 @@ typedef struct tcp_keepalive
   uint32_t seqnum;
   uint32_t acknum;
   uint16_t rx_window;
-} tcp_keep_alive_t;
+} tcp_keepalive_offload_internal_data_t;
 
 /******************************************************
  *                 Global Variables
@@ -121,8 +119,8 @@ typedef struct tcp_keepalive
 
 int tko_enable (bool enable);
 int tko_param (uint16_t keepalive_interval, uint16_t keepalive_retry_count, uint16_t keepalive_retry_interval);
-int tko_connect_init(wwd_tko_connect_t* connect, tcp_keep_alive_t* keep_alive_offload );
-int tcp_client_connect ( tcp_keep_alive_t* keep_alive_offload);
+int tko_connect_init(wwd_tko_connect_t* connect, tcp_keepalive_offload_internal_data_t* keep_alive_offload );
+int tcp_client_connect ( tcp_keepalive_offload_internal_data_t* keep_alive_offload);
 
 /* TCP socket callback */
 void tcp_socket_snd_rcv_callback (void* params);

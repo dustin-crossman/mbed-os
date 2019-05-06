@@ -31,16 +31,6 @@
 
 #include <stdbool.h>
 
-#define ECC_ECDSA_DEBUG    0
-
-#if ECC_ECDSA_DEBUG
-#include "cy_crypto_core_my_support.h"
-#ifndef Tb_PrintStr
-#include <stdio.h>
-#define Tb_PrintStr(s)      printf("%s\n", s)
-#endif
-#endif
-
 
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_ECC_SignHash
@@ -91,10 +81,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
 
         if (eccDp != NULL)
         {
-#if ECC_ECDSA_DEBUG
-    Tb_PrintStr("\necc_sign_hash() for %s, hashlen = %d\n", eccDp->name, hashlen);
-#endif  // ECC_ECDSA_DEBUG
-
             bitsize = eccDp->size;
 
             /* make ephemeral key pair */
@@ -102,20 +88,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
             ephKey.pubkey.y = myKGY;
 
             tmpResult = Cy_Crypto_Core_ECC_MakePublicKey(base, key->curveID, messageKey, &ephKey);
-
-#if ECC_ECDSA_DEBUG
-    Tb_PrintStr("%15s: \t", "hash");
-    Crypto_PrintNumber((uint8_t *)hash, CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize));
-
-    Tb_PrintStr("%15s: \t", "key");
-    Crypto_PrintNumber(key->k, CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize));
-
-    Tb_PrintStr("%15s: \t", "messageKey");
-    Crypto_PrintNumber(messageKey, CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize));
-
-    Tb_PrintStr("%15s: \t", "x1 (pub x)");
-    Crypto_PrintNumber((uint8_t *)ephKey.pubkey.x, CY_CRYPTO_BYTE_SIZE_OF_BITS(bitsize));
-#endif // ECC_ECDSA_DEBUG
 
             if (CY_CRYPTO_SUCCESS == tmpResult)
             {
@@ -162,11 +134,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_SignHash(CRYPTO_Type *base, const uint8
 
                         /* r = x1 mod n */
                         Cy_Crypto_Core_Vu_GetMemValue (base, sig, p_r, bitsize);
-
-#if ECC_ECDSA_DEBUG
-        Tb_PrintStr("x1 after reduction modulo order: ");
-        Crypto_RegMemNumberPrint(p_r);
-#endif // ECC_ECDSA_DEBUG
 
                         if (Cy_Crypto_Core_Vu_IsRegZero(base, p_r))
                         {

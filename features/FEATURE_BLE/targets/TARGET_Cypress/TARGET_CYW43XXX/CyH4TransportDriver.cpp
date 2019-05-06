@@ -63,7 +63,6 @@ void CyH4TransportDriver::initialize()
 
 #endif
     bt_device_wake = 0;
-    wait_ms(500);
     sleep_manager_unlock_deep_sleep();
 }
 
@@ -111,9 +110,6 @@ void CyH4TransportDriver::assert_bt_dev_wake()
 {
 #if (defined(MBED_TICKLESS) && DEVICE_SLEEP && DEVICE_LPTICKER)
     bt_device_wake = 0;
-
-    // BT Clock needs 1.8ms to come up
-    Cy_SysLib_Delay(2);
 #endif
 }
 
@@ -127,6 +123,11 @@ void CyH4TransportDriver::deassert_bt_dev_wake()
     //de-assert bt_device_wake
 	bt_device_wake = 1;
 #endif
+}
+
+void CyH4TransportDriver::update_uart_baud_rate(int baud)
+{
+	uart.baud(baud);
 }
 
 } // namespace cypress_ble

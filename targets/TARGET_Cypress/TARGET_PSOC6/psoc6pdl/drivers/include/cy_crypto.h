@@ -288,13 +288,16 @@
 *     <td>2.30</td>
 *     <td>
 *         <ul>
-*         <li>Added multi-instance support for AES and SHA.</li>
-*		  <li>Added small chunks mode for SHA with any chunk size (from one byte).</li>
-*         <li>Added support for ARM Compiler 6.</li>
+*         <li>Added a multi-instance support for AES and SHA.</li>
+*		  <li>Added a small chunks mode for SHA with any chunk size (from one
+*             byte).</li>
+*         <li>Added the operation memory buffer management (set a new address,
+*             get a size).</li>
+*         <li>Added a support for ARM Compiler 6.</li>
 *         </ul>
 *     </td>
 *     <td>Integration with mbedOS/mbedTLS, restructured the implementation of
-*         SHA and AES for the Crypto ALT interface.
+*         AES and SHA for the Crypto ALT interface.
 *     </td>
 *   </tr>
 *   <tr>
@@ -562,7 +565,7 @@
 * to the server context (cy_stc_crypto_server_context_t) that will be used to
 * store all temporary data.
 *
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoServerStartBase
+* \snippet crypto/snippet/main.c snippet_myCryptoServerStartBase
 *
 * Because the two cores operate asynchronously, ensure that server
 * initialization is complete before initializing the client.
@@ -590,7 +593,7 @@
 * These calls must be made on the client side.
 * Firmware can implement the client on either core.
 *
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoInit
+* \snippet crypto/snippet/main.c snippet_myCryptoInit
 *
 * \section group_crypto_common_use_cases Common Use Cases
 *
@@ -601,7 +604,7 @@
 *   - Call \ref Cy_Crypto_Crc_Run to calculate CRC for a data image.
 *
 * Code example:
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoCrcUse
+* \snippet crypto/snippet/main.c snippet_myCryptoCrcUse
 *
 * \subsection group_crypto_Use_PRNG Pseudo Random Number Generation
 *
@@ -610,7 +613,7 @@
 *   - Call \ref Cy_Crypto_Prng_Generate.
 *
 * Code example:
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoPrngUse
+* \snippet crypto/snippet/main.c snippet_myCryptoPrngUse
 *
 * \subsection group_crypto_Use_TRNG True Random Number Generation
 *
@@ -618,7 +621,7 @@
 *   - Call \ref Cy_Crypto_Trng_Generate with needed parameters.
 *
 * Code example:
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoTrngUse
+* \snippet crypto/snippet/main.c snippet_myCryptoTrngUse
 *
 * \subsection group_crypto_Use_DES DES encryption
 *
@@ -628,7 +631,7 @@
 *     array
 *
 * Code example:
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoDesUse
+* \snippet crypto/snippet/main.c snippet_myCryptoDesUse
 *
 * \subsection group_crypto_Use_TDES TDES encryption
 *
@@ -638,7 +641,7 @@
 *     of keys
 *
 * Code example:
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoTdesUse
+* \snippet crypto/snippet/main.c snippet_myCryptoTdesUse
 *
 * \subsection group_crypto_Use_AES AES encryption
 *
@@ -653,7 +656,7 @@
 *     parameters to make an operation
 *
 * Code example:
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoAesEcbUse
+* \snippet crypto/snippet/main.c snippet_myCryptoAesEcbUse
 *
 * \subsection group_crypto_Use_SHA SHA digest calculation
 *
@@ -662,7 +665,7 @@
 *     operation
 *
 * Code example:
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoSha256Use
+* \snippet crypto/snippet/main.c snippet_myCryptoSha256Use
 *
 * \subsection group_crypto_Use_CMAC CMAC calculation
 *
@@ -673,7 +676,7 @@
 *     operation
 *
 * Code example:
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoCmacUse
+* \snippet crypto/snippet/main.c snippet_myCryptoCmacUse
 *
 * \subsection group_crypto_Use_HMAC HMAC calculation
 *
@@ -683,7 +686,7 @@
 *     operation
 *
 * Code example:
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoHmacUse
+* \snippet crypto/snippet/main.c snippet_myCryptoHmacUse
 *
 * \subsection group_crypto_Use_RSA_VER RSA signature verification
 *
@@ -695,7 +698,7 @@
 *     calculated SHA digest
 *
 * Code example:
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoRsaVerUse
+* \snippet crypto/snippet/main.c snippet_myCryptoRsaVerUse
 *
 * \section group_crypto_rsa_considerations RSA Usage Considerations
 *
@@ -843,7 +846,7 @@ cy_en_crypto_status_t Cy_Crypto_GetLibraryInfo(cy_en_crypto_lib_info_t *cryptoIn
 * \ref cy_en_crypto_status_t
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoInit
+* \snippet crypto/snippet/main.c snippet_myCryptoInit
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Init(cy_stc_crypto_config_t const *config, cy_stc_crypto_context_t *context);
@@ -947,7 +950,7 @@ cy_en_crypto_status_t Cy_Crypto_GetErrorStatus(cy_stc_crypto_hw_error_t *hwError
 * \ref cy_en_crypto_status_t
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoPrngUse
+* \snippet crypto/snippet/main.c snippet_myCryptoPrngUse
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Prng_Init(uint32_t lfsr32InitState,
@@ -977,7 +980,7 @@ cy_en_crypto_status_t Cy_Crypto_Prng_Init(uint32_t lfsr32InitState,
 * \ref cy_en_crypto_status_t
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoPrngUse
+* \snippet crypto/snippet/main.c snippet_myCryptoPrngUse
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Prng_Generate(uint32_t max,
@@ -1010,7 +1013,7 @@ cy_en_crypto_status_t Cy_Crypto_Prng_Generate(uint32_t max,
 * \ref cy_en_crypto_status_t
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoAesEcbUse
+* \snippet crypto/snippet/main.c snippet_myCryptoAesEcbUse
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Aes_Init(uint32_t *key,
@@ -1043,7 +1046,7 @@ cy_en_crypto_status_t Cy_Crypto_Aes_Init(uint32_t *key,
 * \ref cy_en_crypto_status_t
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoAesEcbUse
+* \snippet crypto/snippet/main.c snippet_myCryptoAesEcbUse
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Aes_Ecb_Run(cy_en_crypto_dir_mode_t dirMode,
@@ -1210,7 +1213,7 @@ cy_en_crypto_status_t Cy_Crypto_Aes_Ctr_Run(cy_en_crypto_dir_mode_t dirMode,
 * \ref cy_en_crypto_status_t
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoCmacUse
+* \snippet crypto/snippet/main.c snippet_myCryptoCmacUse
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Aes_Cmac_Run(uint32_t *src,
@@ -1255,7 +1258,7 @@ cy_en_crypto_status_t Cy_Crypto_Aes_Cmac_Run(uint32_t *src,
 * \ref cy_en_crypto_status_t
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoSha256Use
+* \snippet crypto/snippet/main.c snippet_myCryptoSha256Use
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Sha_Run(uint32_t *message,
@@ -1303,7 +1306,7 @@ cy_en_crypto_status_t Cy_Crypto_Sha_Run(uint32_t *message,
 * \ref cy_en_crypto_status_t
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoHmacUse
+* \snippet crypto/snippet/main.c snippet_myCryptoHmacUse
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Hmac_Run(uint32_t *hmac,
@@ -1571,7 +1574,7 @@ cy_en_crypto_status_t Cy_Crypto_Str_MemXor(void const *src0,
 * Calculated CRC value is MSB aligned <b>only when dataReverse is zero</b>.
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoCrcUse
+* \snippet crypto/snippet/main.c snippet_myCryptoCrcUse
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Crc_Init(uint32_t polynomial,
@@ -1614,7 +1617,7 @@ cy_en_crypto_status_t Cy_Crypto_Crc_Init(uint32_t polynomial,
 * Calculated CRC value is MSB aligned <b>only when dataReverse is zero</b>.
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoCrcUse
+* \snippet crypto/snippet/main.c snippet_myCryptoCrcUse
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Crc_Run(void     *data,
@@ -1651,7 +1654,7 @@ cy_en_crypto_status_t Cy_Crypto_Crc_Run(void     *data,
 * \ref cy_en_crypto_status_t
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoTrngUse
+* \snippet crypto/snippet/main.c snippet_myCryptoTrngUse
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Trng_Generate(uint32_t  GAROPol,
@@ -1730,7 +1733,7 @@ cy_en_crypto_status_t Cy_Crypto_Des_Run(cy_en_crypto_dir_mode_t dirMode,
 * \ref cy_en_crypto_status_t
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoTdesUse
+* \snippet crypto/snippet/main.c snippet_myCryptoTdesUse
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Tdes_Run(cy_en_crypto_dir_mode_t dirMode,
@@ -1883,10 +1886,89 @@ cy_en_crypto_status_t Cy_Crypto_Rsa_Verify(cy_en_crypto_rsa_ver_result_t *verRes
                                            cy_stc_crypto_context_rsa_ver_t *cfContext);
 #endif /* #if (CPUSS_CRYPTO_SHA == 1) */
 
+cy_en_crypto_status_t Cy_Crypto_ECDSA_SignHash(const uint8_t *hash,
+                                        uint32_t hashlen,
+                                        uint8_t *sig,
+                                        const cy_stc_crypto_ecc_key *key,
+                                        const uint8_t *messageKey,
+                                        cy_stc_crypto_context_ecc_t *cfContext);
+
+cy_en_crypto_status_t Cy_Crypto_ECDSA_VerifyHash(const uint8_t *sig,
+                                        const uint8_t *hash,
+                                        uint32_t hashlen,
+                                        uint8_t *stat,
+                                        const cy_stc_crypto_ecc_key *key,
+                                        cy_stc_crypto_context_ecc_t *cfContext);
+
 #endif /* #if (CPUSS_CRYPTO_VU == 1) */
 
 /*******************************************************************************
-* Function Name: Cy_Crypto_Rsa_InvertEndianness
+* Function Name: Cy_Crypto_SetMemBufAddress
+****************************************************************************//**
+*
+* This function sets a new operation memory buffer.
+*
+* \param newMembufAddress
+* The pointer to the new operation memory buffer.
+* __Must be 4-byte aligned.__
+*
+* \param newMembufSize
+* The size of the new memory buffer (in bytes)
+*
+* \param cfContext
+* The pointer to the \ref cy_stc_crypto_context_str_t structure that stores
+* the data context.
+*
+* \return
+* \ref cy_en_crypto_status_t
+*
+*******************************************************************************/
+cy_en_crypto_status_t Cy_Crypto_SetMemBufAddress(uint32_t const *newMembufAddress,
+                                           uint32_t newMembufSize,
+                                           cy_stc_crypto_context_str_t *cfContext);
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_GetMemBufAddress
+****************************************************************************//**
+*
+* This function gets an operation memory buffer location.
+*
+* \param membufAddress
+* The pointer of the operation memory buffer.
+*
+* \param cfContext
+* The pointer to the \ref cy_stc_crypto_context_str_t structure that stores
+* the data context.
+*
+* \return
+* \ref cy_en_crypto_status_t
+*
+*******************************************************************************/
+cy_en_crypto_status_t Cy_Crypto_GetMemBufAddress(uint32_t **membufAddress,
+                                           cy_stc_crypto_context_str_t *cfContext);
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_GetMemBufSize
+****************************************************************************//**
+*
+* This function gets an operation memory buffer size.
+*
+* \param membufSize
+* The size of the memory buffer (in bytes)
+*
+* \param cfContext
+* The pointer to the \ref cy_stc_crypto_context_str_t structure that stores
+* the data context.
+*
+* \return
+* \ref cy_en_crypto_status_t
+*
+*******************************************************************************/
+cy_en_crypto_status_t Cy_Crypto_GetMemBufSize(uint32_t *membufSize,
+                                           cy_stc_crypto_context_str_t *cfContext);
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_InvertEndianness
 ****************************************************************************//**
 *
 * This function reverts byte-array memory block, like:<br>
@@ -1905,7 +1987,10 @@ cy_en_crypto_status_t Cy_Crypto_Rsa_Verify(cy_en_crypto_rsa_ver_result_t *verRes
 * The length of the memory array whose endianness is to be inverted (in bytes)
 *
 *******************************************************************************/
-void Cy_Crypto_Rsa_InvertEndianness(void *inArrPtr, uint32_t byteSize);
+void Cy_Crypto_InvertEndianness(void *inArrPtr, uint32_t byteSize);
+
+/* For backward compatibility */
+#define Cy_Crypto_Rsa_InvertEndianness(p, s) Cy_Crypto_InvertEndianness((p), (s))
 
 /** \} group_crypto_cli_functions */
 
