@@ -1,5 +1,4 @@
 stages:
-  - func_test
   - test
 before_script:
     - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
