@@ -387,7 +387,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Update(CRYPTO_Type *base,
                 {
                     uint32_t tempBlockSize = hashBlockSize - hashBlockIdx;
 
-                    Cy_Crypto_Core_V1_MemCpy(base, (void *)hashState->block + hashBlockIdx, message, (uint16_t)tempBlockSize);
+                    Cy_Crypto_Core_V1_MemCpy(base, (void *)((uint32_t)hashState->block + hashBlockIdx), message, (uint16_t)tempBlockSize);
 
                     Cy_Crypto_Core_V1_Sha_ProcessBlock(base, hashState, hashState->block);
 
@@ -403,7 +403,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha_Update(CRYPTO_Type *base,
                 /* Copy the end of the message to the block */
                 if (messageSize != 0U)
                 {
-                    Cy_Crypto_Core_V1_MemCpy(base, (void *)hashState->block + hashBlockIdx, message, (uint16_t)messageSize);
+                    Cy_Crypto_Core_V1_MemCpy(base, (void *)((uint32_t)hashState->block + hashBlockIdx), message, (uint16_t)messageSize);
                 }
             }
 
@@ -567,7 +567,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Sha(CRYPTO_Type *base,
 {
     cy_en_crypto_status_t tmpResult = CY_CRYPTO_BAD_PARAMS;
 
-    void *shaBuffers = (void *)REG_CRYPTO_MEM_BUFF(base);
+    void *shaBuffers = (void *)Cy_Crypto_Core_GetVuMemoryAddress(base);
     cy_stc_crypto_sha_state_t myHashState = { 0 };
 
     tmpResult = Cy_Crypto_Core_V1_Sha_Init (base, &myHashState, mode, shaBuffers);

@@ -330,6 +330,12 @@ extern wwd_result_t wwd_wifi_join_specific( const wiced_scan_result_t* ap, const
 extern wwd_result_t wwd_wifi_leave( wwd_interface_t interface );
 
 
+/* Get WIFI link status
+ * @return  WICED_TRUE  wiced_bool_t: Link is up
+ *          WICED_FASLE
+ */
+extern wiced_bool_t wwd_wifi_get_link_status ( void );
+
 /** @} */
 
 /*****************************************************************************/
