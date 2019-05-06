@@ -567,8 +567,8 @@ static inline cy_rslt_t cyhal_clear_bit(uint8_t* used, cyhal_resource_t type, ui
 
 cy_rslt_t cyhal_hwmgr_reserve(const cyhal_resource_inst_t* obj)
 {
-    core_util_critical_section_enter();
     bool isSet;
+    uint32_t state = cyhal_system_critical_section_enter();
     cy_rslt_t rslt = cyhal_is_set(cyhal_used, obj->type, obj->block_num, obj->channel_num, &isSet);
     if (rslt == CY_RSLT_SUCCESS && isSet)
     {
@@ -579,15 +579,15 @@ cy_rslt_t cyhal_hwmgr_reserve(const cyhal_resource_inst_t* obj)
     {
         rslt = cyhal_set_bit(cyhal_used, obj->type, obj->block_num, obj->channel_num);
     }
-    core_util_critical_section_exit();
+    cyhal_system_critical_section_exit(state);
     
     return rslt;
 }
 
 cy_rslt_t cyhal_hwmgr_free(const cyhal_resource_inst_t* obj)
 {
-    core_util_critical_section_enter();
     bool isUsed;
+    uint32_t state = cyhal_system_critical_section_enter();
     cy_rslt_t rslt = cyhal_is_set(cyhal_used, obj->type, obj->block_num, obj->channel_num, &isUsed);
     if (rslt == CY_RSLT_SUCCESS && !isUsed)
     {
@@ -597,7 +597,7 @@ cy_rslt_t cyhal_hwmgr_free(const cyhal_resource_inst_t* obj)
     {
         rslt = cyhal_clear_bit(cyhal_used, obj->type, obj->block_num, obj->channel_num);
     }
-    core_util_critical_section_exit();
+    cyhal_system_critical_section_exit(state);
     return rslt;
 }
 
@@ -688,17 +688,17 @@ cy_rslt_t cyhal_hwmgr_allocate_dma(cyhal_resource_inst_t* obj)
 
 cy_rslt_t cyhal_hwmgr_set_configured(cyhal_resource_t type, uint8_t block, uint8_t channel)
 {
-    core_util_critical_section_enter();
+    uint32_t state = cyhal_system_critical_section_enter();
     cy_rslt_t status = cyhal_set_bit(cyhal_configured, type, block, channel);
-    core_util_critical_section_exit();
+    cyhal_system_critical_section_exit(state);
     return status;
 }
 
 cy_rslt_t cyhal_hwmgr_set_unconfigured(cyhal_resource_t type, uint8_t block, uint8_t channel)
 {
-    core_util_critical_section_enter();
+    uint32_t state = cyhal_system_critical_section_enter();
     cy_rslt_t status = cyhal_clear_bit(cyhal_configured, type, block, channel);
-    core_util_critical_section_exit();
+    cyhal_system_critical_section_exit(state);
     return status;
 }
 

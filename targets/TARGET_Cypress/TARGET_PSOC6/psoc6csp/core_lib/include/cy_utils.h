@@ -43,7 +43,7 @@ extern "C" {
 */
 
 /** Simple macro to supress the unused parameter warning by casting to void. */
-#define UNUSED_PARAMETER(x) ( (void)(x) )
+#define CY_UNUSED_PARAMETER(x) ( (void)(x) )
 
 /** Utility macro when neither NDEBUG or CY_NO_ASSERT is not declared to check a condition and, if false, trigger a breakpoint */
 #if defined(NDEBUG) || defined(CY_NO_ASSERT)

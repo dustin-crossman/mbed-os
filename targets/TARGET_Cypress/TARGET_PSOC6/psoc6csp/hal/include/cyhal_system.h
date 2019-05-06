@@ -54,13 +54,6 @@ extern "C" {
 * \{
 */
 
-/** Enter a critical section */
-#define core_util_critical_section_enter() \
-    uint32_t _last_irq_status_ = Cy_SysLib_EnterCriticalSection()
-/** Exit a critical section */
-#define core_util_critical_section_exit() \
-     Cy_SysLib_ExitCriticalSection(_last_irq_status_)
-
 /** \} group_hal_system_macros */
 
 
@@ -69,11 +62,31 @@ extern "C" {
 * \{
 */
 
+/** Enter a critical section
+ *
+ * Disables interrupts and returns a value indicating whether the interrupts were previously 
+ * enabled.
+ *
+ * @return Returns the state before entering the critical section. This value must be provided
+ * to \ref cyhal_system_critical_section_exit() to properly restore the state
+ */
+uint32_t cyhal_system_critical_section_enter(void);
+
+/** Exit a critical section
+ *
+ * Re-enables the interrupts if they were enabled before
+*  cyhal_system_critical_section_enter() was called. The argument should be the value
+*  returned from \ref cyhal_system_critical_section_enter().
+ *
+ * @param[in] oldState The state of interrupts from cyhal_system_critical_section_enter()
+ */
+void cyhal_system_critical_section_exit(uint32_t oldState);
+
 /** Send the device to sleep
  *
  * The processor is setup ready for sleep, and sent to sleep using __WFI(). In this mode, the
  * system clock to the core is stopped until a reset or an interrupt occurs.
-
+ *
  * @return Returns CY_RSLT_SUCCESS if the processor successfully entered and exited sleep,
  * otherwise error
  */
@@ -84,7 +97,7 @@ cy_rslt_t cyhal_system_sleep(void);
  * This processor is setup ready for deep sleep, and sent to sleep using __WFI(). This mode
  * has the same sleep features as sleep plus it powers down peripherals and clocks. All state
  * is still maintained.
-
+ *
  * @return Returns CY_RSLT_SUCCESS if the processor successfully entered and exited sleep,
  * otherwise error
  */

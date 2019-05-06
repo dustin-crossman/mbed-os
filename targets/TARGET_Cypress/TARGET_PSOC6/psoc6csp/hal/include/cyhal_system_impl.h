@@ -1,12 +1,12 @@
 /***************************************************************************//**
-* \file cyhal_implementation.h
+* \file cyhal_system_impl.h
 *
 * \brief
-* Provides references for the PSoC 6 specific implementation of the HAL drivers.
-* This includes references to implementation specific header files and any
-* supporting data types. This file should not be used directly. It should only
-* be referenced by HAL drivers to pull in the implementation specific code.
-* 
+* Provides a PSoC Specific interface for interacting with the Cypress power
+* management and system clock configuration. This interface abstracts out the
+* chip specific details. If any chip specific functionality is necessary, or
+* performance is critical the low level functions can be used directly.
+*
 ********************************************************************************
 * \copyright
 * Copyright 2018-2019 Cypress Semiconductor Corporation
@@ -25,18 +25,8 @@
 * limitations under the License.
 *******************************************************************************/
 
-/**
-* \addtogroup group_hal_psoc6 PSoC 6 HAL Implementation
-* \{
-* PSoC 6 specific implementation of the HAL drivers
-* \} group_hal_psoc6
-*/
-
 #pragma once
 
-#include "cy_pdl.h"
-#include "cyhal_hw_types.h"
-#include "cyhal_gpio_impl.h"
-#include "cyhal_scb_common.h"
-#include "cyhal_utils.h"
-#include "cyhal_system_impl.h"
+#define cyhal_system_critical_section_enter     Cy_SysLib_EnterCriticalSection
+
+#define cyhal_system_critical_section_exit(x)   Cy_SysLib_ExitCriticalSection(x)
