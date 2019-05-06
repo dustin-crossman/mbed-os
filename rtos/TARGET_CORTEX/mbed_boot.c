@@ -62,6 +62,7 @@
 #include "mbed_boot.h"
 #include "mbed_error.h"
 #include "mbed_mpu_mgmt.h"
+#include "spm_api.h"
 
 int main(void);
 static void mbed_cpy_nvic(void);
@@ -83,6 +84,9 @@ void mbed_start(void)
     mbed_toolchain_init();
     mbed_main();
     mbed_error_initialize();
+#if defined(COMPONENT_SPE)
+    spm_hal_start_nspe();
+#endif
     main();
 }
 
