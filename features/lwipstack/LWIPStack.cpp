@@ -670,13 +670,21 @@ nsapi_error_t LWIP::setsockopt(nsapi_socket_t handle, int level, int optname, co
 
 nsapi_error_t LWIP::getsockopt(nsapi_socket_t handle, int level, int optname, void *optval, unsigned *optlen)
 {
-    return NSAPI_ERROR_UNSUPPORTED;
+    struct mbed_lwip_socket *s = (struct mbed_lwip_socket *)handle;
+    switch (optname) {
+    case CY_GET_TCP_PCB:
+        *(struct tcp_pcb **)optval = (s->conn->pcb.tcp);
+        return NSAPI_ERROR_OK;
+    default:
+        return NSAPI_ERROR_UNSUPPORTED;
+    }
 }
 
 
 void LWIP::socket_attach(nsapi_socket_t handle, void (*callback)(void *), void *data)
 {
     struct mbed_lwip_socket *s = (struct mbed_lwip_socket *)handle;
+
 
     s->cb = callback;
     s->data = data;

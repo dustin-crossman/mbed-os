@@ -171,6 +171,17 @@
             "pbuf-pool-size": 16,
             "mem-size": 51200
         },
+        "CYW943012P6EVB_01": {
+            "tcpip-thread-stacksize": 8192,
+            "default-thread-stacksize": 640,
+            "ppp-thread-stacksize": 896,
+            "memp-num-tcp-seg": 32,
+            "tcp-mss": 1440,
+            "tcp-snd-buf": "(8 * TCP_MSS)",
+            "tcp-wnd": "(TCP_MSS * 8)",
+            "pbuf-pool-size": 16,
+            "mem-size": 51200
+        },
         "MIMXRT1050_EVK": {
             "mem-size": 36560
         },

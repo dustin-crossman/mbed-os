@@ -1,18 +1,6 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2017-2017 ARM Limited
- * SPDX-License-Identifier: Apache-2.0
+ * $ Copyright Cypress Semiconductor Apache2 $
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 
 #if DEVICE_SERIAL && DEVICE_SERIAL_FC
@@ -20,6 +8,7 @@
 #include "CyH4TransportDriver.h"
 #include "cycfg_pins.h"
 #include "mbed_power_mgmt.h"
+extern "C" void hci_cy_TrSerialRxIncoming(uint8_t *pBuf, uint8_t len);
 
 namespace ble {
 namespace vendor {
@@ -74,7 +63,6 @@ void CyH4TransportDriver::initialize()
 
 #endif
     bt_device_wake = 0;
-    wait_ms(500);
     sleep_manager_unlock_deep_sleep();
 }
 
@@ -111,7 +99,7 @@ void CyH4TransportDriver::on_controller_irq()
 
 	while (uart.readable()) {
         uint8_t char_received = uart.getc();
-        on_data_received(&char_received, 1);
+        hci_cy_TrSerialRxIncoming(&char_received, 1);
     }
 
 	deassert_bt_dev_wake();
@@ -122,9 +110,6 @@ void CyH4TransportDriver::assert_bt_dev_wake()
 {
 #if (defined(MBED_TICKLESS) && DEVICE_SLEEP && DEVICE_LPTICKER)
     bt_device_wake = 0;
-
-    // BT Clock needs 1.8ms to come up
-    Cy_SysLib_Delay(2);
 #endif
 }
 
@@ -138,6 +123,11 @@ void CyH4TransportDriver::deassert_bt_dev_wake()
     //de-assert bt_device_wake
 	bt_device_wake = 1;
 #endif
+}
+
+void CyH4TransportDriver::update_uart_baud_rate(int baud)
+{
+	uart.baud(baud);
 }
 
 } // namespace cypress_ble
