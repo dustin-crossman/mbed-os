@@ -12,7 +12,7 @@ These files are relevant to CY8CPROTO_064_SB or CY8CPROTO_064_SB_M0_PSA, CY8CPRO
 		python.exe keygen.py -k 6 --jwk MCUBOOT_CM0P_KEY.json --pem-priv MCUBOOT_CM0P_KEY_PRIV.pem
 		python.exe keygen.py -k 8 --jwk USERAPP_CM4_KEY.json --pem-priv USERAPP_CM4_KEY_PRIV.pem
 
-*   Create provisioning packets:
+*	Create provisioning packets:
 		Execute from ./prepare folder:	
 		
 		** In case of compilation for CY8CPROTO_064_SB (CM4 only):		
@@ -28,10 +28,10 @@ These files are relevant to CY8CPROTO_064_SB or CY8CPROTO_064_SB_M0_PSA, CY8CPRO
 		CypressBootloader_CM0p.jwt and CypressBootloader_CM0p.hex must be used in pair from the same directory
 		while creation of provisioning packet (.packets/prov_cmd.jwt) and performing of provisioning.
 
-*   Run entrance exam:
+*	Run entrance exam:
 		python.exe entrance_exam_runner.py
 
-* 	Perform provisioning:
+*	Perform provisioning:
 		Execute provision_device_runner.py
 		If arguments for the script are not specified it will run with the default arguments.
 		Default arguments can be overridden with a custom:
@@ -41,12 +41,12 @@ These files are relevant to CY8CPROTO_064_SB or CY8CPROTO_064_SB_M0_PSA, CY8CPRO
 			--pubkey-json FILENAME  File where to save public key in JSON format
 			--pubkey-pem FILENAME   File where to save public key in PEM format
 
-        Example:
+		Example:
 			python.exe provision_device_runner.py --prov-jwt packet/prov_cmd.jwt --hex prebuild/CyBootloader_Release/CypressBootloader_CM0p.hex --pubkey-json keys/dev_pub_key.json --pubkey-pem keys/dev_pub_key.pem
 
 		Pay attention to mode in which device left after provisioning.
 
-* 	Run tests with command:
+*	Run tests with command:
 
 		mbed test --run -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -v
 		
