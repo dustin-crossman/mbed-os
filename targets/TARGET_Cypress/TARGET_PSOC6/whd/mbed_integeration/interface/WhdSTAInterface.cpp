@@ -23,13 +23,20 @@
 #include "rtos.h"
 #include "whd_emac.h"
 #include "whd_wifi_api.h"
-//#include "wiced_wifi.h"
-//#include "whd_management.h"
-//#include "wwd_network_constants.h"
-//#include "wwd_buffer_interface.h"
-//#include "wwd_ap_common.h"
 
 extern "C" void whd_emac_wifi_link_state_changed(bool state_up, whd_interface_t ifp);
+
+#define SCAN_RESULT_BUFF_SIZE     (40)
+#define CMP_MAC( a, b )  (((((unsigned char*)a)[0])==(((unsigned char*)b)[0]))&& \
+                          ((((unsigned char*)a)[1])==(((unsigned char*)b)[1]))&& \
+                          ((((unsigned char*)a)[2])==(((unsigned char*)b)[2]))&& \
+                          ((((unsigned char*)a)[3])==(((unsigned char*)b)[3]))&& \
+                          ((((unsigned char*)a)[4])==(((unsigned char*)b)[4]))&& \
+                          ((((unsigned char*)a)[5])==(((unsigned char*)b)[5])))
+
+//static whd_scan_result_t     result_buff[SCAN_RESULT_BUFF_SIZE];
+//static uint16_t                result_buff_write_pos = 0;
+//static uint16_t                result_buff_read_pos  = 0;
 
 static int whd_toerror(whd_result_t res) {
     switch (res) {
@@ -233,12 +240,14 @@ int8_t WhdSTAInterface::get_rssi()
 
     return (int8_t)rssi;
 }
-#if 0
+
 struct whd_scan_userdata {
-    Semaphore sema;
+    whd_semaphore_type_t sema;
     WiFiAccessPoint *aps;
+    whd_scan_result_t result_buff[SCAN_RESULT_BUFF_SIZE];
     unsigned count;
     unsigned offset;
+    whd_interface_t ifp;
 };
 
 struct whd_scan_security_userdata {
@@ -248,6 +257,7 @@ struct whd_scan_security_userdata {
     whd_security_t security;
 };
 
+#if 0
 static whd_result_t whd_scan_security_handler(
         whd_scan_handler_result_t *result)
 {
@@ -273,105 +283,107 @@ static whd_result_t whd_scan_security_handler(
     free(result);
     return WHD_SUCCESS;
 }
+#endif
 
-static whd_result_t whd_scan_count_handler(
-        whd_scan_handler_result_t *result)
+// static whd_result_t whd_scan_count_handler(whd_scan_result_t** result_ptr, 
+//     void* user_data, whd_scan_status_t status)
+// {
+//     whd_scan_userdata *data = (whd_scan_userdata*)user_data;
+
+//     // finished scan, either succesfully or through an abort
+//     if (status != WHD_SCAN_INCOMPLETE) {
+//         data->sema.release();
+//         return WHD_SUCCESS;
+//     }
+
+//     whd_scan_result_t* record = ( *result_ptr );
+
+
+//     // just count the available networks
+//     data->offset += 1;
+
+//     return WHD_SUCCESS;
+// }
+
+static void whd_scan_handler(whd_scan_result_t** result_ptr, 
+    void* user_data, whd_scan_status_t status)
 {
-    whd_scan_userdata *data = (whd_scan_userdata*)result->user_data;
-    malloc_transfer_to_curr_thread(result);
+
+    whd_scan_userdata *data = (whd_scan_userdata*)user_data;
 
     // finished scan, either succesfully or through an abort
-    if (result->status != WHD_SCAN_INCOMPLETE) {
-        data->sema.release();
-        free(result);
-        return WHD_SUCCESS;
-    }
-
-    // just count the available networks
-    data->offset += 1;
-
-    // release result
-    free(result);
-    return WHD_SUCCESS;
-}
-
-static whd_result_t whd_scan_handler(
-        whd_scan_handler_result_t *result)
-{
-    whd_scan_userdata *data = (whd_scan_userdata*)result->user_data;
-    malloc_transfer_to_curr_thread(result);
-
-    // finished scan, either succesfully or through an abort
-    if (result->status != WHD_SCAN_INCOMPLETE) {
-        data->sema.release();
-        free(result);
-        return WHD_SUCCESS;
+    if (status != WHD_SCAN_INCOMPLETE) {
+        whd_rtos_set_semaphore(&data->sema, WHD_FALSE);
+        return;
     }
 
     // can't really keep anymore scan results
-    if (data->offset == data->count) {
-        whd_wifi_abort_scan();
-        free(result);
-        return WHD_SUCCESS;
+    if (data->count > 0 && data->offset == data->count) {
+        whd_wifi_stop_scan(data->ifp);
+        return;
     }
 
-    // get ap stats
-    nsapi_wifi_ap ap;
+    whd_scan_result_t* record = ( *result_ptr );
 
-    uint8_t length = result->ap_details.SSID.length;
-    if (length < sizeof(ap.ssid)-1) {
-        length = sizeof(ap.ssid)-1;
+    for (int i=0; i<data->offset; i++) {
+        if (CMP_MAC( data->result_buff[i].BSSID.octet, record->BSSID.octet ))
+            return;
     }
-    memcpy(ap.ssid, result->ap_details.SSID.value, length);
-    ap.ssid[length] = '\0';
+    
+    if (data->count > 0) {
+        // get ap stats
+        nsapi_wifi_ap ap;
 
-    memcpy(ap.bssid, result->ap_details.BSSID.octet, sizeof(ap.bssid));
+        uint8_t length = record->SSID.length;
+        if (length < sizeof(ap.ssid)-1) {
+            length = sizeof(ap.ssid)-1;
+        }
+        memcpy(ap.ssid, record->SSID.value, length);
+        ap.ssid[length] = '\0';
 
-    ap.security = whd_tosecurity(result->ap_details.security);
-    ap.rssi = result->ap_details.signal_strength;
-    ap.channel = result->ap_details.channel;
+        memcpy(ap.bssid, record->BSSID.octet, sizeof(ap.bssid));
+
+        ap.security = whd_tosecurity(record->security);
+        ap.rssi = record->signal_strength;
+        ap.channel = record->channel;
+        data->aps[data->offset] = WiFiAccessPoint(ap);
+    }
 
     // store as ap object
-    data->aps[data->offset] = WiFiAccessPoint(ap);
+    data->result_buff[data->offset] = *record;
     data->offset += 1;
 
-    // release result
-    free(result);
-    return WHD_SUCCESS;
 }
-#endif
+
 
 int WhdSTAInterface::scan(WiFiAccessPoint *aps, unsigned count)
 {
-#if 0
-    // initialize whd, this is noop if already init
-    whd_result_t res = whd_init();
-    if (res != WHD_SUCCESS) {
-        return whd_toerror(res);
-    }
+    // initialize wiced, this is noop if already init
+    if (!_whd_emac.powered_up)
+        _whd_emac.power_up();
 
     whd_scan_userdata data;
     data.aps = aps;
     data.count = count;
     data.offset = 0;
+    data.ifp = _whd_emac.ifp;
+    whd_rtos_init_semaphore(&data.sema);
+    whd_scan_result_t scan_result;
+    whd_scan_result_t *result_ptr = &scan_result;
+    whd_result_t res;
 
-    // either count available ap or actually scan based on count argument
-    whd_scan_result_handler_t handler = (count == 0)
-        ? whd_scan_count_handler : whd_scan_handler;
-
-    res = whd_wifi_scan_networks(handler, &data);
+    res = (whd_result_t)whd_wifi_scan(_whd_emac.ifp, WHD_SCAN_TYPE_ACTIVE, WHD_BSS_TYPE_ANY,
+        NULL, NULL, NULL, NULL, whd_scan_handler, (whd_scan_result_t **) &result_ptr, &data );
     if (res != WHD_SUCCESS) {
         return whd_toerror(res);
     }
 
-    int tok = data.sema.wait();
-    if (tok < 1) {
-        return NSAPI_ERROR_WOULD_BLOCK;
+    res = whd_rtos_get_semaphore(&data.sema, NEVER_TIMEOUT, WHD_FALSE);
+    if (res != WHD_SUCCESS) {
+        return whd_toerror(res);
     }
 
     return data.offset;
-#else
-    return NSAPI_ERROR_UNSUPPORTED;
-#endif
+
 }
 
