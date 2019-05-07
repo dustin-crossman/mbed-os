@@ -15,6 +15,7 @@
  */
 
 #include <cstring>
+#include <algorithm>
 #include "WhdSTAInterface.h"
 #include "nsapi.h"
 #include "lwipopts.h"
@@ -24,9 +25,7 @@
 #include "whd_emac.h"
 #include "whd_wifi_api.h"
 
-extern "C" void whd_emac_wifi_link_state_changed(bool state_up, whd_interface_t ifp);
-
-#define SCAN_RESULT_BUFF_SIZE     (40)
+#define SCAN_RESULT_BUFF_SIZE     (30u)
 #define CMP_MAC( a, b )  (((((unsigned char*)a)[0])==(((unsigned char*)b)[0]))&& \
                           ((((unsigned char*)a)[1])==(((unsigned char*)b)[1]))&& \
                           ((((unsigned char*)a)[2])==(((unsigned char*)b)[2]))&& \
@@ -34,9 +33,28 @@ extern "C" void whd_emac_wifi_link_state_changed(bool state_up, whd_interface_t 
                           ((((unsigned char*)a)[4])==(((unsigned char*)b)[4]))&& \
                           ((((unsigned char*)a)[5])==(((unsigned char*)b)[5])))
 
-//static whd_scan_result_t     result_buff[SCAN_RESULT_BUFF_SIZE];
-//static uint16_t                result_buff_write_pos = 0;
-//static uint16_t                result_buff_read_pos  = 0;
+struct whd_scan_userdata {
+    Semaphore* sema;
+    WiFiAccessPoint *aps;
+    whd_scan_result_t result_buff[SCAN_RESULT_BUFF_SIZE];
+    unsigned count;
+    unsigned offset;
+    whd_interface_t ifp;
+};
+
+struct whd_scan_security_userdata {
+    Semaphore* sema;
+    const char *ssid;
+    int ssidlen;
+    whd_security_t security;
+};
+
+static whd_scan_userdata interal_scan_data;
+static whd_scan_result_t internal_scan_result;
+static whd_scan_result_t *result_ptr = &internal_scan_result;
+
+extern "C" void whd_emac_wifi_link_state_changed(bool state_up, whd_interface_t ifp);
+
 
 static int whd_toerror(whd_result_t res) {
     switch (res) {
@@ -126,8 +144,8 @@ nsapi_error_t WhdSTAInterface::connect()
     int i;
 
     // initialize wiced, this is noop if already init
-        if (!_whd_emac.powered_up)
-            _whd_emac.power_up();
+    if (!_whd_emac.powered_up)
+        _whd_emac.power_up();
 
     if (!_interface) {
         nsapi_error_t err = _stack.add_ethernet_interface(_emac, true, &_interface);
@@ -241,70 +259,6 @@ int8_t WhdSTAInterface::get_rssi()
     return (int8_t)rssi;
 }
 
-struct whd_scan_userdata {
-    whd_semaphore_type_t sema;
-    WiFiAccessPoint *aps;
-    whd_scan_result_t result_buff[SCAN_RESULT_BUFF_SIZE];
-    unsigned count;
-    unsigned offset;
-    whd_interface_t ifp;
-};
-
-struct whd_scan_security_userdata {
-    Semaphore sema;
-    const char *ssid;
-    int ssidlen;
-    whd_security_t security;
-};
-
-#if 0
-static whd_result_t whd_scan_security_handler(
-        whd_scan_handler_result_t *result)
-{
-    whd_scan_security_userdata *data =
-            (whd_scan_security_userdata*)result->user_data;
-    malloc_transfer_to_curr_thread(result);
-
-    // finished scan, either succesfully or through an abort
-    if (result->status != WHD_SCAN_INCOMPLETE) {
-        data->sema.release();
-        free(result);
-        return WHD_SUCCESS;
-    }
-
-    if (data->ssidlen == result->ap_details.SSID.length &&
-        memcmp(data->ssid, result->ap_details.SSID.value, data->ssidlen) == 0) {
-        // found a match
-        data->security = result->ap_details.security;
-        whd_wifi_abort_scan();
-    }
-
-    // release result
-    free(result);
-    return WHD_SUCCESS;
-}
-#endif
-
-// static whd_result_t whd_scan_count_handler(whd_scan_result_t** result_ptr, 
-//     void* user_data, whd_scan_status_t status)
-// {
-//     whd_scan_userdata *data = (whd_scan_userdata*)user_data;
-
-//     // finished scan, either succesfully or through an abort
-//     if (status != WHD_SCAN_INCOMPLETE) {
-//         data->sema.release();
-//         return WHD_SUCCESS;
-//     }
-
-//     whd_scan_result_t* record = ( *result_ptr );
-
-
-//     // just count the available networks
-//     data->offset += 1;
-
-//     return WHD_SUCCESS;
-// }
-
 static void whd_scan_handler(whd_scan_result_t** result_ptr, 
     void* user_data, whd_scan_status_t status)
 {
@@ -313,13 +267,14 @@ static void whd_scan_handler(whd_scan_result_t** result_ptr,
 
     // finished scan, either succesfully or through an abort
     if (status != WHD_SCAN_INCOMPLETE) {
-        whd_rtos_set_semaphore(&data->sema, WHD_FALSE);
+        data->sema->release();
         return;
     }
 
     // can't really keep anymore scan results
-    if (data->count > 0 && data->offset == data->count) {
+    if (data->count > 0 && data->offset >= std::min(data->count, SCAN_RESULT_BUFF_SIZE)) {
         whd_wifi_stop_scan(data->ifp);
+        data->sema->release();
         return;
     }
 
@@ -362,28 +317,27 @@ int WhdSTAInterface::scan(WiFiAccessPoint *aps, unsigned count)
     if (!_whd_emac.powered_up)
         _whd_emac.power_up();
 
-    whd_scan_userdata data;
-    data.aps = aps;
-    data.count = count;
-    data.offset = 0;
-    data.ifp = _whd_emac.ifp;
-    whd_rtos_init_semaphore(&data.sema);
-    whd_scan_result_t scan_result;
-    whd_scan_result_t *result_ptr = &scan_result;
+    interal_scan_data.sema = new Semaphore();
+    interal_scan_data.aps = aps;
+    interal_scan_data.count = count;
+    interal_scan_data.offset = 0;
+    interal_scan_data.ifp = _whd_emac.ifp;
     whd_result_t res;
 
     res = (whd_result_t)whd_wifi_scan(_whd_emac.ifp, WHD_SCAN_TYPE_ACTIVE, WHD_BSS_TYPE_ANY,
-        NULL, NULL, NULL, NULL, whd_scan_handler, (whd_scan_result_t **) &result_ptr, &data );
+        NULL, NULL, NULL, NULL, whd_scan_handler, (whd_scan_result_t **) &result_ptr, &interal_scan_data );
     if (res != WHD_SUCCESS) {
+        delete interal_scan_data.sema;
         return whd_toerror(res);
     }
 
-    res = whd_rtos_get_semaphore(&data.sema, NEVER_TIMEOUT, WHD_FALSE);
-    if (res != WHD_SUCCESS) {
-        return whd_toerror(res);
+    int tok = interal_scan_data.sema->wait();
+    if (tok < 1) {
+        delete interal_scan_data.sema;
+        return NSAPI_ERROR_WOULD_BLOCK;
     }
 
-    return data.offset;
-
+    delete interal_scan_data.sema;
+    return interal_scan_data.offset;
 }
 
