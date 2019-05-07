@@ -229,7 +229,7 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
         exit(1)
 
     # call imgtool for signature
-    process = subprocess.Popen(["python", sign_args.get("imgtool"), "sign", "--key", sign_args.get("priv_key"),
+    process = subprocess.Popen([sys.executable, sign_args.get("imgtool"), "sign", "--key", sign_args.get("priv_key"),
                                 "--header-size", sign_args.get("header_size"), "--pad-header", "--align",
                                 sign_args.get("align"), "--version", sign_args.get("version"), "--image-id",
                                 sign_args.get("id"), "--rollback_counter", sign_args.get("rollback_counter"),
