@@ -136,6 +136,19 @@ typedef struct
     uint8_t*    packet;         /**< Pointer to the keep alive packet            */
 } wiced_keep_alive_packet_t;
 
+/* These fields are stored in network order */
+typedef struct bcmtcp_hdr
+{
+    uint16_t  src_port;       /* Source Port Address */
+    uint16_t  dst_port;       /* Destination Port Address */
+    uint32_t  seq_num;        /* TCP Sequence Number */
+    uint32_t  ack_num;        /* TCP Sequence Number */
+    uint16_t  hdrlen_rsvd_flags;      /* Header length, reserved bits and flags */
+    uint16_t  tcpwin;         /* TCP window */
+    uint16_t  chksum;         /* Segment checksum with pseudoheader */
+    uint16_t  urg_ptr;        /* Points to seq-num of byte following urg data */
+}bcmtcp_hdr_t;
+
 /**
  * Structure for storing a Service Set Identifier (i.e. Name of Access Point)
  */
@@ -243,6 +256,38 @@ typedef struct
     uint16_t assoc;   /**< Listen interval as sent to APs    */
 } wiced_listen_interval_t;
 
+/*
+ * Structure of a 10Mb/s Ethernet header.
+ */
+typedef struct
+{
+    uint8_t  ether_dhost[ETHER_ADDR_LEN];
+    uint8_t  ether_shost[ETHER_ADDR_LEN];
+    uint16_t ether_type;
+} wiced_ether_header_t;
+
+typedef struct
+{
+    uint8_t   version_ihl;        /* Version and Internet Header Length */
+    uint8_t   tos;            /* Type Of Service */
+    uint16_t  tot_len;        /* Number of bytes in packet (max 65535) */
+    uint16_t  id;
+    uint16_t  frag;           /* 3 flag bits and fragment offset */
+    uint8_t   ttl;            /* Time To Live */
+    uint8_t   prot;           /* Protocol */
+    uint16_t  hdr_chksum;     /* IP header checksum */
+    uint8_t   src_ip[IPV4_ADDR_LEN];  /* Source IP Address */
+    uint8_t   dst_ip[IPV4_ADDR_LEN];  /* Destination IP Address */
+} ipv4_hdr_t;
+
+/* These fields are stored in network order */
+typedef struct
+{
+    uint16_t  src_port;   /* Source Port Address */
+    uint16_t  dst_port;   /* Destination Port Address */
+    uint16_t  len;        /* Number of bytes in datagram including header */
+    uint16_t  chksum;     /* entire datagram checksum with pseudoheader */
+} bcmudp_hdr_t;
 
 #pragma pack(1)
 
@@ -593,9 +638,86 @@ struct wwd_nan_sub_cmd {
         nan_cmd_handler_t *handler;
 };
 
+/*
+ * TCP keepalive offload definitions
+ */
 
+/* common iovar struct */
+typedef struct wwd_tko
+{
+    uint16_t subcmd_id;       /* subcommand id */
+    uint16_t len;             /* total length of data[] */
+    uint8_t data[1];          /* subcommand data */
+} wwd_tko_t;
 
+/* WWD_TKO_SUBCMD_MAX_CONNECT subcommand data */
+typedef struct wwd_tko_max_tcp
+{
+    uint8_t max;      /* max TCP connections supported */
+    uint8_t pad[3];   /* 4-byte struct alignment */
+} wwd_tko_max_tcp_t;
 
+/* WWD_TKO_SUBCMD_PARAM subcommand data */
+typedef struct wwd_tko_param
+{
+    uint16_t interval;        /* keepalive tx interval (secs) */
+    uint16_t retry_interval;  /* keepalive retry interval (secs) */
+    uint16_t retry_count;     /* retry_count */
+    uint8_t pad[2];           /* 4-byte struct alignment */
+} wwd_tko_param_t;
+
+/* WWD_TKO_SUBCMD_CONNECT subcommand data
+ * invoke with unique 'index' for each TCP connection
+ */
+typedef struct wwd_tko_connect
+{
+    uint8_t index;            /* TCP connection index, 0 to max-1 */
+    uint8_t ip_addr_type;     /* 0 - IPv4, 1 - IPv6 */
+    uint16_t local_port;      /* local port */
+    uint16_t remote_port;     /* remote port */
+    uint32_t local_seq;       /* local sequence number */
+    uint32_t remote_seq;      /* remote sequence number */
+    uint16_t request_len;     /* TCP keepalive request packet length */
+    uint16_t response_len;    /* TCP keepalive response packet length */
+    uint8_t data[1];          /* variable length field containing local/remote IPv4/IPv6,
+                               * TCP keepalive request packet, TCP keepalive response packet
+                               * For IPv4, length is 4 * 2 + request_length + response_length
+                               * offset 0 - local IPv4
+                               * offset 4 - remote IPv4
+                               * offset 8 - TCP keepalive request packet
+                               * offset 8+request_length - TCP keepalive response packet
+                               * For IPv6, length is 16 * 2 + request_length + response_length
+                               *       offset 0 - local IPv6
+                               *       offset 16 - remote IPv6
+                               *       offset 32 - TCP keepalive request packet
+                               *       offset 32+request_length - TCP keepalive response packet
+                               */
+ } wwd_tko_connect_t;
+
+ /* WWD_TKO_SUBCMD_CONNECT subcommand data to GET configured info for specific index */
+ typedef struct wwd_tko_get_connect
+{
+   uint8_t index;            /* TCP connection index, 0 to max-1 */
+   uint8_t pad[3];           /* 4-byte struct alignment */
+} wwd_tko_get_connect_t;
+
+ typedef struct wwd_tko_enable
+ {
+   uint8_t enable;   /* 1 - enable, 0 - disable */
+   uint8_t pad[3];   /* 4-byte struct alignment */
+ } wwd_tko_enable_t;
+
+ /* WWD_TKO_SUBCMD_STATUS subcommand data */
+ /* must be invoked before tko is disabled else status is unavailable */
+ typedef struct wwd_tcp_offload_status
+ {
+    uint8_t count;            /* number of status entries (i.e. equals
+                               * max TCP connections supported)
+                               */
+    uint8_t status[1];        /* variable length field contain status for
+                               * each TCP connection index
+                               */
+ } wwd_tcp_offload_status_t;
 
 /******************************************************
  *                 Global Variables

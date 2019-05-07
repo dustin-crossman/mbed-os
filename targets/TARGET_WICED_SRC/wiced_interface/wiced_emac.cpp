@@ -26,6 +26,7 @@
 #include "wwd_buffer_interface.h"
 #include "wiced_management.h"
 #include "wiced_wifi.h"
+#include "wiced_internal_api.h"
 
 #include "lwip/etharp.h"
 #include "lwip/ethip6.h"
@@ -131,7 +132,7 @@ bool WICED_EMAC::link_out(emac_mem_buf_t *buf)
     uint16_t size = memory_manager->get_total_len(buf);
 
     wwd_result_t res = host_buffer_get(&buffer, WWD_NETWORK_TX, size+offset, WICED_TRUE);
-    MBED_ASSERT(res == WICED_SUCCESS);
+    MBED_ASSERT(res == WWD_SUCCESS);
 
     host_buffer_add_remove_at_front(&buffer, offset);
 
@@ -154,6 +155,7 @@ void host_network_process_ethernet_data(wiced_buffer_t buffer, wwd_interface_t i
 {
 	emac_mem_buf_t *mem_buf = NULL;
     MBED_ASSERT(interface == WWD_STA_INTERFACE);
+    struct pbuf *pbuffer = NULL;
 
     WICED_EMAC &emac = WICED_EMAC::get_instance();
 
@@ -167,14 +169,11 @@ void host_network_process_ethernet_data(wiced_buffer_t buffer, wwd_interface_t i
     uint16_t size = host_buffer_get_current_piece_size(buffer);
 
     if (size > 0) {
-        /* Allocate a memory buffer chain from buffer pool */
-        mem_buf = emac.memory_manager->alloc_heap(size, 0);
-        if (mem_buf != NULL) {
-            memcpy(static_cast<uint8_t *>(emac.memory_manager->get_ptr(mem_buf)), static_cast<uint8_t *>(data), size);
-            emac.emac_link_input_cb(mem_buf);
-        }
+    	mem_buf = buffer->parent;
+    	pbuffer = (struct pbuf *)buffer->parent;
+    	pbuffer->payload = data;
+    	emac.emac_link_input_cb(mem_buf);
     }
-    host_buffer_release(buffer, WWD_NETWORK_RX);
 }
 
 void wiced_emac_wwd_wifi_link_state_changed(bool state_up)
@@ -188,13 +187,19 @@ void wiced_emac_wwd_wifi_link_state_changed(bool state_up)
 }
 
 //Stubs
+
 wiced_result_t wiced_network_deinit           (void) { return WICED_SUCCESS; }
 wiced_result_t wiced_network_init             (void) { return WICED_SUCCESS; }
-void wiced_wireless_link_down_handler         (void) {}
-void wiced_wireless_link_renew_handler        (void) {}
-void wiced_wireless_link_up_handler           (void) {}
-wiced_result_t wiced_network_notify_link_up   (void) { return WICED_SUCCESS; }
-wiced_result_t wiced_network_notify_link_down (void) { return WICED_SUCCESS; }
+wiced_result_t wiced_wireless_link_down_handler   (void *arg ) { return WICED_SUCCESS; }
+wiced_result_t wiced_wireless_link_renew_handler  (void *arg ) { return WICED_SUCCESS; }
+wiced_result_t wiced_wireless_link_up_handler     (void *arg ) { return WICED_SUCCESS; }
+void wiced_network_notify_link_up   (wiced_interface_t interface) {}
+
+void wiced_network_notify_link_down (wiced_interface_t interface)
+{
+	wiced_emac_wwd_wifi_link_state_changed(false);
+}
+
 } // extern "C"
 
 
