@@ -11,7 +11,8 @@ These files are relevant to CY8CPROTO_064_SB or CY8CPROTO_064_SB_M0_PSA, CY8CPRO
 		**NOTE:** DO NOT COMMIT any new keys to repository. ---
 
 2.	Create provisioning packets:
-		Execute from ./prepare folder:	
+
+        Execute from ./prepare folder:	
 		
 		** To create packet for CY8CPROTO_064_SB target using single-stage policy (CM4 only):
 			python.exe provisioning_packet.py --policy policy_1stage_CM4.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey USERAPP_CM4_KEY.json	
@@ -26,8 +27,10 @@ These files are relevant to CY8CPROTO_064_SB or CY8CPROTO_064_SB_M0_PSA, CY8CPRO
 		**NOTE:** CypressBootloader_CM0p.jwt and CypressBootloader_CM0p.hex must be used in pair from the same directory while creation of provisioning packet (.packets/prov_cmd.jwt) and performing of provisioning. ---
 
 3.	Perform provisioning:
+
 		Execute prod_provision_device.py
 		If arguments for the script are not specified it will run with the default arguments.
+
 		Default arguments can be overridden with a custom:
 			--prov-jwt FILENAME     Path to provisioning JWT file (packet which contains all
 									data necessary for provisioning, including policy, authorization packets and keys)
