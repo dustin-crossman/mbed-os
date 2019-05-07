@@ -8,21 +8,20 @@ These files are relevant to CY8CPROTO_064_SB or CY8CPROTO_064_SB_M0_PSA, CY8CPRO
 		python.exe keygen.py -k 6 --jwk MCUBOOT_CM0P_KEY.json --pem-priv MCUBOOT_CM0P_KEY_PRIV.pem
 		python.exe keygen.py -k 8 --jwk USERAPP_CM4_KEY.json --pem-priv USERAPP_CM4_KEY_PRIV.pem
         
-		**NOTE:** DO NOT COMMIT any new keys to repository. ---
+	**_NOTE_:** DO NOT COMMIT any new keys to repository. ---
 
 2.	Create provisioning packets:
 
         Execute from ./prepare folder:	
-		
-		** To create packet for CY8CPROTO_064_SB target using single-stage policy (CM4 only):
-			python.exe provisioning_packet.py --policy policy_1stage_CM4.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey USERAPP_CM4_KEY.json	
+		    ** To create packet for CY8CPROTO_064_SB target using single-stage policy (CM4 only):
+			    python.exe provisioning_packet.py --policy policy_1stage_CM4.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey USERAPP_CM4_KEY.json	
 
-		** To create packet for CY8CPROTO_064_SB_M0_PSA and CY8CPROTO_064_SB_PSA targets using dual-stage policy (CM0 and CM4):
-			python.exe provisioning_packet.py --policy policy_2stage_CM0p.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
+		    ** To create packet for CY8CPROTO_064_SB_M0_PSA and CY8CPROTO_064_SB_PSA targets using dual-stage policy (CM0 and CM4):
+			    python.exe provisioning_packet.py --policy policy_2stage_CM0p.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
 
 		Prebuild folder contains CyBootloader_WithLogs and CyBootloader_Release with corresponding hex and jwt files.
-		* WithLogs enables logs print to terminal.
-		* Release does not print to terminal and boots up silently.
+		    * WithLogs enables logs print to terminal.
+		    * Release does not print to terminal and boots up silently.
 
 		**NOTE:** CypressBootloader_CM0p.jwt and CypressBootloader_CM0p.hex must be used in pair from the same directory while creation of provisioning packet (.packets/prov_cmd.jwt) and performing of provisioning. ---
 
