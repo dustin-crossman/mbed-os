@@ -356,6 +356,10 @@ class Target(namedtuple("Target", "name json_data resolution_order resolution_or
     def is_PSA_non_secure_target(self):
         return 'NSPE_Target' in self.labels
 
+    @property
+    def is_SB_target(self):
+        return 'SB_Target' in self.labels
+
     def get_post_build_hook(self, toolchain):
         """Initialize the post-build hooks for a toolchain. For now, this
         function only allows "post binary" hooks (hooks that are executed

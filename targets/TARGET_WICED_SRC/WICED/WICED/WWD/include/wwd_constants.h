@@ -180,6 +180,91 @@ extern int DIV_ROUND_UP (int m, /*@sef@*/ int n); /* LINT : This tells lint that
 #define BCM_XTLV_OPTION_ALIGN32    0x0001 /* 32bit alignment of type.len.data */
 #define BCM_IOV_BATCH_MASK 0x8000
 
+/* TCP KEEP ALIVE OFFLOAD subcommand IDs */
+
+#define WWD_TKO_SUBCMD_MAX_TCP           0   /* max TCP connections supported */
+#define WWD_TKO_SUBCMD_PARAM             1   /* configure offload common parameters  */
+#define WWD_TKO_SUBCMD_CONNECT           2   /* TCP connection info */
+#define WWD_TKO_SUBCMD_ENABLE            3   /* enable/disable */
+#define WWD_TKO_SUBCMD_STATUS            4   /* TCP connection status */
+
+/* DHCP Lease renewal Offload Sub-command ID's */
+
+#define WWD_IPV4_ADDR_LEN            4      /* IPV4 Address Length   */
+#define WWD_DLTRO_SUBCMD_CONNECT     0      /* DLTRO connection info */
+#define WWD_DLTRO_SUBCMD_PARAM       1      /* DLTRO parameter info  */
+#define WWD_DLTRO_SUBCMD_MAX_DLTRO   2      /* Max DLTRO supported   */
+
+#define ETHER_TYPE_IP              0x0800   /* IP                    */
+#define IPV4_ADDR_LEN                4      /* IPV4 address length   */
+
+/* IPV4 field decodes */
+#define IPV4_VER_MASK              0xf0     /* IPV4 version mask */
+#define IPV4_VER_SHIFT               4      /* IPV4 version shift */
+#define IP_VER_4                     4      /* version number for IPV4 */
+#define IPV4_MIN_HEADER_LEN          20     /* Minimum size for an IP header (no options) */
+#define IP_PROT_UDP                 0x11    /* UDP protocol type */
+#define IPV4_VER_HL_OFFSET           0      /* version and ihl byte offset */
+#define IPV4_HLEN_MASK               0x0f    /* IPV4 header length mask */
+#ifndef IPV4_HLEN
+#define IPV4_HLEN(ipv4_body)        (4 * (((uint8_t *)(ipv4_body))[IPV4_VER_HL_OFFSET] & IPV4_HLEN_MASK))
+#endif
+#define UDP_HDR_LEN                  8      /* UDP header length */
+#define UDP_PORT_LEN                 2      /* UDP port length */
+
+#define IP_PROTO_TCP                 6      /* TCP PROTOCOL */
+#define TCP_SRC_PORT_OFFSET     0       /* TCP source port offset */
+#define TCP_DEST_PORT_OFFSET    2       /* TCP dest port offset */
+#define TCP_SEQ_NUM_OFFSET      4       /* TCP sequence number offset */
+#define TCP_ACK_NUM_OFFSET      8       /* TCP acknowledgement number offset */
+#define TCP_HLEN_OFFSET         12      /* HLEN and reserved bits offset */
+#define TCP_FLAGS_OFFSET        13      /* FLAGS and reserved bits offset */
+#define TCP_CHKSUM_OFFSET       16      /* TCP body checksum offset */
+
+#define TCP_PORT_LEN            2       /* TCP port field length */
+
+/* 8bit TCP flag field */
+#define TCP_FLAG_URG            0x20
+#define TCP_FLAG_ACK            0x10
+#define TCP_FLAG_PSH            0x08
+#define TCP_FLAG_RST            0x04
+#define TCP_FLAG_SYN            0x02
+#define TCP_FLAG_FIN            0x01
+
+#define TCP_HLEN_MASK           0xf000
+#define TCP_HLEN_SHIFT          12
+
+#define TCP_MIN_HEADER_LEN 20
+
+#define TCP_HDRLEN_MASK 0xf0
+#define TCP_HDRLEN_SHIFT 4
+#define TCP_HDRLEN(hdrlen) (((hdrlen) & TCP_HDRLEN_MASK) >> TCP_HDRLEN_SHIFT)
+
+#define TCP_FLAGS_MASK  0x1f
+#define TCP_FLAGS_VAL(hdrlen) ((hdrlen) & TCP_FLAGS_MASK)
+
+
+/* To address round up by 32bit. */
+#define IS_TCPSEQ_GE(a, b) ((a - b) < NBITVAL(31))              /* a >= b */
+#define IS_TCPSEQ_LE(a, b) ((b - a) < NBITVAL(31))              /* a =< b */
+#define IS_TCPSEQ_GT(a, b) !IS_TCPSEQ_LE(a, b)          /* a > b */
+#define IS_TCPSEQ_LT(a, b) !IS_TCPSEQ_GE(a, b)          /* a < b */
+
+
+#define IPV6_MIN_HEADER_LEN          40
+
+/* TCP Keep-alive offload enumerations */
+typedef enum {
+    WWD_TKO_STATUS_NORMAL                       = 0,    /* TCP connection normal, no error */
+    WWD_TKO_STATUS_NO_RESPONSE                  = 1,    /* no response to TCP keepalive */
+    WWD_TKO_STATUS_NO_TCP_ACK_FLAG              = 2,    /* TCP ACK flag not set */
+    WWD_TKO_STATUS_UNEXPECT_TCP_FLAG            = 3,    /* unexpect TCP flags set other than ACK */
+    WWD_TKO_STATUS_SEQ_NUM_INVALID              = 4,    /* ACK != sequence number */
+    WWD_TKO_STATUS_REMOTE_SEQ_NUM_INVALID       = 5,    /* SEQ > remote sequence number */
+    WWD_TKO_STATUS_TCP_DATA                     = 6,    /* TCP data available */
+    WWD_TKO_STATUS_UNAVAILABLE                  = 255,  /* not used/configured */
+} wwd_tko_status_t;
+
 enum wl_nan_sub_cmd_xtlv_id {
          /* nan cfg sub-commands */
         WL_NAN_CMD_CFG_ENABLE = 0x0101,
