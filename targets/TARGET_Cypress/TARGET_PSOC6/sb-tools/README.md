@@ -15,7 +15,7 @@ Execute from ./prepare folder:
 
 * To create packet for CY8CPROTO_064_SB target using single-stage policy (CM4 only):
 	
-		python.exe provisioning_packet.py --policy policy_1stage_CM4.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey USERAPP_CM4_KEY.json	
+		python.exe provisioning_packet.py --policy policy_1stage_CM4.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
 
 * To create packet for CY8CPROTO_064_SB_M0_PSA and CY8CPROTO_064_SB_PSA targets using dual-stage policy (CM0 and CM4):
 	
