@@ -1,1 +1,1 @@
-Files from secureboot-sdk-1.0.0.391
+Files from http://git-ore.aus.cypress.com/repo/secure_mcu_mxs40/commit/a8c308fafda9f627963401073a53583ad8f0c501
