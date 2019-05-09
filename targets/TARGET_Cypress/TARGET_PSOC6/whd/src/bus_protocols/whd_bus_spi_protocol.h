@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #ifndef INCLUDED_SPI_WHD_BUS_PROTOCOL_H
@@ -8,7 +21,7 @@
 #include "whd.h"
 #include "whd_bus_protocol_interface.h"
 #include "cy_result.h"
-#include "cy_hal_spi.h"
+#include "cyhal_spi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,7 +87,7 @@ extern whd_bool_t whd_bus_spi_use_status_report_scheme(whd_driver_t whd_driver);
 extern uint32_t whd_bus_spi_get_max_transfer_size(whd_driver_t whd_driver);
 extern whd_result_t whd_bus_spi_irq_register(whd_driver_t whd_driver);
 extern whd_result_t whd_bus_spi_irq_enable(whd_driver_t whd_driver, whd_bool_t enable);
-extern void whd_bus_spi_irq_handler(void *handler_arg, cy_spi_irq_event_t event);
+extern void whd_bus_spi_irq_handler(void *handler_arg, cyhal_spi_irq_event_t event);
 
 /******************************************************
 *             Global variables

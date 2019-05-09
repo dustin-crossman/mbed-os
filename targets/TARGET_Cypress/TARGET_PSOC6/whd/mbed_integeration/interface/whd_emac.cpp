@@ -28,14 +28,6 @@
 #include "whd_buffer.h"
 #include "whd_buffer_api.h"
 
-#if defined(CY8C6247BZI_D54)
-    #include "cy_bsp_cy8ckit_062_wifi_bt.h"
-#elif defined(CY8C624ABZI_D44)
-    #include "cy_bsp_cy8cproto_062_4343w.h"
-#else
-    #include "cy_device_common.h"
-#endif
-
 
 WHD_EMAC::WHD_EMAC(whd_interface_role_t role)
     : emac_link_input_cb(NULL),
@@ -101,9 +93,10 @@ void WHD_EMAC::power_down()
     whd_deinit(ifp);
 }
 
+extern "C" whd_driver_t* cybsp_get_wifi_driver(void);
 bool WHD_EMAC::power_up()
 {
-	drvp = *(get_whd_driver());
+	drvp = *(cybsp_get_wifi_driver());
 	whd_wifi_on(drvp, &ifp /* OUT */);
     powered_up = true;
     if (link_state && emac_link_state_cb ) {
@@ -174,7 +167,7 @@ void WHD_EMAC::get_ifname(char *name, uint8_t size) const
 
 extern "C"
 {
-void host_network_process_ethernet_data(whd_interface_t role, whd_buffer_t buffer)
+void cy_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer)
 {
 	emac_mem_buf_t *mem_buf = NULL;
 

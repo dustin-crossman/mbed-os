@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include <stdlib.h>
@@ -433,13 +446,13 @@ whd_result_t whd_wifi_read_wlan_log_unsafe(whd_driver_t whd_driver, uint32_t wla
             goto done;
         }
 
-        internal_info->sh.flags = ltoh32(internal_info->sh.flags);
-        internal_info->sh.trap_addr = ltoh32(internal_info->sh.trap_addr);
-        internal_info->sh.assert_exp_addr = ltoh32(internal_info->sh.assert_exp_addr);
-        internal_info->sh.assert_file_addr = ltoh32(internal_info->sh.assert_file_addr);
-        internal_info->sh.assert_line = ltoh32(internal_info->sh.assert_line);
-        internal_info->sh.console_addr = ltoh32(internal_info->sh.console_addr);
-        internal_info->sh.msgtrace_addr = ltoh32(internal_info->sh.msgtrace_addr);
+        internal_info->sh.flags = dtoh32(internal_info->sh.flags);
+        internal_info->sh.trap_addr = dtoh32(internal_info->sh.trap_addr);
+        internal_info->sh.assert_exp_addr = dtoh32(internal_info->sh.assert_exp_addr);
+        internal_info->sh.assert_file_addr = dtoh32(internal_info->sh.assert_file_addr);
+        internal_info->sh.assert_line = dtoh32(internal_info->sh.assert_line);
+        internal_info->sh.console_addr = dtoh32(internal_info->sh.console_addr);
+        internal_info->sh.msgtrace_addr = dtoh32(internal_info->sh.msgtrace_addr);
 
         if ( (internal_info->sh.flags & WLAN_SHARED_VERSION_MASK) != WLAN_SHARED_VERSION )
         {
@@ -463,7 +476,7 @@ whd_result_t whd_wifi_read_wlan_log_unsafe(whd_driver_t whd_driver, uint32_t wla
     /* Allocate console buffer (one time only) */
     if (c->buf == NULL)
     {
-        c->bufsize = ltoh32(c->log.buf_size);
+        c->bufsize = dtoh32(c->log.buf_size);
         c->buf = malloc(c->bufsize);
         if (c->buf == NULL)
         {
@@ -476,7 +489,7 @@ whd_result_t whd_wifi_read_wlan_log_unsafe(whd_driver_t whd_driver, uint32_t wla
     /* Retrieve last read position */
     c->last = whd_driver->internal_info.con_lastpos;
 
-    index = ltoh32(c->log.idx);
+    index = dtoh32(c->log.idx);
 
     /* Protect against corrupt value */
     if (index > c->bufsize)
@@ -497,7 +510,7 @@ whd_result_t whd_wifi_read_wlan_log_unsafe(whd_driver_t whd_driver, uint32_t wla
     /* xxx this could optimize and read only the portion of the buffer needed, but
      * it would also have to handle wrap-around.
      */
-    address = ltoh32(c->log.buf);
+    address = dtoh32(c->log.buf);
     result = whd_bus_transfer_backplane_bytes(whd_driver, BUS_READ, address, c->bufsize, (uint8_t *)c->buf);
     if (result != WHD_SUCCESS)
     {

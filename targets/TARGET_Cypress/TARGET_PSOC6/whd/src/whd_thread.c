@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -20,6 +33,7 @@
  *  @ref whd_thread_receive_one_packet or @ref whd_thread_poll_all functions
  *
  */
+#include "stdlib.h"
 #include "whd_debug.h"
 #include "whd_thread.h"
 #include "bus_protocols/whd_bus_protocol_interface.h"
@@ -78,6 +92,12 @@ whd_result_t whd_thread_init(whd_driver_t whd_driver)
         /*@-unreachable@*/ /*@-globstate@*/ /* Lint: Reachable after hitting assert & globals not defined due to error */
         return retval;
         /*@+unreachable@*/ /*@+globstate@*/
+    }
+
+    whd_driver->thread_info.thread_stack_size = 3*1024;
+    if(whd_driver->thread_info.thread_stack_start == NULL)
+    {
+        whd_driver->thread_info.thread_stack_start = (char*)malloc(whd_driver->thread_info.thread_stack_size);
     }
 
     retval = whd_rtos_create_thread_with_arg(&whd_driver->thread_info.whd_thread, whd_thread_func,

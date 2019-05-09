@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -274,8 +287,6 @@ static void            whd_sdpcm_set_next_buffer_in_queue(whd_driver_t whd_drive
 static void            whd_sdpcm_send_common(whd_driver_t whd_driver, /*@only@*/ whd_buffer_t buffer,
                                              sdpcm_header_type_t header_type);
 static uint8_t         whd_map_dscp_to_priority(whd_driver_t whd_driver, uint8_t dscp_val);
-extern void whd_wifi_log_event(whd_driver_t whd_driver, const whd_event_header_t *event_header,
-                               const uint8_t *event_data);
 /******************************************************
 *             Function definitions
 ******************************************************/
@@ -464,24 +475,26 @@ void whd_network_send_ethernet_data(whd_interface_t ifp, /*@only@*/ whd_buffer_t
     uint8_t whd_tos_map[8] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
     whd_driver_t whd_driver = ifp->whd_driver;
     sdpcm_ethernet_header_t *ethernet_header = (sdpcm_ethernet_header_t *)whd_buffer_get_current_piece_data_pointer(
-                                                                          whd_driver, buffer);
+        whd_driver, buffer);
     uint16_t ether_type;
 
-    ether_type = NTOH16(ethernet_header->ethertype);
+    ether_type = ntoh16(ethernet_header->ethertype);
     if ( (ether_type == WHD_ETHERTYPE_IPv4) || (ether_type == WHD_ETHERTYPE_DOT1AS) )
     {
-        dscp = (uint8_t*)whd_buffer_get_current_piece_data_pointer( whd_driver, buffer ) + IPV4_DSCP_OFFSET;
+        dscp = (uint8_t *)whd_buffer_get_current_piece_data_pointer(whd_driver, buffer) + IPV4_DSCP_OFFSET;
     }
 
-    add_sdpcm_log_entry(LOG_TX, DATA, whd_buffer_get_current_piece_size( whd_driver,
-                            buffer), (char *)whd_buffer_get_current_piece_data_pointer( whd_driver, buffer) );
+    add_sdpcm_log_entry(LOG_TX, DATA, whd_buffer_get_current_piece_size(whd_driver,
+                                                                        buffer), (char *)whd_buffer_get_current_piece_data_pointer(
+                            whd_driver,
+                            buffer) );
 
     WPRINT_WHD_DATA_LOG( ("Wcd:> DATA pkt 0x%08lX len %d\n", (unsigned long)buffer,
-              (int)whd_buffer_get_current_piece_size( whd_driver, buffer) ) );
+                          (int)whd_buffer_get_current_piece_size(whd_driver, buffer) ) );
 
 
     /* Add link space at front of packet */
-    result = whd_buffer_add_remove_at_front( whd_driver, &buffer, - (int) (sizeof(sdpcm_data_header_t)) );
+    result = whd_buffer_add_remove_at_front(whd_driver, &buffer, -(int)(sizeof(sdpcm_data_header_t) ) );
     if (result != WHD_SUCCESS)
     {
         WPRINT_WHD_DEBUG( ("Unable to adjust header space\n") );
@@ -491,7 +504,7 @@ void whd_network_send_ethernet_data(whd_interface_t ifp, /*@only@*/ whd_buffer_t
         return;
     }
 
-    packet = (sdpcm_data_header_t*) whd_buffer_get_current_piece_data_pointer( whd_driver,buffer );
+    packet = (sdpcm_data_header_t *)whd_buffer_get_current_piece_data_pointer(whd_driver, buffer);
 
     if (ifp->bsscfgidx > WHD_INTERFACE_MAX)
     {
@@ -510,7 +523,7 @@ void whd_network_send_ethernet_data(whd_interface_t ifp, /*@only@*/ whd_buffer_t
     {
         if (*dscp != 0) /* If it's equal 0 then it's best effort traffic and nothing needs to be done */
         {
-            priority = whd_map_dscp_to_priority( whd_driver, *dscp );
+            priority = whd_map_dscp_to_priority(whd_driver, *dscp);
         }
     }
 
@@ -528,7 +541,7 @@ void whd_network_send_ethernet_data(whd_interface_t ifp, /*@only@*/ whd_buffer_t
     packet->bdc_header.data_offset = 0;
 
     /* Add the length of the BDC header and pass "down" */
-    whd_sdpcm_send_common( whd_driver, buffer, DATA_HEADER );
+    whd_sdpcm_send_common(whd_driver, buffer, DATA_HEADER);
 }
 
 void whd_sdpcm_update_credit(whd_driver_t whd_driver, uint8_t *data)
@@ -539,7 +552,7 @@ void whd_sdpcm_update_credit(whd_driver_t whd_driver, uint8_t *data)
     if ( (header->channel_and_flags & 0x0f) < (uint8_t)3 )
     {
         sdpcm_info->credit_diff = (uint8_t)(header->bus_data_credit - sdpcm_info->last_bus_data_credit);
-        WPRINT_WHD_DATA_LOG(("credit update =%d\n ",header->bus_data_credit) );
+        WPRINT_WHD_DATA_LOG( ("credit update =%d\n ", header->bus_data_credit) );
         if (sdpcm_info->credit_diff <= GET_C_VAR(whd_driver, BUS_CREDIT_DIFF) )
         {
             sdpcm_info->last_bus_data_credit = header->bus_data_credit;
@@ -584,8 +597,9 @@ void whd_sdpcm_process_rx_packet(/*@only@*/ whd_driver_t whd_driver, whd_buffer_
     whd_result_t result;
 
     whd_sdpcm_info_t *sdpcm_info = &whd_driver->sdpcm_info;
-
     packet = (sdpcm_common_header_t *)whd_buffer_get_current_piece_data_pointer(whd_driver, buffer);
+    packet->sdpcm_header.frametag[0] = dtoh16(packet->sdpcm_header.frametag[0]);
+    packet->sdpcm_header.frametag[1] = dtoh16(packet->sdpcm_header.frametag[1]);
 
     /* Extract the total SDPCM packet size from the first two frametag bytes */
     size = packet->sdpcm_header.frametag[0];
@@ -653,7 +667,7 @@ void whd_sdpcm_process_rx_packet(/*@only@*/ whd_driver_t whd_driver, whd_buffer_
             cdc_header =
                 (sdpcm_cdc_header_t *)&( (char *)&common_header->sdpcm_header )[common_header->sdpcm_header.sw_header.
                                                                                 header_length];
-            flags         = ltoh32(cdc_header->flags);
+            flags         = dtoh32(cdc_header->flags);
             id            = (uint16_t)( (flags & CDCF_IOC_ID_MASK) >> CDCF_IOC_ID_SHIFT );
 
             if (id == sdpcm_info->requested_ioctl_id)
@@ -661,7 +675,8 @@ void whd_sdpcm_process_rx_packet(/*@only@*/ whd_driver_t whd_driver, whd_buffer_
                 /* Save the response packet in a variable */
                 sdpcm_info->ioctl_response = buffer;
 
-                WPRINT_WHD_DATA_LOG( ( "Wcd:< Procd pkt 0x%08lX: IOCTL Response (%d bytes)\n", (unsigned long)buffer, size ) );
+                WPRINT_WHD_DATA_LOG( ("Wcd:< Procd pkt 0x%08lX: IOCTL Response (%d bytes)\n", (unsigned long)buffer,
+                                      size) );
 
                 /* Wake the thread which sent the IOCTL/IOVAR so that it will resume */
                 result = whd_rtos_set_semaphore(&sdpcm_info->ioctl_sleep, WHD_FALSE);
@@ -726,12 +741,12 @@ void whd_sdpcm_process_rx_packet(/*@only@*/ whd_driver_t whd_driver, whd_buffer_
                 (uint32_t )whd_buffer_get_current_piece_data_pointer(whd_driver, buffer) - WHD_ETHERNET_SIZE;
             if ( ( (ip_data_start_add >> 2) << 2 ) != ip_data_start_add )
             {
-                    WPRINT_WHD_DATA_LOG(("IP data not aligned to 4 bytes %lx\n", ip_data_start_add));
+                WPRINT_WHD_DATA_LOG( ("IP data not aligned to 4 bytes %lx\n", ip_data_start_add) );
             }
 
             add_sdpcm_log_entry(LOG_RX, DATA, whd_buffer_get_current_piece_size(whd_driver, buffer),
                                 (char *)whd_buffer_get_current_piece_data_pointer(whd_driver, buffer) );
-                WPRINT_WHD_DATA_LOG( ( "Wcd:< Procd pkt 0x%08lX: Data (%d bytes)\n", (unsigned long)buffer, size ) );
+            WPRINT_WHD_DATA_LOG( ("Wcd:< Procd pkt 0x%08lX: Data (%d bytes)\n", (unsigned long)buffer, size) );
             bssid_index = (uint32_t)(bdc_header->flags2 & BDC_FLAG2_IF_MASK);
             ifp = whd_driver->iflist[bssid_index];
 
@@ -755,7 +770,7 @@ void whd_sdpcm_process_rx_packet(/*@only@*/ whd_driver_t whd_driver, whd_buffer_
 
             event = (whd_event_t *)&bdc_header[bdc_header->data_offset + 1];
 
-            ether_type = NTOH16(event->eth.ethertype);
+            ether_type = ntoh16(event->eth.ethertype);
 
             /* If frame is truly an event, it should have EtherType equal to the Broadcom type. */
             if (ether_type != (uint16_t)ETHER_TYPE_BRCM)
@@ -786,14 +801,14 @@ void whd_sdpcm_process_rx_packet(/*@only@*/ whd_driver_t whd_driver, whd_buffer_
             /* Search for the event type in the list of event handler functions
              * event data is stored in network endianness
              */
-            whd_event->flags      =                        NTOH16(whd_event->flags);
-            whd_event->event_type = (whd_event_num_t)NTOH32(whd_event->event_type);
-            whd_event->status     = (whd_event_status_t)NTOH32(whd_event->status);
-            whd_event->reason     = (whd_event_reason_t)NTOH32(whd_event->reason);
-            whd_event->auth_type  =                        NTOH32(whd_event->auth_type);
-            whd_event->datalen    =                        NTOH32(whd_event->datalen);
-            whd_event->ifidx =  whd_event->ifidx;
-            whd_event->bsscfgidx =  whd_event->bsscfgidx;
+            whd_event->flags      =                        ntoh16(whd_event->flags);
+            whd_event->event_type = (whd_event_num_t)ntoh32(whd_event->event_type);
+            whd_event->status     = (whd_event_status_t)ntoh32(whd_event->status);
+            whd_event->reason     = (whd_event_reason_t)ntoh32(whd_event->reason);
+            whd_event->auth_type  =                        ntoh32(whd_event->auth_type);
+            whd_event->datalen    =                        ntoh32(whd_event->datalen);
+            whd_event->ifidx      = whd_event->ifidx;
+            whd_event->bsscfgidx  = whd_event->bsscfgidx;
             /* Ensure data length is correct */
             if (whd_event->datalen >
                 (uint32_t)(size - ( (char *)DATA_AFTER_HEADER(event) - (char *)&packet->sdpcm_header ) ) )
@@ -828,7 +843,8 @@ void whd_sdpcm_process_rx_packet(/*@only@*/ whd_driver_t whd_driver, whd_buffer_
             }
 
             /* do any needed debug logging of event */
-            whd_wifi_log_event(whd_driver, whd_event, (uint8_t *)DATA_AFTER_HEADER(event) );
+            WHD_IOCTL_LOG_ADD_EVENT(whd_driver, whd_event->event_type, whd_event->status,
+                                    whd_event->reason);
 
             if (whd_rtos_get_semaphore(&sdpcm_info->event_list_mutex, NEVER_TIMEOUT, WHD_FALSE) != WHD_SUCCESS)
             {
@@ -870,7 +886,7 @@ void whd_sdpcm_process_rx_packet(/*@only@*/ whd_driver_t whd_driver, whd_buffer_
             add_sdpcm_log_entry(LOG_RX, EVENT, whd_buffer_get_current_piece_size(whd_driver, buffer),
                                 (char *)whd_buffer_get_current_piece_data_pointer(whd_driver, buffer) );
             WPRINT_WHD_DATA_LOG( ("Wcd:< Procd pkt 0x%08lX: Evnt %d (%d bytes)\n", (unsigned long)buffer,
-                      (int)whd_event->event_type, size) );
+                                  (int)whd_event->event_type, size) );
 
             /* Release the event packet buffer */
             result = whd_buffer_release(whd_driver, buffer, WHD_NETWORK_RX);
@@ -961,12 +977,13 @@ whd_result_t whd_sdpcm_send_ioctl(whd_interface_t ifp, sdpcm_command_type_t type
     }
 
     /* Prepare the CDC header */
-    send_packet->cdc_header.cmd    = command;
-    send_packet->cdc_header.len    = data_length;
-    send_packet->cdc_header.flags =
-        ( ( (uint32_t)++ (sdpcm_info->requested_ioctl_id) << CDCF_IOC_ID_SHIFT ) & CDCF_IOC_ID_MASK ) | type |
-        bss_index <<
-            CDCF_IOC_IF_SHIFT;
+    send_packet->cdc_header.cmd    = htod32(command);
+    send_packet->cdc_header.len    = htod32(data_length);
+
+    send_packet->cdc_header.flags  = ( ( (uint32_t)++ (sdpcm_info->requested_ioctl_id) << CDCF_IOC_ID_SHIFT )
+                                       & CDCF_IOC_ID_MASK ) | type | bss_index << CDCF_IOC_IF_SHIFT;
+    send_packet->cdc_header.flags = htod32(send_packet->cdc_header.flags);
+
     send_packet->cdc_header.status = 0;
 
     /* Manufacturing test can receive big buffers, but sending big buffers causes a wlan firmware error */
@@ -990,12 +1007,12 @@ whd_result_t whd_sdpcm_send_ioctl(whd_interface_t ifp, sdpcm_command_type_t type
 
     common_header = (sdpcm_common_header_t *)whd_buffer_get_current_piece_data_pointer(whd_driver,
                                                                                        sdpcm_info->ioctl_response);
-    cdc_header =
+    cdc_header    =
         (sdpcm_cdc_header_t *)&( (char *)&common_header->sdpcm_header )[common_header->sdpcm_header.sw_header.
                                                                         header_length];
-    flags         = ltoh32(cdc_header->flags);
+    flags         = dtoh32(cdc_header->flags);
 
-    retval = (whd_result_t)(WLAN_ENUM_OFFSET -  ltoh32(cdc_header->status) );
+    retval = (whd_result_t)(WLAN_ENUM_OFFSET -  dtoh32(cdc_header->status) );
 
     /* Check if the caller wants the response */
     if (response_buffer_hnd != NULL)
@@ -1361,7 +1378,7 @@ whd_result_t whd_sdpcm_get_packet_to_send(whd_driver_t whd_driver, /*@special@*/
         /* Check if we're being flow controlled */
         if (whd_bus_is_flow_controlled(whd_driver) == WHD_TRUE)
         {
-            WHD_STATS_INCREMENT_VARIABLE(whd_driver, flow_control );
+            WHD_STATS_INCREMENT_VARIABLE(whd_driver, flow_control);
             return WHD_FLOW_CONTROLLED;
         }
 
@@ -1369,8 +1386,6 @@ whd_result_t whd_sdpcm_get_packet_to_send(whd_driver_t whd_driver, /*@special@*/
         if (sdpcm_info->packet_transmit_sequence_number == sdpcm_info->last_bus_data_credit)
         {
             WHD_STATS_INCREMENT_VARIABLE(whd_driver, no_credit);
-            WPRINT_WHD_ERROR( ("Packet retrieval cancelled due to lack of bus credits , %s failed at %d \n", __func__,
-                               __LINE__) );
             return WHD_NO_CREDITS;
         }
 

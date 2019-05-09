@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -593,8 +606,19 @@ typedef struct whd_scan_result
     uint8_t ccode[2]; /**< Two letter ISO country code from AP                                       */
     uint8_t flags; /**< flags                                                                     */
     struct whd_scan_result *next; /**< Pointer to the next scan result                                           */
+    uint8_t*                  ie_ptr;           /**< Pointer to received Beacon/Probe Response IE  */
+    uint32_t                  ie_len;           /**< Length of IE   */
 } whd_scan_result_t;
 #pragma pack()
+
+typedef struct whd_simple_scan_result
+{
+    whd_ssid_t SSID; /**< Service Set Identification (i.e. Name of Access Point)                    */
+    whd_mac_t BSSID; /**< Basic Service Set Identification (i.e. MAC address of Access Point)       */
+    int16_t signal_strength; /**< Receive Signal Strength Indication in dBm. <-90=Very poor, >-30=Excellent */
+    whd_security_t security; /**< Security type                                                             */
+    uint8_t channel; /**< Radio channel that the AP beacon was received on                          */
+} whd_sync_scan_result_t;
 
 typedef uint16_t wl_chanspec_t;
 #define MCSSET_LEN    16
@@ -656,11 +680,11 @@ typedef uint32_t whd_result_t;
 #define WHD_RESULT_CREATE(x) ((WHD_RESULT_CODE_OFFSET) | ((x) & 0xFFFF))
 
 
-#define WHD_SUCCESS                         WHD_RESULT_CREATE(0)  /**< Success */
+#define WHD_SUCCESS                         0  /**< Success */
 #define WHD_PENDING                         WHD_RESULT_CREATE(1)   /**< Pending */
 #define WHD_TIMEOUT                         WHD_RESULT_CREATE(2)   /**< Timeout */
 #define WHD_BADARG                          WHD_RESULT_CREATE(5)   /**< Bad Arguments */
-#define WHD_UNFINISHED                     WHD_RESULT_CREATE(10)   /**< Operation not finished yet WHD_RESULT_CREATE(maybe aborted) */
+#define WHD_UNFINISHED                      WHD_RESULT_CREATE(10)  /**< Operation not finished yet WHD_RESULT_CREATE(maybe aborted) */
 
 #define WHD_PARTIAL_RESULTS              WHD_RESULT_CREATE(1003)   /**< Partial results */
 #define WHD_INVALID_KEY                  WHD_RESULT_CREATE(1004)   /**< Invalid key */
@@ -727,6 +751,7 @@ typedef uint32_t whd_result_t;
 #define WHD_ACCESS_POINT_NOT_FOUND       WHD_RESULT_CREATE(1066)   /**< Access point not found */
 #define WHD_RTOS_ERROR                   WHD_RESULT_CREATE(1067)   /**< RTOS operation failed */
 #define WHD_CLM_BLOB_DLOAD_ERROR         WHD_RESULT_CREATE(1068)   /**< CLM blob download failed */
+#define WHD_HAL_ERROR                    WHD_RESULT_CREATE(1069)   /**< WHD HAL Error */
 
 #define WLAN_ENUM_OFFSET 2000
 

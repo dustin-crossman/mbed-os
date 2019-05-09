@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -31,7 +44,6 @@
 #include "whd_types_int.h"
 
 #include "cy_result.h"
-#include "cy_hal_spi.h"
 
 
 /******************************************************
@@ -274,7 +286,7 @@ static whd_result_t whd_bus_spi_transfer_buffer(whd_driver_t whd_driver, whd_bus
     whd_buffer_header_t *header = (whd_buffer_header_t *)whd_buffer_get_current_piece_data_pointer(whd_driver, buffer);
     whd_bus_gspi_header_t *gspi_header =
         (whd_bus_gspi_header_t *)( (char *)header->bus_header + MAX_BUS_HEADER_SIZE - sizeof(whd_bus_gspi_header_t) );
-    uint16_t transfer_size;
+    size_t transfer_size;
 
     uint16_t size = ( uint16_t )(whd_buffer_get_current_piece_size(whd_driver, buffer) - sizeof(whd_buffer_header_t) );
 
@@ -327,18 +339,18 @@ static whd_result_t whd_bus_spi_transfer_buffer(whd_driver_t whd_driver, whd_bus
         add_log_entry(LOG_TX, function, address, size, (char *)&gspi_header->data);
     }
 
-    transfer_size = (uint16_t)(newsize + sizeof(whd_bus_gspi_header_t) );
+    transfer_size = (size_t)(newsize + sizeof(whd_bus_gspi_header_t) );
 
     /* Send the data */
     if (direction == BUS_READ)
     {
-        result = cy_spi_transfer(whd_driver->bus_priv->spi_obj, NULL, NULL, (uint8_t *)gspi_header,
-                                 (size_t *)&transfer_size, 0);
+        result = cyhal_spi_transfer(whd_driver->bus_priv->spi_obj, NULL, 0, (uint8_t *)gspi_header,
+                                 transfer_size, 0);
     }
     else
     {
-        result = cy_spi_transfer(whd_driver->bus_priv->spi_obj, (uint8_t *)gspi_header, (size_t *)&transfer_size, NULL,
-                                 NULL, 0);
+        result = cyhal_spi_transfer(whd_driver->bus_priv->spi_obj, (uint8_t *)gspi_header, transfer_size, NULL,
+                                 0, 0);
     }
 
     if (direction == BUS_READ)
@@ -422,7 +434,6 @@ return_with_error: whd_assert("Error accessing backplane", 0 != 0);
         {
             CHECK_RETURN(whd_bus_spi_write_register_value(whd_driver, BACKPLANE_FUNCTION, SPI_FRAME_CONTROL, 1,
                                                           (1 << 0) ) );
-            WPRINT_WHD_ERROR( ("No Packets waiting to be received \n") );
             return WHD_NO_PACKET_TO_RECEIVE;
         }
     }
@@ -436,7 +447,6 @@ return_with_error: whd_assert("Error accessing backplane", 0 != 0);
 
     if (whd_gspi_bytes_pending == 0)
     {
-        WPRINT_WHD_ERROR( ("No Packets waiting to be received \n") );
         return WHD_NO_PACKET_TO_RECEIVE;
     }
 
@@ -486,7 +496,7 @@ whd_result_t whd_bus_spi_init(whd_driver_t whd_driver)
     uint8_t init_data[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     uint32_t interrupt_polarity = 0;
     uint16_t chip_id;
-    uint16_t transfer_size = 12;
+    size_t transfer_size = 12;
 
     whd_driver->bus_gspi_32bit = WHD_FALSE;
 
@@ -515,7 +525,7 @@ whd_result_t whd_bus_spi_init(whd_driver_t whd_driver)
                                                                 (uint32_t)( (SPI_READ_TEST_REGISTER & 0x1FFFFu) <<
                                                                             11 ) |
                                                                 (uint32_t)( (4u /*size*/ & 0x7FFu) << 0 ) ) );
-        CHECK_RETURN(cy_spi_transfer(whd_driver->bus_priv->spi_obj, NULL, NULL, init_data, (size_t *)&transfer_size,
+        CHECK_RETURN(cyhal_spi_transfer(whd_driver->bus_priv->spi_obj, NULL, 0, init_data, transfer_size,
                                      0) );
         loop_count++;
     } while ( (NULL == memchr(&init_data[4], SPI_READ_TEST_REG_LSB, (size_t)8) ) &&
@@ -823,7 +833,7 @@ whd_result_t whd_bus_spi_transfer_bytes(whd_driver_t whd_driver, whd_bus_transfe
     uint16_t newsize;
     whd_bus_gspi_header_t *gspi_header =
         (whd_bus_gspi_header_t *)( (char *)packet->data - sizeof(whd_bus_gspi_header_t) );
-    uint16_t transfer_size;
+    size_t transfer_size;
     *gspi_header =
         ( whd_bus_gspi_header_t )( ( uint32_t )( (whd_bus_gspi_command_mapping[(int)direction] & 0x1) << 31 ) |
                                    ( uint32_t )( (GSPI_INCREMENT_ADDRESS & 0x1) << 30 ) |
@@ -881,18 +891,18 @@ whd_result_t whd_bus_spi_transfer_bytes(whd_driver_t whd_driver, whd_bus_transfe
         add_log_entry(LOG_TX, function, address, (unsigned long)size, (char *)&packet->data);
     }
 
-    transfer_size = (uint16_t)(newsize + sizeof(whd_bus_gspi_header_t) );
+    transfer_size = (size_t)(newsize + sizeof(whd_bus_gspi_header_t) );
 
     /* Send the data */
     if (direction == BUS_READ)
     {
-        result = cy_spi_transfer(whd_driver->bus_priv->spi_obj, NULL, NULL, (uint8_t *)gspi_header,
-                                 (size_t *)&transfer_size, 0);
+        result = cyhal_spi_transfer(whd_driver->bus_priv->spi_obj, NULL, 0, (uint8_t *)gspi_header,
+                                 transfer_size, 0);
     }
     else
     {
-        result = cy_spi_transfer(whd_driver->bus_priv->spi_obj, (uint8_t *)gspi_header, (size_t *)&transfer_size, NULL,
-                                 NULL, 0);
+        result = cyhal_spi_transfer(whd_driver->bus_priv->spi_obj, (uint8_t *)gspi_header, transfer_size, NULL,
+                                 0, 0);
     }
 
     if (direction == BUS_READ)
@@ -1016,7 +1026,7 @@ uint32_t whd_bus_spi_get_max_transfer_size(whd_driver_t whd_driver)
     return WHD_BUS_SPI_MAX_BACKPLANE_TRANSFER_SIZE;
 }
 
-void whd_bus_spi_irq_handler(void *handler_arg, cy_spi_irq_event_t event)
+void whd_bus_spi_irq_handler(void *handler_arg, cyhal_spi_irq_event_t event)
 {
     whd_driver_t whd_driver = (whd_driver_t)handler_arg;
 
@@ -1029,11 +1039,11 @@ void whd_bus_spi_irq_handler(void *handler_arg, cy_spi_irq_event_t event)
 
 whd_result_t whd_bus_spi_irq_register(whd_driver_t whd_driver)
 {
-    return cy_spi_register_irq(whd_driver->bus_priv->spi_obj, whd_bus_spi_irq_handler, whd_driver);
+    return cyhal_spi_register_irq(whd_driver->bus_priv->spi_obj, whd_bus_spi_irq_handler, whd_driver);
 }
 
 whd_result_t whd_bus_spi_irq_enable(whd_driver_t whd_driver, whd_bool_t enable)
 {
-    return cy_spi_irq_enable(whd_driver->bus_priv->spi_obj, CY_SPI_TBD, enable);
+    return cyhal_spi_irq_enable(whd_driver->bus_priv->spi_obj, CYHAL_SPI_IRQ_DONE, enable);
 }
 
