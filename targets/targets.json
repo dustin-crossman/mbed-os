@@ -139,7 +139,7 @@
             },
             "sb-rom-size": {
                 "help": "Size in bytes of SB ROM",
-                "value": null,              
+                "value": null,
                 "conflicts": ["target.mbed_rom_size"]
             },
             "sb-ram-start": {
@@ -152,7 +152,7 @@
                 "value": null,
                 "conflicts": ["target.mbed_ram_size"]
             }
-        }        
+        }
     },
     "CM4_UARM": {
         "inherits": ["Target"],
@@ -8157,7 +8157,7 @@
     },
     "MCU_PSOC6": {
         "inherits": ["Target"],
-        "macros": ["MBED_MPU_CUSTOM"],
+        "macros": ["MBED_MPU_CUSTOM", "MBEDTLS_CONFIG_HW_SUPPORT"],
         "default_toolchain": "GCC_ARM",
         "supported_toolchains": ["GCC_ARM", "IAR", "ARMC5"],
         "core": "Cortex-M4F",
@@ -8336,7 +8336,7 @@
             "non-secure-ram-size": "0xDD00",
             "shared-ram-start": "0x0800FD00",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0800FE00", 
+            "public-ram-start": "0x0800FE00",
             "public-ram-size": "0x200",
             "secure-ram-start": "0x08010000",
             "secure-ram-size": "0x10000"
@@ -8361,7 +8361,7 @@
             "non-secure-ram-size": "0xDD00",
             "shared-ram-start": "0x0800FD00",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x0800FE00", 
+            "public-ram-start": "0x0800FE00",
             "public-ram-size": "0x200",
             "secure-ram-start": "0x08010000",
             "secure-ram-size": "0x10000"
