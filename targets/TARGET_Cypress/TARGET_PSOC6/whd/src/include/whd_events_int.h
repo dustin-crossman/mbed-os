@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -28,7 +41,7 @@ extern "C"
  */
 typedef enum
 {
-    WLC_E_NONE = -1,
+    WLC_E_NONE = 0x7FFFFFFE,
     WLC_E_SET_SSID = 0 /** indicates status of set SSID */,
     WLC_E_JOIN = 1,     /** differentiates join IBSS from found (WLC_E_START) IBSS */
     WLC_E_START = 2,     /** STA founded an IBSS or AP started a BSS */
@@ -156,7 +169,6 @@ typedef enum
     WLC_E_RRM = 141,     /* RRM Event */
     WLC_E_ULP = 146,     /* ULP entry event */
     WLC_E_LAST = 147,     /** highest val + 1 for range checking */
-    WLC_E_FORCE_32_BIT = 0x7FFFFFFE     /** Force enum to be stored in 32 bit variable */
 } whd_event_num_t;
 
 #define WLC_SUP_STATUS_OFFSET      (256)

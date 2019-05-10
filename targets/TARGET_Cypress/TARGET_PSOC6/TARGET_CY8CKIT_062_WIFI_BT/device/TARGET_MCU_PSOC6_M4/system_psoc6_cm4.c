@@ -32,7 +32,7 @@
 #include "cy_syslib.h"
 #include "cy_wdt.h"
 #include "cycfg.h"
-#include "cy_bsp_cy8ckit_062_wifi_bt.h"
+#include "cy_result.h"
 
 #if !defined(CY_IPC_DEFAULT_CFG_DISABLE)
     #include "cy_ipc_sema.h"
@@ -299,7 +299,7 @@ void mbed_sdk_init(void)
 #endif
 
     /* Set up the device based on configurator selections */
-    init_cycfg_all();
+    cybsp_init();
 
     /* Enable global interrupts */
     __enable_irq();
@@ -314,9 +314,10 @@ void mbed_sdk_init(void)
 * Used here to initialize common parts of the Cypress libraries.
 *
 *******************************************************************************/
+extern cy_rslt_t cybsp_wifi_init(void);
 void mbed_main(void)
 {
-	cy_board_init();
+	cybsp_wifi_init();
 }
 
 /*******************************************************************************
