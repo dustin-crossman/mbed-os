@@ -60,9 +60,13 @@ cy_rslt_t cy_resource_get_block_count(const cy_resource_handle_t *handle, uint32
     uint32_t block_size;
     uint32_t total_size = handle->size;
     cy_rslt_t rslt = cy_resource_get_block_size(handle, &block_size);
-    if (rslt == CY_RSLT_SUCCESS)
+    if (rslt == CY_RSLT_SUCCESS && block_size > 0)
     {
         *blocks = (total_size + block_size - 1) / block_size;
+    }
+    else
+    {
+        *blocks = 0;
     }
     return rslt;
 }
@@ -86,12 +90,13 @@ cy_rslt_t cy_resource_read(const cy_resource_handle_t *handle, uint32_t blockno,
     {
         case CY_RESOURCE_IN_MEMORY:
             CY_ASSERT(0 == blockno);
-            memcpy(buffer, handle->val.mem_data, *size);
+            memcpy(*buffer, handle->val.mem_data, *size);
             return CY_RSLT_SUCCESS;
         case CY_RESOURCE_IN_FILESYSTEM:
         case CY_RESOURCE_IN_EXTERNAL_STORAGE:
             //TODO: implement
         default:
+            free(p);
             CY_ASSERT(false);
             *size = 0;
             return CY_RSLT_RSC_ERROR_UNSUPPORTED;

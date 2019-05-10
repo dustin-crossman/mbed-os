@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -124,6 +137,24 @@ extern uint32_t whd_wifi_set_down(whd_interface_t ifp);
  * @param status      : Status of scan process
  */
 typedef void (*whd_scan_result_callback_t)(whd_scan_result_t **result_ptr, void *user_data, whd_scan_status_t status);
+
+/** Initiates a scan to search for 802.11 networks.
+ * This functions returns the scan results with limited sets of parameter in a buffer provided by the caller.
+ * It is also a blocking call.
+ * It is an simplified version of the whd_wifi_scan()
+ *
+ *  @param   ifp                      : Pointer to handle instance of whd interface
+ *  @param   scan_result              : pointer to user requested records buffer.
+ *  @param   count                    : No of records user is interested in. If 0 return the total record count.
+ *
+ *  @note : When scanning specific channels, devices with a strong signal strength on nearby channels may be detected
+ *
+ *  @return record count or Error code
+ */
+extern uint32_t whd_wifi_scan_synch(whd_interface_t ifp,
+        /*@null@*/ whd_sync_scan_result_t *scan_result,
+        uint32_t count
+        );
 
 /** Initiates a scan to search for 802.11 networks.
  *
@@ -660,18 +691,6 @@ extern uint32_t whd_wifi_print_whd_log(whd_driver_t whd_drv);
  * @return WHD_SUCCESS or Error code
  */
 extern uint32_t whd_network_get_ifidx_from_ifp(whd_interface_t ifp, uint8_t *ifidx);
-
-/** Retrieves the interface pointer from ifidx
- *
- *  ifidx is a unique value and be used to identify a instance of tcp/ip stack
- *  This API can be used to find the ifp after receiving event whd_event_header_t
- *
- *  @param  ifp          : Pointer to the whd_interface_t
- *  @param  ifidx        : ifidx received in whd_event_header_t or obtained by calling whd_network_get_ifidx_from_ifp
- *
- *  @return WHD_SUCCESS or Error code
- */
-extern uint32_t whd_network_get_ifp_from_ifidx(whd_interface_t *ifp, uint8_t ifidx);
 
 /** Retrieves the bsscfgidx from interface pointer.
  *

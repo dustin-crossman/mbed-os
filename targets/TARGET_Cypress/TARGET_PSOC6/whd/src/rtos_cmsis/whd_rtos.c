@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -115,7 +128,7 @@ whd_result_t whd_rtos_join_thread(whd_thread_type_t *thread)
  */
 whd_result_t whd_rtos_init_semaphore(/*@out@*/ whd_semaphore_type_t *semaphore)   /*@modifies *semaphore@*/
 {
-    *semaphore = osSemaphoreNew(1, 0, NULL);
+    *semaphore = osSemaphoreNew(1, 1, NULL);
     if (*semaphore == NULL)
     {
         WPRINT_WHD_ERROR( (" semaphore init failed \n") );
@@ -163,12 +176,12 @@ whd_result_t whd_rtos_get_semaphore(whd_semaphore_type_t *semaphore, uint32_t ti
     }
     else if (result == osErrorTimeout)
     {
-        WPRINT_WHD_INFO( ("semaphore time out ") );
+        WPRINT_WHD_ERROR( ("%s semaphore time out\n", __func__) );
         return WHD_TIMEOUT;
     }
     else if (result == osErrorResource)
     {
-        WPRINT_WHD_ERROR( ("semaphore resource error ") );
+        WPRINT_WHD_ERROR( ("%s semaphore resource error\n", __func__) );
         return WHD_WAIT_ABORTED;
     }
     return WHD_SEMAPHORE_ERROR;
@@ -204,10 +217,11 @@ whd_result_t whd_rtos_set_semaphore(whd_semaphore_type_t *semaphore, whd_bool_t 
 
     result = osSemaphoreRelease(*semaphore);
 
-    if ((result == osOK) || (result == osErrorResource))
+    if ( (result == osOK) || (result == osErrorResource) )
     {
         return WHD_SUCCESS;
     }
+
     else if (result == osErrorParameter)
     {
         WPRINT_WHD_ERROR( ("semaphore set osErrorParameter \n") );
@@ -252,7 +266,12 @@ whd_result_t whd_rtos_deinit_semaphore(whd_semaphore_type_t *semaphore)
  */
 whd_time_t whd_rtos_get_time(void)    /*@modifies internalState@*/
 {
-    return osKernelGetSysTimerCount();
+    /* Get Number of ticks per second */
+    uint32_t tick_freq = osKernelGetTickFreq();
+
+    /* Convert ticks count to time in milliseconds */
+    return (osKernelGetTickCount() * (1000/tick_freq));
+
 }
 
 /**

@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -11,7 +24,6 @@
  */
 
 #include "whd_ap.h"
-#include "whd_endian.h"
 #include "whd_chip_constants.h"
 #include "whd_debug.h"
 #include "whd_events_int.h"
@@ -40,19 +52,6 @@ void (*whd_wifi_link_update_callback)(void) = NULL;
 /******************************************************
 *             Function definitions
 ******************************************************/
-void whd_wifi_log_event(whd_driver_t whd_driver, const whd_event_header_t *event_header, const uint8_t *event_data)
-{
-    UNUSED_PARAMETER(event_header);
-    UNUSED_PARAMETER(event_data);
-    WHD_IOCTL_LOG_ADD_EVENT(whd_driver, event_header->event_type, event_header->status,
-                            event_header->reason);
-    WPRINT_WHD_DEBUG( ("%lu: Event ( type, status, reason): %s %s %s\n",
-                       (uint32_t)whd_rtos_get_time( ),
-                       /*whd_interface_to_string( event_header->interface )*/,
-                       whd_event_to_string(event_header->event_type),
-                       whd_status_to_string(event_header->status),
-                       whd_reason_to_string(event_header->reason) ) );
-}
 
 uint32_t whd_wifi_set_mac_address(whd_interface_t ifp, whd_mac_t mac)
 {

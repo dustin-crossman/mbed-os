@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #ifndef INCLUDED_WHD_DEBUG_H
@@ -9,10 +22,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "whd.h"
-
-#ifdef PLATFORM_TRACE
-#include "platform_trace.h"
-#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -26,32 +35,22 @@ extern "C"
 #define WHD_ENABLE_STATS
 /*#define WWD_LOGGING_BUFFER_ENABLE*/
 
-#ifdef DEBUG
-#include "platform_assert.h"
-#define WHD_BREAK_IF_DEBUG( ) WHD_TRIGGER_BREAKPOINT()
+#if defined (__GNUC__)
+#define WHD_TRIGGER_BREAKPOINT( ) do { __asm__ ("bkpt"); } while (0)
+
+#elif defined (__IAR_SYSTEMS_ICC__)
+#define WHD_TRIGGER_BREAKPOINT( ) do { __asm("bkpt 0"); } while (0)
+
 #else
-#define WHD_BREAK_IF_DEBUG( )
-#endif
-
-#ifdef WPRINT_MACRO
-#undef WPRINT_MACRO
-#endif
-
-#ifdef whd_assert
-#undef whd_assert
-#endif
-
-#ifdef whd_minor_assert
-#undef whd_minor_assert
+#define WHD_TRIGGER_BREAKPOINT( )
 #endif
 
 #ifdef WPRINT_ENABLE_ERROR
-#define WPRINT_ERROR(args)                      do { WPRINT_MACRO(args); WICED_ASSERTION_FAIL_ACTION(); } while (0)
-#define whd_assert(error_string, assertion) do { if (!(assertion) ){ WICED_ASSERTION_FAIL_ACTION(); } } while (0)
+#define WPRINT_ERROR(args)                      do { WPRINT_MACRO(args); } while (0)
+#define whd_assert(error_string, assertion) do { if (!(assertion) ){ WHD_TRIGGER_BREAKPOINT(); } } while (0)
 #define whd_minor_assert(error_string, \
                          assertion)   do { if (!(assertion) ) WPRINT_MACRO( (error_string) ); } while (0)
 #else
-#define WHD_BREAK_IF_DEBUG( )
 #define whd_assert(error_string, assertion)         do { if (!(assertion) ) WPRINT_MACRO( (error_string) ); } while (0)
 #define whd_minor_assert(error_string, assertion)   do { (void)(assertion); } while (0)
 #endif
@@ -59,8 +58,8 @@ extern "C"
 /******************************************************
 *             Print declarations
 ******************************************************/
-#if defined( WWD_LOGGING_BUFFER_ENABLE )
-#define WPRINT_MACRO(args) do { whd_buffer_printf args; } while(0==1)
+#if defined(WWD_LOGGING_BUFFER_ENABLE)
+#define WPRINT_MACRO(args) do { whd_buffer_printf args; } while (0 == 1)
 #else
 #define WPRINT_MACRO(args) do { printf args;} while (0 == 1)
 #endif
@@ -80,9 +79,9 @@ extern "C"
 #endif
 
 #ifdef WPRINT_ENABLE_WHD_ERROR
-#define WPRINT_WHD_ERROR(args) { WPRINT_MACRO(args); WHD_BREAK_IF_DEBUG(); }
+#define WPRINT_WHD_ERROR(args) WPRINT_MACRO(args);
 #else
-#define WPRINT_WHD_ERROR(args) { WHD_BREAK_IF_DEBUG(); }
+#define WPRINT_WHD_ERROR(args)
 #endif
 
 #ifdef WPRINT_ENABLE_WHD_DATA_LOG
@@ -107,8 +106,8 @@ void whd_print_logbuffer(void);
 
 
 #ifdef WWD_LOGGING_BUFFER_ENABLE
-#define LOGGING_BUFFER_SIZE (4*1024)
-int whd_buffer_printf (const char *format, ...);
+#define LOGGING_BUFFER_SIZE (4 * 1024)
+int whd_buffer_printf(const char *format, ...);
 
 typedef struct
 {

@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -11,21 +24,17 @@
  */
 
 #include <stdlib.h>
-#include "version.h"
-#include "whd_ap.h"
-#include "whd_endian.h"
+#include "whd_version.h"
 #include "whd_chip_constants.h"
 #include "whd_sdpcm.h"
 #include "whd_thread_internal.h"
 #include "whd_debug.h"
 #include "whd_utils.h"
 #include "whd_wifi_api.h"
-#include "whd_wifi_p2p.h"
 #include "whd_buffer_api.h"
 #include "whd_wlioctl.h"
 #include "whd_types.h"
 #include "whd_types_int.h"
-
 
 /******************************************************
 *                   Constants
@@ -55,7 +64,7 @@
 #define JOIN_SECURITY_FLAGS_MASK    (JOIN_SECURITY_COMPLETE | JOIN_EAPOL_KEY_M1_TIMEOUT | JOIN_EAPOL_KEY_M3_TIMEOUT | \
                                      JOIN_EAPOL_KEY_G1_TIMEOUT | JOIN_EAPOL_KEY_FAILURE)
 
-#define DEFAULT_JOIN_ATTEMPT_TIMEOUT     (10000)   /* Overall join attempt timeout in milliseconds. */
+#define DEFAULT_JOIN_ATTEMPT_TIMEOUT     (7000)   /* Overall join attempt timeout in milliseconds. */
 #define DEFAULT_EAPOL_KEY_PACKET_TIMEOUT (2500)   /* Timeout when waiting for EAPOL key packet M1 or M3 in milliseconds.*/
                                                   /* Some APs may be slow to provide M1 and 1000 ms is not long enough for edge of cell. */
 #ifndef DEFAULT_PM2_SLEEP_RET_TIME
@@ -87,6 +96,14 @@ typedef struct
     int32_t value;
     whd_mac_t mac_address;
 } client_rssi_t;
+
+typedef struct
+{
+    whd_sync_scan_result_t *aps;
+    uint32_t count;
+    uint32_t offset;
+    whd_semaphore_type_t scan_semaphore;
+} whd_scan_userdata_t;
 
 #pragma pack()
 
@@ -275,6 +292,7 @@ static const uint16_t mcs_data_rate_lookup_table[32][2][2] =
     },
 };
 
+
 /******************************************************
 *             Static Function prototypes
 ******************************************************/
@@ -346,9 +364,9 @@ uint32_t whd_wifi_set_up(whd_interface_t ifp)
         WPRINT_MACRO( ("WLAN CLM         : %s\r\n", version) );
     }
 
-    // WPRINT_MACRO( ("WHD VERSION      : " WHD_VERSION "\n") );
-    // WPRINT_MACRO( ("WHD BRANCH       : " WHD_BRANCH "\n") );
-    // WPRINT_MACRO( ("WHD COMMIT DATE  : " WHD_DATE "\n") );
+    WPRINT_MACRO( ("WHD VERSION      : " WHD_VERSION "\n") );
+    WPRINT_MACRO( ("WHD BRANCH       : " WHD_BRANCH "\n") );
+    WPRINT_MACRO( ("WHD COMMIT DATE  : " WHD_DATE "\n") );
 
     /* Update wlan status */
     whd_driver->internal_info.whd_wlan_status.state = WLAN_UP;
@@ -545,15 +563,6 @@ static void *whd_wifi_join_events_handler(whd_interface_t ifp, const whd_event_h
 
     UNUSED_PARAMETER(event_data);
 
-#if 0
-    if ( ( (uint32_t)event_header->interface != WHD_STA_INTERFACE ) &&
-         ( (uint32_t)event_header->interface != WHD_P2P_INTERFACE ) )
-    {
-        // WPRINT_WHD_ERROR(("%s: Bad event header interface, 0x%x\n", __FUNCTION__, event_header->interface));
-        return handler_user_data;
-    }
-#endif
-
     if (event_header->bsscfgidx >= WHD_INTERFACE_MAX)
     {
         WPRINT_WHD_DEBUG( ("%s: event_header: Bad interface\n", __FUNCTION__) );
@@ -598,7 +607,7 @@ static void *whd_wifi_join_events_handler(whd_interface_t ifp, const whd_event_h
                     }
                     else
                     {
-                        WPRINT_WHD_DEBUG( ("Unsuccessful supplicant event; status=0x%x\n", event_header->status) );
+                        WPRINT_WHD_DEBUG( ("Unsuccessful supplicant event; status=0x%lu\n", event_header->status) );
                         /* Unknown failure during EAPOL key handshake */
                         whd_driver->internal_info.whd_join_status[event_header->bsscfgidx] |= JOIN_EAPOL_KEY_FAILURE;
                     }
@@ -661,7 +670,7 @@ static void *whd_wifi_join_events_handler(whd_interface_t ifp, const whd_event_h
             {
                 wl_chan_switch_t *wl_csa = (wl_chan_switch_t *)event_data;
                 UNUSED_PARAMETER(wl_csa);
-                WPRINT_WHD_INFO( ("CSA event => chan %d\n", wl_csa->chspec & 0xff) );
+                WPRINT_WHD_INFO( ("CSA event => chan %d\n", (dtoh16(wl_csa->chspec) & 0xff) ) );
             }
             break;
 
@@ -801,7 +810,6 @@ static void *whd_wifi_join_events_handler(whd_interface_t ifp, const whd_event_h
         case WLC_E_PFN_SCAN_COMPLETE:
         case WLC_E_RMC_EVENT:
         case WLC_E_DPSTA_INTF_IND:
-        case WLC_E_FORCE_32_BIT:
         case WLC_E_ULP:
         case WLC_E_LAST:
         default:
@@ -1143,7 +1151,7 @@ static void whd_wifi_active_join_deinit(whd_interface_t ifp, whd_semaphore_type_
 
     if (WHD_SUCCESS != result)
     {
-        WPRINT_WHD_INFO( ("Failed join (err %d)\n", result) );
+        WPRINT_WHD_INFO( ("Failed join (err %lu)\n", result) );
     }
 
     val = whd_rtos_set_semaphore(&whd_driver->internal_info.active_join_mutex, WHD_FALSE);
@@ -1178,7 +1186,7 @@ static uint32_t whd_wifi_join_wait_for_complete(whd_interface_t ifp, whd_semapho
     if (result != WHD_SUCCESS)
     {
         CHECK_RETURN(whd_wifi_leave(ifp) );
-        WPRINT_WHD_INFO( ("%s: not ready to transceive (err %d); left network\n", __func__, result) );
+        WPRINT_WHD_INFO( ("%s: not ready to transceive (err %lu); left network\n", __func__, result) );
     }
 
     return result;
@@ -1248,13 +1256,6 @@ uint32_t whd_wifi_join_specific(whd_interface_t ifp, const whd_scan_result_t *ap
     /* Keep WLAN awake while joining */
     WHD_WLAN_KEEP_AWAKE(whd_driver);
 
-/*    if ( whd_wifi_set_block_ack_window_size( ifp ) != WHD_SUCCESS )
-    {
-        WHD_WLAN_LET_SLEEP( );
-        WPRINT_WHD_INFO( ( "%s: ba set failed\n", __FUNCTION__ ) );
-        return WHD_SET_BLOCK_ACK_WINDOW_FAIL;
-    }*/
-
     if (ap->bss_type == WHD_BSS_TYPE_ADHOC)
     {
         security |= IBSS_ENABLED;
@@ -1322,7 +1323,7 @@ uint32_t whd_wifi_join_specific(whd_interface_t ifp, const whd_scan_result_t *ap
 
         result = whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, 0);
 
-        WPRINT_WHD_INFO( ("%s: set_ssid result (err %d); left network\n", __func__, result) );
+        WPRINT_WHD_INFO( ("%s: set_ssid result (err %lu); left network\n", __func__, result) );
 
         /* Some firmware, e.g. for 4390, does not support the join IOVAR, so use the older IOCTL call instead */
         if (result == WHD_WLAN_UNSUPPORTED)
@@ -1362,12 +1363,12 @@ uint32_t whd_wifi_join_specific(whd_interface_t ifp, const whd_scan_result_t *ap
         }
         else
         {
-            WPRINT_WHD_INFO( ("%s:3 not ready to transceive (err %d); left network\n", __func__, result) );
+            WPRINT_WHD_INFO( ("%s:3 not ready to transceive (err %lu); left network\n", __func__, result) );
         }
     }
     else
     {
-        WPRINT_WHD_INFO( ("%s: active join init failed: (%d)\n", __FUNCTION__, result) );
+        WPRINT_WHD_INFO( ("%s: active join init failed: (%lu)\n", __FUNCTION__, result) );
     }
     /* clean up from the join attempt */
     whd_wifi_active_join_deinit(ifp, &join_semaphore, result);
@@ -1391,18 +1392,9 @@ uint32_t whd_wifi_join(whd_interface_t ifp, const whd_ssid_t *ssid, whd_security
         WPRINT_WHD_ERROR( ("%s: failure: SSID too long\n", __func__) );
         return WHD_WLAN_BADSSIDLEN;
     }
-
     /* Keep WLAN awake while joining */
     WHD_WLAN_KEEP_AWAKE(whd_driver);
     ifp->role = WHD_STA_ROLE;
-/*
-    if ( whd_wifi_set_block_ack_window_size( ifp ) != WHD_SUCCESS )
-    {
-        WPRINT_WHD_ERROR( ( "%s: failed to set ba win\n", __func__ ) );
-        WHD_WLAN_LET_SLEEP( );
-        return WHD_SET_BLOCK_ACK_WINDOW_FAIL;
-    }
- */
 
     CHECK_RETURN(whd_rtos_init_semaphore(&join_sema) );
     result = whd_wifi_active_join_init(ifp, auth_type, security_key, key_length, &join_sema);
@@ -1427,7 +1419,6 @@ uint32_t whd_wifi_join(whd_interface_t ifp, const whd_ssid_t *ssid, whd_security
     whd_wifi_active_join_deinit(ifp, &join_sema, result);
 
     CHECK_RETURN(result);
-
     return WHD_SUCCESS;
 }
 
@@ -1449,7 +1440,7 @@ uint32_t whd_wifi_leave(whd_interface_t ifp)
 
     if (result != WHD_SUCCESS)
     {
-        WPRINT_WHD_DEBUG( ("whd_sdpcm_send_ioctl(WLC_DISASSOC) failed:%d\r\n", result) );
+        WPRINT_WHD_DEBUG( ("whd_sdpcm_send_ioctl(WLC_DISASSOC) failed:%lu\r\n", result) );
     }
 
     whd_driver->internal_info.whd_join_status[ifp->bsscfgidx] = 0;
@@ -1490,59 +1481,10 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
     uint32_t count_tmp = 0;
     uint16_t temp16;
     uint16_t bss_count;
-    wl_pfn_scanresult_t *pfn_result = NULL;
-    wl_pfn_net_info_t *pfn_net_info = NULL;
-    wl_pfn_subnet_info_t *pfn_subnet = NULL;
     whd_driver_t whd_driver = ifp->whd_driver;
 
     if (whd_driver->internal_info.scan_result_callback == NULL)
     {
-        return handler_user_data;
-    }
-
-    /* process the pfn net found */
-    if (event_header->event_type == WLC_E_PFN_NET_FOUND)
-    {
-        if (whd_driver->internal_info.whd_scan_result_ptr != NULL)
-        {
-            record = (whd_scan_result_t *)(*whd_driver->internal_info.whd_scan_result_ptr);
-            if (record == NULL)
-            {
-                whd_driver->internal_info.scan_result_callback( (whd_scan_result_t **)event_data, handler_user_data,
-                                                                WHD_SCAN_INCOMPLETE );
-                return handler_user_data;
-            }
-
-            pfn_result = (wl_pfn_scanresult_t *)event_data;
-            pfn_subnet = &pfn_result->netinfo.pfnsubnet;
-            pfn_net_info = &pfn_result->netinfo;
-
-            /* Firmware needs to be patched to allow returning the bss info in the result,
-               if we want full scan results from PNO.
-               As the supported use case doesn't require that,
-               leaving as-is to reduce memory usage here and in FW.
-             */
-            record->SSID.length = pfn_subnet->SSID_len;
-            memset(record->SSID.value, 0, sizeof(record->SSID.value) );
-            memcpy(record->SSID.value, pfn_subnet->SSID, pfn_subnet->SSID_len);
-            memcpy(record->BSSID.octet, pfn_subnet->BSSID.octet, sizeof(record->BSSID.octet) );
-            record->signal_strength = pfn_net_info->RSSI;
-            record->bss_type = WHD_BSS_TYPE_INFRASTRUCTURE;
-            record->channel = pfn_subnet->channel;
-            record->band =
-                (whd_channel_to_wl_band(whd_driver,
-                                        record->channel) ==
-                 GET_C_VAR(whd_driver, CHANSPEC_BAND_2G) ) ? WHD_802_11_BAND_2_4GHZ : WHD_802_11_BAND_5GHZ;
-
-            /* For PNO, the user has already specified security to look for; whd layer will update this from recorded data */
-            record->security = WHD_SECURITY_UNKNOWN;
-        }
-
-        /* event header status checks don't make sense for pno events
-         * Also, firmware isn't passing up valid data in the bss_info field, so filled out and now return what we have
-         */
-        whd_driver->internal_info.scan_result_callback(whd_driver->internal_info.whd_scan_result_ptr, handler_user_data,
-                                                       WHD_SCAN_INCOMPLETE);
         return handler_user_data;
     }
 
@@ -1567,9 +1509,9 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
 
     eresult = (wl_escan_result_t *)event_data;
     bss_info = &eresult->bss_info[0];
-    bss_count = eresult->bss_count;
+    bss_count = dtoh16(eresult->bss_count);
 
-    version = WHD_READ_32(&bss_info->version);
+    version = dtoh32(WHD_READ_32(&bss_info->version) );
     whd_minor_assert("wl_bss_info_t has wrong version", version == WL_BSS_INFO_VERSION);
 
     if (whd_driver->internal_info.whd_scan_result_ptr == NULL)
@@ -1596,6 +1538,8 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
     /*
      * check the SSID length and bssinfo ie offset for buffer overflow
      */
+    bss_info->ie_offset = dtoh16(bss_info->ie_offset);
+    bss_info->ie_length = dtoh32(bss_info->ie_length);
     if ( (bss_info->SSID_len > sizeof(bss_info->SSID) ) || (bss_info->ie_offset < sizeof(wl_bss_info_t) ) ||
          (bss_info->ie_offset > (sizeof(wl_bss_info_t) + bss_info->ie_length) ) )
     {
@@ -1630,7 +1574,7 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
     memcpy( (void *)record->BSSID.octet, (const void *)bss_info->BSSID.octet, sizeof(bss_info->BSSID.octet) );
 
     /* Copy the RSSI into the output record structure */
-    record->signal_strength = ( int16_t )(WHD_READ_16(&bss_info->RSSI) );
+    record->signal_strength = ( int16_t )dtoh16( (WHD_READ_16(&bss_info->RSSI) ) );
 
     /* Find maximum data rate and put it in the output record structure */
     record->max_data_rate = 0;
@@ -1663,6 +1607,8 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
         }
     }
 
+    bss_info->capability = dtoh16(bss_info->capability);
+
     /* Write the BSS type into the output record structure */
     record->bss_type =
         ( (bss_info->capability & DOT11_CAP_ESS) !=
@@ -1677,6 +1623,9 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
     cp = (whd_tlv8_header_t *)( ( (uint8_t *)bss_info ) + ie_offset );
     len = WHD_READ_32(&bss_info->ie_length);
     bss_info_length = WHD_READ_32(&bss_info->length);
+
+    record->ie_ptr = (uint8_t *)cp;
+    record->ie_len = len;
 
     /* Validate the length of the IE section */
     if ( (ie_offset > bss_info_length) || (len > bss_info_length - ie_offset) )
@@ -1724,7 +1673,7 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
         akm_suites = (akm_suite_portion_t *)&(rsnie->pairwise_suite_list[rsnie->pairwise_suite_count]);
         for (a = 0; a < akm_suites->akm_suite_count; ++a)
         {
-            uint32_t akm_suite_list_item = NTOH32(akm_suites->akm_suite_list[a]) & 0xFF;
+            uint32_t akm_suite_list_item = ntoh32(akm_suites->akm_suite_list[a]) & 0xFF;
             if (akm_suite_list_item == (uint32_t)WHD_AKM_PSK)
             {
                 record->security |= WPA2_SECURITY;
@@ -1748,7 +1697,7 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
             }
         }
 
-        group_key_suite = NTOH32(rsnie->group_key_suite) & 0xFF;
+        group_key_suite = ntoh32(rsnie->group_key_suite) & 0xFF;
         /* Check the RSN contents to see if there are any references to TKIP cipher (2) in the group key or pairwise keys, */
         /* If so it must be mixed mode. */
         if (group_key_suite == (uint32_t)WHD_CIPHER_TKIP)
@@ -1762,7 +1711,7 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
 
         for (a = 0; a < rsnie->pairwise_suite_count; ++a)
         {
-            uint32_t pairwise_suite_list_item = NTOH32(rsnie->pairwise_suite_list[a]) & 0xFF;
+            uint32_t pairwise_suite_list_item = ntoh32(rsnie->pairwise_suite_list[a]) & 0xFF;
             if (pairwise_suite_list_item == (uint32_t)WHD_CIPHER_TKIP)
             {
                 record->security |= TKIP_ENABLED;
@@ -1784,7 +1733,7 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
         akm_suite_portion_t *akm_suites;
 
         record->security = (whd_security_t)WPA_SECURITY;
-        group_key_suite = NTOH32(wpaie->multicast_suite) & 0xFF;
+        group_key_suite = ntoh32(wpaie->multicast_suite) & 0xFF;
         if (group_key_suite == (uint32_t)WHD_CIPHER_TKIP)
         {
             record->security |= TKIP_ENABLED;
@@ -1797,7 +1746,7 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
         akm_suites = (akm_suite_portion_t *)&(wpaie->unicast_suite_list[wpaie->unicast_suite_count]);
         for (a = 0; a < akm_suites->akm_suite_count; ++a)
         {
-            uint32_t akm_suite_list_item = NTOH32(akm_suites->akm_suite_list[a]) & 0xFF;
+            uint32_t akm_suite_list_item = ntoh32(akm_suites->akm_suite_list[a]) & 0xFF;
             if (akm_suite_list_item == (uint32_t)WHD_AKM_8021X)
             {
                 record->security |= ENTERPRISE_ENABLED;
@@ -1855,7 +1804,7 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
     }
 
     /* Get the channel for pre-N and control channel for n/HT or later */
-    chanspec = WHD_READ_16(&bss_info->chanspec);
+    chanspec = dtoh16(WHD_READ_16(&bss_info->chanspec) );
     if (bss_info->n_cap)
     {
         /* Check control channel first.The channel that chanspec reports is the center frequency which might not be the same as
@@ -1892,6 +1841,129 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
     }
 
     return handler_user_data;
+}
+
+static void whd_scan_count_handler(whd_scan_result_t **result_ptr, void *user_data, whd_scan_status_t status)
+{
+    uint32_t result;
+    whd_scan_userdata_t *scan_userdata = (whd_scan_userdata_t *)user_data;
+
+    /* finished scan, either succesfully or through an abort */
+    if (status != WHD_SCAN_INCOMPLETE)
+    {
+        result = whd_rtos_set_semaphore(&scan_userdata->scan_semaphore, WHD_FALSE);
+        if (result != WHD_SUCCESS)
+            WPRINT_WHD_ERROR( ("Set semaphore failed in %s at %d \n", __func__, __LINE__) );
+        return;
+    }
+
+    /* just count the available networks */
+    scan_userdata->offset += 1;
+
+    memset(*result_ptr, 0, sizeof(whd_scan_result_t) );
+    return;
+}
+
+static void whd_scan_result_handler(whd_scan_result_t **result_ptr, void *user_data, whd_scan_status_t status)
+{
+    uint32_t result;
+    whd_sync_scan_result_t *record;
+    whd_scan_userdata_t *scan_userdata = (whd_scan_userdata_t *)user_data;
+    whd_scan_result_t *current_result = (whd_scan_result_t *)(*result_ptr);
+
+    /* finished scan, either succesfully or through an abort */
+    if (status != WHD_SCAN_INCOMPLETE)
+    {
+        result =  whd_rtos_set_semaphore(&scan_userdata->scan_semaphore, WHD_FALSE);
+        if (result != WHD_SUCCESS)
+            WPRINT_WHD_ERROR( ("Set semaphore failed in %s at %d \n", __func__, __LINE__) );
+        return;
+    }
+
+    /* can't really keep anymore scan results */
+    if (scan_userdata->offset == scan_userdata->count)
+    {
+        /*Offset and the count requested is reached. return with out saving the record details */
+        memset(*result_ptr, 0, sizeof(whd_scan_result_t) );
+        return;
+    }
+
+    /* Safe to access *whd_scan_result_ptr, as whd_scan_result_ptr == NULL case is handled above */
+    record = (whd_sync_scan_result_t *)(&scan_userdata->aps[scan_userdata->offset]);
+
+    /* Copy the SSID into the output record structure */
+    record->SSID.length = current_result->SSID.length;
+    memset(record->SSID.value, 0, sizeof(record->SSID.value) );
+    memcpy(record->SSID.value, current_result->SSID.value, record->SSID.length);
+
+    /* Copy the BSSID into the output record structure */
+    memcpy( (void *)record->BSSID.octet, (const void *)current_result->BSSID.octet,
+            sizeof(current_result->BSSID.octet) );
+
+    record->security = current_result->security;
+    record->signal_strength = current_result->signal_strength;
+    record->channel = current_result->channel;
+
+    scan_userdata->offset += 1;
+    memset(*result_ptr, 0, sizeof(whd_scan_result_t) );
+    return;
+}
+
+uint32_t whd_wifi_scan_synch(whd_interface_t ifp,
+                             /*@null@*/ whd_sync_scan_result_t *scan_result,
+                             uint32_t count
+                             )
+{
+    uint32_t result;
+    whd_scan_result_t *scan_result_ptr;
+    whd_scan_userdata_t scan_userdata;
+    scan_userdata.count = count;
+    scan_userdata.aps = scan_result;
+    scan_userdata.offset = 0;
+
+    CHECK_RETURN(whd_rtos_init_semaphore(&scan_userdata.scan_semaphore) );
+
+    whd_scan_result_callback_t handler = (count == 0)
+                                         ? whd_scan_count_handler : whd_scan_result_handler;
+
+    scan_result_ptr = (whd_scan_result_t *)malloc(sizeof(whd_scan_result_t) );
+    if (scan_result_ptr == NULL)
+    {
+        goto error;
+    }
+    memset(scan_result_ptr, 0, sizeof(whd_scan_result_t) );
+
+    if (whd_wifi_scan(ifp, WHD_SCAN_TYPE_ACTIVE, WHD_BSS_TYPE_ANY, NULL, NULL, NULL, NULL,
+                      handler, (whd_scan_result_t **)&scan_result_ptr, &scan_userdata) != WHD_SUCCESS)
+    {
+        WPRINT_WHD_INFO( ("Failed scan \n") );
+        goto error;
+    }
+
+    result = whd_rtos_get_semaphore(&scan_userdata.scan_semaphore, NEVER_TIMEOUT, WHD_FALSE);
+    whd_assert("Get semaphore failed", (result == WHD_SUCCESS) || (result == WHD_TIMEOUT) );
+
+    result = whd_rtos_deinit_semaphore(&scan_userdata.scan_semaphore);
+    if (WHD_SUCCESS != result)
+    {
+        WPRINT_WHD_INFO( ("Failed join (err %d)\n", result) );
+    }
+    if (scan_result_ptr != NULL)
+    {
+        free(scan_result_ptr);
+        scan_result_ptr = NULL;
+    }
+    return scan_userdata.offset;
+
+
+error:
+    if (scan_result_ptr != NULL)
+    {
+        free(scan_result_ptr);
+        scan_result_ptr = NULL;
+    }
+
+    return WHD_MALLOC_FAILURE;
 }
 
 /*
@@ -1986,7 +2058,7 @@ uint32_t whd_wifi_scan(whd_interface_t ifp,
         {
             scan_params->params.channel_list[i] = htod16(CH20MHZ_CHSPEC(optional_channel_list[i]) );
         }
-        scan_params->params.channel_num = htod32( (int32_t)channel_list_size );
+        scan_params->params.channel_num = (int32_t)htod32(channel_list_size);
     }
 
     whd_driver->internal_info.scan_result_callback = callback;
@@ -1996,7 +2068,6 @@ uint32_t whd_wifi_scan(whd_interface_t ifp,
 
     CHECK_RETURN(whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, 0) );
 
-    /* Return the success of the IOCTL */
     return WHD_SUCCESS;
 }
 
@@ -2476,10 +2547,6 @@ uint32_t whd_wifi_is_ready_to_transceive(whd_interface_t ifp)
 {
     whd_driver_t whd_driver = ifp->whd_driver;
 
-#if 0
-    /* Handle Splint bug *//*@-noeffect@*/ (void)whd_wifi_ap_is_up; /*@+noeffect@*/
-#endif
-
     switch (ifp->role)
     {
         case WHD_AP_ROLE:
@@ -2796,15 +2863,10 @@ uint32_t whd_network_get_ifidx_from_ifp(whd_interface_t ifp, uint8_t *ifidx)
     return WHD_SUCCESS;
 }
 
-uint32_t whd_network_get_ifp_from_ifidx(whd_interface_t *ifp, uint8_t ifidx)
-{
-    //To be implemented
-    return WHD_SUCCESS;
-}
-
 uint32_t whd_network_get_bsscfgidx_from_ifp(whd_interface_t ifp, uint8_t *bsscfgidx)
 {
-    //To be implemented
+    *bsscfgidx = ifp->bsscfgidx;
+
     return WHD_SUCCESS;
 }
 

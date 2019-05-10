@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -348,7 +361,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
         /* Change the AP MAC address to be different from STA MAC */
         if ( (result = whd_wifi_get_mac_address(prim_ifp, &ifp->mac_addr) ) != WHD_SUCCESS )
         {
-            WPRINT_WHD_INFO ( (" Get STA MAC address failed result=%d\n", result) );
+            WPRINT_WHD_INFO ( (" Get STA MAC address failed result=%lu\n", result) );
             return result;
         }
         else
@@ -359,7 +372,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
 
     if ( (result = whd_wifi_set_mac_address(ifp, ifp->mac_addr) ) != WHD_SUCCESS )
     {
-        WPRINT_WHD_INFO ( (" Set AP MAC address failed result=%d\n", result) );
+        WPRINT_WHD_INFO ( (" Set AP MAC address failed result=%lu\n", result) );
         return result;
     }
 
@@ -605,7 +618,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
     }
     else if (result != WHD_SUCCESS)
     {
-        WPRINT_WHD_INFO( ("configure maxassoc : ioctl failed!( err code : %d )\n", result) );
+        WPRINT_WHD_INFO( ("configure maxassoc : ioctl failed!( err code : %lu )\n", result) );
         whd_assert("start_ap: Failed to configure maxassoc\r\n", result == WHD_SUCCESS);
         return result;
     }

@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -125,20 +138,20 @@ whd_result_t whd_process_clm_data(whd_interface_t ifp)
             whd_buffer_t response;
             void *data;
 
-            WPRINT_WHD_DEBUG( ("clmload (%ld byte file) failed with return %d; ", clm_blob_size, ret) );
+            WPRINT_WHD_DEBUG( ("clmload (%ld byte file) failed with return %lu; ", clm_blob_size, ret) );
             data = (int *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, 4, IOVAR_STR_CLMLOAD_STATUS);
             CHECK_IOCTL_BUFFER(data);
             ret_clmload_status = whd_sdpcm_send_iovar(ifp, SDPCM_GET, buffer, &response);
             if (ret_clmload_status != WHD_SUCCESS)
             {
-                WPRINT_WHD_DEBUG( ("clmload_status failed with return %d\n", ret_clmload_status) );
+                WPRINT_WHD_DEBUG( ("clmload_status failed with return %lu\n", ret_clmload_status) );
             }
             else
             {
                 uint8_t *clmload_status = (uint8_t *)whd_buffer_get_current_piece_data_pointer(whd_driver, response);
                 if (clmload_status != NULL)
                 {
-                    WPRINT_WHD_DEBUG( ("clmload_status is %lu\n", *clmload_status) );
+                    WPRINT_WHD_DEBUG( ("clmload_status is %d\n", *clmload_status) );
                     CHECK_RETURN(whd_buffer_release(whd_driver, response, WHD_NETWORK_RX) );
                 }
             }

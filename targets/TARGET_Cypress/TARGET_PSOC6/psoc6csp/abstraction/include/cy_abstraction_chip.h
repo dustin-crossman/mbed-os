@@ -27,4 +27,4 @@
 
 #pragma once
 
-#include "cy_hal.h"
+#include "cyhal.h"

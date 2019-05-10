@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /** @file
@@ -24,7 +37,7 @@
 #include "whd_sdio.h"
 #include "whd_buffer_api.h"
 #include "whd_resource_if.h"
-#include "cy_hal_sdio.h"
+#include "cyhal_sdio.h"
 #include "whd_types_int.h"
 
 
@@ -90,7 +103,7 @@ static whd_result_t whd_bus_sdio_download_firmware(whd_driver_t whd_driver);
 
 static whd_result_t whd_bus_sdio_set_oob_interrupt(whd_driver_t whd_driver, uint8_t gpio_pin_number);
 
-static void whd_bus_sdio_irq_handler(void *handler_arg, cy_sdio_irq_event_t event);
+static void whd_bus_sdio_irq_handler(void *handler_arg, cyhal_sdio_irq_event_t event);
 static whd_result_t whd_bus_sdio_irq_register(whd_driver_t whd_driver);
 static whd_result_t whd_bus_sdio_irq_enable(whd_driver_t whd_driver, whd_bool_t enable);
 
@@ -482,14 +495,14 @@ whd_result_t whd_bus_sdio_init(whd_driver_t whd_driver)
 
     CHECK_RETURN(whd_chip_specific_init(whd_driver) );
     CHECK_RETURN(whd_ensure_wlan_bus_is_up(whd_driver) );
-    cy_sdio_irq_enable(whd_driver->bus_priv->sdio_obj, CY_SDIO_CARD_INTERRUPT, WHD_TRUE);
+    cyhal_sdio_irq_enable(whd_driver->bus_priv->sdio_obj, CYHAL_SDIO_CARD_INTERRUPT, WHD_TRUE);
     UNUSED_PARAMETER(elapsed_time);
     return result;
 }
 
 whd_result_t whd_bus_sdio_deinit(whd_driver_t whd_driver)
 {
-    cy_sdio_irq_enable(whd_driver->bus_priv->sdio_obj, CY_SDIO_CARD_INTERRUPT, WHD_FALSE);
+    cyhal_sdio_irq_enable(whd_driver->bus_priv->sdio_obj, CYHAL_SDIO_CARD_INTERRUPT, WHD_FALSE);
 
     CHECK_RETURN(whd_allow_wlan_bus_to_sleep(whd_driver) );
 
@@ -774,7 +787,7 @@ static whd_result_t whd_bus_sdio_cmd52(whd_driver_t whd_driver, whd_bus_transfer
     arg.cmd52.write_data = value;
 
     WHD_BUS_STATS_INCREMENT_VARIABLE(whd_driver->bus_priv, cmd52);
-    result = cy_sdio_send_cmd(whd_driver->bus_priv->sdio_obj, direction, SDIO_CMD_IO_RW_DIRECT, arg.value,
+    result = cyhal_sdio_send_cmd(whd_driver->bus_priv->sdio_obj, direction, CYHAL_SDIO_CMD_IO_RW_DIRECT, arg.value,
                               &sdio_response);
     WHD_BUS_STATS_CONDITIONAL_INCREMENT_VARIABLE(whd_driver->bus_priv, (result != WHD_SUCCESS), cmd52_fail);
 
@@ -782,7 +795,12 @@ static whd_result_t whd_bus_sdio_cmd52(whd_driver_t whd_driver, whd_bus_transfer
     {
         *response = (uint8_t)(sdio_response & 0x00000000ff);
     }
-    return result;
+
+    if (result == CY_RSLT_SUCCESS)
+        return WHD_SUCCESS;
+    else
+        return WHD_HAL_ERROR;
+
 }
 
 static whd_result_t whd_bus_sdio_cmd53(whd_driver_t whd_driver, whd_bus_transfer_direction_t direction,
@@ -811,11 +829,12 @@ static whd_result_t whd_bus_sdio_cmd53(whd_driver_t whd_driver, whd_bus_transfer
         arg.cmd53.count = (unsigned int)(data_size & 0x1FF);
 
         result =
-            cy_sdio_bulk_transfer(whd_driver->bus_priv->sdio_obj, direction, arg.value,
+            cyhal_sdio_bulk_transfer(whd_driver->bus_priv->sdio_obj, direction, arg.value,
                 (uint32_t *)data, data_size, response);
 
-        if (result != WHD_SUCCESS)
+        if ( result != CY_RSLT_SUCCESS )
         {
+            WPRINT_WHD_ERROR( ("%s:%d cyhal_sdio_bulk_transfer SDIO_BYTE_MODE failed\n", __func__, __LINE__) );
             goto done;
         }
     }
@@ -829,11 +848,12 @@ static whd_result_t whd_bus_sdio_cmd53(whd_driver_t whd_driver, whd_bus_transfer
         arg.cmd53.block_mode = (unsigned int)1;
 
         result =
-            cy_sdio_bulk_transfer(whd_driver->bus_priv->sdio_obj, direction, arg.value,
+            cyhal_sdio_bulk_transfer(whd_driver->bus_priv->sdio_obj, direction, arg.value,
                 (uint32_t *)data, data_size, response);
 
-        if (result != WHD_SUCCESS)
+        if ( result != CY_RSLT_SUCCESS )
         {
+            WPRINT_WHD_ERROR( ("%s:%d cyhal_sdio_bulk_transfer failed\n", __func__, __LINE__) );
             goto done;
         }
     }
@@ -851,7 +871,10 @@ done:
     WHD_BUS_STATS_CONDITIONAL_INCREMENT_VARIABLE(whd_driver->bus_priv,
                                                  ( (result != WHD_SUCCESS) && (direction == BUS_WRITE) ),
                                                  cmd53_write_fail);
-    return result;
+    if (result == CY_RSLT_SUCCESS)
+        return WHD_SUCCESS;
+    else
+        return WHD_HAL_ERROR;
 }
 
 static whd_result_t whd_bus_sdio_download_firmware(whd_driver_t whd_driver)
@@ -1305,12 +1328,12 @@ uint32_t whd_bus_sdio_get_max_transfer_size(whd_driver_t whd_driver)
     return WHD_BUS_SDIO_MAX_BACKPLANE_TRANSFER_SIZE;
 }
 
-void whd_bus_sdio_irq_handler(void *handler_arg, cy_sdio_irq_event_t event)
+void whd_bus_sdio_irq_handler(void *handler_arg, cyhal_sdio_irq_event_t event)
 {
     whd_driver_t whd_driver = (whd_driver_t)handler_arg;
 
-    /* WHD registered only for CY_SDIO_CARD_INTERRUPT */
-    if (event != CY_SDIO_CARD_INTERRUPT)
+    /* WHD registered only for CY_CYHAL_SDIO_CARD_INTERRUPT */
+    if (event != CYHAL_SDIO_CARD_INTERRUPT)
     {
         WPRINT_WHD_ERROR(("Unexpected interrupt event %d\n", event));
 
@@ -1323,11 +1346,11 @@ void whd_bus_sdio_irq_handler(void *handler_arg, cy_sdio_irq_event_t event)
 
 whd_result_t whd_bus_sdio_irq_register(whd_driver_t whd_driver)
 {
-    return cy_sdio_register_irq(whd_driver->bus_priv->sdio_obj, whd_bus_sdio_irq_handler, whd_driver);
+    return cyhal_sdio_register_irq(whd_driver->bus_priv->sdio_obj, whd_bus_sdio_irq_handler, whd_driver);
 }
 
 whd_result_t whd_bus_sdio_irq_enable(whd_driver_t whd_driver, whd_bool_t enable)
 {
-    return cy_sdio_irq_enable(whd_driver->bus_priv->sdio_obj, CY_SDIO_CARD_INTERRUPT, enable);
+    return cyhal_sdio_irq_enable(whd_driver->bus_priv->sdio_obj, CYHAL_SDIO_CARD_INTERRUPT, enable);
 }
 

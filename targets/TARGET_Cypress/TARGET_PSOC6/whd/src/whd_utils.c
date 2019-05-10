@@ -1,5 +1,18 @@
 /*
- * $ Copyright Cypress Semiconductor Apache2 $
+ * Copyright 2019 Cypress Semiconductor Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /**
@@ -11,6 +24,7 @@
 #include "whd_utils.h"
 #include "whd_chip_constants.h"
 #include "whd_endian.h"
+#include "whd_int.h"
 
 #define UNSIGNED_CHAR_TO_CHAR(uch) ( (uch)& 0x7f )
 
@@ -419,22 +433,6 @@ const char *whd_reason_to_string(whd_event_reason_t reason)
     return "Unknown";
 }
 
-const char *whd_interface_to_string(whd_interface_t interface)
-{
-    switch (interface)
-    {
-        CASE_RETURN_STRING(WHD_STA_INTERFACE)
-        CASE_RETURN_STRING(WHD_AP_INTERFACE)
-        CASE_RETURN_STRING(WHD_P2P_INTERFACE)
-        CASE_RETURN_STRING(WHD_ETHERNET_INTERFACE)
-        case WHD_INTERFACE_MAX:
-        case WHD_INTERFACE_FORCE_32_BIT:
-        default:
-            break;
-    }
-    return "Unknown";
-}
-
 char *whd_ether_ntoa(const uint8_t *ea, char *buf, uint8_t buf_len)
 {
     const char hex[] =
@@ -759,106 +757,5 @@ void whd_event_info_to_string(uint32_t cmd, uint16_t flag, uint32_t reason, char
     {
         strncat(ioctl_str, "    WLC_E_SUP_OTHER",  ioctl_str_len);
     }
-}
-
-inline uint16_t swap16(uint16_t val)
-{
-    return SWAP16(val);
-}
-
-inline uint32_t swap32(uint32_t val)
-{
-    return SWAP32(val);
-}
-
-inline uint32_t swap32by16(uint32_t val)
-{
-    return SWAP32BY16(val);
-}
-
-/* Reverse pairs of bytes in a buffer (not for high-performance use) */
-/* buf  - start of buffer of shorts to swap */
-/* len  - byte length of buffer */
-inline void swap16_buf(uint16_t *buf, uint32_t len)
-{
-    len = len / 2;
-
-    while ( (len--) != 0 )
-    {
-        *buf = swap16(*buf);
-        buf++;
-    }
-}
-
-/*
- * Store 16-bit value to unaligned little-endian byte array.
- */
-inline void htol16_ua_store(uint16_t val, uint8_t *bytes)
-{
-    bytes[0] = (uint8_t)(val & 0xff);
-    bytes[1] = (uint8_t)(val >> 8);
-}
-
-/*
- * Store 32-bit value to unaligned little-endian byte array.
- */
-inline void htol32_ua_store(uint32_t val, uint8_t *bytes)
-{
-    bytes[0] = (uint8_t)(val & 0xff);
-    bytes[1] = (uint8_t)( (val >> 8) & 0xff );
-    bytes[2] = (uint8_t)( (val >> 16) & 0xff );
-    bytes[3] = (uint8_t)(val >> 24);
-}
-
-/*
- * Store 16-bit value to unaligned network-(big-)endian byte array.
- */
-inline void hton16_ua_store(uint16_t val, uint8_t *bytes)
-{
-    bytes[0] = (uint8_t)(val >> 8);
-    bytes[1] = (uint8_t)(val & 0xff);
-}
-
-/*
- * Store 32-bit value to unaligned network-(big-)endian byte array.
- */
-inline void hton32_ua_store(uint32_t val, uint8_t *bytes)
-{
-    bytes[0] = (uint8_t)(val >> 24);
-    bytes[1] = (uint8_t)( (val >> 16) & 0xff );
-    bytes[2] = (uint8_t)( (val >> 8) & 0xff );
-    bytes[3] = (uint8_t)(val & 0xff);
-}
-
-/*
- * Load 16-bit value from unaligned little-endian byte array.
- */
-inline uint16_t ltoh16_ua(const void *bytes)
-{
-    return (uint16_t)_LTOH16_UA( (const uint8_t *)bytes );
-}
-
-/*
- * Load 32-bit value from unaligned little-endian byte array.
- */
-inline uint32_t ltoh32_ua(const void *bytes)
-{
-    return (uint32_t)_LTOH32_UA( (const uint8_t *)bytes );
-}
-
-/*
- * Load 16-bit value from unaligned big-(network-)endian byte array.
- */
-inline uint16_t ntoh16_ua(const void *bytes)
-{
-    return (uint16_t)_NTOH16_UA( (const uint8_t *)bytes );
-}
-
-/*
- * Load 32-bit value from unaligned big-(network-)endian byte array.
- */
-inline uint32_t ntoh32_ua(const void *bytes)
-{
-    return (uint32_t)_NTOH32_UA( (const uint8_t *)bytes );
 }
 
