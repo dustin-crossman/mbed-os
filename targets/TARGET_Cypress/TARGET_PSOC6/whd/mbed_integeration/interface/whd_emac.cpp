@@ -27,7 +27,7 @@
 #include "whd_wlioctl.h"
 #include "whd_buffer.h"
 #include "whd_buffer_api.h"
-
+#include "cybsp_api_wifi.h"
 
 WHD_EMAC::WHD_EMAC(whd_interface_role_t role)
     : emac_link_input_cb(NULL),
@@ -93,7 +93,6 @@ void WHD_EMAC::power_down()
     whd_deinit(ifp);
 }
 
-extern "C" whd_driver_t* cybsp_get_wifi_driver(void);
 bool WHD_EMAC::power_up()
 {
 	drvp = *(cybsp_get_wifi_driver());

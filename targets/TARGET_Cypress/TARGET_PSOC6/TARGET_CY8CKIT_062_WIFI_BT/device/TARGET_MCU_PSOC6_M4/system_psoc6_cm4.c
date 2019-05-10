@@ -32,7 +32,7 @@
 #include "cy_syslib.h"
 #include "cy_wdt.h"
 #include "cycfg.h"
-#include "cy_result.h"
+#include "cybsp_api_wifi.h"
 
 #if !defined(CY_IPC_DEFAULT_CFG_DISABLE)
     #include "cy_ipc_sema.h"
@@ -314,7 +314,6 @@ void mbed_sdk_init(void)
 * Used here to initialize common parts of the Cypress libraries.
 *
 *******************************************************************************/
-extern cy_rslt_t cybsp_wifi_init(void);
 void mbed_main(void)
 {
 	cybsp_wifi_init();
