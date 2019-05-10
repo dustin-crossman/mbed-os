@@ -133,8 +133,6 @@ void cy_assert(int expr)
             __disable_irq();
         }
 
-        Cy_SysEnableCM4(CY_BL_CM4_ROM_LOOP_ADDR);
-
         Cy_SRAM_BusyLoop();
     }
 }
@@ -264,6 +262,12 @@ void spm_hal_start_nspe(void)
     bnu_policy.bnu_img_policy.upgrade           = MCUBOOT_POLICY_UPGRADE;
 #endif
 
+    if((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL)
+    {
+        IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
+        BOOT_LOG_INF("TEST MODE");
+        __disable_irq();
+    } 
     BOOT_LOG_INF("Processing available images");
     rc = boot_go(&rsp);
     if (rc != 0)
