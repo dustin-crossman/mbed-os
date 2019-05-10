@@ -28,7 +28,7 @@
 #include "device.h"
 #include "system_psoc6.h"
 #include "cy_device_headers.h"
-#include "psoc6_utils.h"
+#include "cyhal_hwmgr.h"
 #include "cy_syslib.h"
 #include "cy_wdt.h"
 #include "cycfg.h"
@@ -181,7 +181,7 @@ void mbed_sdk_init(void)
 #endif
 
     /* Initialize shared resource manager */
-    cy_srm_initialize();
+    cyhal_hwmgr_init();
 
     /* Initialize system and clocks. */
     /* Placed here as it must be done after proper LIBC initialization. */

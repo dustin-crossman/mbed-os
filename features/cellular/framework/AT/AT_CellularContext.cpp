@@ -687,6 +687,10 @@ nsapi_error_t AT_CellularContext::disconnect()
 {
     tr_info("CellularContext disconnect()");
     if (!_nw || !_is_connected) {
+        if (_new_context_set) {
+            delete_current_context();
+        }
+        _cid = -1;
         return NSAPI_ERROR_NO_CONNECTION;
     }
 
@@ -715,6 +719,11 @@ nsapi_error_t AT_CellularContext::disconnect()
 
     // call device's callback, it will broadcast this to here (cellular_callback)
     _device->cellular_callback(NSAPI_EVENT_CONNECTION_STATUS_CHANGE, NSAPI_STATUS_DISCONNECTED, this);
+
+    if (_new_context_set) {
+        delete_current_context();
+    }
+    _cid = -1;
 
     return _at.unlock_return_error();
 }
@@ -903,6 +912,12 @@ void AT_CellularContext::cellular_callback(nsapi_event_t ev, intptr_t ptr)
         cell_callback_data_t *data = (cell_callback_data_t *)ptr;
         cellular_connection_status_t st = (cellular_connection_status_t)ev;
         _cb_data.error = data->error;
+        _cb_data.final_try = data->final_try;
+        if (data->final_try) {
+            if (_current_op != OP_INVALID) {
+                _semaphore.release();
+            }
+        }
 #if USE_APN_LOOKUP
         if (st == CellularSIMStatusChanged && data->status_data == CellularDevice::SimStateReady &&
                 _cb_data.error == NSAPI_ERROR_OK) {
@@ -924,7 +939,9 @@ void AT_CellularContext::cellular_callback(nsapi_event_t ev, intptr_t ptr)
                     _device->stop();
                     if (_is_blocking) {
                         // operation failed, release semaphore
-                        _semaphore.release();
+                        if (_current_op != OP_INVALID) {
+                            _semaphore.release();
+                        }
                     }
                 }
                 _device->close_information();
@@ -948,8 +965,10 @@ void AT_CellularContext::cellular_callback(nsapi_event_t ev, intptr_t ptr)
         if (_is_blocking) {
             if (_cb_data.error != NSAPI_ERROR_OK) {
                 // operation failed, release semaphore
-                _current_op = OP_INVALID;
-                _semaphore.release();
+                if (_current_op != OP_INVALID) {
+                    _current_op = OP_INVALID;
+                    _semaphore.release();
+                }
             } else {
                 if ((st == CellularDeviceReady && _current_op == OP_DEVICE_READY) ||
                         (st == CellularSIMStatusChanged && _current_op == OP_SIM_READY &&

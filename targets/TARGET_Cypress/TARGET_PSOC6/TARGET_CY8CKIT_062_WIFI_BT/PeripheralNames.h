@@ -106,6 +106,10 @@ typedef enum {
     DAC_0 = (int)CTDAC0_BASE,
 } DACName;
 
+typedef enum {
+    QSPI_0,
+} QSPIName;
+
 #ifdef __cplusplus
 }
 #endif
