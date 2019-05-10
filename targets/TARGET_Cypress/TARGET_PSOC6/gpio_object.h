@@ -36,7 +36,7 @@ typedef struct {
 
 struct gpio_irq_s {
     cyhal_gpio_t pin;
-    void (*handler)(uint32_t, int);
+    void *handler;
     uint32_t id;
     cyhal_gpio_irq_event_t mask;
 };

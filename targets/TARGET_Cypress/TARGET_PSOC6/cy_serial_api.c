@@ -40,14 +40,14 @@ static void serial_handler_internal(void *handler_arg, cyhal_uart_irq_event_t ev
     struct serial_s *ser = cy_serial_get_struct(obj);
 #if DEVICE_SERIAL_ASYNCH
     ser->event_flags = event;
-    void (*async_rx_handler)(void) = ser->async_rx_handler;
+    void (*async_rx_handler)(void) = (void (*)(void))ser->async_rx_handler;
     if (NULL != async_rx_handler && (event & ser->rx_event_mask))
         (*async_rx_handler)();
-    void (*async_tx_handler)(void) = ser->async_tx_handler;
+    void (*async_tx_handler)(void) = (void (*)(void)ser->async_tx_handler;
     if (NULL != async_tx_handler && (event & ser->tx_event_mask))
         (*async_tx_handler)();
 #endif
-    void (*handler)(uint32_t, int) = ser->handler;
+    void (*handler)(uint32_t, int) = (void (*)(uint32_t, int))ser->handler;
     if (NULL != handler)
     {
         if (CYHAL_UART_IRQ_NONE != (event & ser->rx_event_mask))
@@ -124,7 +124,7 @@ void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_b
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SERIAL, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_uart_init");
     serial_set_flow_control(obj, FlowControlNone, orig.pin_rts, orig.pin_cts);
     serial_baud(obj, orig.baud);
-    serial_irq_handler(obj, (void*)orig.handler, orig.handler_arg);
+    serial_irq_handler(obj, (uart_irq_handler)orig.handler, orig.handler_arg);
     ser->rx_event_mask = orig.rx_event_mask;
     ser->tx_event_mask = orig.tx_event_mask;
 }
@@ -134,7 +134,7 @@ void serial_irq_handler(serial_t *obj, uart_irq_handler handler, uint32_t id)
     struct serial_s *ser = cy_serial_get_struct(obj);
     ser->handler_arg = id;
     // The struct uses a different type because objects.h cannot include serial_api.h without creating a cycle
-    ser->handler = (void (*)(uint32_t, int))handler;
+    ser->handler = (void*)handler;
 }
 
 void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
@@ -241,7 +241,7 @@ int serial_tx_asynch(serial_t *obj, const void *tx, size_t tx_length, uint8_t, u
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
     // handler calls serial_irq_handler_asynch
-    ser->async_tx_handler = handler;
+    ser->async_tx_handler = (void*)handler;
     if (CY_RSLT_SUCCESS != cyhal_uart_tx_asynch(&(ser->hal_obj), tx, tx_length))
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SERIAL, MBED_ERROR_CODE_WRITE_FAILED), "serial_tx_asynch");
     return 0;
@@ -251,7 +251,7 @@ void serial_rx_asynch(serial_t *obj, void *rx, size_t rx_length, uint8_t, uint32
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
     // handler calls serial_irq_handler_asynch
-    ser->async_rx_handler = handler;
+    ser->async_rx_handler = (void*)handler;
     if (CY_RSLT_SUCCESS != cyhal_uart_rx_asynch(&(ser->hal_obj), rx, rx_length))
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SERIAL, MBED_ERROR_CODE_WRITE_FAILED), "serial_rx_asynch");
 }
