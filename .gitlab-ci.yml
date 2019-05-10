@@ -7,7 +7,7 @@ before_script:
     - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
 
 # Compile TARGET_PSOC6
-test_mbed_062_crypto:
+.test_mbed_062_crypto:
   stage: test
   tags:
     - MBED_TEST
