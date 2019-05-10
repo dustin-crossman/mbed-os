@@ -15,7 +15,7 @@
 #include "SDIO_HOST.h"
 
 
-#define SEMAPHORE
+//#define SEMAPHORE
 
 
 /*Globals Needed for DMA */
