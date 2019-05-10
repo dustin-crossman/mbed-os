@@ -34,7 +34,7 @@ extern "C" {
 void cy_gpio_irq_handler_impl(void *handler_arg, cyhal_gpio_irq_event_t event)
 {
     gpio_irq_t *obj = (gpio_irq_t *)handler_arg;
-    void (*handler)(uint32_t, int) = obj->handler;
+    void (*handler)(uint32_t, int) = (void (*)(uint32_t, int))obj->handler;
     if (NULL != handler && CYHAL_GPIO_IRQ_NONE != (event & obj->mask))
     {
         gpio_irq_event mbed_event;
@@ -51,7 +51,7 @@ void cy_gpio_irq_handler_impl(void *handler_arg, cyhal_gpio_irq_event_t event)
 int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uint32_t id)
 {
     obj->pin = pin;
-    obj->handler = (void (*)(uint32_t, int))handler;
+    obj->handler = (void*)handler;
     obj->id = id;
     obj->mask = CYHAL_GPIO_IRQ_NONE;
     return pin != NC ? 0 : -1;
