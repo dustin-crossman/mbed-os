@@ -571,7 +571,6 @@ en_sdio_result_t SDIO_GetSemaphoreStatus(bool* status)
         retVal = Ok;
     }
 #endif
-
     return retVal;
 }
 
@@ -595,7 +594,7 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
     /*Store the command and data configurations*/
     stc_sdio_cmd_config_t   stcCmdConfig;
     stc_sdio_data_config_t  stcDataConfig;
-    
+
     /*variable used for holding timeout value*/
 #ifndef SEMAPHORE
     uint32_t    u32Timeout = 0;
