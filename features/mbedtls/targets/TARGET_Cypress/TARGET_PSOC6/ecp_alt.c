@@ -54,6 +54,12 @@
 
 #if defined(MBEDTLS_ECP_ALT)
 
+/* Parameter validation macros based on platform_util.h */
+#define ECP_VALIDATE_RET( cond )    \
+    MBEDTLS_INTERNAL_VALIDATE_RET( cond, MBEDTLS_ERR_ECP_BAD_INPUT_DATA )
+#define ECP_VALIDATE( cond )        \
+    MBEDTLS_INTERNAL_VALIDATE( cond )
+
 #if defined(MBEDTLS_PLATFORM_C)
 #include "mbedtls/platform.h"
 #else
@@ -616,8 +622,30 @@ int mbedtls_ecp_tls_write_point( const mbedtls_ecp_group *grp, const mbedtls_ecp
  */
 int mbedtls_ecp_tls_read_group( mbedtls_ecp_group *grp, const unsigned char **buf, size_t len )
 {
+    int ret;
+    mbedtls_ecp_group_id grp_id;
+    ECP_VALIDATE_RET( grp  != NULL );
+    ECP_VALIDATE_RET( buf  != NULL );
+    ECP_VALIDATE_RET( *buf != NULL );
+
+    if( ( ret = mbedtls_ecp_tls_read_group_id( &grp_id, buf, len ) ) != 0 )
+        return( ret );
+
+    return( mbedtls_ecp_group_load( grp, grp_id ) );
+}
+
+/*
+ * Read a group id from an ECParameters record (RFC 4492) and convert it to
+ * mbedtls_ecp_group_id.
+ */
+int mbedtls_ecp_tls_read_group_id( mbedtls_ecp_group_id *grp,
+                                   const unsigned char **buf, size_t len )
+{
     uint16_t tls_id;
     const mbedtls_ecp_curve_info *curve_info;
+    ECP_VALIDATE_RET( grp  != NULL );
+    ECP_VALIDATE_RET( buf  != NULL );
+    ECP_VALIDATE_RET( *buf != NULL );
 
     /*
      * We expect at least three bytes (see below)
@@ -641,7 +669,9 @@ int mbedtls_ecp_tls_read_group( mbedtls_ecp_group *grp, const unsigned char **bu
     if( ( curve_info = mbedtls_ecp_curve_info_from_tls_id( tls_id ) ) == NULL )
         return( MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE );
 
-    return mbedtls_ecp_group_load( grp, curve_info->grp_id );
+    *grp = curve_info->grp_id;
+
+    return( 0 );
 }
 
 /*

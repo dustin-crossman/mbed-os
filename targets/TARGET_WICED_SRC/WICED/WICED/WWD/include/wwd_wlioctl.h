@@ -887,6 +887,8 @@ typedef struct eventmsgs_ext
 #define IOVAR_STR_BWTE_BWTE_GCI_MASK     "bwte_gci_mask"
 #define IOVAR_STR_BWTE_GCI_SENDMSG       "bwte_gci_sendm"
 
+#define IOVAR_STR_TKO                    "tko"
+
 /* This value derived from the above strings, which appear maxed out in the 20s */
 #define IOVAR_NAME_STR_MAX_SIZE          32
 

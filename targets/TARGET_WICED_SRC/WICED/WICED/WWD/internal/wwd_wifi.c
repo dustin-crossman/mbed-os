@@ -181,6 +181,7 @@ static const wwd_event_num_t rrm_events[]   = { WLC_E_RRM, WLC_E_NONE };
 static uint8_t  wiced_wifi_powersave_mode = NO_POWERSAVE_MODE;
 static uint16_t wiced_wifi_return_to_sleep_delay;
 
+static wiced_bool_t link_status = WICED_FALSE;
 /* Note: monitor_mode_enabled variable is accessed by SDPCM */
 static wiced_bool_t wwd_sdpcm_monitor_mode_enabled = WICED_FALSE;
 
@@ -278,6 +279,7 @@ static            const char*     wwd_interface_to_string      (wwd_interface_t 
 
 extern void wiced_emac_wwd_wifi_link_state_changed(wiced_bool_t state_up);
 
+
 static wwd_result_t wwd_nan_config (wiced_bool_t enable);
 
 /******************************************************
@@ -294,6 +296,7 @@ void wwd_wifi_p2p_set_go_is_up( wiced_bool_t is_up )
     if ( wwd_wifi_p2p_go_is_up != is_up )
     {
         wwd_wifi_p2p_go_is_up = is_up;
+        link_status = is_up;
         wwd_wifi_link_update(is_up);
     }
 }
@@ -1394,7 +1397,8 @@ wwd_result_t wwd_wifi_leave( wwd_interface_t interface )
      }
     wiced_join_status[ interface ] = 0;
 
-    wwd_wifi_link_update(WICED_FALSE);
+    link_status = WICED_FALSE;
+    wwd_wifi_link_update(link_status);
 
     return WWD_SUCCESS;
 }
@@ -1685,6 +1689,7 @@ static const char* wwd_event_to_string( wwd_event_num_t value )
     switch ( value )
     {
         CASE_RETURN_STRING(WLC_E_ULP)
+		CASE_RETURN_STRING(WLC_E_TKO)
         CASE_RETURN(WLC_E_BT_WIFI_HANDOVER_REQ)
         CASE_RETURN(WLC_E_SPW_TXINHIBIT)
         CASE_RETURN(WLC_E_FBT_AUTH_REQ_IND)
@@ -2118,7 +2123,8 @@ static /*@null@*/ void* wiced_join_events_handler( const wwd_event_header_t* eve
         case WLC_E_DEAUTH_IND:
         case WLC_E_DISASSOC_IND:
             wiced_join_status[event_header->interface] &= ~JOIN_AUTHENTICATED;
-            wwd_wifi_link_update(WICED_FALSE);
+            link_status = WICED_FALSE;
+            wwd_wifi_link_update(link_status);
             break;
 
         case WLC_E_AUTH:
@@ -2283,6 +2289,7 @@ static /*@null@*/ void* wiced_join_events_handler( const wwd_event_header_t* eve
         case WLC_E_DPSTA_INTF_IND:
         case WLC_E_FORCE_32_BIT:
         case WLC_E_ULP:
+        case WLC_E_TKO:
         case WLC_E_LAST:
         default:
             wiced_assert( "Received event which was not registered\n", 0 != 0 );
@@ -2292,7 +2299,8 @@ static /*@null@*/ void* wiced_join_events_handler( const wwd_event_header_t* eve
     if ( wwd_wifi_is_ready_to_transceive( (wwd_interface_t) event_header->interface ) == WWD_SUCCESS )
     {
         join_attempt_complete = WICED_TRUE;
-        wwd_wifi_link_update(WICED_TRUE);
+        link_status = WICED_TRUE;
+        wwd_wifi_link_update(link_status);
 
     }
 
@@ -2450,6 +2458,10 @@ wwd_result_t wwd_wifi_is_ready_to_transceive( wwd_interface_t interface )
     }
 }
 
+wiced_bool_t wwd_wifi_get_link_status ( void )
+{
+  return link_status;
+}
 void wwd_wifi_register_link_update_callback( void (*callback_function)( void ) )
 {
     wwd_wifi_link_update_callback = callback_function;
@@ -5698,7 +5710,8 @@ wwd_result_t wwd_wifi_set_flags( uint32_t *wifi_flags, wwd_interface_t interface
 {
     (void)interface;
     wwd_wifi_mesh_flags = *wifi_flags;
-    wwd_wifi_link_update(WICED_TRUE);
+    link_status = WICED_TRUE;
+    wwd_wifi_link_update(link_status);
 
     return WWD_SUCCESS;
 }
