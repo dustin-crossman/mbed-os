@@ -389,10 +389,14 @@ class Target(namedtuple(
         return 'NSPE_Target' in self.labels
 
     @property
+    def is_PSA_target(self):
+        return self.is_PSA_secure_target or self.is_PSA_non_secure_target
+
+    @property
     def is_SB_target(self):
         return 'SB_Target' in self.labels
 
-    def get_post_build_hook(self, toolchain):
+    def get_post_build_hook(self, toolchain_labels):
         """Initialize the post-build hooks for a toolchain. For now, this
         function only allows "post binary" hooks (hooks that are executed
         after the binary image is extracted from the executable file)
