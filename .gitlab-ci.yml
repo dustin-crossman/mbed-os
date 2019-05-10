@@ -7,7 +7,7 @@ before_script:
     - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
 
 # Compile TARGET_PSOC6
-.test_mbed_062_crypto:
+test_mbed_062_crypto:
   stage: test
   tags:
     - MBED_TEST
@@ -18,7 +18,7 @@ before_script:
     - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
 
 # Compile TARGET_PSOC6_PSA
-test_mbed_064_psa:
+.test_mbed_064_psa:
   stage: test
   tags:
     - MBED_TEST
