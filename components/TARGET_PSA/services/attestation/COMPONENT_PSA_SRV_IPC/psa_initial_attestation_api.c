@@ -21,7 +21,7 @@
 #include "psa/client.h"
 #include "attestation.h"
 #include <string.h>
-#include "psa_manifest/sid.h"
+#include "psa_attest_srv_ifs.h"
 
 #define MINOR_VER 1
 
