@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "mbed_spm_partitions.h"
+#include "psa_platform_partition.h"
 #include "platform_srv_impl.h"
 #include "psa/internal_trusted_storage.h"
 #include "psa/service.h"

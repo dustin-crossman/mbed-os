@@ -17,7 +17,7 @@
 #include <string.h>
 #include "psa/client.h"
 #include "psa/service.h"
-#include "mbed_spm_partitions.h"
+#include "psa_client_tests_part1_partition.h"
 
 #define MSG_BUF_SIZE 128
 uint8_t data[MSG_BUF_SIZE] = {0};
