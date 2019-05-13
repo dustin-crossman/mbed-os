@@ -8186,6 +8186,8 @@
             "PWMOUT",
             "ANALOGIN",
             "ANALOGOUT",
+            "SPI",
+            "SPI_ASYNCH",
             "STDIO_MESSAGES",
             "LPTICKER",
             "SLEEP",
