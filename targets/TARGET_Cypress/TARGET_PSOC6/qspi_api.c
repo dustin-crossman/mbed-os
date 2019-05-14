@@ -495,6 +495,10 @@ const PinMap *qspi_master_data3_pinmap(void)
     return PinMap_QSPI_DATA;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> mbed-os-5.12.3
 #endif
 
 /** @}*/

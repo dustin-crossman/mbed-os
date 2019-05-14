@@ -24,8 +24,6 @@ import inspect
 import sys
 from collections import namedtuple
 from copy import copy
-from inspect import getmro
-from collections import namedtuple, Mapping
 from future.utils import raise_from
 from tools.resources import FileType
 from tools.targets.LPC import patch
@@ -50,7 +48,8 @@ CORE_LABELS = {
                     "CORTEX"],
     "Cortex-A9": ["A9", "CORTEX_A", "LIKE_CORTEX_A9", "CORTEX"],
     "Cortex-M23": ["M23", "CORTEX_M", "LIKE_CORTEX_M23", "CORTEX"],
-    "Cortex-M23-NS": ["M23", "M23_NS", "CORTEX_M", "LIKE_CORTEX_M23", "CORTEX"],
+    "Cortex-M23-NS": ["M23", "M23_NS", "CORTEX_M", "LIKE_CORTEX_M23",
+                      "CORTEX"],
     "Cortex-M33": ["M33", "CORTEX_M", "LIKE_CORTEX_M33", "CORTEX"],
     "Cortex-M33-NS": ["M33", "M33_NS", "CORTEX_M", "LIKE_CORTEX_M33",
                       "CORTEX"],
@@ -388,11 +387,16 @@ class Target(namedtuple(
     def is_PSA_non_secure_target(self):
         return 'NSPE_Target' in self.labels
 
+
+	@property
+    def is_PSA_target(self):
+        return self.is_PSA_secure_target or self.is_PSA_non_secure_target
+
     @property
     def is_SB_target(self):
         return 'SB_Target' in self.labels
 
-    def get_post_build_hook(self, toolchain):
+    def get_post_build_hook(self, toolchain_labels):
         """Initialize the post-build hooks for a toolchain. For now, this
         function only allows "post binary" hooks (hooks that are executed
         after the binary image is extracted from the executable file)
@@ -646,11 +650,6 @@ class PSOC6Code:
         else:
             psoc6_complete(t_self, elf, binf)
 
-    @staticmethod
-    def sign_image(t_self, resources, elf, binf):
-        from tools.targets.PSOC6 import sign_image as psoc6_sign_image
-
-        psoc6_sign_image(t_self, resources, elf, binf)
 
 class LPC55S69Code:
     """LPC55S69 Hooks"""
