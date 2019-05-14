@@ -176,7 +176,7 @@ def collect_args(toolchain, image_slot, target_type):
 
         if not os.path.isdir(sdk_path):
             # try location for application ../mbed-os
-            sdk_path = str(root_dir / 'mbed-os' / cy_targets / Path(sb_config.get("sdk_path")).absolute())
+            sdk_path = os.path.join(root_dir, 'mbed-os', sb_config.get("sdk_path"))
 
         args_for_signature = {
             "sdk_path": sdk_path,
