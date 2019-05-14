@@ -1,1 +1,1 @@
-Files from http://git-ore.aus.cypress.com/repo/secure_mcu_mxs40/commit/0e3453d9b4507c5ef8a9f313933dfe15c28405a5
+Files from http://git-ore.aus.cypress.com/repo/secure_mcu_mxs40/commit/da2d60e7bf1b11900cc89bfe35b3dcfb2bc0ed54
