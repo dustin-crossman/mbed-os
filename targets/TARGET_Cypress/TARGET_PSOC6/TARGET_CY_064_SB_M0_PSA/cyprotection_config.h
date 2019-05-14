@@ -53,7 +53,7 @@ const cy_smpu_region_config_t flash_spm_smpu_config[] = {
         .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
-        .prot_region = PROT_SMPU_SMPU_STRUCT5,
+        .prot_region = PROT_SMPU_SMPU_STRUCT4,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
         .pcMstMask = CY_PROT_PCMASK1,
@@ -64,16 +64,17 @@ const cy_smpu_region_config_t sram_spm_smpu_config[] = {
     {   /* SRAM_SPM_PRIV - must include SRAM_SPM_PUB area */
         .address = (uint32_t *)PSA_NON_SECURE_RAM_START, /* 0x08000000 */
         .regionSize = CY_PROT_SIZE_256KB, /* 0x40000 */
-        /* 0xC3 - disable regions 0, 1 (NSPE RAM) 6, 7 (DAP RAM, FLASHBOOT etc)
-           protect SPE, CyBootloader. End protection at 0x08030000 */
+        /* 0xC7 - disable regions 0, 1, 2 (NSPE RAM) 6, 7 (FLASHBOOT)
+           Range 0x08018000...0x08030000 are protected (SPE, CyBootloader) */
         .subregions = (CY_PROT_SUBREGION_DIS7 | CY_PROT_SUBREGION_DIS6 | 
-                       CY_PROT_SUBREGION_DIS1 | CY_PROT_SUBREGION_DIS0),
+                       CY_PROT_SUBREGION_DIS2 | CY_PROT_SUBREGION_DIS1 |
+                       CY_PROT_SUBREGION_DIS0),
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RWX,
         .secure = false,
         .pcMatch = false,
         .pcMask = SECURE_CONTEXTS_MASK,
-        .prot_region = PROT_SMPU_SMPU_STRUCT9,
+        .prot_region = PROT_SMPU_SMPU_STRUCT8,
         .userMstPermission = CY_PROT_PERM_R,
         .privMstPermission = CY_PROT_PERM_RW,
         .pcMstMask = CY_PROT_PCMASK1,
