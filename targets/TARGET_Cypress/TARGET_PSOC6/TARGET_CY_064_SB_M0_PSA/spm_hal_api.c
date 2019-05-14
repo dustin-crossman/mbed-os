@@ -292,8 +292,8 @@ void spm_hal_memory_protection_init(void)
     /* smpu */
     status = smpu_protect((cy_smpu_region_config_t *)flash_spm_smpu_config, sizeof(flash_spm_smpu_config) / sizeof(flash_spm_smpu_config[0]));
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
-//    status = smpu_protect((cy_smpu_region_config_t *)sram_spm_smpu_config, sizeof(sram_spm_smpu_config) / sizeof(sram_spm_smpu_config[0]));
-//    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
+    status = smpu_protect((cy_smpu_region_config_t *)sram_spm_smpu_config, sizeof(sram_spm_smpu_config) / sizeof(sram_spm_smpu_config[0]));
+    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
     status = smpu_config_unprotected(&default_smpu_master_config);
     CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
 
