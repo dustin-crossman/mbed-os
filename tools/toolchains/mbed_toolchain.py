@@ -763,7 +763,7 @@ class mbedToolchain:
         self.mem_stats(mapfile)
 
         self.notify.var("compile_succeded", True)
-        self.notify.var("binary", filename)
+        self.notify.var("binary", full_path)
 
         return full_path, updatable
 
@@ -915,6 +915,7 @@ class mbedToolchain:
             pass
 
     STACK_PARAM = "target.boot-stack-size"
+    TFM_LVL_PARAM = "tfm.level"
 
     def add_linker_defines(self):
         params, _ = self.config_data
@@ -926,36 +927,31 @@ class mbedToolchain:
             )
             self.ld.append(define_string)
             self.flags["ld"].append(define_string)
+            self.ld.append(define_string)
+            self.flags["ld"].append(define_string)
 
-        flags2params = {}
-        if self.target.is_PSA_non_secure_target:
-            flags2params = {
-                "MBED_ROM_START": "target.non-secure-rom-start",
-                "MBED_ROM_SIZE": "target.non-secure-rom-size",
-                "MBED_RAM_START": "target.non-secure-ram-start",
-                "MBED_RAM_SIZE": "target.non-secure-ram-size"
-            }
-        if self.target.is_PSA_secure_target:
-            flags2params = {
-                "MBED_ROM_START": "target.secure-rom-start",
-                "MBED_ROM_SIZE": "target.secure-rom-size",
-                "MBED_RAM_START": "target.secure-ram-start",
-                "MBED_RAM_SIZE": "target.secure-ram-size",
-                "MBED_PUBLIC_RAM_START": "target.public-ram-start",
-                "MBED_PUBLIC_RAM_SIZE": "target.public-ram-size"
-            }
+        # Pass TFM_LVL to linker files, so single linker file can support different TFM security levels.
+        if self.TFM_LVL_PARAM in params:
+            define_string = self.make_ld_define(
+                "TFM_LVL",
+                params[self.TFM_LVL_PARAM].value
+            )
         if self.target.is_SB_target and not self.target.is_PSA_non_secure_target:
             flags2params = {
                 "MBED_ROM_START": "target.sb-rom-start",
                 "MBED_ROM_SIZE": "target.sb-rom-size",
                 "MBED_RAM_START": "target.sb-ram-start",
                 "MBED_RAM_SIZE": "target.sb-ram-size"
-            }              
+            } 
 
-        for flag, param in flags2params.items():
-            define_string = self.make_ld_define(flag, params[param].value)
-            self.ld.append(define_string)
-            self.flags["ld"].append(define_string)
+        if self.target.is_PSA_secure_target:
+            for flag, param in [
+                ("MBED_PUBLIC_RAM_START", "target.public-ram-start"),
+                ("MBED_PUBLIC_RAM_SIZE", "target.public-ram-size")
+            ]:
+                define_string = self.make_ld_define(flag, params[param].value)
+                self.ld.append(define_string)
+                self.flags["ld"].append(define_string)
 
     # Set the configuration data
     def set_config_data(self, config_data):
