@@ -27,14 +27,14 @@
 ******************************************************/
 
 whd_result_t whd_rtos_create_thread_with_arg(whd_thread_type_t *thread, void (*entry_function)(
-                                                 uint32_t), const char *name, void *stack, uint32_t stack_size, uint32_t priority,
-                                             uint32_t arg)
+                                              uint32_t), const char *name, /*@null@*/ void *stack, uint32_t stack_size, uint32_t priority,
+                                          uint32_t arg)
 {
     osThreadAttr_t atr;
 
     atr.name = name;
     atr.attr_bits = osThreadDetached;
-    atr.priority = (osPriority_t)priority;
+    atr.priority = priority;
     atr.stack_mem = stack;
     atr.stack_size = stack_size;
     atr.cb_mem = NULL;
@@ -127,7 +127,7 @@ whd_result_t whd_rtos_join_thread(whd_thread_type_t *thread)
  *
  * @returns WHD_SUCCESS on success, error otherwise
  */
-whd_result_t whd_rtos_init_semaphore(whd_semaphore_type_t *semaphore)
+whd_result_t whd_rtos_init_semaphore(/*@out@*/ whd_semaphore_type_t *semaphore)   /*@modifies *semaphore@*/
 {
     *semaphore = osSemaphoreNew(1, 1, NULL);
     if (*semaphore == NULL)
@@ -155,7 +155,7 @@ whd_result_t whd_rtos_init_semaphore(whd_semaphore_type_t *semaphore)
  *
  */
 whd_result_t whd_rtos_get_semaphore(whd_semaphore_type_t *semaphore, uint32_t timeout_ms,
-                                    whd_bool_t will_set_in_isr)
+                                          whd_bool_t will_set_in_isr)
 {
     osStatus_t result;
     UNUSED_PARAMETER(will_set_in_isr);
@@ -177,6 +177,7 @@ whd_result_t whd_rtos_get_semaphore(whd_semaphore_type_t *semaphore, uint32_t ti
     }
     else if (result == osErrorTimeout)
     {
+        WPRINT_WHD_INFO( ("%s semaphore time out\n", __func__) );
         return WHD_TIMEOUT;
     }
     else if (result == osErrorResource)
@@ -264,13 +265,13 @@ whd_result_t whd_rtos_deinit_semaphore(whd_semaphore_type_t *semaphore)
  *
  * @returns Time in milliseconds since RTOS started.
  */
-whd_time_t whd_rtos_get_time(void)
+whd_time_t whd_rtos_get_time(void)    /*@modifies internalState@*/
 {
     /* Get Number of ticks per second */
     uint32_t tick_freq = osKernelGetTickFreq();
 
     /* Convert ticks count to time in milliseconds */
-    return (osKernelGetTickCount() * (1000 / tick_freq) );
+    return (osKernelGetTickCount() * (1000/tick_freq));
 
 }
 
@@ -307,4 +308,3 @@ whd_result_t whd_rtos_delay_milliseconds(uint32_t num_ms)
     }
     return WHD_RTOS_ERROR;
 }
-

@@ -8304,6 +8304,13 @@
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
+        "config": {
+            "board-name": {
+                "help": "Name of the H/W Kit",
+                "value": "\"CY8CKIT_062_WIFI_BT\"",
+                "macro_name": "BOARD_NAME"
+                 }
+        },
         "program_cycle_s": 10
     },
     "CY8CKIT_062_WIFI_BT_M0_PSA": {
@@ -8381,6 +8388,13 @@
         "detect_code": ["1901"],
         "post_binary_hook": {
             "function": "PSOC6Code.complete"
+        },
+         "config": {
+            "board-name": {
+                "help": "Name of the H/W Kit",
+                "value": "\"CY8CPROTO_062_4343W\"",
+                "macro_name": "BOARD_NAME"
+                 }
         }
     },
     "CY8CKIT_062_BLE": {
@@ -8443,6 +8457,13 @@
         },
         "overrides": {
             "network-default-interface-type": "WIFI"
+        },
+        "config": {
+            "board-name": {
+                "help": "Name of the H/W Kit",
+                "value": "\"CYW943012P6EVB_01\"",
+                "macro_name": "BOARD_NAME"               
+            }
         }
     },
     "FUTURE_SEQUANA_M0": {
