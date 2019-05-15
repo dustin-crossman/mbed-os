@@ -254,7 +254,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
     }*/
 
     /* Query bss state (does it exist? if so is it UP?) */
-    data = (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)4, IOVAR_STR_BSS);
+    data = (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)4, IOVAR_STR_BSS);
     CHECK_IOCTL_BUFFER(data);
 
     if ( (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
@@ -269,7 +269,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
 
     if ( (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
     {
-        if (whd_sdpcm_send_iovar(ifp, SDPCM_GET, buffer, &response) != WHD_SUCCESS)
+        if (whd_cdc_send_iovar(ifp, CDC_GET, buffer, &response) != WHD_SUCCESS)
         {
             /* Note: We don't need to release the response packet since the iovar failed */
             wait_for_interface = WHD_TRUE;
@@ -292,7 +292,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
         }
     }
 
-    if (whd_sdpcm_send_iovar(prim_ifp, SDPCM_GET, buffer, &response) != WHD_SUCCESS)
+    if (whd_cdc_send_iovar(prim_ifp, CDC_GET, buffer, &response) != WHD_SUCCESS)
     {
         /* Note: We don't need to release the response packet since the iovar failed */
         wait_for_interface = WHD_TRUE;
@@ -323,7 +323,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
     if (prim_ifp != ifp)
     {
         /* Turn APSTA on */
-        data = (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)sizeof(*data), IOVAR_STR_APSTA);
+        data = (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)sizeof(*data), IOVAR_STR_APSTA);
         if (data == NULL)
         {
             whd_assert("Could not get buffer for IOVAR", 0 != 0);
@@ -331,7 +331,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
         }
         *data = htod32( (uint32_t)1 );
         /* This will fail on manufacturing test build since it does not have APSTA available */
-        CHECK_RETURN(whd_sdpcm_send_iovar(prim_ifp, SDPCM_SET, buffer, 0) );
+        CHECK_RETURN(whd_cdc_send_iovar(prim_ifp, CDC_SET, buffer, 0) );
 
         if (ifp->state == WHD_FALSE)
         {
@@ -343,10 +343,10 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
     else
     {
         /* Set AP mode */
-        data = (uint32_t *)whd_sdpcm_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
+        data = (uint32_t *)whd_cdc_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
         CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(data, &ap->whd_wifi_sleep_flag);
         *data = 1; /* Turn on AP */
-        CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_ioctl(ifp, SDPCM_SET, WLC_SET_AP, buffer, 0),
+        CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_AP, buffer, 0),
                                     &ap->whd_wifi_sleep_flag);
     }
 #if 0
@@ -377,7 +377,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
     }
 
     /* Set the SSID */
-    data = (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)40, "bsscfg:" IOVAR_STR_SSID);
+    data = (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)40, "bsscfg:" IOVAR_STR_SSID);
     CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(data, &ap->whd_wifi_sleep_flag);
     if (wlan_chip_id == 4334)
     {
@@ -391,11 +391,11 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
     memcpy(&data[2], (uint8_t *)ssid->value, ssid->length);
     if ( (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
     {
-        CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
+        CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_iovar(ifp, CDC_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
     }
     else
     {
-        CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_iovar(prim_ifp, SDPCM_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
+        CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_iovar(prim_ifp, CDC_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
     }
 
     if ( (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
@@ -408,10 +408,10 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
         }
     }
     /* Set the channel */
-    data = (uint32_t *)whd_sdpcm_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
+    data = (uint32_t *)whd_cdc_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
     CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(data, &ap->whd_wifi_sleep_flag);
     *data = htod32(channel);
-    CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_ioctl(ifp, SDPCM_SET, WLC_SET_CHANNEL, buffer, 0),
+    CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_CHANNEL, buffer, 0),
                                 &ap->whd_wifi_sleep_flag);
 
     /* Need to decide on the wep configuration */
@@ -421,7 +421,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
         for (length = 0; length < key_length; length = (uint16_t)(length + 2 + security_key[1]) )
         {
             const whd_wep_key_t *in_key = (const whd_wep_key_t *)&security_key[length];
-            wl_wsec_key_t *out_key = (wl_wsec_key_t *)whd_sdpcm_get_ioctl_buffer(&buffer, sizeof(wl_wsec_key_t) );
+            wl_wsec_key_t *out_key = (wl_wsec_key_t *)whd_cdc_get_ioctl_buffer(&buffer, sizeof(wl_wsec_key_t) );
             CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(out_key, &ap->whd_wifi_sleep_flag);
             memset(out_key, 0, sizeof(wl_wsec_key_t) );
             out_key->index = in_key->index;
@@ -449,12 +449,12 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
             out_key->len = htod32(out_key->len);
             out_key->algo = htod32(out_key->algo);
             out_key->flags = htod32(out_key->flags);
-            CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_ioctl(ifp, SDPCM_SET, WLC_SET_KEY, buffer,
-                                                             NULL), &ap->whd_wifi_sleep_flag);
+            CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_KEY, buffer,
+                                                           NULL), &ap->whd_wifi_sleep_flag);
         }
 
         /* Set authentication type */
-        auth = (uint32_t *)whd_sdpcm_get_ioctl_buffer(&buffer, (uint16_t)4);
+        auth = (uint32_t *)whd_cdc_get_ioctl_buffer(&buffer, (uint16_t)4);
         CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(auth, &ap->whd_wifi_sleep_flag);
         if (auth_type == WHD_SECURITY_WEP_SHARED)
         {
@@ -464,12 +464,12 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
         {
             *auth = WEP_OPEN_SYSTEM_AUTHENTICATION; /*  0 = Open System authentication */
         }
-        CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_ioctl(ifp, SDPCM_SET, WLC_SET_AUTH, buffer,
-                                                         0), &ap->whd_wifi_sleep_flag);
+        CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_AUTH, buffer,
+                                                       0), &ap->whd_wifi_sleep_flag);
     }
 #endif
 
-    data = (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, "bsscfg:" IOVAR_STR_WSEC);
+    data = (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, "bsscfg:" IOVAR_STR_WSEC);
     CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(data, &ap->whd_wifi_sleep_flag);
     if ( (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
     {
@@ -487,7 +487,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
     {
         data[1] = htod32( (uint32_t)auth_type );
     }
-    CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_iovar(prim_ifp, SDPCM_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
+    CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_iovar(prim_ifp, CDC_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
     if (wlan_chip_id == 4334)
     {
         if (auth_type != WHD_SECURITY_OPEN)
@@ -496,22 +496,22 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
 
             /* Set the wpa auth */
             data =
-                (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, "bsscfg:" IOVAR_STR_WPA_AUTH);
+                (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, "bsscfg:" IOVAR_STR_WPA_AUTH);
             CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(data, &ap->whd_wifi_sleep_flag);
             data[0] = htod32( (uint32_t)CHIP_AP_INTERFACE );
             data[1] = htod32( (uint32_t)(auth_type == WHD_SECURITY_WPA_TKIP_PSK) ?
                               (WPA_AUTH_PSK) : (WPA2_AUTH_PSK | WPA_AUTH_PSK) );
-            CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_iovar(prim_ifp, SDPCM_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
+            CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_iovar(prim_ifp, CDC_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
 
             /* Set the passphrase */
-            psk = (wsec_pmk_t *)whd_sdpcm_get_ioctl_buffer(whd_driver, &buffer, sizeof(wsec_pmk_t) );
+            psk = (wsec_pmk_t *)whd_cdc_get_ioctl_buffer(whd_driver, &buffer, sizeof(wsec_pmk_t) );
             CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(psk, &ap->whd_wifi_sleep_flag);
             memcpy(psk->key, security_key, key_length);
             psk->key_len = htod16(key_length);
             psk->flags = htod16( (uint16_t)WSEC_PASSPHRASE );
             CHECK_RETURN(whd_rtos_delay_milliseconds(1) );
             /* Delay required to allow radio firmware to be ready to receive PMK and avoid intermittent failure */
-            CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_ioctl(ifp, SDPCM_SET, WLC_SET_WSEC_PMK, buffer, 0),
+            CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_WSEC_PMK, buffer, 0),
                                         &ap->whd_wifi_sleep_flag);
         }
     }
@@ -524,7 +524,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
 
             /* Set the wpa auth */
             data =
-                (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, "bsscfg:" IOVAR_STR_WPA_AUTH);
+                (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, "bsscfg:" IOVAR_STR_WPA_AUTH);
             CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(data, &ap->whd_wifi_sleep_flag);
             if ( (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
             {
@@ -539,41 +539,41 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
                                    WHD_SECURITY_WPA_TKIP_PSK) ? (WPA_AUTH_PSK) : (WPA2_AUTH_PSK | WPA_AUTH_PSK) );
             if ( (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
             {
-                CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
+                CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_iovar(ifp, CDC_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
             }
             else
             {
-                CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_iovar(prim_ifp, SDPCM_SET, buffer, 0),
+                CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_iovar(prim_ifp, CDC_SET, buffer, 0),
                                             &ap->whd_wifi_sleep_flag);
             }
 
             /* Set the passphrase */
-            psk = (wsec_pmk_t *)whd_sdpcm_get_ioctl_buffer(whd_driver, &buffer, sizeof(wsec_pmk_t) );
+            psk = (wsec_pmk_t *)whd_cdc_get_ioctl_buffer(whd_driver, &buffer, sizeof(wsec_pmk_t) );
             CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(psk, &ap->whd_wifi_sleep_flag);
             memcpy(psk->key, security_key, key_length);
             psk->key_len = htod16(key_length);
             psk->flags = htod16( (uint16_t)WSEC_PASSPHRASE );
             CHECK_RETURN(whd_rtos_delay_milliseconds(1) );
             /* Delay required to allow radio firmware to be ready to receive PMK and avoid intermittent failure */
-            CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_ioctl(ifp, SDPCM_SET, WLC_SET_WSEC_PMK, buffer,
-                                                             0), &ap->whd_wifi_sleep_flag);
+            CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_WSEC_PMK, buffer,
+                                                           0), &ap->whd_wifi_sleep_flag);
         }
     }
 
     if (wlan_chip_id == 4334)
     {
         /* Set the GMode */
-        data = whd_sdpcm_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
+        data = whd_cdc_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
     }
     else
     {
         /* Set the GMode */
-        data = (uint32_t *)whd_sdpcm_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
+        data = (uint32_t *)whd_cdc_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
     }
 
     CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(data, &ap->whd_wifi_sleep_flag);
     *data = htod32( (uint32_t)GMODE_AUTO );
-    result = whd_sdpcm_send_ioctl(ifp, SDPCM_SET, WLC_SET_GMODE, buffer, 0);
+    result = whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_GMODE, buffer, 0);
     if ( (result != WHD_SUCCESS) && (result != WHD_WLAN_ASSOCIATED) )
     {
         whd_assert("start_ap: Failed to set GMode\n", 0 == 1);
@@ -582,32 +582,32 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
     }
 
     /* Set the multicast transmission rate to 11 Mbps rather than the default 1 Mbps */
-    data = (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)4, IOVAR_STR_2G_MULTICAST_RATE);
+    data = (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)4, IOVAR_STR_2G_MULTICAST_RATE);
     CHECK_IOCTL_BUFFER(data);
     *data = htod32( (uint32_t)RATE_SETTING_11_MBPS );
     if ( (wlan_chip_id == 4334) || (wlan_chip_id == 43340) || (wlan_chip_id == 43342) )
     {
-        result = whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, NULL);
+        result = whd_cdc_send_iovar(ifp, CDC_SET, buffer, NULL);
         whd_assert("start_ap: Failed to set multicast transmission rate\r\n", result == WHD_SUCCESS);
     }
     else
     {
-        CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, NULL), &ap->whd_wifi_sleep_flag);
+        CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_iovar(ifp, CDC_SET, buffer, NULL), &ap->whd_wifi_sleep_flag);
     }
 
     /* Set DTIM period */
     if (wlan_chip_id == 4334)
     {
-        data = whd_sdpcm_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
+        data = whd_cdc_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
     }
     else
     {
-        data = (uint32_t *)whd_sdpcm_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
+        data = (uint32_t *)whd_cdc_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
     }
     CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(data, &ap->whd_wifi_sleep_flag);
     *data = htod32( (uint32_t)WHD_DEFAULT_SOFT_AP_DTIM_PERIOD );
-    CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_ioctl(ifp, SDPCM_SET, WLC_SET_DTIMPRD, buffer,
-                                                     0), &ap->whd_wifi_sleep_flag);
+    CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_DTIMPRD, buffer,
+                                                   0), &ap->whd_wifi_sleep_flag);
 
     /* Configuring the max number of associated STA in SoftAP mode. */
     result = whd_wifi_set_iovar_value(ifp, IOVAR_STR_MAX_ASSOC, WHD_WIFI_CONFIG_AP_MAX_ASSOC);
@@ -641,7 +641,7 @@ uint32_t whd_wifi_start_ap(whd_interface_t ifp)
         return WHD_UNKNOWN_INTERFACE;
     }
 
-    data = (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, IOVAR_STR_BSS);
+    data = (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, IOVAR_STR_BSS);
     CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(data, &ap->whd_wifi_sleep_flag);
 
     if ( (wlan_chip_id == 43012) || (wlan_chip_id == 43362) || (wlan_chip_id == 43455) || (wlan_chip_id == 43430) )
@@ -654,7 +654,7 @@ uint32_t whd_wifi_start_ap(whd_interface_t ifp)
     }
 
     data[1] = htod32( (uint32_t)BSS_UP );
-    CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_iovar(prim_ifp, SDPCM_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
+    CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_iovar(prim_ifp, CDC_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
 
     /* Wait until AP is brought up */
     CHECK_RETURN_WITH_SEMAPHORE(whd_rtos_get_semaphore(&ap->whd_wifi_sleep_flag, (uint32_t)10000,
@@ -684,18 +684,18 @@ uint32_t whd_wifi_stop_ap(whd_interface_t ifp)
     if ( (wlan_chip_id == 43012) || (wlan_chip_id == 43362) || (wlan_chip_id == 43455) || (wlan_chip_id == 43430) )
     {
         /* Query bss state (does it exist? if so is it UP?) */
-        data = (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)4, IOVAR_STR_BSS);
+        data = (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)4, IOVAR_STR_BSS);
         CHECK_IOCTL_BUFFER(data);
         *data = ifp->bsscfgidx;
     }
     else
     {
         /* Query bss state (does it exist? if so is it UP?) */
-        data = whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)4, IOVAR_STR_BSS);
+        data = whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)4, IOVAR_STR_BSS);
         CHECK_IOCTL_BUFFER(data);
         *data = htod32( (uint32_t)CHIP_AP_INTERFACE );
     }
-    result = whd_sdpcm_send_iovar(prim_ifp, SDPCM_GET, buffer, &response);
+    result = whd_cdc_send_iovar(prim_ifp, CDC_GET, buffer, &response);
     if (result == WHD_WLAN_NOTFOUND)
     {
         /* AP interface does not exist - i.e. it is down */
@@ -719,19 +719,19 @@ uint32_t whd_wifi_stop_ap(whd_interface_t ifp)
     /* set BSS down */
     if ( (wlan_chip_id == 43012) || (wlan_chip_id == 43362) || (wlan_chip_id == 43455) || (wlan_chip_id == 43430) )
     {
-        data = (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, IOVAR_STR_BSS);
+        data = (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, IOVAR_STR_BSS);
         CHECK_IOCTL_BUFFER(data);
         data[0] = htod32(ifp->bsscfgidx);
         data[1] = htod32( (uint32_t)BSS_DOWN );
-        CHECK_RETURN(whd_sdpcm_send_iovar(prim_ifp, SDPCM_SET, buffer, 0) );
+        CHECK_RETURN(whd_cdc_send_iovar(prim_ifp, CDC_SET, buffer, 0) );
     }
     else
     {
-        data = whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, IOVAR_STR_BSS);
+        data = whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)8, IOVAR_STR_BSS);
         CHECK_IOCTL_BUFFER(data);
         data[0] = htod32( (uint32_t)CHIP_AP_INTERFACE );
         data[1] = htod32( (uint32_t)BSS_DOWN );
-        CHECK_RETURN(whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, 0) );
+        CHECK_RETURN(whd_cdc_send_iovar(ifp, CDC_SET, buffer, 0) );
     }
 
     /* Wait until AP is brought down */
@@ -749,10 +749,10 @@ uint32_t whd_wifi_stop_ap(whd_interface_t ifp)
     }
 
     /* Disable AP mode */
-    data = (uint32_t *)whd_sdpcm_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
+    data = (uint32_t *)whd_cdc_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
     CHECK_IOCTL_BUFFER_WITH_SEMAPHORE(data, &whd_driver->ap_info.whd_wifi_sleep_flag);
     *data = 0; /* Turn off AP */
-    CHECK_RETURN_WITH_SEMAPHORE(whd_sdpcm_send_ioctl(ifp, SDPCM_SET, WLC_SET_AP, buffer, 0),
+    CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_AP, buffer, 0),
                                 &whd_driver->ap_info.whd_wifi_sleep_flag);
 
     CHECK_RETURN(whd_management_set_event_handler(ifp, apsta_events, NULL, NULL) );

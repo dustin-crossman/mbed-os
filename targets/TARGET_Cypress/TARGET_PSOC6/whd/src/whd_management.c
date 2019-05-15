@@ -140,7 +140,7 @@ uint32_t whd_init(whd_driver_t *whd_driver_ptr, whd_init_config_t *whd_init_conf
         whd_drv->resource_if = resource_ops;
         whd_bus_common_info_init(whd_drv);
         whd_thread_info_init(whd_drv, whd_init_config);
-        whd_sdpcm_info_init(whd_drv);
+        whd_cdc_bdc_info_init(whd_drv);
         whd_internal_info_init(whd_drv);
         whd_ap_info_init(whd_drv);
         //whd_wifi_sleep_info_init(whd_drv);
@@ -221,16 +221,15 @@ whd_result_t whd_management_wifi_platform_init(whd_driver_t whd_driver, whd_coun
     /* WLAN device is now powered up. Change state from OFF to DOWN */
     whd_driver->internal_info.whd_wlan_status.state = WLAN_DOWN;
 
+
     retval = whd_thread_init(whd_driver);
     if (retval != WHD_SUCCESS)
     {
         WPRINT_WHD_ERROR( ("Could not initialize WHD thread\n") );
         return retval;
     }
-
     /* Register interrupt handler for SDIO/SPI */
     whd_bus_irq_register(whd_driver);
-
     /* Enable SDIO/SPI interrupt */
     whd_bus_irq_enable(whd_driver, WHD_TRUE);
 
@@ -264,6 +263,7 @@ uint32_t whd_wifi_on(whd_driver_t whd_driver, whd_interface_t *ifpp)
 
     whd_init_stats(whd_driver);
 
+
     retval = whd_management_wifi_platform_init(whd_driver, whd_driver->country, WHD_FALSE);
     if (retval != WHD_SUCCESS)
     {
@@ -289,7 +289,7 @@ uint32_t whd_wifi_on(whd_driver_t whd_driver, whd_interface_t *ifpp)
     /* Note: This is only required for later chips.
      * The 4319 has glomming off by default however the 43362 has it on by default.
      */
-    data = (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)4, IOVAR_STR_TX_GLOM);
+    data = (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)4, IOVAR_STR_TX_GLOM);
     if (data == NULL)
     {
         whd_assert("Could not get buffer for IOVAR", 0 != 0);
@@ -298,7 +298,7 @@ uint32_t whd_wifi_on(whd_driver_t whd_driver, whd_interface_t *ifpp)
         /*@-unreachable@*/
     }
     *data = 0;
-    retval = whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, 0);
+    retval = whd_cdc_send_iovar(ifp, CDC_SET, buffer, 0);
     if ( (retval != WHD_SUCCESS) && (retval != WHD_WLAN_UNSUPPORTED) )
     {
         /* Note: System may time out here if bus interrupts are not working properly */
@@ -308,7 +308,7 @@ uint32_t whd_wifi_on(whd_driver_t whd_driver, whd_interface_t *ifpp)
 
 #if 0
     /* Turn APSTA on */
-    data = (uint32_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)sizeof(*data), IOVAR_STR_APSTA);
+    data = (uint32_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)sizeof(*data), IOVAR_STR_APSTA);
     if (data == NULL)
     {
         whd_assert("Could not get buffer for IOVAR", 0 != 0);
@@ -316,7 +316,7 @@ uint32_t whd_wifi_on(whd_driver_t whd_driver, whd_interface_t *ifpp)
     }
     *data = htod32( (uint32_t)1 );
     /* This will fail on manufacturing test build since it does not have APSTA available */
-    retval = whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, 0);
+    retval = whd_cdc_send_iovar(ifp, CDC_SET, buffer, 0);
     if ( (retval != WHD_SUCCESS) && (retval != WHD_WLAN_UNSUPPORTED) )
     {
         /* Could not turn on APSTA */
@@ -335,8 +335,8 @@ uint32_t whd_wifi_on(whd_driver_t whd_driver, whd_interface_t *ifpp)
      *
      */
 
-    country_struct = (wl_country_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)sizeof(wl_country_t),
-                                                                IOVAR_STR_COUNTRY);
+    country_struct = (wl_country_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)sizeof(wl_country_t),
+                                                              IOVAR_STR_COUNTRY);
     if (country_struct == NULL)
     {
         whd_assert("Could not get buffer for IOCTL", 0 != 0);
@@ -357,7 +357,7 @@ uint32_t whd_wifi_on(whd_driver_t whd_driver, whd_interface_t *ifpp)
     {
         country_struct->rev = (int32_t)htod32(-1);
     }
-    retval = whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, 0);
+    retval = whd_cdc_send_iovar(ifp, CDC_SET, buffer, 0);
     if (retval != WHD_SUCCESS)
     {
         /* Could not set wifi country */
@@ -372,15 +372,15 @@ uint32_t whd_wifi_on(whd_driver_t whd_driver, whd_interface_t *ifpp)
     for (counter = 0, retval = WHD_PENDING; retval != WHD_SUCCESS && counter < (uint32_t)MAX_POST_SET_COUNTRY_RETRY;
          ++counter)
     {
-        event_mask = (uint8_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)WL_EVENTING_MASK_LEN,
-                                                           IOVAR_STR_EVENT_MSGS);
+        event_mask = (uint8_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)WL_EVENTING_MASK_LEN,
+                                                         IOVAR_STR_EVENT_MSGS);
         if (event_mask == NULL)
         {
             whd_assert("Could not get buffer for IOVAR", 0 != 0);
             return WHD_BUFFER_ALLOC_FAIL;
         }
         memset(event_mask, 0, (size_t)WL_EVENTING_MASK_LEN);
-        retval = whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, 0);
+        retval = whd_cdc_send_iovar(ifp, CDC_SET, buffer, 0);
     }
     if (retval != WHD_SUCCESS)
     {
@@ -392,14 +392,14 @@ uint32_t whd_wifi_on(whd_driver_t whd_driver, whd_interface_t *ifpp)
     CHECK_RETURN(whd_wifi_set_up(ifp) );
 
     /* Set the GMode */
-    data = (uint32_t *)whd_sdpcm_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
+    data = (uint32_t *)whd_cdc_get_ioctl_buffer(whd_driver, &buffer, (uint16_t)4);
     if (data == NULL)
     {
         whd_assert("Could not get buffer for IOCTL", 0 != 0);
         return WHD_BUFFER_ALLOC_FAIL;
     }
     *data = htod32( (uint32_t)GMODE_AUTO );
-    retval = whd_sdpcm_send_ioctl(ifp, SDPCM_SET, WLC_SET_GMODE, buffer, 0);
+    retval = whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_GMODE, buffer, 0);
     if (retval != WHD_SUCCESS)
     {
         /* Note: System may time out here if bus interrupts are not working properly */

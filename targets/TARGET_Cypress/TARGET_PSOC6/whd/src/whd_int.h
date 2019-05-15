@@ -24,6 +24,7 @@
 
 #include "whd_thread.h"
 #include "whd_sdpcm.h"
+#include "whd_cdc_bdc.h"
 #include "whd_chip.h"
 #include "whd_ap.h"
 #include "whd_debug.h"
@@ -84,6 +85,7 @@ struct whd_driver
     whd_bool_t bus_gspi_32bit;
 
     whd_thread_info_t thread_info;
+    whd_cdc_bdc_info_t cdc_bdc_info;
     whd_sdpcm_info_t sdpcm_info;
     whd_internal_info_t internal_info;
     whd_ap_int_info_t ap_info;

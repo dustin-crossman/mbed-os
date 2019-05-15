@@ -50,8 +50,8 @@ extern "C"
  *  @return WHD_SUCCESS or Error code
  */
 extern uint32_t whd_init(whd_driver_t *whd_driver_ptr, whd_init_config_t *whd_init_config,
-                             whd_resource_source_t *resource_ops, whd_buffer_funcs_t *buffer_ops,
-                             whd_netif_funcs_t *network_ops);
+                         whd_resource_source_t *resource_ops, whd_buffer_funcs_t *buffer_ops,
+                         whd_netif_funcs_t *network_ops);
 
 /** Attach the WLAN Device to specific SDIO bus
  *
@@ -152,9 +152,9 @@ typedef void (*whd_scan_result_callback_t)(whd_scan_result_t **result_ptr, void 
  *  @return record count or Error code
  */
 extern uint32_t whd_wifi_scan_synch(whd_interface_t ifp,
-        /*@null@*/ whd_sync_scan_result_t *scan_result,
-        uint32_t count
-        );
+                                    /*@null@*/ whd_sync_scan_result_t *scan_result,
+                                    uint32_t count
+                                    );
 
 /** Initiates a scan to search for 802.11 networks.
  *
@@ -612,7 +612,7 @@ extern uint32_t whd_wifi_send_action_frame(whd_interface_t ifp, whd_af_params_t 
 /** Sends an IOCTL command
  *
  *  @param  ifp           : Pointer to handle instance of whd interface
- *  @param  ioctl         : SDPCM_SET - To set the I/O control
+ *  @param  ioctl         : CDC_SET - To set the I/O control
  *  @param  value         : Data value to be sent
  *
  *  @return WHD_SUCCESS or Error code
@@ -623,7 +623,7 @@ extern uint32_t whd_wifi_set_ioctl_value(whd_interface_t ifp, uint32_t ioctl, ui
 /** Sends an IOCTL command
  *
  *  @param  ifp           : Pointer to handle instance of whd interface
- *  @param  ioctl         : SDPCM_GET - To get the I/O control
+ *  @param  ioctl         : CDC_GET - To get the I/O control
  *  @param  value         : Pointer to receive the data value
  *
  *  @return WHD_SUCCESS or Error code
@@ -633,7 +633,7 @@ extern uint32_t whd_wifi_get_ioctl_value(whd_interface_t ifp, uint32_t ioctl, ui
 /** Sends an IOCTL command
  *
  *  @param  ifp           : Pointer to handle instance of whd interface
- *  @param  ioctl         : SDPCM_SET - To set the I/O control
+ *  @param  ioctl         : CDC_SET - To set the I/O control
  *  @param  buffer        : Handle for a packet buffer containing the data value to be sent.
  *  @param  buffer_length : Length of buffer
  *
@@ -644,7 +644,7 @@ extern uint32_t whd_wifi_set_ioctl_buffer(whd_interface_t ifp, uint32_t ioctl, v
 /** Sends an IOCTL command
  *
  *  @param  ifp          : Pointer to handle instance of whd interface
- *  @param  ioctl        : SDPCM_GET - To get the I/O control
+ *  @param  ioctl        : CDC_GET - To get the I/O control
  *  @param  out_buffer   : Pointer to receive the handle for the packet buffer containing the response data value received
  *  @param  out_length   : Length of out_buffer
  *
@@ -652,6 +652,20 @@ extern uint32_t whd_wifi_set_ioctl_buffer(whd_interface_t ifp, uint32_t ioctl, v
  */
 extern uint32_t whd_wifi_get_ioctl_buffer(whd_interface_t ifp, uint32_t ioctl, uint8_t *out_buffer,
                                           uint16_t out_length);
+
+/** Sends an IOVAR command
+ *
+ *  @param  ifp          : Pointer to handle instance of whd interface
+ *  @param  iovar_name   : SDPCM_GET - To get the I/O Variable
+ *  @param  param        : Paramater to be passed for the IOVAR
+ *  @param  iovar_name   : Paramter length
+ *  @param  out_buffer   : Pointer to receive the handle for the packet buffer containing the response data value received
+ *  @param  out_length   : Length of out_buffer
+ *
+ *  @return WHD_SUCCESS or Error code
+ */
+extern uint32_t whd_wifi_get_iovar_buffer_with_param(whd_interface_t ifp, const char* iovar_name, void *param,
+                                          uint32_t paramlen, uint8_t* out_buffer, uint32_t out_length);
 
 /* Debug APIs */
 

@@ -21,7 +21,7 @@
 #include "bus_protocols/whd_bus_common.h"
 #include "bus_protocols/whd_bus_protocol_interface.h"
 #include "whd_chip_constants.h"
-#include "whd_sdpcm.h"
+#include "whd_cdc_bdc.h"
 #include "whd_thread_internal.h"
 #include "whd_buffer_api.h"
 #include "whd_debug.h"
@@ -694,10 +694,10 @@ whd_result_t whd_wifi_set_custom_country_code(whd_interface_t ifp, const whd_cou
         whd_buffer_t buffer;
         whd_result_t result;
         whd_country_info_t *data;
-        data = (whd_country_info_t *)whd_sdpcm_get_ioctl_buffer(whd_driver, &buffer,
-                                                                (uint16_t)sizeof(whd_country_info_t) + 10);
+        data = (whd_country_info_t *)whd_cdc_get_ioctl_buffer(whd_driver, &buffer,
+                                                              (uint16_t)sizeof(whd_country_info_t) + 10);
         memcpy(data, country_code, sizeof(whd_country_info_t) );
-        result = whd_sdpcm_send_ioctl(ifp, SDPCM_SET, WLC_SET_CUSTOM_COUNTRY, buffer, NULL);
+        result = whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_CUSTOM_COUNTRY, buffer, NULL);
         return result;
     }
     else
@@ -789,17 +789,17 @@ uint32_t whd_wifi_print_whd_log(whd_driver_t whd_driver)
 
     whd_ioctl_print(whd_driver);
 
-    if((buffer = malloc(WLAN_LOG_BUF_LEN)) == NULL)
+    if ( (buffer = malloc(WLAN_LOG_BUF_LEN) ) == NULL )
     {
-       WPRINT_WHD_ERROR(("Memory allocation failed for log buffer in %s \n", __FUNCTION__));
-       return WHD_MALLOC_FAILURE;
+        WPRINT_WHD_ERROR( ("Memory allocation failed for log buffer in %s \n", __FUNCTION__) );
+        return WHD_MALLOC_FAILURE;
     }
 
     wlan_chip_id = whd_chip_get_chip_id(whd_driver);
     if (wlan_chip_id == 43362)
     {
         result = whd_wifi_read_wlan_log_unsafe(whd_driver, ( (GET_C_VAR(whd_driver, CHIP_RAM_SIZE) +
-                                               PLATFORM_WLAN_RAM_BASE) - 4 ), buffer, WLAN_LOG_BUF_LEN);
+                                                              PLATFORM_WLAN_RAM_BASE) - 4 ), buffer, WLAN_LOG_BUF_LEN);
         CHECK_RETURN(result);
         return WHD_SUCCESS;
     }
@@ -807,7 +807,7 @@ uint32_t whd_wifi_print_whd_log(whd_driver_t whd_driver)
     {
         CHECK_RETURN(whd_ensure_wlan_bus_is_up(whd_driver) );
         result = whd_wifi_read_wlan_log_unsafe(whd_driver, ( (GET_C_VAR(whd_driver, CHIP_RAM_SIZE) +
-                                               PLATFORM_WLAN_RAM_BASE) - 4 ), buffer, WLAN_LOG_BUF_LEN);
+                                                              PLATFORM_WLAN_RAM_BASE) - 4 ), buffer, WLAN_LOG_BUF_LEN);
         whd_thread_notify(whd_driver);
         CHECK_RETURN(result);
         return WHD_SUCCESS;
@@ -834,7 +834,7 @@ uint32_t whd_wifi_print_whd_log(whd_driver_t whd_driver)
         result = whd_wifi_read_wlan_log_unsafe(whd_driver, wlan_shared_address, buffer, WLAN_LOG_BUF_LEN);
         WHD_WLAN_LET_SLEEP(whd_driver);
         whd_print_logbuffer();
-        free( buffer );
+        free(buffer);
         CHECK_RETURN(result);
 
         return WHD_SUCCESS;
@@ -1089,9 +1089,9 @@ static whd_result_t whd_kso_enable(whd_driver_t whd_driver, whd_bool_t enable)
     {
         /* 2 Sequential writes to KSO bit are required for SR module to wakeup, both write can fail */
         whd_bus_write_register_value(whd_driver, BACKPLANE_FUNCTION, (uint32_t)SDIO_SLEEP_CSR, (uint8_t)1,
-                                                  write_value);
+                                     write_value);
         whd_bus_write_register_value(whd_driver, BACKPLANE_FUNCTION, (uint32_t)SDIO_SLEEP_CSR, (uint8_t)1,
-                                                  write_value);
+                                     write_value);
         if (enable == WHD_TRUE)
         {
             /* device WAKEUP through KSO:

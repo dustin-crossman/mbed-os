@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include "whd_clm.h"
 #include "whd_wlioctl.h"
-#include "whd_sdpcm.h"
+#include "whd_cdc_bdc.h"
 #include "whd_debug.h"
 #include "whd_int.h"
 #include "whd_buffer_api.h"
@@ -55,10 +55,10 @@ static int whd_download_wifi_clm_image(whd_interface_t ifp, const char *iovar, u
     whd_assert("dload buffer too large", len < 0xffffffff - 8);
     len = len + 8 - (len % 8);
 
-    iov_data = (uint8_t *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, (uint16_t)len, iovar);
+    iov_data = (uint8_t *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, (uint16_t)len, iovar);
     CHECK_IOCTL_BUFFER(iov_data);
     memcpy(iov_data, (uint8_t *)dload_ptr, len);
-    CHECK_RETURN(whd_sdpcm_send_iovar(ifp, SDPCM_SET, buffer, NULL) );
+    CHECK_RETURN(whd_cdc_send_iovar(ifp, CDC_SET, buffer, NULL) );
     return WHD_SUCCESS;
 }
 
@@ -139,9 +139,9 @@ whd_result_t whd_process_clm_data(whd_interface_t ifp)
             void *data;
 
             WPRINT_WHD_DEBUG( ("clmload (%ld byte file) failed with return %lu; ", clm_blob_size, ret) );
-            data = (int *)whd_sdpcm_get_iovar_buffer(whd_driver, &buffer, 4, IOVAR_STR_CLMLOAD_STATUS);
+            data = (int *)whd_cdc_get_iovar_buffer(whd_driver, &buffer, 4, IOVAR_STR_CLMLOAD_STATUS);
             CHECK_IOCTL_BUFFER(data);
-            ret_clmload_status = whd_sdpcm_send_iovar(ifp, SDPCM_GET, buffer, &response);
+            ret_clmload_status = whd_cdc_send_iovar(ifp, CDC_GET, buffer, &response);
             if (ret_clmload_status != WHD_SUCCESS)
             {
                 WPRINT_WHD_DEBUG( ("clmload_status failed with return %lu\n", ret_clmload_status) );
