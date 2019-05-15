@@ -387,8 +387,7 @@ class Target(namedtuple(
     def is_PSA_non_secure_target(self):
         return 'NSPE_Target' in self.labels
 
-
-	@property
+    @property
     def is_PSA_target(self):
         return self.is_PSA_secure_target or self.is_PSA_non_secure_target
 
@@ -650,6 +649,13 @@ class PSOC6Code:
         else:
             psoc6_complete(t_self, elf, binf)
 
+    @staticmethod
+    def sign_image(t_self, resources, elf, binf):
+        from tools.targets.PSOC6 import sign_image as psoc6_sign_image
+
+        psoc6_sign_image(t_self, resources, elf, binf)
+
+################################################################################
 
 class LPC55S69Code:
     """LPC55S69 Hooks"""
