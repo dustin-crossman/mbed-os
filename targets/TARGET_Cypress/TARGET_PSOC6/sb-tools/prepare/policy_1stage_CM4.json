@@ -90,7 +90,7 @@
                     {
                         "type": "SRAM_SPM_PRIV",
                         "address": 134348800,
-                        "size": 53248
+                        "size": 65536
                     },
                     {
                         "type": "SRAM_DAP",
