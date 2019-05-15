@@ -8136,17 +8136,17 @@
         },
         "overrides": {
             "non-secure-rom-start": "0x10000400",
-            "non-secure-rom-size": "0x30000",
+            "non-secure-rom-size": "0x7FC00",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
-            "non-secure-ram-size": "0x8000",
-            "shared-ram-start": "0x08008000",
+            "non-secure-ram-size": "0x17D00",
+            "shared-ram-start": "0x08017D00",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x08008100", 
+            "public-ram-start": "0x08017E00",
             "public-ram-size": "0x200",
-            "secure-ram-start": "0x08008300",
-            "secure-ram-size": "0x17D00"
+            "secure-ram-start": "0x08018000",
+            "secure-ram-size": "0x16000"
         }
     },
     "CY8CPROTO_064_SB_PSA": {
@@ -8161,17 +8161,17 @@
         },
         "overrides": {
             "non-secure-rom-start": "0x10000400",
-            "non-secure-rom-size": "0x30000",
+            "non-secure-rom-size": "0x7FC00",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
-            "non-secure-ram-size": "0x8000",
-            "shared-ram-start": "0x08008000",
+            "non-secure-ram-size": "0x17D00",
+            "shared-ram-start": "0x08017D00",
             "shared-ram-size": "0x100",
-            "public-ram-start": "0x08008100", 
+            "public-ram-start": "0x08017E00",
             "public-ram-size": "0x200",
-            "secure-ram-start": "0x08008300",
-            "secure-ram-size": "0x17D00"
+            "secure-ram-start": "0x08018000",
+            "secure-ram-size": "0x16000"
         }
     },
     "CY8CMOD_062_4343W": {
