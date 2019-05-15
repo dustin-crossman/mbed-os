@@ -40,6 +40,7 @@ struct whd_scan_userdata {
     unsigned count;
     unsigned offset;
     whd_interface_t ifp;
+    bool scan_in_progress;
 };
 
 struct whd_scan_security_userdata {
@@ -121,7 +122,7 @@ nsapi_error_t WhdSTAInterface::set_credentials(const char *ssid, const char *pas
         (pass == NULL && security != NSAPI_SECURITY_NONE) ||
         (strlen(pass) == 0 && security != NSAPI_SECURITY_NONE) ||
         (strlen(pass) > 63 && (security == NSAPI_SECURITY_WPA2 || security == NSAPI_SECURITY_WPA || security == NSAPI_SECURITY_WPA_WPA2))
-		)
+        )
     {
         return NSAPI_ERROR_PARAMETER;
     }
@@ -213,7 +214,7 @@ nsapi_error_t WhdSTAInterface::connect()
 
     if(whd_wifi_is_ready_to_transceive(_whd_emac.ifp) == WHD_SUCCESS)
     {
-    		whd_emac_wifi_link_state_changed(true, _whd_emac.ifp);
+         whd_emac_wifi_link_state_changed(true, _whd_emac.ifp);
     }
 
     // bring up
@@ -259,14 +260,20 @@ int8_t WhdSTAInterface::get_rssi()
     return (int8_t)rssi;
 }
 
-static void whd_scan_handler(whd_scan_result_t** result_ptr, 
+static void whd_scan_handler(whd_scan_result_t** result_ptr,
     void* user_data, whd_scan_status_t status)
 {
 
     whd_scan_userdata *data = (whd_scan_userdata*)user_data;
 
+    /* Even after stopping scan, some results will still come as results are already present in the queue */
+    if (data->scan_in_progress == false) {
+        return;
+    }
+
     // finished scan, either succesfully or through an abort
     if (status != WHD_SCAN_INCOMPLETE) {
+        data->scan_in_progress = false;
         data->sema->release();
         return;
     }
@@ -274,6 +281,7 @@ static void whd_scan_handler(whd_scan_result_t** result_ptr,
     // can't really keep anymore scan results
     if (data->count > 0 && data->offset >= std::min(data->count, SCAN_RESULT_BUFF_SIZE)) {
         whd_wifi_stop_scan(data->ifp);
+        data->scan_in_progress = false;
         data->sema->release();
         return;
     }
@@ -284,7 +292,7 @@ static void whd_scan_handler(whd_scan_result_t** result_ptr,
         if (CMP_MAC( data->result_buff[i].BSSID.octet, record->BSSID.octet ))
             return;
     }
-    
+
     if (data->count > 0) {
         // get ap stats
         nsapi_wifi_ap ap;
@@ -304,8 +312,11 @@ static void whd_scan_handler(whd_scan_result_t** result_ptr,
         data->aps[data->offset] = WiFiAccessPoint(ap);
     }
 
-    // store as ap object
-    data->result_buff[data->offset] = *record;
+    if (data->offset < SCAN_RESULT_BUFF_SIZE) {
+        // store as ap object
+        data->result_buff[data->offset] = *record;
+    }
+
     data->offset += 1;
 
 }
@@ -322,7 +333,9 @@ int WhdSTAInterface::scan(WiFiAccessPoint *aps, unsigned count)
     interal_scan_data.count = count;
     interal_scan_data.offset = 0;
     interal_scan_data.ifp = _whd_emac.ifp;
+    interal_scan_data.scan_in_progress = true;
     whd_result_t res;
+
 
     res = (whd_result_t)whd_wifi_scan(_whd_emac.ifp, WHD_SCAN_TYPE_ACTIVE, WHD_BSS_TYPE_ANY,
         NULL, NULL, NULL, NULL, whd_scan_handler, (whd_scan_result_t **) &result_ptr, &interal_scan_data );
