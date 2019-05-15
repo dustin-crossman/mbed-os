@@ -280,9 +280,12 @@ static void whd_scan_handler(whd_scan_result_t** result_ptr,
 
     // can't really keep anymore scan results
     if (data->count > 0 && data->offset >= std::min(data->count, SCAN_RESULT_BUFF_SIZE)) {
-        whd_wifi_stop_scan(data->ifp);
-        data->scan_in_progress = false;
-        data->sema->release();
+        /* We can not abort the scan as this function is getting executed in WHD context,
+           Note that to call any WHD API, caller function should not in WHD context */
+        /* Temp Fix: Allow the scan results to complete on it's own */
+        //whd_wifi_stop_scan(data->ifp);
+        //data->scan_in_progress = false;
+        //data->sema->release();
         return;
     }
 
