@@ -8136,7 +8136,7 @@
         },
         "overrides": {
             "non-secure-rom-start": "0x10000400",
-            "non-secure-rom-size": "0x30000",
+            "non-secure-rom-size": "0x7FC00",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
@@ -8146,7 +8146,7 @@
             "public-ram-start": "0x08017E00",
             "public-ram-size": "0x200",
             "secure-ram-start": "0x08018000",
-            "secure-ram-size": "0x18000"
+            "secure-ram-size": "0x16000"
         }
     },
     "CY8CPROTO_064_SB_PSA": {
@@ -8161,7 +8161,7 @@
         },
         "overrides": {
             "non-secure-rom-start": "0x10000400",
-            "non-secure-rom-size": "0x30000",
+            "non-secure-rom-size": "0x7FC00",
             "secure-rom-start": "0x10080400",
             "secure-rom-size": "0x4FC00",
             "non-secure-ram-start": "0x08000000",
@@ -8171,7 +8171,7 @@
             "public-ram-start": "0x08017E00",
             "public-ram-size": "0x200",
             "secure-ram-start": "0x08018000",
-            "secure-ram-size": "0x18000"
+            "secure-ram-size": "0x16000"
         }
     },
     "CY8CMOD_062_4343W": {
