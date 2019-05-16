@@ -43,7 +43,7 @@
 ;******************************************************************************/
 
 #if !defined(MBED_ROM_START)
-  #define MBED_ROM_START    0x10002000
+  #define MBED_ROM_START    0x10002400
 #endif
 
 ;* MBED_APP_START is being  used by the bootloader build script and
@@ -55,7 +55,7 @@
 #endif
 
 #if !defined(MBED_ROM_SIZE)
-  #define MBED_ROM_SIZE     0x000FE000
+  #define MBED_ROM_SIZE     0x0004FC00
 #endif
 
 ;* MBED_APP_SIZE is being  used by the bootloader build script and
@@ -71,7 +71,7 @@
 #endif
 
 #if !defined(MBED_RAM_SIZE)
-  #define MBED_RAM_SIZE     0x00045800
+  #define MBED_RAM_SIZE     0x0001E000
 #endif
 
 #if !defined(MBED_BOOT_STACK_SIZE)
