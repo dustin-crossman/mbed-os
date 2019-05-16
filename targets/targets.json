@@ -8326,11 +8326,7 @@
             "function": "PSOC6Code.sign_image"
         },
         "overrides": {
-            "network-default-interface-type": "WIFI",
-            "sb-rom-start": "0x10002400",
-            "sb-rom-size": "0x4FC00",
-            "sb-ram-start": "0x08002000",
-            "sb-ram-size": "0x1E000"
+            "network-default-interface-type": "WIFI"
         }
     },
     "CY8CPROTO_064_SB_M0_PSA": {
@@ -8342,7 +8338,6 @@
             "MBEDTLS_PSA_CRYPTO_SPM",
             "MBEDTLS_PSA_CRYPTO_C",
             "MBEDTLS_ENTROPY_NV_SEED",
-            "CY_IPC_DEFAULT_CFG_DISABLE",
             "PU_ENABLE"
         ],
         "deliver_to_target": "CY8CPROTO_064_SB_PSA",

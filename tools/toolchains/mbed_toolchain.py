@@ -936,14 +936,6 @@ class mbedToolchain:
                 "TFM_LVL",
                 params[self.TFM_LVL_PARAM].value
             )
-        if self.target.is_SB_target and not self.target.is_PSA_non_secure_target:
-            flags2params = {
-                "MBED_ROM_START": "target.sb-rom-start",
-                "MBED_ROM_SIZE": "target.sb-rom-size",
-                "MBED_RAM_START": "target.sb-ram-start",
-                "MBED_RAM_SIZE": "target.sb-ram-size"
-            } 
-
         if self.target.is_PSA_secure_target:
             for flag, param in [
                 ("MBED_PUBLIC_RAM_START", "target.public-ram-start"),
