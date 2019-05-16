@@ -43,13 +43,6 @@ struct whd_scan_userdata {
     bool scan_in_progress;
 };
 
-struct whd_scan_security_userdata {
-    Semaphore* sema;
-    const char *ssid;
-    int ssidlen;
-    whd_security_t security;
-};
-
 static whd_scan_userdata interal_scan_data;
 static whd_scan_result_t internal_scan_result;
 static whd_scan_result_t *result_ptr = &internal_scan_result;
@@ -170,28 +163,7 @@ nsapi_error_t WhdSTAInterface::connect()
 
     // choose network security
     whd_security_t security = whd_fromsecurity(_security);
-#if 0
-    if (security == WHD_SECURITY_OPEN) {
-        // none actually indicates we need to find out the security ourselves
-        // if ssid isn't being broadcasted we just continue with security none
-        whd_scan_security_userdata data;
-        data.ssid = _ssid;
-        data.ssidlen = strlen(_ssid);
-        data.security = WHD_SECURITY_OPEN;
 
-        res = whd_wifi_scan_networks(whd_scan_security_handler, &data);
-        if (res != WHD_SUCCESS) {
-            return whd_toerror(res);
-        }
-
-        int tok = data.sema.wait();
-        if (tok < 1) {
-            return NSAPI_ERROR_WOULD_BLOCK;
-        }
-
-        security = data.security;
-    }
-#endif
     // join the network
     whd_result_t res;
     for ( i = 0; i < MAX_RETRY_COUNT; i++ )
@@ -282,16 +254,12 @@ static void whd_scan_handler(whd_scan_result_t** result_ptr,
     if (data->count > 0 && data->offset >= std::min(data->count, SCAN_RESULT_BUFF_SIZE)) {
         /* We can not abort the scan as this function is getting executed in WHD context,
            Note that to call any WHD API, caller function should not in WHD context */
-        /* Temp Fix: Allow the scan results to complete on it's own */
-        //whd_wifi_stop_scan(data->ifp);
-        //data->scan_in_progress = false;
-        //data->sema->release();
         return;
     }
 
     whd_scan_result_t* record = ( *result_ptr );
 
-    for (int i=0; i<data->offset; i++) {
+    for (unsigned int i=0; i<data->offset; i++) {
         if (CMP_MAC( data->result_buff[i].BSSID.octet, record->BSSID.octet ))
             return;
     }
@@ -313,11 +281,6 @@ static void whd_scan_handler(whd_scan_result_t** result_ptr,
         ap.rssi = record->signal_strength;
         ap.channel = record->channel;
         data->aps[data->offset] = WiFiAccessPoint(ap);
-    }
-
-    if (data->offset < SCAN_RESULT_BUFF_SIZE) {
-        // store as ap object
-        data->result_buff[data->offset] = *record;
     }
 
     data->offset += 1;
