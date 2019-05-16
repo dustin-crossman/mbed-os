@@ -122,6 +122,7 @@ public:
 protected:
     // friend of CellularDevice, so it's the only way to close or delete this class.
     friend class CellularDevice;
+    CellularContext();
     virtual ~CellularContext() {}
 public: // from NetworkInterface
     virtual nsapi_error_t set_blocking(bool blocking) = 0;
@@ -281,6 +282,12 @@ public: // from NetworkInterface
     /** Returns the control plane AT command interface
      */
     virtual ControlPlane_netif *get_cp_netif() = 0;
+
+    /** Get the pdp context id associated with this context.
+     *
+     *  @return cid
+     */
+    int get_cid() const;
 
 protected: // Device specific implementations might need these so protected
     enum ContextOperation {

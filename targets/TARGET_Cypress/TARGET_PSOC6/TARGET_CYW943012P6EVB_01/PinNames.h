@@ -72,6 +72,13 @@ typedef cyhal_gpio_t PinName;
 #define QSPI_IO_3 P11_3
 #define QSPI_SEL P11_2
 
+#define QSPI_FLASH1_IO0 QSPI_IO_0
+#define QSPI_FLASH1_IO1 QSPI_IO_1
+#define QSPI_FLASH1_IO2 QSPI_IO_2
+#define QSPI_FLASH1_IO3 QSPI_IO_3
+#define QSPI_FLASH1_SCK QSPI_CLK
+#define QSPI_FLASH1_CSN QSPI_SEL
+
 // Standardized interfaces names
 #define STDIO_UART_TX UART_TX
 #define STDIO_UART_RX UART_RX

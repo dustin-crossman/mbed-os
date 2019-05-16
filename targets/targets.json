@@ -1347,7 +1347,7 @@
     "KW24D": {
         "supported_form_factors": ["ARDUINO"],
         "core": "Cortex-M4",
-        "supported_toolchains": ["ARMC5", "GCC_ARM", "IAR"],
+        "supported_toolchains": ["ARM", "GCC_ARM", "IAR"],
         "extra_labels": ["Freescale", "MCUXpresso_MCUS", "KSDK2_MCUS", "FRDM"],
         "is_disk_virtual": true,
         "macros": ["CPU_MKW24D512VHA5", "FSL_RTOS_MBED"],
@@ -1510,12 +1510,10 @@
             "SPI_ASYNCH",
             "SPISLAVE",
             "STDIO_MESSAGES",
-            "STORAGE",
             "TRNG",
             "FLASH",
             "USBDEVICE"
         ],
-        "features": ["STORAGE"],
         "release_versions": ["2", "5"],
         "device_name": "MK64FN1M0xxx12",
         "bootloader_supported": true,
@@ -2090,6 +2088,7 @@
             "PORTINOUT",
             "PORTOUT",
             "SERIAL",
+            "SERIAL_FC",
             "SLEEP",
             "SPI",
             "SPISLAVE",
@@ -2416,6 +2415,7 @@
                 "macro_name": "CLOCK_SOURCE"
             }
         },
+        "components_add": ["FLASHIAP"],
         "detect_code": ["0745"],
         "device_has_add": [
             "ANALOGOUT",
@@ -2644,7 +2644,7 @@
             "CYW4343X",
             "CORDIO"
         ],
-        "features": ["BLE", "STORAGE"],
+        "features": ["BLE"],
         "macros_add": ["USB_STM_HAL", "USBHOST_OTHER"],
         "device_has_add": [
             "SERIAL_ASYNCH",
@@ -3468,7 +3468,7 @@
             "MPU"
         ],
         "device_has_remove": ["LPTICKER"],
-        "macros_add": ["MBEDTLS_CONFIG_HW_SUPPORT"],
+        "macros_add": ["MBEDTLS_CONFIG_HW_SUPPORT", "MBED_SPLIT_HEAP"],
         "device_name": "STM32L443RC",
         "detect_code": ["0458"],
         "bootloader_supported": true
@@ -3493,7 +3493,8 @@
         "detect_code": ["0765"],
         "macros_add": [
             "MBED_TICKLESS",
-            "USBHOST_OTHER"
+            "USBHOST_OTHER",
+            "MBED_SPLIT_HEAP"
         ],
         "device_has_add": [
             "ANALOGOUT",
@@ -3555,7 +3556,8 @@
         "macros_add": [
             "MBED_TICKLESS",
             "USBHOST_OTHER",
-            "MBEDTLS_CONFIG_HW_SUPPORT"
+            "MBEDTLS_CONFIG_HW_SUPPORT",
+            "MBED_SPLIT_HEAP"
         ],
         "device_has_add": [
             "ANALOGOUT",
@@ -3590,7 +3592,8 @@
         "detect_code": ["0460"],
         "macros_add": [
             "MBEDTLS_CONFIG_HW_SUPPORT",
-            "WISE_1570"
+            "WISE_1570",
+            "MBED_SPLIT_HEAP"
         ],
         "device_has_add": [
             "ANALOGOUT",
@@ -4150,7 +4153,8 @@
         "detect_code": ["0764"],
         "macros_add": [
             "MBED_TICKLESS",
-            "USBHOST_OTHER"
+            "USBHOST_OTHER",
+            "MBED_SPLIT_HEAP"
         ],
         "device_has_add": [
             "ANALOGOUT",
@@ -4181,7 +4185,7 @@
             }
         },
         "detect_code": ["0468"],
-        "macros_add": ["USBHOST_OTHER", "TWO_RAM_REGIONS"],
+        "macros_add": ["USBHOST_OTHER", "MBED_SPLIT_HEAP"],
         "device_has_add": [
             "ANALOGOUT",
             "CAN",
@@ -4214,7 +4218,8 @@
         "detect_code": ["0820"],
         "macros_add": [
             "MBED_TICKLESS",
-            "USBHOST_OTHER"
+            "USBHOST_OTHER",
+            "MBED_SPLIT_HEAP"
         ],
         "device_has_add": [
             "ANALOGOUT",
@@ -4229,8 +4234,8 @@
         "device_name": "STM32L476VG",
         "bootloader_supported": true
     },
-	"RHOMBIO_L476DMW1K": {
-        "components_add": ["FLASHIAP"],
+    "RHOMBIO_L476DMW1K": {
+        "components_add": ["QSPIF", "FLASHIAP"],
         "inherits": ["FAMILY_STM32"],
         "core": "Cortex-M4F",
         "extra_labels_add": ["STM32L4", "STM32L476xG", "STM32L476VG"],
@@ -4250,7 +4255,7 @@
         "macros_add": [
             "MBED_TICKLESS",
             "USBHOST_OTHER",
-            "TWO_RAM_REGIONS"
+            "MBED_SPLIT_HEAP"
         ],
         "device_has_add": [
             "ANALOGOUT",
@@ -4258,6 +4263,7 @@
             "SERIAL_FC",
             "TRNG",
             "FLASH",
+            "QSPI", 
             "MPU"
         ],
         "release_versions": ["2", "5"],
@@ -4298,6 +4304,7 @@
         "inherits": ["FAMILY_STM32"],
         "core": "Cortex-M4F",
         "extra_labels_add": ["STM32F4", "STM32F411RE"],
+        "components_add": ["FLASHIAP"],
         "config": {
             "modem_is_on_board": {
                 "help": "Value: Tells the build system that the modem is on-board as oppose to a plug-in shield/module.",
@@ -4311,17 +4318,18 @@
             }
         },
         "overrides": { "lse_available": 0 },
-        "macros_add": ["HSE_VALUE=26000000", "VECT_TAB_OFFSET=0x08010000"],
+        "macros_add": ["HSE_VALUE=26000000"],
         "post_binary_hook": {
             "function": "MTSCode.combine_bins_mts_dragonfly",
             "toolchains": ["GCC_ARM", "ARM_STD", "ARM_MICRO", "IAR"]
         },
-        "device_has_add": ["MPU"],
+        "device_has_add": ["MPU", "FLASH"],
         "device_has_remove": [
             "SERIAL_FC"
         ],
         "release_versions": ["2", "5"],
-        "device_name": "STM32F411RE"
+        "device_name": "STM32F411RE",
+        "bootloader_supported": true
     },
     "MTS_DRAGONFLY_L471QG": {
         "inherits": ["FAMILY_STM32"],
@@ -4358,6 +4366,9 @@
             "TRNG",
             "FLASH",
             "MPU"
+        ],
+        "macros_add": [
+            "MBED_SPLIT_HEAP"
         ],
         "release_versions": ["2", "5"],
         "device_name": "STM32L471QG",
@@ -6502,6 +6513,7 @@
         "device_name": "EFM32GG11B820F2048GL192",
         "device_has": [
             "ANALOGIN",
+            "CAN",
             "CRC",
             "EMAC",
             "I2C",
@@ -7419,6 +7431,7 @@
             "FLASH",
             "MPU"
         ],
+        "components_add": ["FLASHIAP"],
         "release_versions": ["2", "5"],
         "device_name": "M453VG6AE",
         "bootloader_supported": true,
@@ -8085,6 +8098,7 @@
             "FLASH",
             "MPU"
         ],
+        "components_add": ["FLASHIAP"],
         "detect_code": ["1305"],
         "release_versions": ["5"],
         "device_name": "M2351KIAAEES",
@@ -8371,7 +8385,7 @@
         "supported_form_factors": ["ARDUINO"],
         "extra_labels_add": ["PSOC6_FUTURE", "CY8C63XX", "FUTURE_SEQUANA"],
         "extra_labels_remove": ["PSOC6"],
-        "device_has_remove": ["TRNG", "CRC"],
+        "device_has_remove": ["TRNG", "CRC", "QSPI"],
         "macros_add": ["CY8C6347BZI_BLD53"],
         "detect_code": ["6000"],
         "post_binary_hook": {
@@ -8400,7 +8414,7 @@
         "supported_form_factors": ["ARDUINO"],
         "extra_labels_add": ["PSOC6_FUTURE", "CY8C63XX", "CORDIO"],
         "extra_labels_remove": ["PSOC6"],
-        "device_has_remove": ["TRNG", "CRC"],
+        "device_has_remove": ["TRNG", "CRC", "QSPI"],
         "macros_add": ["CY8C6347BZI_BLD53"],
         "detect_code": ["6000"],
         "hex_filename": "psoc63_m0_default_1.03.hex",
@@ -8527,6 +8541,13 @@
     "UNO_91H": {
         "inherits": ["RDA5981X"],
         "detect_code": ["8001"],
+        "components_add": ["FLASHIAP"],
+        "bootloader_supported": true,
+        "mbed_ram_start": "0x00100080",
+        "mbed_ram_size": "0x1ff80",
+        "mbed_rom_start": "0x18001000",
+        "mbed_rom_size": "0x1F4000",
+        "sectors": [[0,4096]],
         "overrides": {
             "network-default-interface-type" : "WIFI"
         }
