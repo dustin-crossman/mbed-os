@@ -4252,7 +4252,7 @@
         "device_name": "STM32L476VG",
         "bootloader_supported": true
     },
-	"RHOMBIO_L476DMW1K": {
+    "RHOMBIO_L476DMW1K": {
         "components_add": ["FLASHIAP"],
         "inherits": ["FAMILY_STM32"],
         "core": "Cortex-M4F",
@@ -7786,13 +7786,13 @@
         "overrides": { "lpticker_delay_ticks": 4 },
         "detect_code": ["0839"],
         "device_has_add": [
-			"CRC",
-			"SERIAL_ASYNCH",
-			"SERIAL_FC",
-			"TRNG",
-			"FLASH",
-			"MPU"
-		],
+            "CRC",
+            "SERIAL_ASYNCH",
+            "SERIAL_FC",
+            "TRNG",
+            "FLASH",
+            "MPU"
+        ],
         "features": ["BLE"],
         "release_versions": ["2", "5"],
         "bootloader_supported": true
@@ -8227,7 +8227,7 @@
     "CY8CKIT_062_WIFI_BT_M0": {
         "inherits": ["MCU_PSOC6_M0"],
         "supported_form_factors": ["ARDUINO"],
-        "extra_labels_add": ["PSOC6_01", "CY8C62XX", "CY8CKIT_062_WIFI_BT"],
+        "extra_labels_add": ["PSOC6_01", "CY8CKIT_062_WIFI_BT"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
         "detect_code": ["1900"],
         "post_binary_hook": {
@@ -8260,16 +8260,15 @@
             "MBEDTLS_PSA_CRYPTO_SPM",
             "MBEDTLS_PSA_CRYPTO_C",
             "MBEDTLS_ENTROPY_NV_SEED",
-            "CY_IPC_DEFAULT_CFG_DISABLE",
             "PU_ENABLE"
         ],
         "deliver_to_target": "CY8CKIT_062_WIFI_BT_PSA",
         "delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_CY8CKIT_062_WIFI_BT_PSA/prebuilt",
         "overrides": {
             "secure-rom-start": "0x10000000",
-            "secure-rom-size": "0x40000",
-            "non-secure-rom-start": "0x10040000",
-            "non-secure-rom-size": "0xB8000",
+            "secure-rom-size": "0x80000",
+            "non-secure-rom-start": "0x10080000",
+            "non-secure-rom-size": "0x78000",
             "secure-ram-start": "0x08000000",
             "secure-ram-size": "0x10000",
             "non-secure-ram-start": "0x08010000",
@@ -8289,9 +8288,9 @@
         "hex_filename": "psa_release_1.0.hex",
         "overrides": {
             "secure-rom-start": "0x10000000",
-            "secure-rom-size": "0x40000",
-            "non-secure-rom-start": "0x10040000",
-            "non-secure-rom-size": "0xB8000",
+            "secure-rom-size": "0x80000",
+            "non-secure-rom-start": "0x10080000",
+            "non-secure-rom-size": "0x78000",
             "secure-ram-start": "0x08000000",
             "secure-ram-size": "0x10000",
             "non-secure-ram-start": "0x08010000",
@@ -8830,15 +8829,15 @@
         "detect_code": ["1703"],
         "macros_add": ["GD32E10X"],
         "release_versions": ["5"]
-	},
+    },
     "TT_M4G9": {
-		"inherits": ["Target"],
-		"core": "Cortex-M4F",
-		"is_disk_virtual": true,
-		"extra_labels": ["TT"],
-		"macros": ["__TT_M4G9__"],
-		"supported_toolchains": ["GCC_ARM", "ARM", "IAR"],
-		"device_has": ["USTICKER",
+        "inherits": ["Target"],
+        "core": "Cortex-M4F",
+        "is_disk_virtual": true,
+        "extra_labels": ["TT"],
+        "macros": ["__TT_M4G9__"],
+        "supported_toolchains": ["GCC_ARM", "ARM", "IAR"],
+        "device_has": ["USTICKER",
                    "RESET_REASON",
                    "ANALOGIN",
                    "ANALOGOUT",
@@ -8855,11 +8854,11 @@
                    "STDIO_MESSAGES",
                    "FLASH",
                    "MPU"
-		],
-		"device_name": "TMPM4G9F15FG",
-		"detect_code": ["8013"],
-		"release_versions": ["5"],
-		"bootloader_supported": true
+        ],
+        "device_name": "TMPM4G9F15FG",
+        "detect_code": ["8013"],
+        "release_versions": ["5"],
+        "bootloader_supported": true
     },
     "__build_tools_metadata__": {
         "version": "1",
