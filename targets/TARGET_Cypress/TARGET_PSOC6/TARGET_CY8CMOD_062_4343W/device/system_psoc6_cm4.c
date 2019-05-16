@@ -32,6 +32,7 @@
 #include "cy_syslib.h"
 #include "cy_wdt.h"
 #include "cycfg.h"
+#include "cybsp_api_wifi.h"
 
 #if !defined(CY_IPC_DEFAULT_CFG_DISABLE)
     #include "cy_ipc_sema.h"
@@ -270,9 +271,17 @@ void SystemInit(void)
 #endif /* !defined(CY_IPC_DEFAULT_CFG_DISABLE) */
 }
 
+/*******************************************************************************
+* Function Name: mbed_main
+****************************************************************************//**
+*
+* Mbed's post-memory-initialization function.
+* Used here to initialize common parts of the Cypress libraries.
+*
+*******************************************************************************/
 void mbed_main(void)
 {
-    cy_board_init();
+    cybsp_wifi_init();
 }
 
 /*******************************************************************************
@@ -302,7 +311,7 @@ void mbed_sdk_init(void)
 #endif
 
     /* Set up the device based on configurator selections */
-    init_cycfg_all();
+    cybsp_init();
 
     /* Enable global interrupts */
     __enable_irq();

@@ -23,6 +23,7 @@
 *******************************************************************************/
 #include "cybsp_api_wifi.h"
 #include "cy_network_buffer.h"
+#include "cmsis_os2.h"
 
 #if defined(__cplusplus)
 extern "C" {

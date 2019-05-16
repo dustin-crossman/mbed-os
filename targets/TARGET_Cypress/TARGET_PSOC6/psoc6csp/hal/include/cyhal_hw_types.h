@@ -298,7 +298,7 @@ typedef struct {
     uint16_t                    block_size;
     
     stc_sdio_irq_cb_t*          pfuCb;
-    uint32_t                    irqCause;
+    uint32_t                    irq_cause;
 #else
     void *empty;
 #endif /* defined(CY_IP_MXSDHC) */
@@ -375,6 +375,21 @@ typedef struct {
     void *empty;
 #endif
 } cyhal_wdt_t;
+
+
+/** USB Device object */
+typedef struct {
+#ifdef CY_IP_MXUSBFS
+    USBFS_Type*                     base;
+    cy_stc_usbfs_dev_drv_context_t* context;
+    cyhal_resource_inst_t           resource;
+    cyhal_gpio_t                    pin_dp;
+    cyhal_gpio_t                    pin_dm;
+    /* TODO: complete definition during implementation */
+#else
+    void *empty;
+#endif
+} cyhal_usb_dev_t;
 
 /** \} group_hal_hw_types_data_structures */
 

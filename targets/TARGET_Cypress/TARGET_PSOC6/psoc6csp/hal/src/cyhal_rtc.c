@@ -80,13 +80,27 @@ cy_rslt_t cyhal_rtc_init(cyhal_rtc_t *obj)
     cy_rslt_t rslt = CY_RSLT_SUCCESS;
     if (cyhal_rtc_initialized == CY_RTC_STATE_UNINITIALIZED)
     {
-        static const struct tm initial_time = {
-            .tm_mday = 1,
-            .tm_year = 70,
-            // _rtc_maketime does not use tm_wday or tm_yday
-        };
-        if (CY_RSLT_SUCCESS != (rslt = (cyhal_rtc_write(obj, &initial_time))))
-            return rslt;
+        cy_stc_rtc_config_t dateTime;
+        Cy_RTC_GetDateAndTime(&dateTime);
+        if (0 == dateTime.dayOfWeek || 0 == dateTime.date || 0 == dateTime.month)
+        {
+            // Date is not valid; reset to default time
+            dateTime.sec = 0;
+            dateTime.min = 0;
+            dateTime.hour = 0;
+            dateTime.amPm = CY_RTC_AM;
+            dateTime.hrFormat = CY_RTC_24_HOURS;
+            dateTime.dayOfWeek = CY_RTC_THURSDAY;
+            dateTime.date = 1;
+            dateTime.month = 1;
+            dateTime.year = 70;
+            Cy_RTC_SetDateAndTime(&dateTime);
+        }
+        else
+        {
+            // Time is already set (possibly after sw reset). Assume century.
+            cyhal_rtc_century = 2000;
+        }
         Cy_RTC_ClearInterrupt(CY_RTC_INTR_CENTURY);
         Cy_RTC_SetInterruptMask(CY_RTC_INTR_CENTURY);
         static const cy_stc_sysint_t irqCfg = {srss_interrupt_backup_IRQn, CY_RTC_DEFAULT_PRIORITY};

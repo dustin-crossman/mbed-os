@@ -84,7 +84,7 @@ static cy_rslt_t reserve_pins(void)
     {
         return result;
     }
-    result = reserve_pin((cyhal_gpio_t)CYBSP_BTN2);
+    result = reserve_pin((cyhal_gpio_t)CYBSP_USER_BTN0);
     if (result != CY_RSLT_SUCCESS)
     {
         return result;
@@ -109,27 +109,27 @@ static cy_rslt_t reserve_pins(void)
     {
         return result;
     }
-    result = reserve_pin((cyhal_gpio_t)CYBSP_LED_RED);
+    result = reserve_pin((cyhal_gpio_t)CYBSP_LED_RGB_RED);
     if (result != CY_RSLT_SUCCESS)
     {
         return result;
     }
-    result = reserve_pin((cyhal_gpio_t)CYBSP_LED_BLUE);
+    result = reserve_pin((cyhal_gpio_t)CYBSP_LED_RGB_BLUE);
     if (result != CY_RSLT_SUCCESS)
     {
         return result;
     }
-    result = reserve_pin((cyhal_gpio_t)CYBSP_LED_GREEN);
+    result = reserve_pin((cyhal_gpio_t)CYBSP_LED_RGB_GREEN);
     if (result != CY_RSLT_SUCCESS)
     {
         return result;
     }
-    result = reserve_pin((cyhal_gpio_t)CYBSP_LED8);
+    result = reserve_pin((cyhal_gpio_t)CYBSP_USER_LED0);
     if (result != CY_RSLT_SUCCESS)
     {
         return result;
     }
-    return reserve_pin((cyhal_gpio_t)CYBSP_LED9);
+    return reserve_pin((cyhal_gpio_t)CYBSP_USER_LED1);
 }
 
 static cy_rslt_t reserve_peri_diviers(void)
@@ -185,7 +185,7 @@ cy_rslt_t cybsp_init(void)
 
 cy_rslt_t cybsp_led_init(cybsp_led_t which)
 {
-    return cyhal_gpio_init((cyhal_gpio_t)which, CYHAL_GPIO_DIR_OUTPUT, CYHAL_GPIO_DRIVE_STRONG, CYBSP_LED_OFF);
+    return cyhal_gpio_init((cyhal_gpio_t)which, CYHAL_GPIO_DIR_OUTPUT, CYHAL_GPIO_DRIVE_STRONG, CYBSP_LED_STATE_OFF);
 }
 
 cy_rslt_t cybsp_led_set_state(cybsp_led_t which, bool on)
@@ -198,28 +198,28 @@ cy_rslt_t cybsp_led_toggle(cybsp_led_t which)
     return cyhal_gpio_toggle((cyhal_gpio_t)which);
 }
 
-cy_rslt_t cybsp_switch_init(cybsp_switch_t which)
+cy_rslt_t cybsp_btn_init(cybsp_btn_t which)
 {
-    return cyhal_gpio_init((cyhal_gpio_t)which, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_SWITCH_OFF);
+    return cyhal_gpio_init((cyhal_gpio_t)which, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
 }
 
-cy_rslt_t cybsp_switch_get_state(cybsp_switch_t which, bool *state)
+cy_rslt_t cybsp_btn_get_state(cybsp_btn_t which, bool *state)
 {
     return cyhal_gpio_read((cyhal_gpio_t)which, state);
 }
 
-static void (*switch_interrupt_call_back) (void);
+static void (*btn_interrupt_call_back) (void);
 static void gpio_call_back_wrapper(void *handler_arg, cyhal_gpio_irq_event_t event)
 {
-    if (switch_interrupt_call_back != NULL)
+    if (btn_interrupt_call_back != NULL)
     {
-        switch_interrupt_call_back();
+        btn_interrupt_call_back();
     }
 }
 
-cy_rslt_t cybsp_switch_set_interrupt(cybsp_switch_t which, cyhal_gpio_irq_event_t type, void (*callback)(void))
+cy_rslt_t cybsp_btn_set_interrupt(cybsp_btn_t which, cyhal_gpio_irq_event_t type, void (*callback)(void))
 {
-    switch_interrupt_call_back = callback;
+    btn_interrupt_call_back = callback;
     cy_rslt_t result = cyhal_gpio_register_irq((cyhal_gpio_t)which, 7, &gpio_call_back_wrapper, NULL);
     if (result == CY_RSLT_SUCCESS)
     {

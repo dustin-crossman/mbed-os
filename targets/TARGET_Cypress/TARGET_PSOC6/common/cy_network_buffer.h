@@ -78,7 +78,7 @@ extern "C" {
  *
  *  @return          : CY_RSLT_SUCCESS or error code
  */
-cy_rslt_t cy_host_buffer_get(whd_buffer_t *buffer, whd_buffer_dir_t direction, uint16_t size, uint32_t timeout_ms);
+cy_rslt_t cy_host_buffer_get(whd_buffer_t *buffer, whd_buffer_dir_t direction, unsigned short size, unsigned long timeout_ms);
 
 /** Releases a packet buffer
  *
@@ -177,7 +177,7 @@ cy_rslt_t cy_buffer_add_remove_at_front(whd_buffer_t *buffer, int32_t add_remove
  *                    releasing this buffer is transferred from WHD at this point.
  *
  */
-void *cy_network_process_ethernet_data(whd_interface_t interface, whd_buffer_t buffer);
+void cy_network_process_ethernet_data(whd_interface_t interface, whd_buffer_t buffer);
 
 /** \} group_abstraction_buffer_functions */
 
