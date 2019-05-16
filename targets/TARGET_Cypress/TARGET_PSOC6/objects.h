@@ -80,10 +80,10 @@ struct trng_s {
 
 #if DEVICE_I2C
 struct i2c_s {
-    cy_i2c_t hal_i2c;
+    cyhal_i2c_t hal_i2c;
     cyhal_i2c_cfg_t cfg;
     void (*async_handler)(void);
-    cy_i2c_irq_event_t event;
+    cyhal_i2c_irq_event_t event;
     size_t async_rx_size;
 };
 #endif
