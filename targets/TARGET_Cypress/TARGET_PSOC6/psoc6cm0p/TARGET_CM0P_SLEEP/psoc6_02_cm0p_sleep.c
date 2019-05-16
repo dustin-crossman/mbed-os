@@ -2,9 +2,7 @@
 * \file psoc6_02_cm0p_sleep.c
 *
 * \brief
-* Cortex-M0+ application image.
-* To include it in the Cortex-M4 application, append to CFLAGS:
-* -DPSOC6_02_CM0P_SLEEP
+* Cortex-M0+ prebuilt application image.
 *
 ********************************************************************************
 * \copyright
@@ -14,8 +12,9 @@
 *******************************************************************************/
 
 #include <stdint.h>
+#include "cy_device_headers.h"
 
-#if defined(PSOC6_02_CM0P_SLEEP)
+#if defined(_PSOC6_02_CONFIG_H_)
 
 #if defined(__APPLE__) && defined(__clang__)
 __attribute__ ((__section__("__CY_M0P_IMAGE,__cy_m0p_image"), used))
@@ -345,4 +344,4 @@ const uint8_t cy_m0p_image[] = {
     0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u,
     0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u,
 };
-#endif /* defined(PSOC6_02_CM0P_SLEEP) */
+#endif /* defined(_PSOC6_02_CONFIG_H_) */
