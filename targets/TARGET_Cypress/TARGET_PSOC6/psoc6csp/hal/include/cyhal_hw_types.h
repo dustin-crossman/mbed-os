@@ -111,8 +111,7 @@ typedef struct {
 /** DMA object */
 typedef struct {
 #if defined(CY_IP_M4CPUSS_DMAC_INSTANCES) || defined(CY_IP_M4CPUSS_DMA_INSTANCES)
-    /* TODO: define */
-    void * TODO_define;
+    cyhal_resource_inst_t     resource;
 #else
     void *empty;
 #endif
@@ -234,12 +233,7 @@ typedef struct {
 
 /** RTC object */
 typedef struct {
-#ifdef CY_IP_MXS40SRSS_RTC_INSTANCES
-    /* TODO: define */
-    void * TODO_define;
-#else
-    void *empty;
-#endif
+    uint8_t placeholder;
 } cyhal_rtc_t;
 
 /** SDHC object */
@@ -282,6 +276,7 @@ typedef struct {
     bool                        enableLedControl;
     cy_stc_sd_host_context_t    context;
     cyhal_gpio_t                resetPin;
+    uint32_t                    irq_cause;
 
 #elif defined(CY8C6247BZI_D54) /* TODO: BSP-525 */
     cyhal_resource_inst_t       resource;
@@ -303,7 +298,7 @@ typedef struct {
     uint16_t                    block_size;
     
     stc_sdio_irq_cb_t*          pfuCb;
-    uint32_t                    irqCause;
+    uint32_t                    irq_cause;
 #else
     void *empty;
 #endif /* defined(CY_IP_MXSDHC) */
@@ -362,6 +357,10 @@ typedef struct {
     cyhal_clock_divider_t       clock;
     cy_stc_scb_uart_context_t   context;
     uint32_t                    irq_cause;
+    cy_stc_syspm_callback_params_t pm_params;
+    cy_stc_syspm_callback_t     pm_callback;
+    en_hsiom_sel_t              saved_tx_hsiom;
+    en_hsiom_sel_t              saved_rts_hsiom;
 #else
     void *empty;
 #endif
@@ -376,6 +375,21 @@ typedef struct {
     void *empty;
 #endif
 } cyhal_wdt_t;
+
+
+/** USB Device object */
+typedef struct {
+#ifdef CY_IP_MXUSBFS
+    USBFS_Type*                     base;
+    cy_stc_usbfs_dev_drv_context_t* context;
+    cyhal_resource_inst_t           resource;
+    cyhal_gpio_t                    pin_dp;
+    cyhal_gpio_t                    pin_dm;
+    /* TODO: complete definition during implementation */
+#else
+    void *empty;
+#endif
+} cyhal_usb_dev_t;
 
 /** \} group_hal_hw_types_data_structures */
 

@@ -55,6 +55,8 @@ extern "C" {
 
 /** The requested resource type is invalid */
 #define CYHAL_UART_RSLT_ERR_INVALID_PIN (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_UART, 0))
+/** Failed to confiugre power management callback */
+#define CYHAL_UART_RSLT_ERR_PM_CALLBACK (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_UART, 1))
 
 /** \} group_hal_uart_macros */
 

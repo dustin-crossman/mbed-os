@@ -261,28 +261,8 @@
                 <Param id="sioOutputBuffer" value="true"/>
                 <Param id="inFlash" value="true"/>
             </Block>
-            <Block location="ioss[0].port[0].pin[3]" alias="LED_RED" template="mxs40pin" version="1.0">
-                <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
-                <Param id="initialState" value="1"/>
-                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
-                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
-                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
-                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
-                <Param id="sioOutputBuffer" value="true"/>
-                <Param id="inFlash" value="true"/>
-            </Block>
             <Block location="ioss[0].port[0].pin[4]" alias="SW2" template="mxs40pin" version="1.0">
                 <Param id="DriveModes" value="CY_GPIO_DM_PULLUP"/>
-                <Param id="initialState" value="1"/>
-                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
-                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
-                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
-                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
-                <Param id="sioOutputBuffer" value="true"/>
-                <Param id="inFlash" value="true"/>
-            </Block>
-            <Block location="ioss[0].port[11].pin[1]" alias="LED_BLUE" template="mxs40pin" version="1.0">
-                <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
                 <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
                 <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
@@ -351,7 +331,7 @@
                 <Param id="sioOutputBuffer" value="true"/>
                 <Param id="inFlash" value="true"/>
             </Block>
-            <Block location="ioss[0].port[13].pin[7]" alias="LED9" template="mxs40pin" version="1.0">
+            <Block location="ioss[0].port[13].pin[7]" alias="LED_RED" template="mxs40pin" version="1.0">
                 <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
                 <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
@@ -372,16 +352,6 @@
                 <Param id="inFlash" value="true"/>
             </Block>
             <Block location="ioss[0].port[1].pin[1]" alias="LED_GREEN" template="mxs40pin" version="1.0">
-                <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
-                <Param id="initialState" value="1"/>
-                <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
-                <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
-                <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
-                <Param id="driveStrength" value="CY_GPIO_DRIVE_FULL"/>
-                <Param id="sioOutputBuffer" value="true"/>
-                <Param id="inFlash" value="true"/>
-            </Block>
-            <Block location="ioss[0].port[1].pin[5]" alias="LED8" template="mxs40pin" version="1.0">
                 <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
                 <Param id="initialState" value="1"/>
                 <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
@@ -852,10 +822,6 @@
         <Net>
             <Port name="ioss[0].port[6].pin[1].digital_inout[0]"/>
             <Port name="scb[3].i2c_sda[0]"/>
-        </Net>
-        <Net>
-            <Port name="ioss[0].port[11].pin[1].digital_out[0]"/>
-            <Port name="tcpwm[0].cnt[1].line_compl[0]"/>
         </Net>
         <Net>
             <Port name="ioss[0].port[11].pin[2].digital_out[0]"/>

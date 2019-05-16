@@ -40,6 +40,7 @@
 #include "cyhal_adc.h"
 #include "cyhal_comp.h"
 #include "cyhal_crc.h"
+#include "cyhal_crc_impl.h"
 #include "cyhal_dac.h"
 #include "cyhal_dma.h"
 #include "cyhal_flash.h"
@@ -59,12 +60,11 @@
 #include "cyhal_spi.h"
 #include "cyhal_system.h"
 #include "cyhal_timer.h"
-#include "cyhal_uart.h"
-#include "cyhal_wdt.h"
-#include "cyhal_crc.h"
-#include "cyhal_crc_impl.h"
 #include "cyhal_trng.h"
 #include "cyhal_trng_impl.h"
+#include "cyhal_uart.h"
+#include "cyhal_wdt.h"
+
 
 /** \} group_hal */
 

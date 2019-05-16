@@ -66,7 +66,7 @@ IRQn_Type CY_QSPI_IRQ_N[CY_IP_MXSMIF_INSTANCES] =
 #endif /* ifdef SMIF0 */
 };
 
-static void cyhal_qspi_0_irq_handler(void) __attribute__((unused));
+static void cyhal_qspi_0_callback_handler(uint32_t event) __attribute__((unused));
 
 /* Callback information struct */
 static struct
@@ -77,68 +77,68 @@ static struct
 } irq_data_stc[CY_IP_MXSMIF_INSTANCES];
 
 /* Translate PDL QSPI interrupt cause into QSPI HAL interrupt cause */
-static cyhal_qspi_irq_event_t cyhal_convert_interrupt_from_pdl(uint32_t pdl_intr_cause)
+static cyhal_qspi_irq_event_t cyhal_convert_event_from_pdl(uint32_t pdl_intr_cause)
 {
-    cyhal_qspi_irq_event_t intr_cause = CYHAL_QSPI_IRQ_NONE;
+    cyhal_qspi_irq_event_t intr_cause;
 
-    intr_cause |= pdl_intr_cause & CY_SMIF_ALIGNMENT_ERROR ? CYHAL_QSPI_IRQ_ALIGNMENT_ERROR : 0;
-    intr_cause |= pdl_intr_cause & CY_SMIF_RX_DATA_FIFO_UNDERFLOW ? CYHAL_QSPI_IRQ_RX_DATA_FIFO_UNRFLW : 0;
-    intr_cause |= pdl_intr_cause & CY_SMIF_TX_DATA_FIFO_OVERFLOW ? CYHAL_QSPI_IRQ_TX_DATA_FIFO_OVRFLW : 0;
-    intr_cause |= pdl_intr_cause & CY_SMIF_TX_COMMAND_FIFO_OVERFLOW ? CYHAL_QSPI_IRQ_TX_CMD_FIFO_OVRFLW : 0;
-    intr_cause |= pdl_intr_cause & CY_SMIF_TX_DATA_FIFO_LEVEL_TRIGGER ? CYHAL_QSPI_IRQ_TX_DATA_FIFO_LEVEL_TRG : 0;
-    intr_cause |= pdl_intr_cause & CY_SMIF_RX_DATA_FIFO_LEVEL_TRIGGER ? CYHAL_QSPI_IRQ_RX_DATA_FIFO_LEVEL_TRG : 0;
+    switch (pdl_intr_cause)
+    {
+        case CY_SMIF_SEND_CMPLT:
+            intr_cause = CYHAL_QSPI_IRQ_TRANSMIT_DONE;
+            break;
+        case CY_SMIF_REC_CMPLT:
+            intr_cause = CYHAL_QSPI_IRQ_RECEIVE_DONE;
+            break;
+        default:
+            intr_cause = CYHAL_QSPI_IRQ_NONE;
+    }
 
     return intr_cause;
-}
-
-/* Translate QSPI HAL interrupt cause into QSPI PDL interrupt cause */
-static uint32_t cyhal_convert_interrupt_to_pdl(uint32_t event_cause)
-{
-    uint32_t pdl_intr_cause = 0u;
-
-    pdl_intr_cause |= event_cause & CYHAL_QSPI_IRQ_ALIGNMENT_ERROR ? CY_SMIF_ALIGNMENT_ERROR : 0;
-    pdl_intr_cause |= event_cause & CYHAL_QSPI_IRQ_RX_DATA_FIFO_UNRFLW ? CY_SMIF_RX_DATA_FIFO_UNDERFLOW : 0;
-    pdl_intr_cause |= event_cause & CYHAL_QSPI_IRQ_TX_DATA_FIFO_OVRFLW ? CY_SMIF_TX_DATA_FIFO_OVERFLOW : 0;
-    pdl_intr_cause |= event_cause & CYHAL_QSPI_IRQ_TX_CMD_FIFO_OVRFLW ? CY_SMIF_TX_COMMAND_FIFO_OVERFLOW : 0;
-    pdl_intr_cause |= event_cause & CYHAL_QSPI_IRQ_TX_DATA_FIFO_LEVEL_TRG ? CY_SMIF_TX_DATA_FIFO_LEVEL_TRIGGER : 0;
-    pdl_intr_cause |= event_cause & CYHAL_QSPI_IRQ_RX_DATA_FIFO_LEVEL_TRG ? CY_SMIF_RX_DATA_FIFO_LEVEL_TRIGGER : 0;
-
-    return pdl_intr_cause;
 }
 
 /*******************************************************************************
 *       Dispatcher Interrrupt Service Routine
 *******************************************************************************/
 
-static void cyhal_qspi_intr_wrapper_indexed(uint32_t instance_num)
+static void cyhal_qspi_callback_wrapper_indexed(uint32_t instance_num, uint32_t event)
 {
-    uint32_t intr_cause_pdl = Cy_SMIF_GetInterruptStatusMasked(irq_data_stc[instance_num].obj->base);
-    cyhal_qspi_irq_event_t irq_status = cyhal_convert_interrupt_from_pdl(intr_cause_pdl);
-
     if (NULL != irq_data_stc[instance_num].handler)
     {
+        cyhal_qspi_irq_event_t irq_status = cyhal_convert_event_from_pdl(event);
+
         /* Call registered callbacks here */
         irq_data_stc[instance_num].handler(irq_data_stc[instance_num].irq_arg, irq_status);
     }
-
-    Cy_SMIF_ClearInterrupt(irq_data_stc[instance_num].obj->base, intr_cause_pdl);
 }
-
 /*******************************************************************************
 *       (Internal) Interrrupt Service Routines
 *******************************************************************************/
 
 /* Handler for SMIF0 */
-static void cyhal_qspi_0_irq_handler()
+static void cyhal_qspi_0_callback_handler(uint32_t event)
 {
-    cyhal_qspi_intr_wrapper_indexed(0);
+    cyhal_qspi_callback_wrapper_indexed(0, event);
 }
 
-/* List of interrupt handler, takes instance id as idx */
-static void (*cyhal_qspi_intr_dispatcher_table[CY_IP_MXSMIF_INSTANCES])(void) =
+/* Interrupt call, needed for SMIF Async operations */
+static void cyhal_qspi_process_smif_0_intr()
+{
+    Cy_SMIF_Interrupt(irq_data_stc[0].obj->base, &(irq_data_stc[0].obj->context));
+}
+
+/* List of callback handler, takes instance id as idx */
+static void (*cyhal_qspi_callback_dispatcher_table[CY_IP_MXSMIF_INSTANCES])(uint32_t event) =
 {
 #if (CY_IP_MXSMIF_INSTANCES > 0)
-        cyhal_qspi_0_irq_handler,
+        cyhal_qspi_0_callback_handler,
+#endif /* CY_IP_MXSMIF_INSTANCES > 0 */
+};
+
+/* List of SMIF service interrupt handler, takes instance id as idx */
+static void (*cyhal_smif_intr_dispatcher_table[CY_IP_MXSMIF_INSTANCES])() =
+{
+#if (CY_IP_MXSMIF_INSTANCES > 0)
+        cyhal_qspi_process_smif_0_intr,
 #endif /* CY_IP_MXSMIF_INSTANCES > 0 */
 };
 
@@ -318,7 +318,8 @@ static cy_en_smif_txfr_width_t get_cyhal_bus_width(cyhal_qspi_bus_width_t bus_wi
 }
 
 /* Translates cyhal_qspi_command_t to cy_stc_smif_mem_cmd_t */
-static void convert_to_cyhal_cmd_config(const cyhal_qspi_command_t *qspi_command, cy_stc_smif_mem_cmd_t *const cyhal_cmd_config)
+static void convert_to_cyhal_cmd_config(const cyhal_qspi_command_t *qspi_command,
+    cy_stc_smif_mem_cmd_t *const cyhal_cmd_config)
 {
     /* This function does not check 'disabled' of each sub-structure in qspi_command_t
     *  It is the responsibility of the caller to check it. */
@@ -373,7 +374,8 @@ static uint32_t get_size(cyhal_qspi_size_t hal_size)
 
 /* Sends QSPI command with certain set of data */
 /* Address passed through 'command' is not used, instead the value in 'addr' is used. */
-static cy_rslt_t qspi_command_transfer(cyhal_qspi_t *obj, const cyhal_qspi_command_t *command, uint32_t addr, bool endOfTransfer)
+static cy_rslt_t qspi_command_transfer(cyhal_qspi_t *obj, const cyhal_qspi_command_t *command,
+    uint32_t addr, bool endOfTransfer)
 {
     /* max address size is 4 bytes and max alt size is 4 bytes */
     uint8_t cmd_param[8] = {0};
@@ -424,10 +426,9 @@ static cy_rslt_t qspi_command_transfer(cyhal_qspi_t *obj, const cyhal_qspi_comma
 
         uint32_t cmpltTxfr = ((endOfTransfer) ? 1UL : 0UL);
         result = (cy_rslt_t)Cy_SMIF_TransmitCommand(obj->base, cyhal_cmd_config.command,
-                                                                 cyhal_cmd_config.cmdWidth, cmd_param, (addr_size + alt_size),
-                                                                 bus_width, obj->slave_select, cmpltTxfr, &obj->context);
+                                                         cyhal_cmd_config.cmdWidth, cmd_param, (addr_size + alt_size),
+                                                         bus_width, obj->slave_select, cmpltTxfr, &obj->context);
     }
-
     return result;
 }
 
@@ -442,12 +443,12 @@ static cy_rslt_t check_user_pins(cyhal_qspi_t * obj, cyhal_qspi_bus_width_t * ma
     }
     else
     {
-    	*max_width = CYHAL_QSPI_CFG_BUS_SINGLE;
+        *max_width = CYHAL_QSPI_CFG_BUS_SINGLE;
     }
     /* Dual mode */
     if (NC != obj->pin_io1)
     {
-    	*max_width = CYHAL_QSPI_CFG_BUS_DUAL;
+        *max_width = CYHAL_QSPI_CFG_BUS_DUAL;
     }
     /* Quad Mode */
     if ((NC != obj->pin_io2) && (CY_RSLT_SUCCESS == result))
@@ -458,7 +459,7 @@ static cy_rslt_t check_user_pins(cyhal_qspi_t * obj, cyhal_qspi_bus_width_t * ma
             result = NC != obj->pin_io3 ? CY_RSLT_SUCCESS : CYHAL_QSPI_RSLT_ERR_PIN;
             if (CY_RSLT_SUCCESS == result)
             {
-            	*max_width = CYHAL_QSPI_CFG_BUS_QUAD;
+                *max_width = CYHAL_QSPI_CFG_BUS_QUAD;
             }
         }
     }
@@ -487,9 +488,9 @@ static cy_rslt_t check_user_pins(cyhal_qspi_t * obj, cyhal_qspi_bus_width_t * ma
             result = NC != obj->pin_io7 ? CY_RSLT_SUCCESS : CYHAL_QSPI_RSLT_ERR_PIN;
         }
         if (CY_RSLT_SUCCESS == result)
-		{
-        	*max_width = CYHAL_QSPI_CFG_BUS_OCTAL;
-		}
+        {
+            *max_width = CYHAL_QSPI_CFG_BUS_OCTAL;
+        }
 
     }
     if (CY_RSLT_SUCCESS == result)
@@ -588,19 +589,19 @@ static const cyhal_resource_pin_mapping_t * get_dataselect(cyhal_gpio_t io0, cy_
 /* Check if obj->base instance is instance of QSPI */
 static bool check_instance_is_correct(cyhal_qspi_t *obj)
 {
-	bool instance_correct = false;
-	uint32_t i;
+    bool instance_correct = false;
+    uint32_t i;
 
-	for (i=0;i<CY_IP_MXSMIF_INSTANCES;i++)
-	{
-		if (obj->base == smif_base_addresses[i])
-		{
-			instance_correct = true;
-			break;
-		}
-	}
+    for (i=0;i<CY_IP_MXSMIF_INSTANCES;i++)
+    {
+        if (obj->base == smif_base_addresses[i])
+        {
+            instance_correct = true;
+            break;
+        }
+    }
 
-	return instance_correct;
+    return instance_correct;
 }
 
 /* Free all allocated resources */
@@ -611,11 +612,11 @@ static cy_rslt_t free_resources(cyhal_qspi_t *obj)
 
     if (check_instance_is_correct(obj))
     {
-    	Cy_SMIF_DeInit(obj->base);
+        Cy_SMIF_DeInit(obj->base);
     }
     else
     {
-    	ret_result = CYHAL_QSPI_RSLT_ERR_INSTANCE;
+        ret_result = CYHAL_QSPI_RSLT_ERR_INSTANCE;
     }
 
     if (CYHAL_RSC_INVALID != obj->resource.type)
@@ -799,8 +800,8 @@ cy_rslt_t cyhal_qspi_init(
         {
             if (sclk_map->inst->block_num != io1_map->inst->block_num)
             {
-				result = CYHAL_QSPI_RSLT_ERR_PIN;
-			}
+                result = CYHAL_QSPI_RSLT_ERR_PIN;
+            }
         }
     }
     /* Pins io2 and io3 are only available in CY_SMIF_DATA_SEL0 and CY_SMIF_DATA_SEL2 modes */
@@ -884,7 +885,8 @@ cy_rslt_t cyhal_qspi_init(
     bool configured = false;
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_hwmgr_is_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num, &configured);
+        result = cyhal_hwmgr_is_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num,
+            &configured);
     }
 
     if ((CY_RSLT_SUCCESS == result) && !configured)
@@ -898,7 +900,20 @@ cy_rslt_t cyhal_qspi_init(
 
     if (CY_RSLT_SUCCESS == result)
     {
-    	result = cyhal_hwmgr_reserve(&(obj->resource));
+        result = cyhal_hwmgr_reserve(&(obj->resource));
+    }
+
+    if (CY_RSLT_SUCCESS == result)
+    {
+        irq_data_stc[obj->resource.block_num].obj = obj;
+        irq_data_stc[obj->resource.block_num].obj->irq_cause = CYHAL_QSPI_IRQ_NONE;
+        /* default interrupt priority of 7 (lowest possible priority). */
+        cy_stc_sysint_t irqCfg = {
+            .intrSrc = CY_QSPI_IRQ_N[obj->resource.block_num],
+            .intrPriority = 7u
+        };
+        Cy_SysInt_Init(&irqCfg, cyhal_smif_intr_dispatcher_table[obj->resource.block_num]);
+        NVIC_EnableIRQ(CY_QSPI_IRQ_N[obj->resource.block_num]);
     }
 
     if (CY_RSLT_SUCCESS != result)
@@ -916,13 +931,13 @@ cy_rslt_t cyhal_qspi_free(cyhal_qspi_t *obj)
 
     if (NULL != obj)
     {
-    	ret_result = free_resources(obj);
-    	result = cyhal_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
-		ret_result = (CY_RSLT_SUCCESS == result) ? ret_result : result;
+        ret_result = free_resources(obj);
+        result = cyhal_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
+        ret_result = (CY_RSLT_SUCCESS == result) ? ret_result : result;
     }
     else
     {
-    	ret_result = CYHAL_QSPI_RSLT_ERR_INSTANCE;
+        ret_result = CYHAL_QSPI_RSLT_ERR_INSTANCE;
     }
 
     return ret_result;
@@ -968,7 +983,7 @@ cy_rslt_t cyhal_qspi_read(cyhal_qspi_t *obj, const cyhal_qspi_command_t *command
             if (CY_RSLT_SUCCESS == status)
             {
                 status = (cy_rslt_t)Cy_SMIF_ReceiveDataBlocking(obj->base, (uint8_t *)data, chunk,
-                                                                            get_cyhal_bus_width(command->data.bus_width), 
+                                                                            get_cyhal_bus_width(command->data.bus_width),
                                                                             &obj->context);
                 if (CY_RSLT_SUCCESS != status)
                 {
@@ -981,6 +996,36 @@ cy_rslt_t cyhal_qspi_read(cyhal_qspi_t *obj, const cyhal_qspi_command_t *command
         data = (uint8_t *)data + chunk;
     }
 
+    return status;
+}
+
+cy_rslt_t cyhal_qspi_read_async(cyhal_qspi_t *obj, const cyhal_qspi_command_t *command, void *data, size_t *length)
+{
+    cy_rslt_t status = CY_RSLT_SUCCESS;
+    uint32_t addr = command->address.value;
+    status = qspi_command_transfer(obj, command, addr, false);
+    if (CY_RSLT_SUCCESS == status)
+    {
+        if (command->dummy_count > 0u)
+        {
+            status = (cy_rslt_t)Cy_SMIF_SendDummyCycles(obj->base, command->dummy_count);
+        }
+
+        if (CY_RSLT_SUCCESS == status)
+        {
+            cy_smif_event_cb_t callback_dispatcher_ptr;
+            if (obj->irq_cause & CYHAL_QSPI_IRQ_RECEIVE_DONE)
+            {
+                callback_dispatcher_ptr = cyhal_qspi_callback_dispatcher_table[obj->resource.block_num];
+            }
+            else
+            {
+                callback_dispatcher_ptr = NULL;
+            }
+            status = (cy_rslt_t)Cy_SMIF_ReceiveData(obj->base, (uint8_t *)data, (uint32_t)*length,
+                get_cyhal_bus_width(command->data.bus_width), callback_dispatcher_ptr, &obj->context);
+        }
+    }
     return status;
 }
 
@@ -1006,8 +1051,40 @@ cy_rslt_t cyhal_qspi_write(cyhal_qspi_t *obj, const cyhal_qspi_command_t *comman
     return status;
 }
 
+/* length can be up to 65536. */
+cy_rslt_t cyhal_qspi_write_async(cyhal_qspi_t *obj, const cyhal_qspi_command_t *command, const void *data, size_t *length)
+{
+    cy_rslt_t status = qspi_command_transfer(obj, command, command->address.value, false);
+
+    if (CY_RSLT_SUCCESS == status)
+    {
+        if (command->dummy_count > 0u)
+        {
+            status = (cy_rslt_t)Cy_SMIF_SendDummyCycles(obj->base, command->dummy_count);
+        }
+
+        if (CY_SMIF_SUCCESS == status)
+        {
+            cy_smif_event_cb_t callback_dispatcher_ptr;
+            if (obj->irq_cause & CYHAL_QSPI_IRQ_TRANSMIT_DONE)
+            {
+                callback_dispatcher_ptr = cyhal_qspi_callback_dispatcher_table[obj->resource.block_num];
+            }
+            else
+            {
+                callback_dispatcher_ptr = NULL;
+            }
+            status = (cy_rslt_t)Cy_SMIF_TransmitData(obj->base, (uint8_t *)data, *length, 
+                get_cyhal_bus_width(command->data.bus_width), callback_dispatcher_ptr, &obj->context);
+
+        }
+    }
+    return status;
+}
+
 cy_rslt_t cyhal_qspi_transfer(
-    cyhal_qspi_t *obj, const cyhal_qspi_command_t *command, const void *tx_data, size_t tx_size, void *rx_data, size_t rx_size)
+    cyhal_qspi_t *obj, const cyhal_qspi_command_t *command, const void *tx_data, size_t tx_size, void *rx_data,
+    size_t rx_size)
 {
     cy_rslt_t status = CY_RSLT_SUCCESS;
 
@@ -1036,25 +1113,10 @@ cy_rslt_t cyhal_qspi_transfer(
 
 cy_rslt_t cyhal_qspi_register_irq(cyhal_qspi_t *obj, cyhal_qspi_irq_handler_t handler, void *handler_arg)
 {
-    cy_rslt_t result = CY_RSLT_SUCCESS;
     uint8_t idx = obj->resource.block_num;
-    irq_data_stc[idx].obj = obj;
     irq_data_stc[idx].handler = handler;
     irq_data_stc[idx].irq_arg = handler_arg;
-
-    if (NVIC_GetEnableIRQ(CY_QSPI_IRQ_N[idx]) == 0)
-    {
-        /* default interrupt priority of 7 (lowest possible priority). */
-        cy_stc_sysint_t irqCfg = {
-            .intrSrc = CY_QSPI_IRQ_N[idx],
-            .intrPriority = 7u};
-        Cy_SMIF_SetInterruptMask(
-            irq_data_stc[idx].obj->base, cyhal_convert_interrupt_to_pdl(irq_data_stc[idx].obj->irq_cause));
-        Cy_SysInt_Init(&irqCfg, cyhal_qspi_intr_dispatcher_table[idx]);
-        NVIC_EnableIRQ(CY_QSPI_IRQ_N[idx]);
-    }
-
-    return result;
+    return CY_RSLT_SUCCESS;
 }
 
 cy_rslt_t cyhal_qspi_irq_enable(cyhal_qspi_t *obj, cyhal_qspi_irq_event_t event, bool enable)

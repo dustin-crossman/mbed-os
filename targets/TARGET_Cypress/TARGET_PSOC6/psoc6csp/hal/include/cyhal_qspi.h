@@ -75,13 +75,9 @@ typedef enum cyhal_qspi_size {
 
 /** QSPI interrupt triggers */
 typedef enum {
-    CYHAL_QSPI_IRQ_NONE                        = 0,        /**< Disable all interrupts. >*/
-    CYHAL_QSPI_IRQ_ALIGNMENT_ERROR             = 1 << 1,   /**< XIP_ALIGNMENT_ERROR interrupt see TRM for details. >*/
-    CYHAL_QSPI_IRQ_RX_DATA_FIFO_UNRFLW         = 1 << 2,   /**< RX_DATA_FIFO_UNDERFLOW interrupt see TRM for details. >*/
-    CYHAL_QSPI_IRQ_TX_DATA_FIFO_OVRFLW         = 1 << 3,   /**< TX_DATA_FIFO_OVERFLOW interrupt see TRM for details. >*/
-    CYHAL_QSPI_IRQ_TX_CMD_FIFO_OVRFLW          = 1 << 4,   /**< TX_CMD_FIFO_OVERFLOW interrupt see TRM for details. >*/
-    CYHAL_QSPI_IRQ_TX_DATA_FIFO_LEVEL_TRG      = 1 << 5,   /**< TR_TX_REQ interrupt see TRM for details. >*/
-    CYHAL_QSPI_IRQ_RX_DATA_FIFO_LEVEL_TRG      = 1 << 6,   /**< TR_RX_REQ interrupt see TRM for details. >*/
+    CYHAL_QSPI_IRQ_NONE                             = 0,            /**< Disable all interrupts. >*/
+    CYHAL_QSPI_IRQ_TRANSMIT_DONE                    = 1 << 0,       /**< Async transmit done. >*/
+    CYHAL_QSPI_IRQ_RECEIVE_DONE                     = 1 << 1,       /**< Async receive done. >*/
 } cyhal_qspi_irq_event_t;
 
 /** \} group_hal_qspi_enums */
@@ -107,25 +103,25 @@ typedef enum {
 /** QSPI command settings */
 typedef struct cyhal_qspi_command {
     struct {
-        cyhal_qspi_bus_width_t bus_width;              /**< Bus width for the instruction >*/
-        uint8_t value;                              /**< Instruction value >*/
-        bool disabled;                              /**< Instruction phase skipped if disabled is set to true >*/
+        cyhal_qspi_bus_width_t bus_width;               /**< Bus width for the instruction >*/
+        uint8_t value;                                  /**< Instruction value >*/
+        bool disabled;                                  /**< Instruction phase skipped if disabled is set to true >*/
     } instruction;
     struct {
-        cyhal_qspi_bus_width_t bus_width;              /**< Bus width for the address >*/
-        cyhal_qspi_size_t size;                        /**< Address size >*/
-        uint32_t value;                             /**< Address value >*/
-        bool disabled;                              /**< Address phase skipped if disabled is set to true >*/
+        cyhal_qspi_bus_width_t bus_width;               /**< Bus width for the address >*/
+        cyhal_qspi_size_t size;                         /**< Address size >*/
+        uint32_t value;                                 /**< Address value >*/
+        bool disabled;                                  /**< Address phase skipped if disabled is set to true >*/
     }  address;
     struct {
-        cyhal_qspi_bus_width_t bus_width;              /**< Bus width for alternative  >*/
-        cyhal_qspi_size_t size;                        /**< Alternative size >*/
-        uint32_t value;                             /**< Alternative value >*/
-        bool disabled;                              /**< Alternative phase skipped if disabled is set to true >*/
+        cyhal_qspi_bus_width_t bus_width;               /**< Bus width for alternative  >*/
+        cyhal_qspi_size_t size;                         /**< Alternative size >*/
+        uint32_t value;                                 /**< Alternative value >*/
+        bool disabled;                                  /**< Alternative phase skipped if disabled is set to true >*/
     } alt;
-    uint8_t dummy_count;                            /**< Dummy cycles count >*/
+    uint8_t dummy_count;                                /**< Dummy cycles count >*/
     struct {
-        cyhal_qspi_bus_width_t bus_width;              /**< Bus width for data >*/
+        cyhal_qspi_bus_width_t bus_width;               /**< Bus width for data >*/
     } data;
 } cyhal_qspi_command_t;
 
@@ -195,6 +191,16 @@ cy_rslt_t cyhal_qspi_frequency(cyhal_qspi_t *obj, uint32_t hz);
  */
 cy_rslt_t cyhal_qspi_read(cyhal_qspi_t *obj, const cyhal_qspi_command_t *command, void *data, size_t *length);
 
+/** Receive a command and block of data in asynchronous mode. Require __enable_irq() call in order to work.
+ *
+ * @param[in]     obj QSPI object
+ * @param[in]     command QSPI command
+ * @param[out]    data RX buffer
+ * @param[in,out] length in - RX buffer length in bytes, out - number of bytes read
+ * @return The status of the read request
+ */
+cy_rslt_t cyhal_qspi_read_async(cyhal_qspi_t *obj, const cyhal_qspi_command_t *command, void *data, size_t *length);
+
 /** Send a command and block of data
  *
  * @param[in]     obj     QSPI object
@@ -204,6 +210,16 @@ cy_rslt_t cyhal_qspi_read(cyhal_qspi_t *obj, const cyhal_qspi_command_t *command
  * @return The status of the write request
  */
 cy_rslt_t cyhal_qspi_write(cyhal_qspi_t *obj, const cyhal_qspi_command_t *command, const void *data, size_t *length);
+
+/** Send a command and block of data in asynchronous mode. Require __enable_irq() call in order to work.
+ *
+ * @param[in]     obj     QSPI object
+ * @param[in]     command QSPI command
+ * @param[in]     data    TX buffer
+ * @param[in,out] length  in - TX buffer length in bytes, out - number of bytes written
+ * @return The status of the write request
+ */
+cy_rslt_t cyhal_qspi_write_async(cyhal_qspi_t *obj, const cyhal_qspi_command_t *command, const void *data, size_t *length);
 
 /** Send a command (and optionally data) and get the response. Can be used to send/receive device specific commands
  *
@@ -219,8 +235,6 @@ cy_rslt_t cyhal_qspi_transfer(
     cyhal_qspi_t *obj, const cyhal_qspi_command_t *command, const void *tx_data, size_t tx_size, void *rx_data,
     size_t rx_size
 );
-
-//TODO: asynch
 
 /** The QSPI interrupt handler registration
  *

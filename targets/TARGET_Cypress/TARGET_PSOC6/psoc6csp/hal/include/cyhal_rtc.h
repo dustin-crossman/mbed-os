@@ -41,8 +41,12 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <time.h>
 #include "cy_result.h"
 #include "cyhal_implementation.h"
+
+/** RTC not initialized */
+#define CY_RSLT_RTC_NOT_INITIALIZED CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_RTC, 0)
 
 #if defined(__cplusplus)
 extern "C" {
@@ -55,8 +59,7 @@ extern "C" {
 
 /** RTC interrupt triggers */
 typedef enum {
-    /** TODO: Fill in */
-    CYHAL_RTC_TBD,
+    CYHAL_RTC_ALARM,
 } cyhal_rtc_irq_event_t;
 
 /** \} group_hal_rtc_enums */
@@ -111,26 +114,26 @@ cy_rslt_t cyhal_rtc_is_enabled(cyhal_rtc_t *obj);
 /** Get the current time from the RTC peripheral
  *
  * @param[in]  obj RTC object
- * @param[out] time The current time in seconds
+ * @param[out] time The current time
  * @return The status of the read request
  */
-cy_rslt_t cyhal_rtc_read(cyhal_rtc_t *obj, uint64_t *time);
+cy_rslt_t cyhal_rtc_read(cyhal_rtc_t *obj, struct tm *time);
 
 /** Write the current time in seconds to the RTC peripheral
  *
  * @param[in] obj  RTC object
- * @param[in] time The current time to be set in seconds.
+ * @param[in] time The time to be set
  * @return The status of the write request
  */
-cy_rslt_t cyhal_rtc_write(cyhal_rtc_t *obj, uint64_t time);
+cy_rslt_t cyhal_rtc_write(cyhal_rtc_t *obj, const struct tm *time);
 
 /** Set an alarm for the specified time in seconds to the RTC peripheral
  *
  * @param[in] obj  RTC object
- * @param[in] time The alarm time to be set in seconds.
+ * @param[in] time The alarm time to be set
  * @return The status of the alarm request
  */
-cy_rslt_t cyhal_rtc_alarm(cyhal_rtc_t *obj, uint64_t time);
+cy_rslt_t cyhal_rtc_alarm(cyhal_rtc_t *obj, const struct tm *time);
 
 /** The RTC alarm interrupt handler registration
  *

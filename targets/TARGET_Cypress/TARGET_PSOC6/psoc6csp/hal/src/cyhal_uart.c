@@ -430,6 +430,7 @@ static cy_rslt_t free_resources(cyhal_uart_t *obj)
 {
     cy_rslt_t error_accum = CY_RSLT_SUCCESS;
     cy_rslt_t error;
+    Cy_SysPm_UnregisterCallback(&(obj->pm_callback));
     if (obj->resource.type != CYHAL_RSC_INVALID)
     {
         error = cyhal_hwmgr_free(&(obj->resource));
@@ -491,6 +492,50 @@ static cy_rslt_t free_resources(cyhal_uart_t *obj)
         }
     }
     return error_accum;
+}
+
+static cy_en_syspm_status_t cyhal_uart_pm_callback(cy_stc_syspm_callback_params_t *params, cy_en_syspm_callback_mode_t mode)
+{
+    cy_en_syspm_status_t rslt = Cy_SCB_UART_DeepSleepCallback(params, mode);
+    cyhal_uart_t *obj = params->context;
+    GPIO_PRT_Type *txport = obj->pin_tx != NC ? CYHAL_GET_PORTADDR(obj->pin_tx) : NULL,
+                  *rtsport = obj->pin_rts != NC ? CYHAL_GET_PORTADDR(obj->pin_rts) : NULL;
+    uint8_t txpin = (uint8_t)CYHAL_GET_PIN(obj->pin_tx), rtspin = (uint8_t)CYHAL_GET_PIN(obj->pin_rts);
+    switch (mode)
+    {
+    case CY_SYSPM_CHECK_READY:
+        if (rslt == CY_SYSPM_SUCCESS)
+        {
+            if (NULL != txport)
+            {
+                obj->saved_tx_hsiom = Cy_GPIO_GetHSIOM(txport, txpin);
+                Cy_GPIO_Clr(txport, txpin);
+                Cy_GPIO_SetHSIOM(txport, txpin, HSIOM_SEL_GPIO);
+            }
+            if (NULL != rtsport)
+            {
+                obj->saved_rts_hsiom = Cy_GPIO_GetHSIOM(rtsport, rtspin);
+                Cy_GPIO_Clr(rtsport, rtspin);
+                Cy_GPIO_SetHSIOM(rtsport, rtspin, HSIOM_SEL_GPIO);
+            }
+        }
+        break;
+    case CY_SYSPM_CHECK_FAIL: // fallthrough
+    case CY_SYSPM_AFTER_TRANSITION:
+        if (NULL != txport)
+        {
+            Cy_GPIO_SetHSIOM(txport, txpin, obj->saved_tx_hsiom);
+            Cy_GPIO_Set(txport, txpin);
+        }
+        if (NULL != rtsport)
+        {
+            Cy_GPIO_SetHSIOM(rtsport, rtspin, obj->saved_rts_hsiom);
+            Cy_GPIO_Set(rtsport, rtspin);
+        }
+        break;
+    default: break;
+    }
+    return rslt;
 }
 
 static cy_en_scb_uart_parity_t convert_parity(cyhal_uart_parity_t parity)
@@ -613,6 +658,16 @@ cy_rslt_t cyhal_uart_init(cyhal_uart_t *obj, cyhal_gpio_t tx, cyhal_gpio_t rx, c
             {
                 Cy_SCB_UART_StartRingBuffer(obj->base, cfg->rx_buffer, cfg->rx_buffer_size, &(obj->context));
             }
+            obj->pm_params.base = obj->base;
+            obj->pm_params.context = obj;
+            obj->pm_callback.callback = &cyhal_uart_pm_callback;
+            obj->pm_callback.type = CY_SYSPM_DEEPSLEEP;
+            obj->pm_callback.skipMode = 0;
+            obj->pm_callback.callbackParams = &(obj->pm_params);
+            obj->pm_callback.prevItm = NULL;
+            obj->pm_callback.nextItm = NULL;
+            if (!Cy_SysPm_RegisterCallback(&(obj->pm_callback)))
+                result = CYHAL_UART_RSLT_ERR_PM_CALLBACK;
         }        
         cyhal_hwmgr_set_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
     }
