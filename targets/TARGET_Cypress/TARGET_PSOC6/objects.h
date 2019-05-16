@@ -17,6 +17,7 @@
 #include "cyhal_uart.h"
 #include "cyhal_flash.h"
 #include "cyhal_i2c.h"
+#include "cyhal_spi.h"
 #include "PeripheralPins.h"
 #include "gpio_object.h"
 
@@ -85,6 +86,21 @@ struct i2c_s {
     void (*async_handler)(void);
     cyhal_i2c_irq_event_t event;
     size_t async_rx_size;
+};
+#endif
+
+#if DEVICE_SPI
+struct spi_s {
+    cyhal_spi_t hal_spi;
+    cyhal_spi_cfg_t cfg;
+    void *async_handler;
+    int async_events;
+    int async_event_mask;
+    cyhal_gpio_t mosi;
+    cyhal_gpio_t miso;
+    cyhal_gpio_t sclk;
+    cyhal_gpio_t ssel;
+    int hz;
 };
 #endif
 
