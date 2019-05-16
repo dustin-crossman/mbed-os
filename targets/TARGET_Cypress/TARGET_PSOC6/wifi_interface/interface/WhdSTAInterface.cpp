@@ -257,7 +257,7 @@ static void whd_scan_handler(whd_scan_result_t** result_ptr,
         return;
     }
 
-    whd_scan_result_t* record = ( *result_ptr );
+    whd_scan_result_t* record = *result_ptr;
 
     for (unsigned int i=0; i<data->offset; i++) {
         if (CMP_MAC( data->result_buff[i].BSSID.octet, record->BSSID.octet ))
@@ -283,6 +283,8 @@ static void whd_scan_handler(whd_scan_result_t** result_ptr,
         data->aps[data->offset] = WiFiAccessPoint(ap);
     }
 
+    // store to result_buff for future duplication removal
+    data->result_buff[data->offset] = *record;
     data->offset += 1;
 
 }
