@@ -78,7 +78,7 @@ extern "C" {
  *
  *  @return          : CY_RSLT_SUCCESS or error code
  */
-cy_rslt_t cy_host_buffer_get(whd_buffer_t *buffer, whd_buffer_dir_t direction, uint16_t size, uint32_t timeout_ms);
+cy_rslt_t cy_host_buffer_get(whd_buffer_t *buffer, whd_buffer_dir_t direction, unsigned short size, unsigned long timeout_ms);
 
 /** Releases a packet buffer
  *
