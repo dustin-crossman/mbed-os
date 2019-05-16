@@ -17,6 +17,8 @@
 
 #include "i2c_api.h"
 #include "cyhal_i2c.h"
+#include "mbed_error.h"
+#include "mbed_assert.h"
 
 #if DEVICE_I2C
 
@@ -42,69 +44,70 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_init");
     i2c->cfg.is_slave = false;
     i2c->cfg.address = 0;
-    i2c->cfg.frequency_hz = 400;
+    i2c->cfg.frequencyhal_hz = 400;
     i2c->async_handler = NULL;
 }
 
 void i2c_frequency(i2c_t *obj, int hz)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
-    i2c->cfg.frequency_hz = (uint32_t)hz;
+    i2c->cfg.frequencyhal_hz = (uint32_t)hz;
     if (CY_RSLT_SUCCESS != cyhal_i2c_set_config(&(i2c->hal_i2c), &(i2c->cfg)))
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_set_config");
 }
 
-int i2c_start(i2c_t *obj);
-// TODO: not supported by HAL
+int i2c_start(i2c_t *obj)
+{
+    // TODO: not supported by HAL
+    MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_UNSUPPORTED), "i2c_start");
+    return -1;
+}
 
-int i2c_stop(i2c_t *obj);
-// TODO: not supported by HAL
+int i2c_stop(i2c_t *obj)
+{
+    // TODO: not supported by HAL
+    MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_UNSUPPORTED), "i2c_stop");
+    return -1;
+}
 
 int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
+    MBED_ASSERT(stop != 0); // TODO: stop==0 not supported by HAL
     if (CY_RSLT_SUCCESS != cyhal_i2c_master_recv(&(i2c->hal_i2c), address, (uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT))
-        return -1;
-    // TODO: stop==0 not supported by HAL
+        return (int)I2C_ERROR_NO_SLAVE;
     return length;
 }
 
 int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
+    MBED_ASSERT(stop != 0); // TODO: stop==0 not supported by HAL
     if (CY_RSLT_SUCCESS != cyhal_i2c_master_send(&(i2c->hal_i2c), address, (const uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT))
         return -1;
-    // TODO: slave may accept fewer bytes than sent
-    // TODO: stop==0 not supported by HAL
+    // TODO: receiver may accept fewer bytes than sent but HAL does not report how many bytes were sent
     return length;
 }
 
-/* Reset I2C peripheral. TODO: The action here. Most of the implementation sends stop()
- *
- *  @param obj The I2C object
- */
 void i2c_reset(i2c_t *obj)
 {
+    // TODO: The action here. Most of the implementation sends stop()
     i2c_stop(obj);
 }
 
-/* Read one byte
- *
- *  @param obj The I2C object
- *  @param last Acknoledge
- *  @return The read byte
- */
-int i2c_byte_read(i2c_t *obj, int last);
-// TODO: not supported by HAL
+int i2c_byte_read(i2c_t *obj, int last)
+{
+    // TODO: HAL does not provide a way to do this in master mode
+    MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_UNSUPPORTED), "i2c_byte_read");
+    return -1;
+}
 
-/* Write one byte
- *
- *  @param obj The I2C object
- *  @param data Byte to be written
- *  @return 0 if NAK was received, 1 if ACK was received, 2 for timeout.
- */
-int i2c_byte_write(i2c_t *obj, int data);
-// TODO: not supported by HAL
+int i2c_byte_write(i2c_t *obj, int data)
+{
+    // TODO: HAL does not provide a way to do this in master mode
+    MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_UNSUPPORTED), "i2c_byte_write");
+    return -1;
+}
 
 const PinMap *i2c_master_sda_pinmap(void)
 {
@@ -136,13 +139,16 @@ void i2c_slave_mode(i2c_t *obj, int enable_slave)
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_set_config");
 }
 
-int  i2c_slave_receive(i2c_t *obj);
-// TODO: not supported by HAL
+int  i2c_slave_receive(i2c_t *obj)
+{
+    // TODO: not supported by HAL
+    MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_UNSUPPORTED), "i2c_slave_receive");
+}
 
 int  i2c_slave_read(i2c_t *obj, char *data, int length)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
-    if (CY_RSLT_SUCCESS != cyhal_i2c_slave_recv(&(obj->hal_i2c), (uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT))
+    if (CY_RSLT_SUCCESS != cyhal_i2c_slave_recv(&(i2c->hal_i2c), (uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT))
         return 0;
     return 1;
 }
@@ -150,7 +156,7 @@ int  i2c_slave_read(i2c_t *obj, char *data, int length)
 int  i2c_slave_write(i2c_t *obj, const char *data, int length)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
-    if (CY_RSLT_SUCCESS != cyhal_i2c_slave_send(&(obj->hal_i2c), (const uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT))
+    if (CY_RSLT_SUCCESS != cyhal_i2c_slave_send(&(i2c->hal_i2c), (const uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT))
         return 0;
     return 1;
 }
@@ -170,7 +176,7 @@ void i2c_slave_address(i2c_t *obj, int idx, uint32_t address, uint32_t mask)
 
 static void cy_i2c_async_handler(void *handler_arg, cyhal_i2c_irq_event_t event)
 {
-    struct i2c_s *i2c = cy_get_i2c((cy_i2c_t *)handler_arg);
+    struct i2c_s *i2c = cy_get_i2c((i2c_t *)handler_arg);
     i2c->event = event;
     void (*async_handler)(void) = i2c->async_handler;
     if (NULL != async_handler)
@@ -184,9 +190,9 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
     i2c->async_handler = (void (*)(void))handler;
     if (CY_RSLT_SUCCESS != cyhal_i2c_register_irq(&(i2c->hal_i2c), &cy_i2c_async_handler, obj))
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_register_irq");
-    if (CY_RSLT_SUCCESS != cyhal_i2c_irq_enable(&(i2c->hal_i2c), CY_I2C_IRQ_TX_DONE | CY_I2C_IRQ_TX_ERROR | CY_I2C_IRQ_RX_DONE | CY_I2C_IRQ_RX_ERROR, true))
+    if (CY_RSLT_SUCCESS != cyhal_i2c_irq_enable(&(i2c->hal_i2c), CYHAL_I2C_SLAVE_ERR_EVENT | CYHAL_I2C_SLAVE_RD_CMPLT_EVENT | CYHAL_I2C_SLAVE_WR_CMPLT_EVENT | CYHAL_I2C_MASTER_ERR_EVENT | CYHAL_I2C_MASTER_RD_CMPLT_EVENT | CYHAL_I2C_MASTER_WR_CMPLT_EVENT, true))
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_irq_enable");
-    // TODO: stop==0 not supported by HAL
+    MBED_ASSERT(stop != 0); // TODO: stop==0 not supported by HAL
     if (CY_RSLT_SUCCESS != cyhal_i2c_transfer_async(&(i2c->hal_i2c), tx, tx_length, rx, rx_length, address))
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_transfer_async");
 }
@@ -196,17 +202,18 @@ uint32_t i2c_irq_handler_asynch(i2c_t *obj)
     //#define I2C_EVENT_ALL                 (I2C_EVENT_ERROR |  I2C_EVENT_TRANSFER_COMPLETE | I2C_EVENT_ERROR_NO_SLAVE | I2C_EVENT_TRANSFER_EARLY_NACK)
     struct i2c_s *i2c = cy_get_i2c(obj);
     uint32_t event = 0;
-    if (CY_I2C_IRQ_NONE != (i2c->event & CY_I2C_IRQ_RX_DONE) || (i2c->async_rx_size == 0 && CY_I2C_IRQ_NONE != (i2c->event & CY_I2C_IRQ_TX_DONE)))
-        event |= I2C_EVENT_TRANSFER_COMPLETE;
-    if (CY_I2C_IRQ_NONE != (i2c->event & (CY_I2C_IRQ_TX_ERROR | CY_I2C_IRQ_RX_ERROR)))
+    if (CYHAL_I2C_IRQ_NONE != (i2c->event & (CYHAL_I2C_SLAVE_ERR_EVENT | CYHAL_I2C_MASTER_ERR_EVENT)))
         event |= I2C_EVENT_ERROR;
+    if (CYHAL_I2C_IRQ_NONE != (i2c->event & (CYHAL_I2C_SLAVE_RD_CMPLT_EVENT | CYHAL_I2C_SLAVE_WR_CMPLT_EVENT | CYHAL_I2C_MASTER_RD_CMPLT_EVENT | CYHAL_I2C_MASTER_WR_CMPLT_EVENT)))
+        event |= I2C_EVENT_TRANSFER_COMPLETE;
     return event;
 }
 
 uint8_t i2c_active(i2c_t *obj)
 {
-    struct i2c_s *i2c = cy_get_i2c(obj);
-    return Cy_SCB_I2C_IsBusBusy(&(i2c->hal_i2c.base)) ? 1 : 0;
+    // TODO: not supported by HAL
+    MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_UNSUPPORTED), "i2c_active");
+    return 0;
 }
 
 void i2c_abort_asynch(i2c_t *obj)
