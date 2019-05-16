@@ -56,43 +56,11 @@ const cy_stc_gpio_pin_config_t WCO_OUT_config =
 	.vrefSel = 0UL,
 	.vohSel = 0UL,
 };
-const cy_stc_gpio_pin_config_t LED_RED_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = LED_RED_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_FULL,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
 const cy_stc_gpio_pin_config_t SW2_config = 
 {
 	.outVal = 1,
 	.driveMode = CY_GPIO_DM_PULLUP,
 	.hsiom = SW2_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_FULL,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-const cy_stc_gpio_pin_config_t LED_BLUE_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = LED_BLUE_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
 	.vtrip = CY_GPIO_VTRIP_CMOS,
@@ -200,11 +168,11 @@ const cy_stc_gpio_pin_config_t QSPI_SPI_CLOCK_config =
 	.vrefSel = 0UL,
 	.vohSel = 0UL,
 };
-const cy_stc_gpio_pin_config_t LED9_config = 
+const cy_stc_gpio_pin_config_t LED_RED_config = 
 {
 	.outVal = 1,
 	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = LED9_HSIOM,
+	.hsiom = LED_RED_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
 	.vtrip = CY_GPIO_VTRIP_CMOS,
@@ -237,22 +205,6 @@ const cy_stc_gpio_pin_config_t LED_GREEN_config =
 	.outVal = 1,
 	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
 	.hsiom = LED_GREEN_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_FULL,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-const cy_stc_gpio_pin_config_t LED8_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = LED8_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
 	.vtrip = CY_GPIO_VTRIP_CMOS,
@@ -736,11 +688,7 @@ void init_cycfg_pins(void)
 
 	Cy_GPIO_Pin_Init(WCO_OUT_PORT, WCO_OUT_PIN, &WCO_OUT_config);
 
-	Cy_GPIO_Pin_Init(LED_RED_PORT, LED_RED_PIN, &LED_RED_config);
-
 	Cy_GPIO_Pin_Init(SW2_PORT, SW2_PIN, &SW2_config);
-
-	Cy_GPIO_Pin_Init(LED_BLUE_PORT, LED_BLUE_PIN, &LED_BLUE_config);
 
 	Cy_GPIO_Pin_Init(QSPI_SS0_PORT, QSPI_SS0_PIN, &QSPI_SS0_config);
 
@@ -754,12 +702,10 @@ void init_cycfg_pins(void)
 
 	Cy_GPIO_Pin_Init(QSPI_SPI_CLOCK_PORT, QSPI_SPI_CLOCK_PIN, &QSPI_SPI_CLOCK_config);
 
-	Cy_GPIO_Pin_Init(LED9_PORT, LED9_PIN, &LED9_config);
+	Cy_GPIO_Pin_Init(LED_RED_PORT, LED_RED_PIN, &LED_RED_config);
 
 
 	Cy_GPIO_Pin_Init(LED_GREEN_PORT, LED_GREEN_PIN, &LED_GREEN_config);
-
-	Cy_GPIO_Pin_Init(LED8_PORT, LED8_PIN, &LED8_config);
 
 	Cy_GPIO_Pin_Init(SDHC0_DAT0_PORT, SDHC0_DAT0_PIN, &SDHC0_DAT0_config);
 

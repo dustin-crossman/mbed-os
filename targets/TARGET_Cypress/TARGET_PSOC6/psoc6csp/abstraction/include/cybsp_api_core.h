@@ -47,6 +47,14 @@ extern "C" {
 #endif
 
 /**
+* \addtogroup group_abstraction_board_macros
+* \{
+*/
+
+
+/** \} group_abstraction_board_macros */
+
+/**
 * \addtogroup group_abstraction_board_functions
 * \{
 */
@@ -69,7 +77,7 @@ cy_rslt_t cybsp_led_init(cybsp_led_t which);
 /**
  * \brief Toggle the specified LED
  * \param which The specific LED number to enable, see BSP header file for available LEDs
- * \returns CY_RSLT_SUCCESS if the LED was enabled successfully
+ * \returns CY_RSLT_SUCCESS if the LED was toggled
  */
 cy_rslt_t cybsp_led_toggle(cybsp_led_t which);
 
@@ -77,33 +85,53 @@ cy_rslt_t cybsp_led_toggle(cybsp_led_t which);
  * \brief Sets the state of the LED.
  * \param which The specific LED number to set state, see BSP header file for available LEDs
  * \param on Whether the LED should be turned on (true) or off (false)
- * \returns CY_RSLT_SUCCESS if the LED was enabled successfully
+ * \returns CY_RSLT_SUCCESS if the LED state was updated
  */
 cy_rslt_t cybsp_led_set_state(cybsp_led_t which, bool on);
 
 /**
- * \brief Init and allocate the specified switch, setting the GPIO drive mode as necessary
- * \param which The specific switch number to enable, see BSP header file for available switches
- * \returns CY_RSLT_SUCCESS if the switch was enabled successfully
+ * \brief Turns the LED on.
+ * \param which The specific LED number to set state, see BSP header file for available LEDs
+ * \returns CY_RSLT_SUCCESS if the LED was turned on
  */
-cy_rslt_t cybsp_switch_init(cybsp_switch_t which);
+static inline cy_rslt_t cybsp_led_on(cybsp_led_t which)
+{
+    return cybsp_led_set_state(which, CYBSP_LED_STATE_ON);
+}
 
 /**
- * \brief Sets the state of the switch.
- * \param which The specific switch number to get state from, see BSP header file for available switches
- * \param state State of the switch
- * \returns CY_RSLT_SUCCESS if the switch information was retrieved successfully
+ * \brief Turns the LED off.
+ * \param which The specific LED number to set state, see BSP header file for available LEDs
+ * \returns CY_RSLT_SUCCESS if the LED was turned off
  */
-cy_rslt_t cybsp_switch_get_state(cybsp_switch_t which, bool* state);
+static inline cy_rslt_t cybsp_led_off(cybsp_led_t which)
+{
+    return cybsp_led_set_state(which, CYBSP_LED_STATE_OFF);
+}
 
 /**
- * \brief Sets the interrupt to trigger when the switch state is changed.
- * \param which The specific switch number to get state from, see BSP header file for available switches
+ * \brief Init and allocate the specified button, setting the GPIO drive mode as necessary
+ * \param which The specific button number to enable, see BSP header file for available buttones
+ * \returns CY_RSLT_SUCCESS if the button was enabled successfully
+ */
+cy_rslt_t cybsp_btn_init(cybsp_btn_t which);
+
+/**
+ * \brief Sets the state of the button.
+ * \param which The specific button number to get state from, see BSP header file for available buttones
+ * \param state State of the button
+ * \returns CY_RSLT_SUCCESS if the button information was retrieved successfully
+ */
+cy_rslt_t cybsp_btn_get_state(cybsp_btn_t which, bool* state);
+
+/**
+ * \brief Sets the interrupt to trigger when the button state is changed.
+ * \param which The specific button number to get state from, see BSP header file for available buttones
  * \param type The type sets level vs edge and active high vs active low
- * \param callback The function pointer to call when the switch state changes
- * \returns CY_RSLT_SUCCESS if the switch information was retrieved successfully
+ * \param callback The function pointer to call when the button state changes
+ * \returns CY_RSLT_SUCCESS if the button information was retrieved successfully
  */
-cy_rslt_t cybsp_switch_set_interrupt(cybsp_switch_t which, cyhal_gpio_irq_event_t type, void (*callback)(void));
+cy_rslt_t cybsp_btn_set_interrupt(cybsp_btn_t which, cyhal_gpio_irq_event_t type, void (*callback)(void));
 
 
 /** \} group_abstraction_board_functions */

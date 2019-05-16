@@ -67,6 +67,7 @@ extern "C" {
 #define CYHAL_SDIO_CLOCK_ERROR          (0x100)   /**< Failed to initial clock for SDIO */
 #define CYHAL_SDIO_BAD_ARGUMENT         (0x200)   /**< Bad argument passed for SDIO */
 #define CYHAL_SDIO_SEMA_NOT_INITED      (0x400)   /**< Semaphore is not initiated */
+#define CYHAL_SDIO_FUNC_NOT_SUPPORTED   (0x800)   /**< Function is not supported */
 
 /* HAL return value defines */
 
@@ -118,23 +119,23 @@ typedef enum
 
 /** Events that can cause an SDIO interrupt */
 typedef enum {
-    CYHAL_SDIO_CMD_COMPLETE, //!> Command Complete
-    CYHAL_SDIO_XFER_COMPLETE, //!> Host read/write transfer is complete
-    CYHAL_SDIO_BGAP_EVENT, //!> This bit is set when both read/write transaction is stopped
-    CYHAL_SDIO_DMA_INTERRUPT, //!> Host controller detects an SDMA Buffer Boundary during transfer
-    CYHAL_SDIO_BUF_WR_READY, //!> This bit is set if the Buffer Write Enable changes from 0 to 1
-    CYHAL_SDIO_BUF_RD_READY, //!> This bit is set if the Buffer Read Enable changes from 0 to 1
-    CYHAL_SDIO_CARD_INSERTION, //!> This bit is set if the Card Inserted in the Present State
-    CYHAL_SDIO_CARD_REMOVAL, //!> This bit is set if the Card Inserted in the Present State
-    CYHAL_SDIO_CARD_INTERRUPT, //!> The synchronized value of the DAT[1] interrupt input for SD mode
-    CYHAL_SDIO_INT_A,
-    CYHAL_SDIO_INT_B,
-    CYHAL_SDIO_INT_C,
-    CYHAL_SDIO_RE_TUNE_EVENT, //!> This bit is set if the Re-Tuning Request changes from 0 to 1
-    CYHAL_SDIO_FX_EVENT, //!> This status is set when R[14] of response register is set to 1
-    CYHAL_SDIO_CQE_EVENT, //!> This status is set if Command Queuing/Crypto event has occurred
-    CYHAL_SDIO_ERR_INTERRUPT, //!> If any of the bits in the Error Interrupt Status register are set
-    CYHAL_SDIO_ALL_INTERRUPTS, //!> Is used to enable/disable all interrupts
+    CYHAL_SDIO_CMD_COMPLETE   = 0x0001, //!> Command Complete
+    CYHAL_SDIO_XFER_COMPLETE  = 0x0002, //!> Host read/write transfer is complete
+    CYHAL_SDIO_BGAP_EVENT     = 0x0004, //!> This bit is set when both read/write transaction is stopped
+    CYHAL_SDIO_DMA_INTERRUPT  = 0x0008, //!> Host controller detects an SDMA Buffer Boundary during transfer
+    CYHAL_SDIO_BUF_WR_READY   = 0x0010, //!> This bit is set if the Buffer Write Enable changes from 0 to 1
+    CYHAL_SDIO_BUF_RD_READY   = 0x0020, //!> This bit is set if the Buffer Read Enable changes from 0 to 1
+    CYHAL_SDIO_CARD_INSERTION = 0x0040, //!> This bit is set if the Card Inserted in the Present State
+    CYHAL_SDIO_CARD_REMOVAL   = 0x0080, //!> This bit is set if the Card Inserted in the Present State
+    CYHAL_SDIO_CARD_INTERRUPT = 0x0100, //!> The synchronized value of the DAT[1] interrupt input for SD mode
+    CYHAL_SDIO_INT_A          = 0x0200, //!> Reserved: set to 0
+    CYHAL_SDIO_INT_B          = 0x0400, //!> Reserved: set to 0
+    CYHAL_SDIO_INT_C          = 0x0800, //!> Reserved: set to 0,
+    CYHAL_SDIO_RE_TUNE_EVENT  = 0x1000, //!> Reserved: set to 0,
+    CYHAL_SDIO_FX_EVENT       = 0x2000, //!> This status is set when R[14] of response register is set to 1
+    CYHAL_SDIO_CQE_EVENT      = 0x4000, //!> This status is set if Command Queuing/Crypto event has occurred
+    CYHAL_SDIO_ERR_INTERRUPT  = 0x8000, //!> If any of the bits in the Error Interrupt Status register are set
+    CYHAL_SDIO_ALL_INTERRUPTS = 0xE1FF, //!> Is used to enable/disable all interrupts
 } cyhal_sdio_irq_event_t;
 
 /** \} group_hal_sdio_enums */

@@ -20,7 +20,7 @@
 #include "lp_ticker_api.h"
 #include "mbed_error.h"
 #include "cyhal_wdt.h"
-#include "cycfg_platform.h"
+#include "cycfg_system.h"
 
 #if DEVICE_LPTICKER
 

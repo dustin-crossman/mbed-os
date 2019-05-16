@@ -23,7 +23,7 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include <string.h> /* For memcpy */
+#include <stdlib.h> /* For memcpy */
 #include "cyhal_sdhc.h"
 #include "cyhal_sdio.h"
 #include "cy_sysint.h"
@@ -867,10 +867,12 @@ cy_rslt_t cyhal_sdio_init(cyhal_sdio_t *obj, cyhal_gpio_t cmd, cyhal_gpio_t clk,
     const uint32_t outputVal = 0UL;
     cy_stc_sd_host_context_t context;
 
-    /* TODO need to take it from manager? */
+    /* TODO need to take it from manager! HW manager should give base address if available */
     obj->base = sdhc_base_addresses[0];
 
-      /*This is for WiFi reset pin, and will put the part in the reset */
+
+    /* TODO This should be removed???*/
+    /*This is for WiFi reset pin, and will put the part in the reset */
     port = Cy_GPIO_PortToAddr(CYHAL_GET_PORT(obj->resetPin));
     Cy_GPIO_Pin_FastInit(port, CYHAL_GET_PIN(obj->resetPin), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_GPIO);
 
@@ -937,6 +939,8 @@ cy_rslt_t cyhal_sdio_free(cyhal_sdio_t *obj)
     return CY_RSLT_SUCCESS;
 }
 
+
+/* TODO this should be all removed - only change freq and block size */
 cy_rslt_t cyhal_sdio_configure(cyhal_sdio_t *obj, const cyhal_sdio_cfg_t *config)
 {
     cy_rslt_t ret = CY_RSLT_SUCCESS;
@@ -1082,9 +1086,13 @@ cy_rslt_t cyhal_sdio_send_cmd(const cyhal_sdio_t *obj, cyhal_transfer_t directio
     {
         ret = CY_RSLT_TYPE_ERROR;
     }
-
+    
+    /* TODO - Looks like we do not need this when no data transfer command is used
+    *  will investigate once 2m support is added.
+    */
     /* This interrupt is disabled in interrupt handler so need to enable it here */
     Cy_SD_Host_SetNormalInterruptEnable(obj->base, (Cy_SD_Host_GetNormalInterruptEnable(obj->base) | CY_SD_HOST_CARD_INTERRUPT));
+    
     return ret;
 }
 
@@ -1098,10 +1106,8 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     cy_en_sd_host_status_t       result = CY_SD_HOST_ERROR_TIMEOUT;
     cyhal_sdio_transfer_mode_t      mode = (64U <= length) ? CYHAL_SDIO_BLOCK_MODE : CYHAL_SDIO_BYTE_MODE;
 
-    /* Commented it out cose of IAR warnings. Currently WHD put 64b aligned 
-    *  length so we should be fine
-       static uint32_t temp_Buffer[length + 64 - 1];
-    */
+    /* TODO - perhaps it would be better to allocate static 2048b ? */
+    uint32_t* temp_Buffer = (uint32_t*)malloc(length + 64 - 1);
 
     /* Initialize data constants*/
     dat.autoCommand         = CY_SD_HOST_AUTO_CMD_NONE;
@@ -1110,7 +1116,7 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     dat.enReliableWrite     = false;
     dat.enableDma           = true;
 
-    /*Clear out the response*/
+    /* Clear out the response */
     if ( response != NULL )
     {
         *response = 0UL;
@@ -1130,7 +1136,7 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
         /* Check if an error occurred on any previous transactions */
         if( Cy_SD_Host_GetNormalInterruptStatus(obj->base) & CY_SD_HOST_ERR_INTERRUPT )
         {
-            /* Reset the block if there was an error.  Note a full reset usually
+            /* Reset the block if there was an error. Note a full reset usually
              * requires more time, but this short version is working quite well and
              * successfully clears out the error state.
              */
@@ -1154,21 +1160,16 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
 
         dat.read = ( direction == CYHAL_WRITE ) ? false : true;
 
-        /* TODO - fix as is in udb sdio or try to have two transitions */
+        /* TODO - fix as is in udb sdio or try to have two transitions BSP-542*/
         if( mode == CYHAL_SDIO_BLOCK_MODE )
         {
-            dat.blockSize         = block_size;
-            dat.numberOfBlock     = ( length + block_size - 1 ) / block_size;
-              
-            /* Commented it out cose of IAR warnings. Currently WHD put 64b aligned 
-            *  length so we should be fine
-            *
-              
-              if (dat.read)
-              {
-                  dat.data = (uint32_t*) temp_Buffer;
-              }
-              */
+            dat.blockSize     = block_size;
+            dat.numberOfBlock = ( length + block_size - 1 ) / block_size;
+            
+            if (dat.read)
+            {
+                dat.data = (uint32_t*) temp_Buffer;
+            }
         }
         else
         {
@@ -1176,7 +1177,7 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
               dat.numberOfBlock   = 1UL;
         }
 
-       /*Disable XFER Done interrupt*/
+       /* Disable XFER Done interrupt */
        obj->base->CORE.NORMAL_INT_SIGNAL_EN_R  &= (uint16_t)~CY_SD_HOST_XFER_COMPLETE;
 
        (void)Cy_SD_Host_InitDataTransfer(obj->base, &dat);
@@ -1204,17 +1205,20 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
         ret = CY_RSLT_TYPE_ERROR;
     }
 
-    /* Commented it out cose of IAR warnings. Currently WHD put 64b aligned 
-    *  length so we should be fine
-    *
+
     if(result == CY_RSLT_SUCCESS && mode == CYHAL_SDIO_BLOCK_MODE && dat.read)
     {
         memcpy((uint32_t *)data, temp_Buffer, (size_t)length);
     }
-    */
-    
+
     /* This interrupt is disabled in interrupt handler so need to enable it here */
     Cy_SD_Host_SetNormalInterruptEnable(obj->base, (Cy_SD_Host_GetNormalInterruptEnable(obj->base) | CY_SD_HOST_CARD_INTERRUPT));
+
+    free(temp_Buffer);
+
+    /* Make sure all previous changes are applied */
+    Cy_SysLib_DelayUs(250U);
+    __DSB();
 
     return ret;
 }
@@ -1303,7 +1307,7 @@ static void isr_sdio_1_handler (void)
     isr_sdio_handler(1, SDHC1);
 }
 
-cy_rslt_t cy_sdio_register_irq(cyhal_sdio_t *obj, cyhal_sdio_irq_handler handler, void *handler_arg)
+cy_rslt_t cyhal_sdio_register_irq(cyhal_sdio_t *obj, cyhal_sdio_irq_handler handler, void *handler_arg)
 {
     cy_rslt_t ret = CY_RSLT_SUCCESS;
     uint8_t index = obj->resource.block_num;

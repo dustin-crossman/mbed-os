@@ -177,7 +177,7 @@ cy_rslt_t cy_buffer_add_remove_at_front(whd_buffer_t *buffer, int32_t add_remove
  *                    releasing this buffer is transferred from WHD at this point.
  *
  */
-void *cy_network_process_ethernet_data(whd_interface_t interface, whd_buffer_t buffer);
+void cy_network_process_ethernet_data(whd_interface_t interface, whd_buffer_t buffer);
 
 /** \} group_abstraction_buffer_functions */
 
