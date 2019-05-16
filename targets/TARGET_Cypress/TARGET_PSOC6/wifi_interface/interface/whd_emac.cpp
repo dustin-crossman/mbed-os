@@ -30,22 +30,12 @@
 #include "cybsp_api_wifi.h"
 
 WHD_EMAC::WHD_EMAC(whd_interface_role_t role)
-    : emac_link_input_cb(NULL),
-      emac_link_state_cb(NULL),
-      powered_up(false), link_state(false),
-      resource_ops(NULL), buffer_ops(NULL), netif_ops(NULL), whd_init_config(NULL),
-      ifp(NULL), drvp(NULL),
-      interface_type(role)
+    : interface_type(role)
 {
 }
 
 WHD_EMAC::WHD_EMAC()
-    : emac_link_input_cb(NULL),
-      emac_link_state_cb(NULL),
-      powered_up(false), link_state(false),
-      resource_ops(NULL), buffer_ops(NULL), netif_ops(NULL), whd_init_config(NULL),
-      ifp(NULL), drvp(NULL),
-      interface_type(WHD_STA_ROLE)
+    : interface_type(WHD_STA_ROLE)
 {
 }
 

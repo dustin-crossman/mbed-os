@@ -155,14 +155,14 @@ public:
      */
     virtual void set_memory_manager(EMACMemoryManager &mem_mngr);
 
-    emac_link_input_cb_t emac_link_input_cb; /**< Callback for incoming data */
-    emac_link_state_change_cb_t emac_link_state_cb;
+    emac_link_input_cb_t emac_link_input_cb = NULL; /**< Callback for incoming data */
+    emac_link_state_change_cb_t emac_link_state_cb = NULL;
     EMACMemoryManager *memory_manager;
-    bool powered_up;
-    bool link_state;
+    bool powered_up = false;
+    bool link_state = false;
     whd_interface_role_t interface_type;
-    whd_driver_t drvp;
-    whd_interface_t ifp;
+    whd_driver_t drvp = NULL;
+    whd_interface_t ifp = NULL;
     whd_mac_t multicast_addr;
     struct whd_resource_source *resource_ops = NULL;
     whd_buffer_funcs_t *buffer_ops = NULL;
