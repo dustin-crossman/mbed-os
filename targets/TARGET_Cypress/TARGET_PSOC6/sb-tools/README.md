@@ -51,15 +51,34 @@ Default arguments can be overridden with a custom:
 
 # TESTS
 		
-1.	Build tests for PSA targets with these commands:
+1.	Build and run tests for PSA targets with these commands (valid for mbed-os starting from 5.12.2 and later):
 
-		mbed test --compile -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *psa* -v
-		mbed test --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -v
+		Run commands:
+		mbed test --compile --build 1/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n components-*psa* -v
+		mbed test --compile --build 1/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n components-*psa* -v --run
+		 
+		Run commands:
+		mbed test --compile --build 1/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *spm_client* -DUSE_PSA_TEST_PARTITIONS -DUSE_CLIENT_TESTS_PART1 -v
+		mbed test --compile --build 1/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *spm_client* -DUSE_PSA_TEST_PARTITIONS -DUSE_CLIENT_TESTS_PART1 -v --run
+		 
+		Run commands:
+		mbed test --compile --build 1/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *spm_server -DUSE_PSA_TEST_PARTITIONS -DUSE_SERVER_TESTS_PART1 -DUSE_SERVER_TESTS_PART2 -v
+		mbed test --compile --build 1/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *spm_server -DUSE_PSA_TEST_PARTITIONS -DUSE_SERVER_TESTS_PART1 -DUSE_SERVER_TESTS_PART2 -v --run
+		 
+		Run commands:
+		mbed test --compile --build 1/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *spm_smoke -DUSE_PSA_TEST_PARTITIONS -DUSE_SMOKE_TESTS_PART1 -v
+		mbed test --compile --build 1/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *spm_smoke -DUSE_PSA_TEST_PARTITIONS -DUSE_SMOKE_TESTS_PART1 -v --run
+		 
+		Run commands:
+		mbed test --compile --build 1/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -v
+		mbed test --compile --build 1/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -v --run
+		 
+		Run commands:
+		mbed test --build 1/CY8CPROTO_064_SB_M0_PSA --compile -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n tests-psa-* -v
+		mbed test --build 1/CY8CPROTO_064_SB_PSA --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n tests-psa-* -v
+		mbedgt -i tests-psa-spm*,tests-psa-crypto_access* -v
 
-2.	Run tests with command:
-
-		mbed test --run -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -v
-		
+		**_NOTE:_** In case of using non Windows platform flag --build 1/@TARGET_NAME@ can be ommited.
 
 # TROUBLESHOOTING:
 
