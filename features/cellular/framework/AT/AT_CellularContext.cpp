@@ -377,9 +377,9 @@ bool AT_CellularContext::get_context()
             cid_max = cid;
         }
         char pdp_type_from_context[10];
-        int pdp_type_len = _at.read_string(pdp_type_from_context, sizeof(pdp_type_from_context) - 1);
+        int pdp_type_len = _at.read_string(pdp_type_from_context, sizeof(pdp_type_from_context));
         if (pdp_type_len > 0) {
-            apn_len = _at.read_string(apn, sizeof(apn) - 1);
+            apn_len = _at.read_string(apn, sizeof(apn));
             if (apn_len >= 0) {
                 if (_apn && (strcmp(apn, _apn) != 0)) {
                     continue;
@@ -672,6 +672,10 @@ nsapi_error_t AT_CellularContext::disconnect()
 {
     tr_info("CellularContext disconnect()");
     if (!_nw || !_is_connected) {
+        if (_new_context_set) {
+            delete_current_context();
+        }
+        _cid = -1;
         return NSAPI_ERROR_NO_CONNECTION;
     }
 
@@ -700,6 +704,11 @@ nsapi_error_t AT_CellularContext::disconnect()
 
     // call device's callback, it will broadcast this to here (cellular_callback)
     _device->cellular_callback(NSAPI_EVENT_CONNECTION_STATUS_CHANGE, NSAPI_STATUS_DISCONNECTED, this);
+
+    if (_new_context_set) {
+        delete_current_context();
+    }
+    _cid = -1;
 
     return _at.unlock_return_error();
 }
