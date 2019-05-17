@@ -93,7 +93,7 @@ struct i2c_s {
 struct spi_s {
     cyhal_spi_t hal_spi;
     cyhal_spi_cfg_t cfg;
-    void *async_handler;
+    void (*async_handler)(void);
     int async_events;
     int async_event_mask;
     cyhal_gpio_t mosi;

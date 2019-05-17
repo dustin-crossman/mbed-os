@@ -211,7 +211,7 @@ const PinMap *spi_slave_cs_pinmap(void)
 void spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, MBED_UNUSED uint8_t bit_width, uint32_t handler, uint32_t event, MBED_UNUSED DMAUsage hint)
 {
     struct spi_s *spi = cy_get_spi(obj);
-    spi->async_handler = (void *)handler;
+    spi->async_handler = (void (*)(void))handler;
     spi->async_event_mask = event;
     if (CY_RSLT_SUCCESS != cyhal_spi_transfer_async(&(spi->hal_spi), (const uint8_t *)tx, (size_t)tx_length, (uint8_t *)rx, (size_t)rx_length))
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_spi_transfer_async");
