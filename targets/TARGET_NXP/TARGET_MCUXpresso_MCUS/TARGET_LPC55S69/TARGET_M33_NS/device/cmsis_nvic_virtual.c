@@ -17,9 +17,11 @@
  */
 
 #include "cmsis_nvic_virtual.h"
-#include "psa/lifecycle.h"
+#include "mbed_toolchain.h"
+
+MBED_NORETURN void mbed_psa_system_reset();
 
 void __NVIC_TFMSystemReset(void)
 {
-    psa_system_reset();
+    mbed_psa_system_reset();
 }
