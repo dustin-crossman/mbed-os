@@ -15,9 +15,6 @@
  * limitations under the License.
  */
 
-#ifndef INCLUDED_WHD_RTOS_H
-#define INCLUDED_WHD_RTOS_H
-
 #include "whd_types.h"
 #include "whd_debug.h"
 #include "whd_rtos_interface.h"
@@ -71,4 +68,3 @@ typedef osMessageQueueId_t whd_queue_type_t;                  /** CMSIS definiti
 } /* extern "C" */
 #endif
 
-#endif

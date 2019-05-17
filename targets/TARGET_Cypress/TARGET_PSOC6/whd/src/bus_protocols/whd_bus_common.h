@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef INCLUDED_WHD_BUS_COMMON_H
+#ifndef INCLUDED__WHD_BUS_COMMON_H
 #define INCLUDED_WHD_BUS_COMMON_H
 
 #include "whd.h"
