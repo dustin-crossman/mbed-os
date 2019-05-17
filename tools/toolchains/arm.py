@@ -1,6 +1,6 @@
 """
 mbed SDK
-Copyright (c) 2011-2013 ARM Limited
+Copyright (c) 2011-2019 ARM Limited
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ from builtins import str  # noqa: F401
 
 import re
 from copy import copy
-from os.path import join, dirname, splitext, basename, exists, isfile
+from os.path import join, dirname, splitext, basename, exists, isfile, relpath
 from os import makedirs, write, remove
 from tempfile import mkstemp
 from shutil import rmtree
@@ -28,6 +28,7 @@ from distutils.version import LooseVersion
 from tools.targets import CORE_ARCH
 from tools.toolchains.mbed_toolchain import mbedToolchain, TOOLCHAIN_PATHS
 from tools.utils import mkdir, NotSupportedException, run_cmd
+from tools.resources import FileRef
 
 ARMC5_MIGRATION_WARNING = (
     "Warning: We noticed that you are using Arm Compiler 5. "
@@ -81,16 +82,11 @@ class ARM(mbedToolchain):
             if "--library_type=microlib" not in self.flags['common']:
                 self.flags['common'].append("--library_type=microlib")
 
-        if target.core == "Cortex-M0+":
-            cpu = "Cortex-M0"
-        elif target.core == "Cortex-M4F":
-            cpu = "Cortex-M4.fp"
-        elif target.core == "Cortex-M7FD":
-            cpu = "Cortex-M7.fp.dp"
-        elif target.core == "Cortex-M7F":
-            cpu = "Cortex-M7.fp.sp"
-        else:
-            cpu = target.core
+        cpu = {
+            "Cortex-M0+": "Cortex-M0plus",
+            "Cortex-M4F": "Cortex-M4.fp.sp",
+            "Cortex-M7F": "Cortex-M7.fp.sp",
+            "Cortex-M7FD": "Cortex-M7.fp.dp"}.get(target.core, target.core)
 
         ARM_BIN = join(TOOLCHAIN_PATHS['ARM'], "bin")
 
@@ -272,39 +268,39 @@ class ARM(mbedToolchain):
     def compile_cpp(self, source, object, includes):
         return self.compile(self.cppc, source, object, includes)
 
-    def correct_scatter_shebang(self, scatter_file, cur_dir_name=None):
+    def correct_scatter_shebang(self, sc_fileref, cur_dir_name=None):
         """Correct the shebang at the top of a scatter file.
 
         Positional arguments:
-        scatter_file -- the scatter file to correct
+        sc_fileref -- FileRef object of the scatter file
 
         Keyword arguments:
         cur_dir_name -- the name (not path) of the directory containing the
                         scatter file
 
         Return:
-        The location of the correct scatter file
+        The FileRef of the correct scatter file
 
         Side Effects:
         This method MAY write a new scatter file to disk
         """
-        with open(scatter_file, "r") as input:
+        with open(sc_fileref.path, "r") as input:
             lines = input.readlines()
             if (lines[0].startswith(self.SHEBANG) or
-                    not lines[0].startswith("#!")):
-                return scatter_file
+                not lines[0].startswith("#!")):
+                return sc_fileref
             else:
                 new_scatter = join(self.build_dir, ".link_script.sct")
                 if cur_dir_name is None:
-                    cur_dir_name = dirname(scatter_file)
+                    cur_dir_name = dirname(sc_fileref.path)
                 self.SHEBANG += " -I %s" % cur_dir_name
-                if self.need_update(new_scatter, [scatter_file]):
+                if self.need_update(new_scatter, [sc_fileref.path]):
                     with open(new_scatter, "w") as out:
                         out.write(self.SHEBANG)
                         out.write("\n")
                         out.write("".join(lines[1:]))
 
-                return new_scatter
+                return FileRef(".link_script.sct", new_scatter)
 
     def get_link_command(
             self,
@@ -322,8 +318,9 @@ class ARM(mbedToolchain):
         if lib_dirs:
             args.extend(["--userlibpath", ",".join(lib_dirs)])
         if scatter_file:
-            new_scatter = self.correct_scatter_shebang(scatter_file)
-            args.extend(["--scatter", new_scatter])
+            scatter_name = relpath(scatter_file)
+            new_scatter = self.correct_scatter_shebang(FileRef(scatter_name, scatter_file))
+            args.extend(["--scatter", new_scatter.path])
 
         cmd = self.ld + args
 
@@ -550,6 +547,7 @@ class ARMC6(ARM_STD):
             "Cortex-M7FD": "cortex-m7",
             "Cortex-M33": "cortex-m33+nodsp",
             "Cortex-M33F": "cortex-m33+nodsp",
+            "Cortex-M33E": "cortex-m33",
             "Cortex-M33FE": "cortex-m33"}.get(core, core)
 
         cpu = cpu.lower()
@@ -557,38 +555,32 @@ class ARMC6(ARM_STD):
         self.SHEBANG += " -mcpu=%s" % cpu
 
         # FPU handling
-        if core == "Cortex-M4F":
+        if core in ["Cortex-M4", "Cortex-M7", "Cortex-M33", "Cortex-M33E"]:
+            self.flags['common'].append("-mfpu=none")
+        elif core == "Cortex-M4F":
             self.flags['common'].append("-mfpu=fpv4-sp-d16")
             self.flags['common'].append("-mfloat-abi=hard")
-            self.flags['ld'].append("--cpu=cortex-m4")
-        elif core == "Cortex-M7F":
+        elif core == "Cortex-M7F" or core.startswith("Cortex-M33F"):
             self.flags['common'].append("-mfpu=fpv5-sp-d16")
             self.flags['common'].append("-mfloat-abi=hard")
-            self.flags['ld'].append("--cpu=cortex-m7.fp.sp")
         elif core == "Cortex-M7FD":
             self.flags['common'].append("-mfpu=fpv5-d16")
             self.flags['common'].append("-mfloat-abi=hard")
-            self.flags['ld'].append("--cpu=cortex-m7")
-        elif core == "Cortex-M33F":
-            self.flags['common'].append("-mfpu=fpv5-sp-d16")
-            self.flags['common'].append("-mfloat-abi=hard")
-            self.flags['ld'].append("--cpu=cortex-m33.no_dsp")
-        elif core == "Cortex-M33":
-            self.flags['common'].append("-mfpu=none")
-            self.flags['ld'].append("--cpu=cortex-m33.no_dsp.no_fp")
-        else:
-            self.flags['ld'].append("--cpu=%s" % cpu)
 
-        asm_cpu = {
-            "Cortex-M0+": "Cortex-M0",
-            "Cortex-M4F": "Cortex-M4.fp",
+        asm_ld_cpu = {
+            "Cortex-M0+": "Cortex-M0plus",
+            "Cortex-M4": "Cortex-M4.no_fp",
+            "Cortex-M4F": "Cortex-M4",
+            "Cortex-M7": "Cortex-M7.no_fp",
             "Cortex-M7F": "Cortex-M7.fp.sp",
-            "Cortex-M7FD": "Cortex-M7.fp.dp",
+            "Cortex-M7FD": "Cortex-M7",
             "Cortex-M33": "Cortex-M33.no_dsp.no_fp",
+            "Cortex-M33E": "Cortex-M33.no_fp",
             "Cortex-M33F": "Cortex-M33.no_dsp",
             "Cortex-M33FE": "Cortex-M33"}.get(core, core)
 
-        self.flags['asm'].append("--cpu=%s" % asm_cpu)
+        self.flags['asm'].append("--cpu=%s" % asm_ld_cpu)
+        self.flags['ld'].append("--cpu=%s" % asm_ld_cpu)
 
         self.cc = ([join(TOOLCHAIN_PATHS["ARMC6"], "armclang")] +
                    self.flags['common'] + self.flags['c'])

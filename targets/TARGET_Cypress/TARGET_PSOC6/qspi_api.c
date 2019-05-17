@@ -43,10 +43,10 @@
 /* Default QSPI configuration */
 static const cy_stc_smif_config_t default_qspi_config =
 {
-	.mode = (uint32_t)CY_SMIF_NORMAL,
-	.deselectDelay = QSPI_DESELECT_DELAY,
-	.rxClockSel = (uint32_t)CY_SMIF_SEL_INV_INTERNAL_CLK,
-	.blockEvent = (uint32_t)CY_SMIF_BUS_ERROR,
+    .mode = (uint32_t)CY_SMIF_NORMAL,
+    .deselectDelay = QSPI_DESELECT_DELAY,
+    .rxClockSel = (uint32_t)CY_SMIF_SEL_INV_INTERNAL_CLK,
+    .blockEvent = (uint32_t)CY_SMIF_BUS_ERROR,
 };
 
 
@@ -146,11 +146,11 @@ static void convert_to_cy_cmd_config(const qspi_command_t *qspi_command, cy_stc_
 
 static void uint32_to_byte_array(uint32_t value, uint8_t *byteArray, uint32_t startPos, uint32_t size)
 {
-	do {
-		size--;
-		byteArray[size + startPos] = (uint8_t)value;
-		value >>= 0x08;
-	} while(size > 0);
+    do {
+        size--;
+        byteArray[size + startPos] = (uint8_t)value;
+        value >>= 0x08;
+    } while(size > 0);
 }
 
 static qspi_status_t validate_and_find_slaveselect(cy_en_smif_slave_select_t *slaveSelect, PinName ssel){
@@ -494,7 +494,6 @@ const PinMap *qspi_master_data3_pinmap(void)
 {
     return PinMap_QSPI_DATA;
 }
-
 #endif
 
 /** @}*/
