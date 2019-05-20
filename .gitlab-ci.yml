@@ -6,6 +6,11 @@ before_script:
     - curl.exe --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip
     - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
 
+cache:
+  paths:
+    - ../venv/
+    - ../pyocd/
+
 # Compile TARGET_PSOC6
 test_mbed_062_crypto:
   stage: test
@@ -27,3 +32,37 @@ test_mbed_064_psa:
     - mbed test --compile --build OUT/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -vv
     - Add-Content OUT\.mbedignore "*"
     - mbed test --compile --build OUT/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -v --run
+
+# Run pyocd wrapper functional tests
+pyocd_wrapper:
+  stage: func_test
+  tags:
+    - MBED_TEST
+  script:
+    - python -V
+    - cd ..
+    - virtualenv venv
+    - .\venv\Scripts\activate.ps1
+    - echo "[INFO] Getting latest pyocd"
+    - if (Test-Path pyocd) { cd pyocd; git pull; cd .. } else { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd }
+    - echo "[INFO] Installing recquired python modules"
+    - pip install cmsis-pack-manager
+    - pip install colorama
+    - pip install intelhex
+    - pip install intervaltree
+    - pip install prettytable
+    - pip install pyelftools
+    - pip install pyusb
+    - pip install pywinusb
+    - pip install pyyaml
+    - pip install six
+    - pip install setuptools_scm_git_archive
+    - pip install setuptools_scm
+    - echo "[INFO] Installing pyocd"
+    - cd pyocd
+    - python setup.py install
+    - cd ..
+    - echo "[INFO] Start tests"
+    - cd .\mbed-os\targets\TARGET_Cypress\TARGET_PSOC6\sb-tools\test\
+    - python -m unittest -v test_pyocd_wrapper.py
+    - deactivate
