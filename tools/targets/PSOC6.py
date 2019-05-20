@@ -211,9 +211,14 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
                 target = {"name": part, "core": "cm0p"}
                 # SPE image flash address start
                 img_start_addr = "0x10080000"
-            else:
+            elif "_PSA" in part:
                 # NSPE image flash address start
                 img_start_addr = "0x10000000"
+                target = {"name": part, "core": "cm4"}
+
+            else:
+                # CM4 SB image flash address start
+                img_start_addr = "0x10002000"
                 target = {"name": part, "core": "cm4"}
 
     # create binary file from mbed elf for the following processing
