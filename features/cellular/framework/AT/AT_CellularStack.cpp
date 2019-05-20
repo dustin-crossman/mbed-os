@@ -70,7 +70,7 @@ const char *AT_CellularStack::get_ip_address()
 
         _at.skip_param();
 
-        int len = _at.read_string(_ip, NSAPI_IPv4_SIZE - 1);
+        int len = _at.read_string(_ip, NSAPI_IPv4_SIZE);
         if (len == -1) {
             _ip[0] = '\0';
             _at.resp_stop();
@@ -81,7 +81,7 @@ const char *AT_CellularStack::get_ip_address()
 
         // in case stack type is not IPV4 only, try to look also for IPV6 address
         if (_stack_type != IPV4_STACK) {
-            (void)_at.read_string(_ip, PDP_IPV6_SIZE - 1);
+            (void)_at.read_string(_ip, PDP_IPV6_SIZE);
         }
     }
 
@@ -132,9 +132,7 @@ nsapi_error_t AT_CellularStack::socket_open(nsapi_socket_t *handle, nsapi_protoc
     tr_info("Socket %d open", index);
     // create local socket structure, socket on modem is created when app calls sendto/recvfrom
     _socket[index] = new CellularSocket;
-    CellularSocket *psock;
-    psock = _socket[index];
-    memset(psock, 0, sizeof(CellularSocket));
+    CellularSocket *psock = _socket[index];
     SocketAddress addr(0, get_dynamic_ip_port());
     psock->id = index;
     psock->localAddress = addr;

@@ -1,15 +1,29 @@
 stages:
   - test
 before_script:
+    - pwd
     - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
-    
+    - curl.exe --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip
+    - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
+
+# Compile TARGET_PSOC6
+test_mbed_062_crypto:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - echo "CY8CKIT_062_WIFI_BT"
+    - mbed test -m CY8CKIT_062_WIFI_BT -t GCC_ARM -n tests-mbedtls* -vv
+    - echo "CY8CPROTO_062_4343W"
+    - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
+
 # Compile TARGET_PSOC6_PSA
 test_mbed_064_psa:
   stage: test
   tags:
     - MBED_TEST
   script:
-    - mbedls -m 1907:CY8CPROTO_064_SB 
-    - mbed test --compile -m CY_064_SB_M0_PSA -t GCC_ARM -n *psa* -vv
-    - mbed test --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
-    - mbed test --run -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -vv
+    - Add-Content OUT\.mbedignore "*"
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -v --run
