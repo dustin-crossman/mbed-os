@@ -129,31 +129,6 @@
         "components": ["PSA_SRV_IMPL", "PSA_SRV_IPC", "SPE"],
         "public": false
     },
-    "SB_Target": {
-        "public": false,
-        "config": {
-            "sb-rom-start": {
-                "help": "Starting address of SB ROM",
-                "value": null,
-                "conflicts": ["target.mbed_rom_size"]
-            },
-            "sb-rom-size": {
-                "help": "Size in bytes of SB ROM",
-                "value": null,              
-                "conflicts": ["target.mbed_rom_size"]
-            },
-            "sb-ram-start": {
-                "help": "Start in bytes of SB RAM",
-                "value": null,
-                "conflicts": ["target.mbed_ram_start"]
-            },
-            "sb-ram-size": {
-                "help": "Size in bytes of SB RAM",
-                "value": null,
-                "conflicts": ["target.mbed_ram_size"]
-            }
-        }        
-    },
     "CM4_UARM": {
         "inherits": ["Target"],
         "core": "Cortex-M4",
@@ -8314,7 +8289,7 @@
         }
     },
     "CY8CPROTO_064_SB": {
-        "inherits": ["MCU_PSOC6_M4", "SB_Target"],
+        "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
         "supported_form_factors": ["ARDUINO"],
         "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW4343X", "CORDIO", "CY8C62XX"],
