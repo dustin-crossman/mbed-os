@@ -35,7 +35,7 @@ test_mbed_064_psa:
 
 # Run pyocd wrapper functional tests
 pyocd_wrapper:
-  stage: func_test
+  stage: test
   tags:
     - MBED_TEST
   script:
