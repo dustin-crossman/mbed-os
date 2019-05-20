@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "psa_platform_partition.h"
+#include "mbed_spm_partitions.h"
 #include "platform_srv_impl.h"
 #include "psa/internal_trusted_storage.h"
 #include "psa/service.h"
@@ -52,10 +52,10 @@ static psa_status_t lifecycle_change_request(psa_msg_t *msg)
 
 }
 
-static psa_status_t system_reset_request(psa_msg_t *msg)
+static MBED_NORETURN psa_status_t system_reset_request(psa_msg_t *msg)
 {
     (void)msg;
-    psa_system_reset_impl();
+    mbed_psa_system_reset_impl();
 }
 
 static void message_handler(psa_msg_t *msg, SignalHandler handler)

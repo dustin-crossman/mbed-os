@@ -1,5 +1,6 @@
 /* mbed Microcontroller Library
  * Copyright (c) 2018-2018 ARM Limited
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +18,14 @@
 #define MBED_QSPI_FLASH_S25FL512S_H
 
 #define QSPI_FLASH_CHIP_STRING "Cypress S25FL512S"
-#define QSPI_FLASH_CYPRESS_S25FL512S 
+#define QSPI_FLASH_CYPRESS_S25FL512S
 
 // Command for reading configuration register
-#define QSPI_CMD_RDCR0                         0x35  // To read Quad (QE) enable bit 
-// Command for writing status/configuration register 
+#define QSPI_CMD_RDCR0                         0x35  // To read Quad (QE) enable bit
+// Command for writing status/configuration register
 #define QSPI_CMD_WRSR                          0x01 // To write Qual (QE) enable bit
 // Command for reading status register
-#define QSPI_CMD_RDSR                          0x05 // To read WIP bit of status register 1 
+#define QSPI_CMD_RDSR                          0x05 // To read WIP bit of status register 1
 
 
 
@@ -62,11 +63,11 @@
 #define QSPI_CMD_READ_1IO_FAST                  0x0B   // 1-1-1 mode
 #define QSPI_CMD_READ_1IO                       0x03   // 1-1-1 mode
 #define QSPI_CMD_READ_2IO                       0xBB   // 1-2-2 mode    - dual I/O
-#define QSPI_CMD_READ_1I2O                      0x3B   // 1-1-2 mode    - dual output 
+#define QSPI_CMD_READ_1I2O                      0x3B   // 1-1-2 mode    - dual output
 #define QSPI_CMD_READ_4IO                       0xEB   // 1-4-4 mode    - quad I/O
 #define QSPI_CMD_READ_1I4O                      0x6B   // 1-1-4 mode    - quad output
 
-// Alt (mode) value for quad I/O read           
+// Alt (mode) value for quad I/O read
 #define QSPI_ALT_READ_4IO                       0x01 // 1-4-4 mode only
 
 #define QSPI_READ_1IO_DUMMY_CYCLE               0
@@ -185,75 +186,6 @@
                                                                             \
     return ((reg_data[0] & STATUS_BIT_QE) == 0 ?                            \
             QSPI_STATUS_OK : QSPI_STATUS_ERROR)
-
-
-
-// #define FAST_MODE_ENABLE()                                                  \
-//                                                                             \
-//     const int32_t reg_size = QSPI_STATUS_REG_SIZE + QSPI_CONFIG_REG_0_SIZE; \
-//     uint8_t reg_data[reg_size];                                             \
-//                                                                             \
-//     if (read_register(STATUS_REG, reg_data,                                 \
-//             QSPI_STATUS_REG_SIZE, qspi) != QSPI_STATUS_OK) {                \
-//         return QSPI_STATUS_ERROR;                                           \
-//     }                                                                       \
-//     if (read_register(CONFIG_REG0, reg_data + QSPI_STATUS_REG_SIZE,         \
-//             QSPI_CONFIG_REG_0_SIZE, qspi) != QSPI_STATUS_OK) {              \
-//         return QSPI_STATUS_ERROR;                                           \
-//     }                                                                       \
-//                                                                             \
-//     if (write_enable(qspi) != QSPI_STATUS_OK) {                             \
-//         return QSPI_STATUS_ERROR;                                           \
-//     }                                                                       \
-//                                                                             \
-//     reg_data[2] |= CONFIG1_BIT_LH;                                          \
-//     if (write_register(QSPI_CMD_WRSR, reg_data,                             \
-//             reg_size, qspi) != QSPI_STATUS_OK) {                            \
-//         return QSPI_STATUS_ERROR;                                           \
-//     }                                                                       \
-//     WAIT_FOR(WRSR_MAX_TIME, qspi);                                          \
-//                                                                             \
-//     if (read_register(CONFIG_REG0, reg_data,                                \
-//             QSPI_CONFIG_REG_0_SIZE, qspi) != QSPI_STATUS_OK) {              \
-//         return QSPI_STATUS_ERROR;                                           \
-//     }                                                                       \
-//                                                                             \
-//     return ((reg_data[1] & CONFIG1_BIT_LH) != 0 ?                           \
-//             QSPI_STATUS_OK : QSPI_STATUS_ERROR)
-
-
-// #define FAST_MODE_DISABLE()                                                 \
-//                                                                             \
-//     const int32_t reg_size = QSPI_STATUS_REG_SIZE + QSPI_CONFIG_REG_0_SIZE; \
-//     uint8_t reg_data[reg_size];                                             \
-//                                                                             \
-//     if (read_register(STATUS_REG, reg_data,                                 \
-//             QSPI_STATUS_REG_SIZE, qspi) != QSPI_STATUS_OK) {                \
-//         return QSPI_STATUS_ERROR;                                           \
-//     }                                                                       \
-//     if (read_register(CONFIG_REG0, reg_data + QSPI_STATUS_REG_SIZE,         \
-//             QSPI_CONFIG_REG_0_SIZE, qspi) != QSPI_STATUS_OK) {              \
-//         return QSPI_STATUS_ERROR;                                           \
-//     }                                                                       \
-//                                                                             \
-//     if (write_enable(qspi) != QSPI_STATUS_OK) {                             \
-//         return QSPI_STATUS_ERROR;                                           \
-//     }                                                                       \
-//                                                                             \
-//     reg_data[2] &= ~(CONFIG1_BIT_LH);                                       \
-//     if (write_register(QSPI_CMD_WRSR, reg_data,                             \
-//             reg_size, qspi) != QSPI_STATUS_OK) {                            \
-//         return QSPI_STATUS_ERROR;                                           \
-//     }                                                                       \
-//     WAIT_FOR(WRSR_MAX_TIME, qspi);                                          \
-//                                                                             \
-//     if (read_register(CONFIG_REG0, reg_data,                                \
-//             QSPI_CONFIG_REG_0_SIZE, qspi) != QSPI_STATUS_OK) {              \
-//         return QSPI_STATUS_ERROR;                                           \
-//     }                                                                       \
-//                                                                             \
-//     return ((reg_data[1] & CONFIG1_BIT_LH) == 0 ?                           \
-//             QSPI_STATUS_OK : QSPI_STATUS_ERROR)
 
 
 #endif // MBED_QSPI_FLASH_S25FL512S_H

@@ -56,7 +56,7 @@
             "area_2_address": "0x100FC000",
             "area_2_size": 16384
         },
-    "CY8CKIT_062_WIFI_BT_M0": {
+       "CY8CKIT_062_WIFI_BT_M0": {
             "area_1_address": "0x10078000",
             "area_1_size": 16384,
             "area_2_address": "0x1007C000",
@@ -83,7 +83,7 @@
         "CY8CPROTO_064_SB_PSA": {
             "enabled" : false
         },
-        "CY_064_SB_M0_PSA": {
+        "CY8CPROTO_064_SB_M0_PSA": {
             "enabled" : false
         }
     }
