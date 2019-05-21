@@ -8193,7 +8193,8 @@
             "SLEEP",
             "FLASH",
             "TRNG",
-            "CRC"
+            "CRC",
+            "USBDEVICE"
         ],
         "release_versions": ["5"],
         "extra_labels": ["Cypress", "PSOC6"],
