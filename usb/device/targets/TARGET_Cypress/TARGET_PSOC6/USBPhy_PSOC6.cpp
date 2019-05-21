@@ -40,22 +40,22 @@ void USBPhyHw::init(USBPhyEvents *events)
     this->events = events;
 
     // Disable IRQ
-    NVIC_DisableIRQ(USB_IRQn);
+    //NVIC_DisableIRQ(USB_IRQn);
 
     // TODO -  Setup clocks
 
     // TODO - Enable USB module
 
     // Enable IRQ
-    NVIC_SetVector(USB_IRQn, (uint32_t)&_usbisr);
-    NVIC_EnableIRQ(USB_IRQn);
+    //NVIC_SetVector(USB_IRQn, (uint32_t)&_usbisr);
+    //NVIC_EnableIRQ(USB_IRQn);
 }
 
 void USBPhyHw::deinit()
 {
     // Disconnect and disable interrupt
     disconnect();
-    NVIC_DisableIRQ(USB_IRQn);
+    //NVIC_DisableIRQ(USB_IRQn);
 }
 
 bool USBPhyHw::powered()
@@ -116,7 +116,7 @@ const usb_ep_table_t *USBPhyHw::endpoint_table()
 {
     // TODO - Update the endpoint table for what your device supports
 
-    static const usb_ep_table_t template_table = {
+    static const usb_ep_table_t lpc_table = {
         4096 - 32 * 4, // 32 words for endpoint buffers
         // +3 based added to interrupt and isochronous to ensure enough
         // space for 4 byte alignment
@@ -207,6 +207,7 @@ bool USBPhyHw::endpoint_read(usb_ep_t endpoint, uint8_t *data, uint32_t size)
 uint32_t USBPhyHw::endpoint_read_result(usb_ep_t endpoint)
 {
     // TODO - return the size of the last OUT packet received on endpoint
+    return 0;
 }
 
 bool USBPhyHw::endpoint_write(usb_ep_t endpoint, uint8_t *data, uint32_t size)
@@ -225,12 +226,12 @@ void USBPhyHw::process()
 {
     // TODO - update register for your mcu
 
-    uint8_t stat = USB0->STAT;
+    //uint8_t stat = USB0->STAT;
 
-    USB0->STAT = stat; // Clear pending interrupts
+    //USB0->STAT = stat; // Clear pending interrupts
 
     // reset interrupt
-    if (stat & USB_STAT_RESET_MASK) {
+    //if (stat & USB_STAT_RESET_MASK) {
 
         // TODO - disable all endpoints
 
@@ -239,72 +240,72 @@ void USBPhyHw::process()
         // TODO - enable control endpoint
 
         // reset bus for USBDevice layer
-        events->reset();
+    //    events->reset();
 
         // Re-enable interrupt
-        NVIC_ClearPendingIRQ(USB_IRQn);
-        NVIC_EnableIRQ(USB_IRQn);
-        return;
-    }
+        //NVIC_ClearPendingIRQ(USB_IRQn);
+        //NVIC_EnableIRQ(USB_IRQn);
+        //return;
+    //}
 
     // power applied
-    if (stat & USB_STAT_POWERED) {
-        events->powered(true);
-    }
+    //if (stat & USB_STAT_POWERED) {
+    //    events->powered(true);
+    //}
 
     // power lost
-    if (stat & USB_STAT_UNPOWERED) {
-        events->powered(false);
-    }
+    //if (stat & USB_STAT_UNPOWERED) {
+    //    events->powered(false);
+    //}
 
     // sleep interrupt
-    if (stat & USB_STAT_SUSPEND_MASK) {
-        events->suspend(true);
-    }
+    //if (stat & USB_STAT_SUSPEND_MASK) {
+    //    events->suspend(true);
+    //}
 
     // resume interrupt
-    if (stat & USB_STAT_RESUME_MASK) {
-        events->suspend(false);
-    }
+    //if (stat & USB_STAT_RESUME_MASK) {
+    //    events->suspend(false);
+    //}
 
     // sof interrupt
-    if (stat & USB_STAT_SOF_MASK) {
+    //if (stat & USB_STAT_SOF_MASK) {
         // SOF event, read frame number
-        events->sof(USB0->FRAME);
-    }
+    //    events->sof(USB0->FRAME);
+    //}
 
     // endpoint interrupt
-    if (stat & USB_STAT_EP_MASK) {
-        uint32_t ep_pending = USB->EP;
-
-        // TODO - call endpoint 0 IN callback if pending
-        events->ep0_in();
-
-        // TODO - call endpoint 0 OUT callback if pending
-        events->ep0_out();
-
-        // TODO - call endpoint 0 SETUP callback if pending
-        events->ep0_setup();
-
-        for (int i = 0; i < 16; i++) {
-            // TODO - call endpoint i IN callback if pending
-            events->in(0x80 | i);
-        }
-
-        for (int i = 0; i < 16; i++) {
-            // TODO - call endpoint i OUT callback if pending
-            events->out();
-        }
-
-        USB->EP = ep_pending; // clear pending
-    }
+    //if (stat & USB_STAT_EP_MASK) {
+    //    uint32_t ep_pending = USB->EP;
+    //
+    //    // TODO - call endpoint 0 IN callback if pending
+    //    events->ep0_in();
+    //
+    //    // TODO - call endpoint 0 OUT callback if pending
+    //    events->ep0_out();
+    //
+    //    // TODO - call endpoint 0 SETUP callback if pending
+    //    events->ep0_setup();
+    //
+    //    for (int i = 0; i < 16; i++) {
+    //        // TODO - call endpoint i IN callback if pending
+    //        events->in(0x80 | i);
+    //    }
+    //
+    //    for (int i = 0; i < 16; i++) {
+    //        // TODO - call endpoint i OUT callback if pending
+    //        events->out();
+    //    }
+    //
+    //    USB->EP = ep_pending; // clear pending
+    //}
 
     // Re-enable interrupt
-    NVIC_ClearPendingIRQ(USB_IRQn);
-    NVIC_EnableIRQ(USB_IRQn);
+    //NVIC_ClearPendingIRQ(USB_IRQn);
+    //NVIC_EnableIRQ(USB_IRQn);
 }
 
 void USBPhyHw::_usbisr(void) {
-    NVIC_DisableIRQ(USB_IRQn);
-    instance->events->start_process();
+    //NVIC_DisableIRQ(USB_IRQn);
+    //instance->events->start_process();
 }
