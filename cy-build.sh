@@ -52,7 +52,7 @@ fi
 mbed config ROOT .
 mbed test --compile --toolchain $2 -n tests-usb_device-basic --target CY8CKIT_062_WIFI_BT -vv
 mbed test --compile --toolchain $2 -n tests-usb_device-basic --target CY8CPROTO_062_4343W -vv
-mbed test --compile --toolchain $2 -n tests-usb_device-basic --target CY8CKIT_062_BLE -vv
+#mbed test --compile --toolchain $2 -n tests-usb_device-basic --target CY8CKIT_062_BLE -vv
 
 # Delete the mapped drive...
 if [[ ${windows} -ne 0 ]]; then
