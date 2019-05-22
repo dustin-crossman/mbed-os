@@ -136,8 +136,6 @@ class mbedToolchain:
         self.target = target
         self.name = self.__class__.__name__
 
-        # compile/assemble/link/binary hooks
-        self._post_build_hook = target.get_post_build_hook(self.name)
 
         # Toolchain flags
         self.flags = deepcopy(build_profile or self.profile_template)
@@ -754,14 +752,18 @@ class mbedToolchain:
         else:
             updatable = None
 
-        if self._post_build_hook:
+        # compile/assemble/link/binary hooks
+        post_build_hook = self.target.get_post_build_hook(
+            self._get_toolchain_labels()
+        )
+        if post_build_hook:
             self.progress("post-build", name)
-            self._post_build_hook(self, r, elf, full_path)
+            post_build_hook(self, r, elf, full_path)
         # Initialize memap and process map file. This doesn't generate output.
         self.mem_stats(mapfile)
 
         self.notify.var("compile_succeded", True)
-        self.notify.var("binary", filename)
+        self.notify.var("binary", full_path)
 
         return full_path, updatable
 
@@ -773,6 +775,7 @@ class mbedToolchain:
         )
         self.notify.debug("Return: %s" % rc)
 
+        self.parse_output(stderr)
         for output_line in stdout.splitlines():
             self.notify.debug("Output: %s" % output_line)
         for error_line in stderr.splitlines():
@@ -838,7 +841,7 @@ class mbedToolchain:
     def _add_all_regions(self, region_list, active_region_name):
         for region in region_list:
             self._add_defines_from_region(region)
-            if region.active:
+            if region.active and active_region_name:
                 for define in [
                         ("%s_START" % active_region_name,
                          "0x%x" % region.start),
@@ -872,7 +875,7 @@ class mbedToolchain:
                     "s" if len(regions) > 1 else "",
                     ", ".join(r.name for r in regions)
                 ))
-                self._add_all_regions(regions, "MBED_RAM")
+                self._add_all_regions(regions, None)
             except ConfigException:
                 pass
 
@@ -912,6 +915,7 @@ class mbedToolchain:
             pass
 
     STACK_PARAM = "target.boot-stack-size"
+    TFM_LVL_PARAM = "tfm.level"
 
     def add_linker_defines(self):
         params, _ = self.config_data
@@ -923,36 +927,23 @@ class mbedToolchain:
             )
             self.ld.append(define_string)
             self.flags["ld"].append(define_string)
-
-        flags2params = {}
-        if self.target.is_PSA_non_secure_target:
-            flags2params = {
-                "MBED_ROM_START": "target.non-secure-rom-start",
-                "MBED_ROM_SIZE": "target.non-secure-rom-size",
-                "MBED_RAM_START": "target.non-secure-ram-start",
-                "MBED_RAM_SIZE": "target.non-secure-ram-size"
-            }
-        if self.target.is_PSA_secure_target:
-            flags2params = {
-                "MBED_ROM_START": "target.secure-rom-start",
-                "MBED_ROM_SIZE": "target.secure-rom-size",
-                "MBED_RAM_START": "target.secure-ram-start",
-                "MBED_RAM_SIZE": "target.secure-ram-size",
-                "MBED_PUBLIC_RAM_START": "target.public-ram-start",
-                "MBED_PUBLIC_RAM_SIZE": "target.public-ram-size"
-            }
-        if self.target.is_SB_target and not self.target.is_PSA_non_secure_target:
-            flags2params = {
-                "MBED_ROM_START": "target.sb-rom-start",
-                "MBED_ROM_SIZE": "target.sb-rom-size",
-                "MBED_RAM_START": "target.sb-ram-start",
-                "MBED_RAM_SIZE": "target.sb-ram-size"
-            }              
-
-        for flag, param in flags2params.items():
-            define_string = self.make_ld_define(flag, params[param].value)
             self.ld.append(define_string)
             self.flags["ld"].append(define_string)
+
+        # Pass TFM_LVL to linker files, so single linker file can support different TFM security levels.
+        if self.TFM_LVL_PARAM in params:
+            define_string = self.make_ld_define(
+                "TFM_LVL",
+                params[self.TFM_LVL_PARAM].value
+            )
+        if self.target.is_PSA_secure_target:
+            for flag, param in [
+                ("MBED_PUBLIC_RAM_START", "target.public-ram-start"),
+                ("MBED_PUBLIC_RAM_SIZE", "target.public-ram-size")
+            ]:
+                define_string = self.make_ld_define(flag, params[param].value)
+                self.ld.append(define_string)
+                self.flags["ld"].append(define_string)
 
     # Set the configuration data
     def set_config_data(self, config_data):

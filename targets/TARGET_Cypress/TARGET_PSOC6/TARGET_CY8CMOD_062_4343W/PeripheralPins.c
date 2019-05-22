@@ -491,3 +491,4 @@ const PinMap PinMap_QSPI_SSEL[] = {          // does not use PERI clock, uses HF
     {NC,    NC,    0}
 };
 #endif // DEVICE_QSPI
+
