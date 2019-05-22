@@ -262,14 +262,6 @@ cy_rslt_t cyhal_sdio_irq_enable(cyhal_sdio_t *obj, cyhal_sdio_irq_event_t event,
 
 /** \} group_hal_sdio_functions */
 
-/** \cond INTERNAL */
-/* TODO: Remove these functions. Temporary added to make it workable */
-cy_rslt_t sdio_bus_interrupt_enable(const cyhal_sdio_t *obj);
-cy_rslt_t sdio_bus_interrupt_disable(const cyhal_sdio_t *obj);
-cy_rslt_t sdio_interrupt_status(const cyhal_sdio_t *obj, uint16_t* status);
-cy_rslt_t sdio_clear_pending_isr(const cyhal_sdio_t *obj);
-/** \endcond */
-
 #if defined(__cplusplus)
 }
 #endif

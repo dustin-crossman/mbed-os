@@ -273,9 +273,15 @@ typedef struct {
     cyhal_resource_inst_t       resource;
     bool                        emmc;
     cy_en_sd_host_dma_type_t    dmaType;
-    bool                        enableLedControl;
     cy_stc_sd_host_context_t    context;
-    cyhal_gpio_t                resetPin;
+    cyhal_gpio_t                pin_clk;
+    cyhal_gpio_t                pin_cmd;
+    cyhal_gpio_t                pin_data0;
+    cyhal_gpio_t                pin_data1;
+    cyhal_gpio_t                pin_data2;
+    cyhal_gpio_t                pin_data3;
+    uint32_t                    frequencyhal_hz;
+    uint16_t                    block_size;
     uint32_t                    irq_cause;
 
 #elif defined(CY8C6247BZI_D54) /* TODO: BSP-525 */
