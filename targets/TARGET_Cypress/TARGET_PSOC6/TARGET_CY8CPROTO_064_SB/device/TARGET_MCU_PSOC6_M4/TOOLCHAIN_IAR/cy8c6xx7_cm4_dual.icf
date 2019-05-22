@@ -155,7 +155,7 @@ if (!isdefinedsymbol(__STACK_SIZE)) {
 }
 
 if (!isdefinedsymbol(__HEAP_SIZE)) {
-    define symbol __ICFEDIT_size_heap__ = 0x20000;
+    define symbol __ICFEDIT_size_heap__ = 0x400;
 } else {
   define symbol __ICFEDIT_size_heap__ = __HEAP_SIZE;
 }
