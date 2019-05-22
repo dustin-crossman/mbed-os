@@ -24,7 +24,7 @@ before_script:
   script:
     - bash -ex cy-build.sh win GCC_ARM
 
-.win10-IAR:
+win10-IAR:
   stage: build
   tags:
     - mti-win10
@@ -44,7 +44,7 @@ ubuntu18-ARM:
   # Ignore linkage failure due to undefined symbols
   allow_failure: true
 
-ubuntu18-GCC_ARM:
+.ubuntu18-GCC_ARM:
   stage: build
   tags:
     # see DEVOPS-304 - devops-linux
@@ -55,7 +55,7 @@ ubuntu18-GCC_ARM:
 ##############################################################################
 # Mac - GCC_ARM
 ##############################################################################
-.mac10.14-GCC_ARM:
+mac10.14-GCC_ARM:
   stage: build
   tags:
     - mti-mac10.14
