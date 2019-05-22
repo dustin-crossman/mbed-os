@@ -168,18 +168,20 @@ static cy_rslt_t reserve_peri_diviers(void)
 cy_rslt_t cybsp_init(void)
 {
     init_cycfg_all();
-    // cy_rslt_t result = reserve_pins();
-    // if (result != CY_RSLT_SUCCESS)
-    // {
-    //     return result;
-    // }
-    // result = reserve_peri_diviers();
-    // if (result != CY_RSLT_SUCCESS)
-    // {
-    //     return result;
-    // }
-    // result = init_peripherals();
-    // return result;
+    #if 0
+    cy_rslt_t result = reserve_pins();
+    if (result != CY_RSLT_SUCCESS)
+    {
+        return result;
+    }
+    result = reserve_peri_diviers();
+    if (result != CY_RSLT_SUCCESS)
+    {
+        return result;
+    }
+    result = init_peripherals();
+    return result;
+    #endif
     return CY_RSLT_SUCCESS;
 }
 

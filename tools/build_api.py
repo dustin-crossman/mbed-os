@@ -26,6 +26,7 @@ from shutil import rmtree
 from os.path import join, exists, dirname, basename, abspath, normpath, splitext
 from os.path import relpath
 from os import linesep, remove, makedirs
+from copy import copy
 from time import time
 from json import load, dump
 from jinja2 import FileSystemLoader
@@ -40,7 +41,7 @@ from .paths import (MBED_CMSIS_PATH, MBED_TARGETS_PATH, MBED_LIBRARIES,
                     MBED_CONFIG_FILE, MBED_LIBRARIES_DRIVERS,
                     MBED_LIBRARIES_PLATFORM, MBED_LIBRARIES_HAL,
                     BUILD_DIR)
-from .resources import Resources, FileType, FileRef
+from .resources import Resources, FileType, FileRef, PsaManifestResourceFilter
 from .notifier.mock import MockNotifier
 from .targets import TARGET_NAMES, TARGET_MAP, CORE_ARCH, Target
 from .libraries import Library
@@ -365,17 +366,13 @@ def transform_release_toolchains(target, version):
     """
     if int(target.build_tools_metadata["version"]) > 0:
         if version == '5':
-            non_arm_toolchains = set(["IAR", "GCC_ARM"])
-            if 'ARMC5' in target.supported_toolchains:
-                result = ["ARMC5"]
-            else:
-                result = ["ARM", "ARMC6"]
-            result.extend(
-                set(target.supported_toolchains).intersection(
-                    non_arm_toolchains
-                )
-            )
-            return result
+            toolchains = copy(target.supported_toolchains)
+
+            if "ARM" in toolchains:
+                toolchains.remove("ARM")
+                toolchains.extend(["ARMC5", "ARMC6"])
+
+            return toolchains
         return target.supported_toolchains
     else:
         if version == '5':
@@ -514,7 +511,7 @@ def build_project(src_paths, build_path, target, toolchain_name,
                   report=None, properties=None, project_id=None,
                   project_description=None, config=None,
                   app_config=None, build_profile=None, stats_depth=None,
-                  ignore=None, spe_build=False):
+                  ignore=None, resource_filter=None):
     """ Build a project. A project may be a test or a user program.
 
     Positional arguments:
@@ -542,6 +539,7 @@ def build_project(src_paths, build_path, target, toolchain_name,
     build_profile - a dict of flags that will be passed to the compiler
     stats_depth - depth level for memap to display file/dirs
     ignore - list of paths to add to mbedignore
+    resource_filter - can be used for filtering out resources after scan
     """
     # Convert src_path to a list if needed
     if not isinstance(src_paths, list):
@@ -584,8 +582,8 @@ def build_project(src_paths, build_path, target, toolchain_name,
     try:
         resources = Resources(notify).scan_with_toolchain(
             src_paths, toolchain, inc_dirs=inc_dirs)
-        if spe_build:
-            resources.filter_spe()
+        resources.filter(resource_filter)
+
         # Change linker script if specified
         if linker_script is not None:
             resources.add_file_ref(FileType.LD_SCRIPT, linker_script, linker_script)
@@ -667,7 +665,7 @@ def build_library(src_paths, build_path, target, toolchain_name,
                   archive=True, notify=None, macros=None, inc_dirs=None, jobs=1,
                   report=None, properties=None, project_id=None,
                   remove_config_header_file=False, app_config=None,
-                  build_profile=None, ignore=None):
+                  build_profile=None, ignore=None, resource_filter=None):
     """ Build a library
 
     Positional arguments:
@@ -693,6 +691,7 @@ def build_library(src_paths, build_path, target, toolchain_name,
     app_config - location of a chosen mbed_app.json file
     build_profile - a dict of flags that will be passed to the compiler
     ignore - list of paths to add to mbedignore
+    resource_filter - can be used for filtering out resources after scan
     """
 
     # Convert src_path to a list if needed
@@ -753,6 +752,8 @@ def build_library(src_paths, build_path, target, toolchain_name,
     try:
         res = Resources(notify).scan_with_toolchain(
             src_paths, toolchain, dependencies_paths, inc_dirs=inc_dirs)
+        res.filter(resource_filter)
+        res.filter(PsaManifestResourceFilter())
 
         # Copy headers, objects and static libraries - all files needed for
         # static lib

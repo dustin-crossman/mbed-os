@@ -28,7 +28,6 @@
 #include "cycfg_notices.h"
 #include "cy_sysclk.h"
 #include "cy_gpio.h"
-#include "cy_syspm.h"
 
 #if defined(__cplusplus)
 extern "C" {

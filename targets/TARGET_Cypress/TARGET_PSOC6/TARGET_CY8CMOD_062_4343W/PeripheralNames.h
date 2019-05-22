@@ -43,6 +43,7 @@ typedef enum {
     UART_12 = (int)SCB12_BASE,
 } UARTName;
 
+#define DEVICE_SPI_COUNT CY_IP_MXSCB_INSTANCES
 
 typedef enum {
     SPI_0 = (int)SCB0_BASE,
@@ -111,6 +112,10 @@ typedef enum {
 typedef enum {
     ADC_0 = (int)SAR_BASE,
 } ADCName;
+
+typedef enum {
+    SMIF_0 = (int)SMIF0_BASE,
+} SMIFName;
 
 #ifdef __cplusplus
 }
