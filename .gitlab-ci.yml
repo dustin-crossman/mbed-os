@@ -17,14 +17,14 @@ before_script:
   script:
     - bash -ex cy-build.sh win ARM
 
-.win10-GCC_ARM:
+win10-GCC_ARM:
   stage: build
   tags:
     - mti-win10
   script:
     - bash -ex cy-build.sh win GCC_ARM
 
-win10-IAR:
+.win10-IAR:
   stage: build
   tags:
     - mti-win10
