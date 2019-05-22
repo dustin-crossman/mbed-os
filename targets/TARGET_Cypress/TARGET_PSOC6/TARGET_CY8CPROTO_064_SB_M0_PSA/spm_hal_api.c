@@ -215,6 +215,11 @@ void spm_hal_start_nspe(void)
     /* Processing of policy in JWT format */
     uint32_t jwtLen;
     char *jwt;
+
+    BOOT_LOG_INF("/******************************************************/");
+    BOOT_LOG_INF(" SPE + MCUBoot Application ");
+    BOOT_LOG_INF("/******************************************************/");
+    BOOT_LOG_INF("Processing JWT Policy");
     rc = Cy_JWT_GetProvisioningDetails(FB_POLICY_JWT, &jwt, &jwtLen);
     if(0 != rc)
     {

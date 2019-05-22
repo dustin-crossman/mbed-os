@@ -190,6 +190,11 @@ void mbed_sdk_init(void)
     /* Placed here as it must be done after proper LIBC initialization. */
     SystemInit();
 
+#if defined(COMPONENT_SPE)
+    /* Set up the device based on configurator selections */
+    init_cycfg_all();
+#endif
+
 #if defined(COMPONENT_SPM_MAILBOX)
     /* Configure mailbox IPC interrupts */
     mailbox_init();
