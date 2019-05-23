@@ -20,7 +20,8 @@ before_script:
 win10-GCC_ARM:
   stage: build
   tags:
-    - mti-win10
+#    - mti-win10
+    - WIN
   script:
     - bash -ex cy-build.sh win GCC_ARM
 
@@ -61,3 +62,4 @@ mac10.14-GCC_ARM:
     - mti-mac10.14
   script:
     - bash -ex cy-build.sh mac GCC_ARM
+
