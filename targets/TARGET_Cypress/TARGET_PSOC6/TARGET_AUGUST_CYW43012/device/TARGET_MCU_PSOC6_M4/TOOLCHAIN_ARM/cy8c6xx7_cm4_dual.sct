@@ -1,10 +1,10 @@
-#! armcc -E
+#! armclang -E --target=arm-arm-none-eabi -x c -mcpu=cortex-m4
 ; The first line specifies a preprocessor command that the linker invokes
 ; to pass a scatter file through a C preprocessor.
 
 ;*******************************************************************************
 ;* \file cy8c6xx7_cm4_dual.scat
-;* \version `$CY_MAJOR_VERSION`.`$CY_MINOR_VERSION`
+;* \version 2.40
 ;*
 ;* Linker file for the ARMCC.
 ;*
@@ -43,11 +43,27 @@
 ;******************************************************************************/
 
 #if !defined(MBED_ROM_START)
-  #define MBED_ROM_START    0x10002000
+  #define MBED_ROM_START    0x10002400
+#endif
+
+;* MBED_APP_START is being  used by the bootloader build script and
+;* will be calculate by the system. Without bootloader the MBED_APP_START
+;* is equal to MBED_ROM_START
+;*
+#if !defined(MBED_APP_START)
+  #define MBED_APP_START    MBED_ROM_START
 #endif
 
 #if !defined(MBED_ROM_SIZE)
-  #define MBED_ROM_SIZE     0x000FE000
+  #define MBED_ROM_SIZE     0x0004FC00
+#endif
+
+;* MBED_APP_SIZE is being  used by the bootloader build script and
+;* will be calculate by the system. Without bootloader the MBED_APP_SIZE
+;* is equal to MBED_ROM_SIZE
+;*
+#if !defined(MBED_APP_SIZE)
+  #define MBED_APP_SIZE     MBED_ROM_SIZE
 #endif
 
 #if !defined(MBED_RAM_START)
@@ -55,7 +71,7 @@
 #endif
 
 #if !defined(MBED_RAM_SIZE)
-  #define MBED_RAM_SIZE     0x00045800
+  #define MBED_RAM_SIZE     0x0001E000
 #endif
 
 #if !defined(MBED_BOOT_STACK_SIZE)
@@ -69,7 +85,7 @@
 
 ; The following defines control RAM and flash memory allocation for the CM4 core.
 ; You can change the memory allocation by editing RAM and Flash defines.
-; Note that 2 KB of RAM (at the end of the RAM section) are reserved for system use.
+; Note that 2 KB of RAM (at the end of the SRAM) are reserved for system use.
 ; Using this memory region for other purposes will lead to unexpected behavior.
 ; Your changes must be aligned with the corresponding defines for CM0+ core in 'xx_cm0plus.scat',
 ; where 'xx' is the device group; for example, 'cy8c6xx7_cm0plus.scat'.
@@ -77,8 +93,8 @@
 #define RAM_START               MBED_RAM_START
 #define RAM_SIZE                MBED_RAM_SIZE
 ; Flash
-#define FLASH_START             MBED_ROM_START
-#define FLASH_SIZE              MBED_ROM_SIZE
+#define FLASH_START             MBED_APP_START
+#define FLASH_SIZE              MBED_APP_SIZE
 
 ; The following defines describe a 32K flash region used for EEPROM emulation.
 ; This region can also be used as the general purpose flash.
@@ -251,6 +267,32 @@ CYMETA 0x90500000
 {
     .cymeta +0 { * (.cymeta) }
 }
+
+/* The following symbols used by the cymcuelftool. */
+/* Flash */
+#define __cy_memory_0_start 0x10000000
+#define __cy_memory_0_length  0x00100000
+#define __cy_memory_0_row_size 0x200
+
+/* Emulated EEPROM Flash area */
+#define __cy_memory_1_start    0x14000000
+#define __cy_memory_1_length   0x8000
+#define __cy_memory_1_row_size 0x200
+
+/* Supervisory Flash */
+#define __cy_memory_2_start    0x16000000
+#define __cy_memory_2_length   0x8000
+#define __cy_memory_2_row_size 0x200
+
+/* XIP */
+#define __cy_memory_3_start    0x18000000
+#define __cy_memory_3_length   0x08000000
+#define __cy_memory_3_row_size 0x200
+
+/* eFuse */
+#define __cy_memory_4_start    0x90700000
+#define __cy_memory_4_length   0x100000
+#define __cy_memory_4_row_size 1
 
 
 /* [] END OF FILE */

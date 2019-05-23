@@ -62,5 +62,17 @@
 #ifndef INITIAL_SP
 #define INITIAL_SP              (0x08000000 + 0x00008000)  /* Ram origin + length */ 
 #endif
+#elif defined(TARGET_AUGUST_CYW43012)
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08000000 + 0x00008000)  /* Ram origin + length */ 
+#endif
+#elif defined(TARGET_AUGUST_CYW43012_M0_PSA)
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08018000 + 0x00016000)  /* Ram origin + length */ 
+#endif
+#elif defined(TARGET_AUGUST_CYW43012_PSA)
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08000000 + 0x00017D00)  /* Ram origin + length */ 
+#endif
 #endif
 #endif  /* MBED_MBED_RTX_H */

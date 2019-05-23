@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file system_psoc6_cm4.c
-* \version 2.30
+* \version 2.40
 *
 * The device system-source file.
 *
@@ -42,6 +42,10 @@
         #include "cy_flash.h"
     #endif /* defined(CY_DEVICE_PSOC6ABLE2) */
 #endif /* !defined(CY_IPC_DEFAULT_CFG_DISABLE) */
+
+#if defined(COMPONENT_SPM_MAILBOX)
+void mailbox_init(void);
+#endif
 
 
 /*******************************************************************************
@@ -154,9 +158,6 @@ uint32_t cy_delay32kMs    = CY_DELAY_MS_OVERFLOW_THRESHOLD *
     #define CY_ROOT_PATH_SRC_DSI_MUX_PILO   (19UL)
 #endif /* (SRSS_PILO_PRESENT == 1U) */
 
-#if defined(COMPONENT_SPM_MAILBOX)
-void mailbox_init(void);
-#endif
 
 /*******************************************************************************
 * Function Name: SystemInit
@@ -267,10 +268,6 @@ void SystemInit(void)
 #endif /* defined(CY_DEVICE_PSOC6ABLE2) */
 
 #endif /* !defined(CY_IPC_DEFAULT_CFG_DISABLE) */
-
-#if defined(COMPONENT_SPM_MAILBOX)
-    mailbox_init();
-#endif
 }
 
 
@@ -284,6 +281,11 @@ void SystemInit(void)
 *******************************************************************************/
 void mbed_sdk_init(void)
 {
+#if !defined(COMPONENT_SPM_MAILBOX)
+    /* Disable global interrupts */
+    __disable_irq();
+#endif
+
     /* Initialize shared resource manager */
     cy_srm_initialize();
 
@@ -291,9 +293,14 @@ void mbed_sdk_init(void)
     /* Placed here as it must be done after proper LIBC initialization. */
     SystemInit();
 
+#if defined(COMPONENT_SPM_MAILBOX)
+    mailbox_init();
+#endif
+
+#if !defined(COMPONENT_NSPE)
     /* Set up the device based on configurator selections */
     init_cycfg_all();
-
+#endif
     /* Enable global interrupts */
     __enable_irq();
 }
@@ -520,6 +527,7 @@ void Cy_SysIpcPipeIsrCm4(void)
 }
 #endif
 
+
 /*******************************************************************************
 * Function Name: Cy_MemorySymbols
 ****************************************************************************//**
@@ -529,7 +537,7 @@ void Cy_SysIpcPipeIsrCm4(void)
 * linker configuration files. The following symbols used by the cymcuelftool.
 *
 *******************************************************************************/
-#if defined (__ARMCC_VERSION)
+#if defined (__ARMCC_VERSION) && (__ARMCC_VERSION < 6010050)
 __asm void Cy_MemorySymbols(void)
 {
     /* Flash */
@@ -582,8 +590,7 @@ __cy_memory_4_start     EQU __cpp(0x90700000)
 __cy_memory_4_length    EQU __cpp(0x100000)
 __cy_memory_4_row_size  EQU __cpp(1)
 }
-
-#endif /* defined (__ARMCC_VERSION) */
+#endif /* defined (__ARMCC_VERSION) && (__ARMCC_VERSION < 6010050) */
 
 
 /* [] END OF FILE */

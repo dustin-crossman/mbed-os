@@ -15,7 +15,7 @@
 
 #include "stdbool.h"
 
-#include "types.h"
+#include "fb_types.h"
 #include <stddef.h>
 #include <sys/types.h>
 #include <fb_device.h>

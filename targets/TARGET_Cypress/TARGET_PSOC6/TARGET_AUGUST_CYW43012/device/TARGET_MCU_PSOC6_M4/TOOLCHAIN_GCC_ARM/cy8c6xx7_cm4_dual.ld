@@ -1,6 +1,6 @@
 /***************************************************************************//**
-* \file cy8c6xx7_cm0plus.ld
-* \version 2.30
+* \file cy8c6xx7_cm4_dual.ld
+* \version 2.40
 *
 * Linker file for the GNU C compiler.
 *
@@ -41,27 +41,35 @@ GROUP(-lgcc -lc -lnosys)
 ENTRY(Reset_Handler)
 
 #if !defined(MBED_ROM_START)
-  #define MBED_ROM_START    0x10000000
+  #define MBED_ROM_START    0x10002400
+#endif
+
+/* MBED_APP_START is being  used by the bootloader build script and
+* will be calculate by the system. Without bootloader the MBED_APP_START
+* is equal to MBED_ROM_START
+*/
+#if !defined(MBED_APP_START)
+  #define MBED_APP_START MBED_ROM_START
 #endif
 
 #if !defined(MBED_ROM_SIZE)
-  #define MBED_ROM_SIZE     0x80000
+  #define MBED_ROM_SIZE     0x0004FC00
+#endif
+
+/* MBED_APP_SIZE is being  used by the bootloader build script and
+* will be calculate by the system. Without bootloader the MBED_APP_SIZE
+* is equal to MBED_ROM_SIZE
+*/
+#if !defined(MBED_APP_SIZE)
+  #define MBED_APP_SIZE MBED_ROM_SIZE
 #endif
 
 #if !defined(MBED_RAM_START)
-  #define MBED_RAM_START    0x08000000
+  #define MBED_RAM_START    0x08002000
 #endif
 
 #if !defined(MBED_RAM_SIZE)
-  #define MBED_RAM_SIZE     0x10000
-#endif
-
-#if !defined(MBED_PUBLIC_RAM_START)
-  #define MBED_PUBLIC_RAM_START    0x08047600
-#endif
-
-#if !defined(MBED_PUBLIC_RAM_SIZE)
-  #define MBED_PUBLIC_RAM_SIZE     0x200
+  #define MBED_RAM_SIZE     0x0001E000
 #endif
 
 #if !defined(MBED_BOOT_STACK_SIZE)
@@ -77,20 +85,21 @@ STACK_SIZE = MBED_BOOT_STACK_SIZE;
 * option.
 */
 EXTERN(Reset_Handler)
-
+EXTERN(uxTopUsedPriority) /*rnok: This symbol is needed to support debugging */
 /* The MEMORY section below describes the location and size of blocks of memory in the target.
 * Use this section to specify the memory regions available for allocation.
 */
 MEMORY
 {
-    /* The ram and flash regions control RAM and flash memory allocation for the CM0+ core.
+    /* The ram and flash regions control RAM and flash memory allocation for the CM4 core.
      * You can change the memory allocation by editing the 'ram' and 'flash' regions.
-     * Your changes must be aligned with the corresponding memory regions for the CM4 core in 'xx_cm4_dual.ld',
-     * where 'xx' is the device group; for example, 'cy8c6xx7_cm4_dual.ld'.
+     * Note that 2 KB of RAM (at the end of the SRAM) are reserved for system use.
+     * Using this memory region for other purposes will lead to unexpected behavior.
+     * Your changes must be aligned with the corresponding memory regions for CM0+ core in 'xx_cm0plus.ld',
+     * where 'xx' is the device group; for example, 'cy8c6xx7_cm0plus.ld'.
      */
     ram               (rwx)   : ORIGIN = MBED_RAM_START, LENGTH = MBED_RAM_SIZE
-    public_ram        (rw)   : ORIGIN = MBED_PUBLIC_RAM_START, LENGTH = MBED_PUBLIC_RAM_SIZE
-    flash             (rx)    : ORIGIN = MBED_ROM_START, LENGTH = (MBED_ROM_SIZE - 0x8000)
+    flash             (rx)    : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
 
     /* This is a 32K flash region used for EEPROM emulation. This region can also be used as the general purpose flash.
      * You can assign sections to this memory region for only one of the cores.
@@ -148,11 +157,6 @@ GROUP(libgcc.a libc.a libm.a libnosys.a)
 
 SECTIONS
 {
-    .cy_app_header :
-    {
-        KEEP(*(.cy_app_header))
-    } > flash
-
     .text :
     {
         . = ALIGN(4);
@@ -206,7 +210,7 @@ SECTIONS
 
     /* To copy multiple ROM to RAM sections,
      * uncomment .copy.table section and,
-     * define __STARTUP_COPY_MULTIPLE in startup_psoc6_01_cm0plus.S */
+     * define __STARTUP_COPY_MULTIPLE in startup_psoc6_01_cm4.S */
     .copy.table :
     {
         . = ALIGN(4);
@@ -228,7 +232,7 @@ SECTIONS
 
     /* To clear multiple BSS sections,
      * uncomment .zero.table section and,
-     * define __STARTUP_CLEAR_BSS_MULTIPLE in startup_psoc6_01_cm0plus.S */
+     * define __STARTUP_CLEAR_BSS_MULTIPLE in startup_psoc6_01_cm4.S */
     .zero.table :
     {
         . = ALIGN(4);
@@ -268,6 +272,7 @@ SECTIONS
         KEEP(*(SORT(.init_array.*)))
         KEEP(*(.init_array))
         PROVIDE_HIDDEN (__init_array_end = .);
+
 
         . = ALIGN(4);
         /* finit data */
@@ -329,22 +334,7 @@ SECTIONS
         __HeapLimit = .;
     } > ram
 
-
-    /* .stack_dummy section doesn't contains any symbols. It is only
-     * used for linker to calculate size of stack sections, and assign
-     * values to stack symbols later */
-    .stack_dummy (NOLOAD):
-    {
-        KEEP(*(.stack*))
-    } > ram
-
-    /* Public RAM */
-    .cy_pub_ram (NOLOAD):
-    {
-        . = ALIGN(4);
-        KEEP(*(.cy_pub_ram))
-    } > public_ram
-
+    
     /* Set stack top to end of RAM, and stack limit move down by
      * size of stack_dummy section */
     __StackTop = ORIGIN(ram) + LENGTH(ram);
@@ -353,6 +343,14 @@ SECTIONS
 
     /* Check if data + heap + stack exceeds RAM limit */
     ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
+
+
+    /* Used for the digital signature of the secure application and the Bootloader SDK application.
+    * The size of the section depends on the required data size. */
+    .cy_app_signature ORIGIN(flash) + LENGTH(flash) - 256 :
+    {
+        KEEP(*(.cy_app_signature))
+    } > flash
 
 
     /* Emulated EEPROM Flash area */
