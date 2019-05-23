@@ -48,7 +48,7 @@ def process_customer_keys(paths):
               default='../prebuild/cy_auth.jwt',
               help='Provisioning authorization certificate.')
 @click.option('--policy', 'policy_path',
-              default='policy_1stage_CM4.json',
+              default='policy_single_stage_CM4.json',
               help='Policy file.')
 @click.option('--out', 'output_path',
               default='../packet',
