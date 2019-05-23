@@ -43,28 +43,19 @@
 #endif
 #elif defined(TARGET_CY8CPROTO_064_SB)
 #ifndef INITIAL_SP
-#define INITIAL_SP              (0x08001000 + 0x0001F000)  /* Ram origin + length */
-#endif
-#elif defined(TARGET_CY8CPROTO_064_M0_PSA)
-#ifndef INITIAL_SP
-#define INITIAL_SP              (0x0800E000 + 0x00012000)  /* Ram origin + length */
-#endif
-#elif defined(TARGET_CY8CPROTO_064_SB_PSA)
-#ifndef INITIAL_SP
-//#define INITIAL_SP              (0x08000000 + 0x0000CD00)  /* Ram origin + length */ 
-#define INITIAL_SP              (0x08000000 + 0x00008000)  /* Ram origin + length */ 
+#define INITIAL_SP              (0x08002000 + 0x0001E000)  /* Ram origin + length */
 #endif
 #elif defined(TARGET_CY8CPROTO_064_SB_M0_PSA)
 #ifndef INITIAL_SP
-#define INITIAL_SP              (0x08008300 + 0x00017D00)  /* Ram origin + length */ 
+#define INITIAL_SP              (0x08018000 + 0x00016000)  /* Ram origin + length */ 
 #endif
 #elif defined(TARGET_CY8CPROTO_064_SB_PSA)
 #ifndef INITIAL_SP
-#define INITIAL_SP              (0x08000000 + 0x00008000)  /* Ram origin + length */ 
+#define INITIAL_SP              (0x08000000 + 0x00017D00)  /* Ram origin + length */ 
 #endif
 #elif defined(TARGET_AUGUST_CYW43012)
 #ifndef INITIAL_SP
-#define INITIAL_SP              (0x08000000 + 0x00008000)  /* Ram origin + length */ 
+#define INITIAL_SP              (0x08002000 + 0x0001E000)  /* Ram origin + length */ 
 #endif
 #elif defined(TARGET_AUGUST_CYW43012_M0_PSA)
 #ifndef INITIAL_SP
