@@ -16,7 +16,7 @@
 
 #ifndef _ASMLANGUAGE
 
-#include <types.h>
+#include <fb_types.h>
 
 /* Helper to pass a int as a pointer or vice-versa.
  * Those are available for 32 bits architectures:

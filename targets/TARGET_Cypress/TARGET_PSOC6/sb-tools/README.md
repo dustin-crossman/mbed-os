@@ -19,7 +19,7 @@ Execute from ./prepare folder:
 
 * To create packet for CY8CPROTO_064_SB_M0_PSA and CY8CPROTO_064_SB_PSA targets using dual-stage policy (CM0 and CM4):
 	
-		python.exe provisioning_packet.py --policy policy_2stage_CM0p.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
+		python.exe provisioning_packet.py --policy policy_2stage_CM0p.json  --out ../packet --cyboot ../prebuild/CyBootloader_WithLogs/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
 
 Prebuild folder contains CyBootloader_WithLogs and CyBootloader_Release with corresponding hex and jwt files.
   * WithLogs enables logs print to terminal.
@@ -45,7 +45,7 @@ Default arguments can be overridden with a custom:
 
 *Example:*
 	
-	python.exe prod_provision_device.py --prov-jwt packet/prov_cmd.jwt --hex prebuild/CyBootloader_Release/CypressBootloader_CM0p.hex --pubkey-json keys/dev_pub_key.json --pubkey-pem keys/dev_pub_key.pem
+	python.exe prod_provision_device.py --prov-jwt packet/prov_cmd.jwt --hex prebuild/CyBootloader_WithLogs/CypressBootloader_CM0p.hex --pubkey-json keys/dev_pub_key.json --pubkey-pem keys/dev_pub_key.pem
 	
 **_NOTE:_** PSoC 6 supply voltage must be 2.5 V to perform provisioning.
 
