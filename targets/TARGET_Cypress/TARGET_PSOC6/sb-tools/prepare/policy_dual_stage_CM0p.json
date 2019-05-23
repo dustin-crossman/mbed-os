@@ -26,45 +26,26 @@
             "permission" : "allowed",
             "destroy_fuses" : [
                 {
-                    "start" : 968,
-                    "size" : 2
+                    "start" : 888,
+                    "size" : 136
                 },
                 {
-                    "start" : 974,
-                    "size" : 2
+                    "start" : 648,
+                    "size" : 104
                 }
             ],
             "destroy_flash" : [
                 {
                     "start" : 268435456,
                     "size" : 0
+                },
+                {
+                    "start" : 269483520,
+                    "size" : 16
                 }
             ],
             "key" : 2
         }
-    },
-    "wounding" :
-    {
-        "title": "wounding_policy",
-        "peripherals": [
-            {
-                "title": "BLE",
-                "id": 1,
-                "base_address": 1077673984
-            }
-        ],
-        "memories": {
-                "flash": 1048576,
-                "workflash": 32768,
-                "sflash": 32768,
-                "sram": 294912
-        },
-        "software" : [
-            {
-                "id" : 1,
-                "capability" : 2
-            }
-        ]
     },
     "boot_upgrade" :
     {
@@ -76,7 +57,7 @@
                 "id": 0,
                 "launch": 1,
                 "monotonic": 0,
-                "upgrade": true,
+                "upgrade": false,
                 "upgrade_auth": [
                     3
                 ],
@@ -104,7 +85,7 @@
                     6
                 ],
                 "id": 1,
-                "launch": 5,
+                "launch": 16,
                 "monotonic": 0,
                 "upgrade": true,
                 "encrypt": false,
@@ -130,7 +111,7 @@
                 "boot_auth": [
                     8
                 ],
-                "id": 5,
+                "id": 16,
                 "monotonic": 0,
                 "upgrade": true,
                 "upgrade_auth": [
