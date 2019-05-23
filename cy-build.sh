@@ -1,7 +1,4 @@
 ##
-
-git clone git@git-ore.aus.cypress.com:devops/devops_scripts.git
-
 echo 'devops_scripts/*' >> .mbedignore
 
 _arm_gnu=""
