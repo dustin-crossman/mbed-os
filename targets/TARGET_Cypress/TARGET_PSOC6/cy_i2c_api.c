@@ -19,6 +19,7 @@
 #include "cyhal_i2c.h"
 #include "mbed_error.h"
 #include "mbed_assert.h"
+#include "mbed_critical.h"
 
 #if DEVICE_I2C
 
@@ -64,7 +65,7 @@ static void cy_i2c_event_handler(void *handler_arg, cyhal_i2c_irq_event_t event)
         default: break;
     }
 #ifdef DEVICE_I2C_ASYNCH
-    i2c->async_event = cy_i2c_convert_event(event);
+    i2c->async_event = cy_i2c_convert_event((i2c_t *)handler_arg, event);
     void (*async_handler)(void) = i2c->async_handler;
     if (NULL != async_handler && i2c->async_event != 0)
         (*async_handler)();
