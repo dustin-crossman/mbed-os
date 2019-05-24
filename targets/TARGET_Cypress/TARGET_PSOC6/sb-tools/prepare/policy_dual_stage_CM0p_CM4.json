@@ -37,14 +37,14 @@
             "destroy_flash" : [
                 {
                     "start" : 268435456,
-                    "size" : 0
+                    "size" : 851968
                 },
                 {
                     "start" : 269483520,
                     "size" : 16
                 }
             ],
-            "key" : 2
+            "key" : 5
         }
     },
     "wounding" :

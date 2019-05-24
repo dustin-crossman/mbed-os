@@ -3,7 +3,7 @@
                 "boot1" : { 
                     "VERSION" : "0.1",
                     "ROLLBACK_COUNTER" : "0",
-                    "IMAGE_ID" : "5",
+                    "IMAGE_ID" : "16",
                     "SLOT_SIZE" : "0x30000",
                     "PAD" : "--pad"
                 }
