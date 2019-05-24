@@ -85,6 +85,25 @@
         },
         "CY8CPROTO_064_SB_M0_PSA": {
             "enabled" : false
+        },
+        "AUGUST_CYW43012": {
+            "area_1_address": "0x10078000",
+            "area_1_size": 16384,
+            "area_2_address": "0x1007C000",
+            "area_2_size": 16384
+        },
+        "AUGUST_CYW43012_M0": {
+            "area_1_address": "0x100C8000",
+            "area_1_size": 16384,
+            "area_2_address": "0x100CC000",
+            "area_2_size": 16384
+        },
+        "AUGUST_CYW43012_PSA": {
+            "enabled" : false
+        },
+        "AUGUST_CYW43012_PSA": {
+            "enabled" : false
         }
+
     }
 }

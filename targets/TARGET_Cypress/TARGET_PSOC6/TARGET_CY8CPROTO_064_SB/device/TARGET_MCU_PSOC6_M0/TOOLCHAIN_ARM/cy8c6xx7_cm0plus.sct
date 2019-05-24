@@ -181,11 +181,6 @@ LR_IROM1 FLASH_START (FLASH_SIZE - 0x8000)
         * (.noinit)
     }
 
-    RW_IRAM2 PUBLIC_RAM_START UNINIT
-    {
-        * (.cy_sharedmem)
-    }
-
     ; Application heap area (HEAP)
     ARM_LIB_HEAP  +0
     { 
@@ -196,6 +191,11 @@ LR_IROM1 FLASH_START (FLASH_SIZE - 0x8000)
     ARM_LIB_STACK RAM_START+RAM_SIZE -Stack_Size
     {
         * (STACK)
+    }
+
+    RW_IRAM2 PUBLIC_RAM_START UNINIT
+    {
+        * (.cy_sharedmem)
     }
 }
 

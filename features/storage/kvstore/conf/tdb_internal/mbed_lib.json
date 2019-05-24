@@ -34,6 +34,14 @@
         "CY8CPROTO_064_SB_PSA": {
             "internal_size": "0x2000",
             "internal_base_address": "0x1002E000"
+        },
+        "AUGUST_CYW43012_M0_PSA": {
+            "internal_size": "0x8000",
+            "internal_base_address": "0x100C8000"
+        },
+        "AUGUST_CYW43012_PSA": {
+            "internal_size": "0x2000",
+            "internal_base_address": "0x1002E000"
         }
     }
 }

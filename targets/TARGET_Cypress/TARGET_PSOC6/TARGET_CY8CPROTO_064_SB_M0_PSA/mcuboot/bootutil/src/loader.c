@@ -71,7 +71,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <hal/hal_flash.h>
-#include <os/os_malloc.h>
 #include "bootutil/bootutil.h"
 #include "bootutil/image.h"
 #include "bootutil_priv.h"
