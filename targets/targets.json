@@ -8155,7 +8155,7 @@
         "inherits": ["Target"],
         "macros": ["MBED_MPU_CUSTOM", "MBEDTLS_CONFIG_HW_SUPPORT"],
         "default_toolchain": "GCC_ARM",
-        "supported_toolchains": ["GCC_ARM", "IAR", "ARMC5"],
+        "supported_toolchains": ["GCC_ARM", "IAR", "ARM"],
         "core": "Cortex-M4F",
         "OUTPUT_EXT": "hex",
         "device_has": [
