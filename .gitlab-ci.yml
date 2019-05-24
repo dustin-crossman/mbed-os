@@ -5,8 +5,16 @@ before_script:
   - bash -c pwd
   - whoami
   - set
-#  - git checkout-index --force --all
+    # Required to apply gitattributes, see BSP-601
+  - git checkout-index --force --all
   - git clone git@git-ore.aus.cypress.com:devops/devops_scripts.git
+  
+  
+  #Update PSOC6PDL
+  #Update BSP_CSP
+  - bash build_assets.sh
+  - build_mbed.sh
+  
 
 ##############################################################################
 # Win10 - ARM, GCC_ARM and IAR
@@ -18,12 +26,12 @@ before_script:
   script:
     - bash -ex cy-build.sh win ARM
 
-win10-GCC_ARM:
+.win10-GCC_ARM:
   stage: build
   tags:
 #    - mti-win10
-#    - WIN
-    - capsense
+    - WIN
+#    - capsense
   script:
     - bash -ex cy-build.sh win GCC_ARM
 
@@ -37,7 +45,7 @@ win10-GCC_ARM:
 ##############################################################################
 # Ubuntu18 - ARM and GCC_ARM
 ##############################################################################
-ubuntu18-ARM:
+.ubuntu18-ARM:
   stage: build
   tags:
     # see DEVOPS-304 - devops-linux
@@ -62,6 +70,8 @@ mac10.14-GCC_ARM:
   stage: build
   tags:
     - mti-mac10.14
+  variables:
+    - $CI_MBED_GT_USBDEV
   script:
     - bash -ex cy-build.sh mac GCC_ARM
 

@@ -1,3 +1,4 @@
+#!/bin/bash
 ##
 echo 'devops_scripts/*' >> .mbedignore
 
