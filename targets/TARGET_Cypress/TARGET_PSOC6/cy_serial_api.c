@@ -158,7 +158,7 @@ int  serial_getc(serial_t *obj)
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
     uint8_t value;
-    if (CY_RSLT_SUCCESS != cyhal_uart_getc(&(ser->hal_obj), &value))
+    if (CY_RSLT_SUCCESS != cyhal_uart_getc(&(ser->hal_obj), &value, 0))
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SERIAL, MBED_ERROR_CODE_READ_FAILED), "serial_getc");
     return value;
 }
@@ -173,15 +173,13 @@ void serial_putc(serial_t *obj, int c)
 int  serial_readable(serial_t *obj)
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
-    bool readable;
-    return (CY_RSLT_SUCCESS == cyhal_uart_is_readable(&(ser->hal_obj), &readable) && readable) ? 1 : 0;
+    return cyhal_uart_readable(&(ser->hal_obj)) > 0 ? 1 : 0;
 }
 
 int  serial_writable(serial_t *obj)
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
-    bool writable;
-    return (CY_RSLT_SUCCESS == cyhal_uart_is_writable(&(ser->hal_obj), &writable) && writable) ? 1 : 0;
+    return cyhal_uart_writable(&(ser->hal_obj)) > 0 ? 1 : 0;
 }
 
 void serial_clear(serial_t *obj)
