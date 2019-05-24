@@ -17,7 +17,7 @@ before_script:
   script:
     - bash -ex cy-build.sh win ARM
 
-.win10-GCC_ARM:
+win10-GCC_ARM:
   stage: build
   tags:
 #    - mti-win10
@@ -57,7 +57,7 @@ before_script:
 ##############################################################################
 # Mac - GCC_ARM
 ##############################################################################
-mac10.14-GCC_ARM:
+.mac10.14-GCC_ARM:
   stage: build
   tags:
     - mti-mac10.14
