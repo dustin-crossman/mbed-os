@@ -17,7 +17,13 @@
 
 #include "fb_types.h"
 #include <stddef.h>
+#if defined(__ARMCC_VERSION) /* ARM-MDK */
+typedef long int off_t;
+#elif defined (__ICCARM__) /* IAR */
+typedef long int off_t;
+#else /* (__GNUC__)  GCC */
 #include <sys/types.h>
+#endif
 #include <fb_device.h>
 
 #if defined(CONFIG_FLASH_PAGE_LAYOUT)
