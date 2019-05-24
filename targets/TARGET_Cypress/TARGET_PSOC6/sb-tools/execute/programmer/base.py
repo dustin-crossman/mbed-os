@@ -72,14 +72,6 @@ class ProgrammerBase(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def set_core(self, core_number):
-        """
-        Selects CPU core by number.
-        :param core_number: The core number.
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
     def read8(self, address):
         """
         Reads 8-bit value from specified memory location.

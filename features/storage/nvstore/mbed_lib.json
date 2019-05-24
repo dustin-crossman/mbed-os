@@ -27,7 +27,7 @@
             "macro_name": "NVSTORE_AREA_2_SIZE",
             "help": "Area 2 size"
         }
-	},
+    },
     "target_overrides": {
         "NUCLEO_F410RB": {
             "enabled" : false
@@ -38,7 +38,7 @@
             "area_2_address": "0x100FC000",
             "area_2_size": 16384
         },
-		"FUTURE_SEQUANA_M0": {
+        "FUTURE_SEQUANA_M0": {
             "area_1_address": "0x10078000",
             "area_1_size": 16384,
             "area_2_address": "0x1007C000",
@@ -56,7 +56,7 @@
             "area_2_address": "0x100FC000",
             "area_2_size": 16384
         },
-    "CY8CKIT_062_WIFI_BT_M0": {
+       "CY8CKIT_062_WIFI_BT_M0": {
             "area_1_address": "0x10078000",
             "area_1_size": 16384,
             "area_2_address": "0x1007C000",
@@ -85,6 +85,25 @@
         },
         "CY8CPROTO_064_SB_M0_PSA": {
             "enabled" : false
+        },
+        "AUGUST_CYW43012": {
+            "area_1_address": "0x10078000",
+            "area_1_size": 16384,
+            "area_2_address": "0x1007C000",
+            "area_2_size": 16384
+        },
+        "AUGUST_CYW43012_M0": {
+            "area_1_address": "0x100C8000",
+            "area_1_size": 16384,
+            "area_2_address": "0x100CC000",
+            "area_2_size": 16384
+        },
+        "AUGUST_CYW43012_PSA": {
+            "enabled" : false
+        },
+        "AUGUST_CYW43012_PSA": {
+            "enabled" : false
         }
+
     }
 }
