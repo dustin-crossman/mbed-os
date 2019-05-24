@@ -2,7 +2,7 @@
     "debug" :
     {
         "m0p" : {
-            "permission" : "disabled",
+            "permission" : "enabled",
             "control" : "certificate",
             "key" : 1
         },
@@ -78,7 +78,7 @@
                     3
                 ],
                 "id": 0,
-                "launch": 4,
+                "launch": 1,
                 "monotonic": 0,
                 "upgrade": false,
                 "upgrade_auth": [
@@ -105,9 +105,36 @@
             },
             {
                 "boot_auth": [
+                    6
+                ],
+                "id": 1,
+                "launch": 16,
+                "monotonic": 0,
+                "upgrade": true,
+                "encrypt": false,
+                "encrypt_key_id": 1,
+                "upgrade_auth": [
+                    6
+                ],
+                "backup": false,
+                "resources": [
+                    {
+                        "type": "BOOT",
+                        "address": 268959744,
+                        "size": 327680
+                    },
+                    {
+                        "type": "UPGRADE",
+                        "address": 268632064,
+                        "size": 327680
+                    }
+                ]
+            },
+            {
+                "boot_auth": [
                     8
                 ],
-                "id": 4,
+                "id": 16,
                 "monotonic": 0,
                 "upgrade": true,
                 "upgrade_auth": [
@@ -117,13 +144,13 @@
                 "resources": [
                     {
                         "type": "BOOT",
-                        "address": 268443648,
-                        "size": 327680
+                        "address": 268435456,
+                        "size": 196608
                     },
                     {
                         "type": "UPGRADE",
-                        "address": 268771328,
-                        "size": 327680
+                        "address": 268632064,
+                        "size": 1024
                     }
                 ]
             }
