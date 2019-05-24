@@ -57,6 +57,8 @@ extern "C" {
 #define CYHAL_UART_RSLT_ERR_INVALID_PIN (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_UART, 0))
 /** Failed to confiugre power management callback */
 #define CYHAL_UART_RSLT_ERR_PM_CALLBACK (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_UART, 1))
+/** The getc call timed out with no received data */
+#define CY_RSLT_ERR_CSP_UART_GETC_TIMEOUT (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_UART, 2))
 
 /** \} group_hal_uart_macros */
 
@@ -148,9 +150,11 @@ cy_rslt_t cyhal_uart_baud(cyhal_uart_t *obj, uint32_t baudrate);
  *
  * @param[in] obj    The uart object
  * @param[out] value The value read from the serial port
+ * @param[in] timeout The time in ms to spend attempting to receive from serial port
+ *                    timeout = zero is wait forever
  * @return The status of the getc request
  */
-cy_rslt_t cyhal_uart_getc(cyhal_uart_t *obj, uint8_t *value);
+cy_rslt_t cyhal_uart_getc(cyhal_uart_t *obj, uint8_t *value, uint32_t timeout);
 
 /** Send a character. This is a blocking call, waiting for a peripheral to be available
  *  for writing
@@ -161,23 +165,21 @@ cy_rslt_t cyhal_uart_getc(cyhal_uart_t *obj, uint8_t *value);
  */
 cy_rslt_t cyhal_uart_putc(cyhal_uart_t *obj, uint32_t value);
 
-/** Check if the uart peripheral is readable
+/** Check the number of bytes avaialable to read from the receive buffers
  *
  * @param[in]  obj      The uart object
- * @param[out] readable Non-zero value if a character can be read, 0 if nothing to read
- * @return The status of the is_readable request
+ * @return The number of readable bytes
  */
-cy_rslt_t cyhal_uart_is_readable(cyhal_uart_t *obj, bool *readable);
+uint32_t cyhal_uart_readable(cyhal_uart_t *obj);
 
-/** Check if the uart peripheral is writable
+/** Check the number of bytes than can be written to the transmit buffer
  *
  * @param[in]  obj      The uart object
- * @param[out] writable Non-zero value if a character can be written, 0 otherwise.
- * @return The status of the is_writable request
+ * @return The number of bytes that can be written 
  */
-cy_rslt_t cyhal_uart_is_writable(cyhal_uart_t *obj, bool *writable);
+uint32_t cyhal_uart_writable(cyhal_uart_t *obj);
 
-/** Clear the uart peripheral
+/** Clear the uart peripheral buffers
  *
  * @param[in] obj The uart object
  * @return The status of the clear request
@@ -233,6 +235,7 @@ cy_rslt_t cyhal_uart_tx_asynch(cyhal_uart_t *obj, void *tx, size_t length);
  * @return The status of the rx_asynch request
  */
 cy_rslt_t cyhal_uart_rx_asynch(cyhal_uart_t *obj, void *rx, size_t length);
+
 /** Attempts to determine if the uart peripheral is already in use for TX
  *
  * @param[in]  obj    The uart object

@@ -33,8 +33,6 @@ extern "C" {
 
 /** The start address of the SCB blocks */
 extern CySCB_Type* CY_SCB_BASE_ADDRESSES[CY_IP_MXSCB_INSTANCES];
-/** The hardware buffer size of the SCB blocks */
-extern uint16_t CY_SCB_BUFFER_SIZE[CY_IP_MXSCB_INSTANCES];
 /** The interrupt number of the SCB blocks. */
 extern IRQn_Type CY_SCB_IRQ_N[CY_IP_MXSCB_INSTANCES];
 
