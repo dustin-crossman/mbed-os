@@ -21,8 +21,8 @@ win10-GCC_ARM:
   stage: build
   tags:
 #    - mti-win10
-    - WIN
-#    - capsense
+#    - WIN
+    - capsense
   script:
     - bash -ex cy-build.sh win GCC_ARM
 
