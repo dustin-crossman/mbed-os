@@ -124,8 +124,6 @@ def complete_func(message_func, elf0, hexf0, hexf1=None, dest=None):
 
 # Find Cortex M0 image.
 def find_cm0_image(toolchain, resources, elf, hexf, hex_filename):
-    if hex_filename is None:
-        return None
     # Locate user-specified image
     from tools.resources import FileType
     hex_files = resources.get_file_paths(FileType.HEX)
@@ -153,28 +151,36 @@ def collect_args(toolchain, image_slot, target_type):
     sb_params_file_path = root_dir / cy_targets / Path("TARGET_" + target_type["name"]) / sb_params_file_name
 
     if not os.path.isfile(str(sb_params_file_path)):
-        # try location for tests ./mbed-os
-        sb_params_file_path = root_dir / 'mbed-os' / cy_targets / \
+        # may be muboot target
+        sb_params_file_path = root_dir / cy_targets / 'TARGET_MCUBOOT' / \
                               Path("TARGET_" + target_type["name"]) / sb_params_file_name
         if not os.path.isfile(str(sb_params_file_path)):
-            toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Target not found!")
-            raise Exception("imgtool finished execution with errors!")
+            # consider tests build
+            sb_params_file_path = root_dir / 'mbed-os' / cy_targets / \
+                              Path("TARGET_" + target_type["name"]) / sb_params_file_name
+            if not os.path.isfile(str(sb_params_file_path)):
+                # tests build may also be muboot target
+                sb_params_file_path = root_dir / 'mbed-os' / cy_targets / 'TARGET_MCUBOOT' / \
+                              Path("TARGET_" + target_type["name"]) / sb_params_file_name
+                if not os.path.isfile(str(sb_params_file_path)):
+                    toolchain.notify.debug("[PSOC6.sign_image] ERROR: Target not found!")
+                    raise Exception("imgtool finished execution with errors!")
 
     with open(str(sb_params_file_path)) as f:
         json_str = f.read()
         sb_config = json.loads(json_str)
 
-        # suppose default location for application ../mbed-os
-        skd_path = str(Path(sb_config.get("sdk_path")).absolute())
+        # suppose default location for tests ./mbed-os
+        sdk_path = str(root_dir / cy_targets / Path(sb_config.get("sdk_path")).absolute())
 
-        if not os.path.isdir(skd_path):
-            # try location for tests ./mbed-os
-            skd_path = str(('mbed-os' / Path(sb_config.get("sdk_path"))).absolute())
+        if not os.path.isdir(sdk_path):
+            # try location for application ../mbed-os
+            sdk_path = str(root_dir / 'mbed-os' / cy_targets / Path(sb_config.get("sdk_path")).absolute())
 
         args_for_signature = {
-            "sdk_path": skd_path,
-            "priv_key": str(skd_path + sb_config["priv_key_file"]),
-            "imgtool": str(skd_path + "/imgtool/imgtool.py"),
+            "sdk_path": sdk_path,
+            "priv_key": str(sdk_path + sb_config["priv_key_file"]),
+            "imgtool": str(sdk_path + "/imgtool/imgtool.py"),
             "version": str(sb_config[target_type["core"]][image_slot]["VERSION"]),
             "id": str(sb_config[target_type["core"]][image_slot]["IMAGE_ID"]),
             "rollback_counter": str(sb_config[target_type["core"]][image_slot]["ROLLBACK_COUNTER"]),
@@ -188,11 +194,7 @@ def collect_args(toolchain, image_slot, target_type):
 
 
 # Sign binary image with Secure Boot SDK tools
-def sign_image(toolchain, resources, elf0, binf, hexf1=None):
-    mbed_elf_path = str(Path(elf0).resolve())
-    mbed_bin_path = mbed_elf_path[:-4] + ".bin"
-    mbed_hex_path = Path(binf).resolve()
-
+def sign_image(toolchain, elf0, binf, hexf1=None):
     target = {"name": "UNDEFINED", "core": "UNDEFINED"}
     img_start_addr = 0
 
@@ -203,20 +205,19 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
                 target = {"name": part, "core": "cm0p"}
                 # SPE image flash address start
                 img_start_addr = "0x10080000"
-            else:
+            elif "_PSA" in part:
                 # NSPE image flash address start
+                img_start_addr = "0x10000000"
+                target = {"name": part, "core": "cm4"}
+
+            else:
+                # CM4 SB image flash address start
                 img_start_addr = "0x10002000"
                 target = {"name": part, "core": "cm4"}
 
-    # create binary file from mbed elf for the following processing
-    subprocess.Popen(["arm-none-eabi-objcopy", str(mbed_elf_path),
-                      "-O", "binary", str(mbed_bin_path)])
-
     # preserve original hex file from mbed-os build
-    copy2(str(mbed_hex_path), (str(mbed_hex_path)[:-4] + "_unsigned.hex"))
-
-    binf = binf[:-4] + ".bin"
-    binf_signed = binf[:-4] + "_signed.bin"
+    binf_orig = str(binf)[:-4] + "_unsigned.hex"
+    copy2(str(binf), binf_orig)
 
     # gather arguments for signature command invoking
     if target["name"] != "UNDEFINED":
@@ -226,32 +227,28 @@ def sign_image(toolchain, resources, elf0, binf, hexf1=None):
         exit(1)
 
     # call imgtool for signature
-    process = subprocess.Popen(["python", sign_args.get("imgtool"), "sign", "--key", sign_args.get("priv_key"),
+    process = subprocess.Popen([sys.executable, sign_args.get("imgtool"), "sign", "--key", sign_args.get("priv_key"),
                                 "--header-size", sign_args.get("header_size"), "--pad-header", "--align",
                                 sign_args.get("align"), "--version", sign_args.get("version"), "--image-id",
                                 sign_args.get("id"), "--rollback_counter", sign_args.get("rollback_counter"),
-                                "--slot-size", sign_args.get("slot_size"), "--overwrite-only", sign_args.get("pad"), binf, binf_signed],
+                                "--slot-size", sign_args.get("slot_size"), "--overwrite-only", sign_args.get("pad"), binf_orig, binf],
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # catch stderr outputs
     stderr = process.communicate()
-    print(str(stderr[1].decode("utf-8")))
+    rc = process.wait()
 
-    if stderr[1].decode("utf-8"):
-        toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")
-        toolchain.notify.tool_error("[PSOC6.sign_image] Message from imgtool: " + stderr[1].decode("utf-8"))
+    if rc != 0:
+        toolchain.notify.debug("[PSOC6.sign_image] ERROR: Signature is not added!")
+        toolchain.notify.debug("[PSOC6.sign_image] Message from imgtool: " + stderr[1].decode("utf-8"))
         raise Exception("imgtool finished execution with errors!")
     else:
         toolchain.notify.info("[PSOC6.sign_image] SUCCESS: Image is signed with no errors!")
 
-    # TODO: resolve img_start_addr acquisition as parameter, not a constant
-    # convert signed image binary back to hex format
-    if img_start_addr:
-        subprocess.Popen(["arm-none-eabi-objcopy", "--change-address", img_start_addr,
-                          "-I", "binary", "-O", "ihex", binf_signed, str(mbed_hex_path)])
-    else:
-        toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Signature is not added!")
-        raise Exception("imgtool finished execution with errors!")
-
 def complete(toolchain, elf0, hexf0, hexf1=None):
-    complete_func(toolchain.notify.debug, elf0, hexf0, hexf1)
+    if os.path.isfile(str(hexf0)) and os.path.isfile(str(hexf1)):
+        complete_func(toolchain.notify.debug, elf0, hexf0, hexf1)
+            
+def sign_complete(toolchain, elf0, binf, m0hex):
+    sign_image(toolchain, elf0, binf, None)
+    complete_func(toolchain.notify.debug, None, binf, m0hex)
