@@ -8188,6 +8188,8 @@
             "ANALOGOUT",
             "SPI",
             "SPI_ASYNCH",
+            "I2C",
+            "I2C_ASYNCH",
             "STDIO_MESSAGES",
             "LPTICKER",
             "SLEEP",
