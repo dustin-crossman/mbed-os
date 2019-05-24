@@ -9,7 +9,7 @@ before_script:
   - git checkout-index --force --all
   - git clone git@git-ore.aus.cypress.com:devops/devops_scripts.git
   
-  
+  - echo $CI_MBED_GT_USBDEV
   #Update PSOC6PDL
   #Update BSP_CSP
   - bash build_assets.sh
@@ -70,8 +70,6 @@ mac10.14-GCC_ARM:
   stage: build
   tags:
     - mti-mac10.14
-  variables:
-    - $CI_MBED_GT_USBDEV
   script:
     - bash -ex cy-build.sh mac GCC_ARM
 
