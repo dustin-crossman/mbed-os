@@ -107,7 +107,6 @@ def patch(message_func, ihex, hexf, align=256):
 def merge_images(hexf0, hexf1=None):
     ihex = IntelHex()
     ihex.padding = 0x00
-
     ihex.loadfile(hexf0, "hex")
     if hexf1 is not None:
         # Merge the CM0+ image
@@ -125,8 +124,6 @@ def complete_func(message_func, elf0, hexf0, hexf1=None, dest=None):
 
 # Find Cortex M0 image.
 def find_cm0_image(toolchain, resources, elf, hexf, hex_filename):
-    if hex_filename is None:
-        return None
     # Locate user-specified image
     from tools.resources import FileType
     hex_files = resources.get_file_paths(FileType.HEX)
@@ -151,7 +148,7 @@ def collect_args(toolchain, image_slot, target_type):
     root_dir = Path(os.getcwd())
 
     # suppose default location for application ../mbed-os
-    sb_params_file_path = root_dir / cy_targets / Path("TARGET_" + target_type["name"]) / sb_params_file_name                                
+    sb_params_file_path = root_dir / cy_targets / Path("TARGET_" + target_type["name"]) / sb_params_file_name
 
     if not os.path.isfile(str(sb_params_file_path)):
         # may be muboot target
@@ -178,7 +175,7 @@ def collect_args(toolchain, image_slot, target_type):
 
         if not os.path.isdir(sdk_path):
             # try location for application ../mbed-os
-            sdk_path = os.path.join(root_dir, 'mbed-os', sb_config.get("sdk_path"))
+            sdk_path = str(root_dir / 'mbed-os' / cy_targets / Path(sb_config.get("sdk_path")).absolute())
 
         args_for_signature = {
             "sdk_path": sdk_path,
@@ -194,6 +191,7 @@ def collect_args(toolchain, image_slot, target_type):
         }
 
     return args_for_signature
+
 
 # Sign binary image with Secure Boot SDK tools
 def sign_image(toolchain, elf0, binf, hexf1=None):
