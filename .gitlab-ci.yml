@@ -5,7 +5,6 @@ before_script:
   - bash -c pwd
   - whoami
   - set
-  - git clone git@git-ore.aus.cypress.com:devops/devops_scripts.git
 
 ##############################################################################
 # Win10 - ARM, GCC_ARM and IAR
