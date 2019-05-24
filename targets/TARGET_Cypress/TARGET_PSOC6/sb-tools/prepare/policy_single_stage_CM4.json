@@ -2,7 +2,7 @@
     "debug" :
     {
         "m0p" : {
-            "permission" : "enabled",
+            "permission" : "disabled",
             "control" : "certificate",
             "key" : 1
         },
