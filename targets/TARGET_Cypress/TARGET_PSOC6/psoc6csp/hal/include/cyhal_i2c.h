@@ -55,6 +55,8 @@ extern "C" {
 
 /** The requested resource type is invalid */
 #define CYHAL_I2C_RSLT_ERR_INVALID_PIN (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_I2C, 0))
+/** Can not reach desired data rate */
+#define CYHAL_I2C_RSLT_ERR_CAN_NOT_REACH_DR (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_I2C, 0))
 
 /** \} group_hal_i2c_macros */
 

@@ -1,8 +1,8 @@
 /*******************************************************************************
-* File Name: cycfg_platform.h
+* File Name: cycfg_system.h
 *
 * Description:
-* Platform configuration
+* Peripheral Hardware Block configuration
 * This file was automatically generated and should not be modified.
 * 
 ********************************************************************************
@@ -22,8 +22,8 @@
 * limitations under the License.
 ********************************************************************************/
 
-#if !defined(CYCFG_PLATFORM_H)
-#define CYCFG_PLATFORM_H
+#if !defined(CYCFG_SYSTEM_H)
+#define CYCFG_SYSTEM_H
 
 #include "cycfg_notices.h"
 #include "cy_sysclk.h"
@@ -35,6 +35,15 @@ extern "C" {
 #endif
 
 #define CY_CFG_SYSCLK_CLKLF_FREQ_HZ 32768
+#define CY_CFG_PWR_MODE_LP 0x01UL
+#define CY_CFG_PWR_MODE_ULP 0x02UL
+#define CY_CFG_PWR_MODE_ACTIVE 0x04UL
+#define CY_CFG_PWR_MODE_SLEEP 0x08UL
+#define CY_CFG_PWR_MODE_DEEPSLEEP 0x10UL
+#define CY_CFG_PWR_SYS_IDLE_MODE CY_CFG_PWR_MODE_SLEEP
+#define CY_CFG_PWR_SYS_ACTIVE_MODE CY_CFG_PWR_MODE_LP
+#define CY_CFG_PWR_DEEPSLEEP_LATENCY 0UL
+#define CY_CFG_PWR_USING_LDO 1
 #define CY_CFG_PWR_VDDA_MV 3300
 #define CY_CFG_PWR_VDDD_MV 3300
 #define CY_CFG_PWR_VBACKUP_MV 3300
@@ -42,11 +51,11 @@ extern "C" {
 #define CY_CFG_PWR_VDDIO0_MV 3300
 #define CY_CFG_PWR_VDDIO1_MV 3300
 
-void init_cycfg_platform(void);
+void init_cycfg_system(void);
 
 #if defined(__cplusplus)
 }
 #endif
 
 
-#endif /* CYCFG_PLATFORM_H */
+#endif /* CYCFG_SYSTEM_H */

@@ -127,15 +127,6 @@ cy_rslt_t cyhal_wdt_set_time(cyhal_wdt_t *obj, uint32_t time);
  */
 cy_rslt_t cyhal_wdt_set_match(cyhal_wdt_t *obj, uint32_t value);
 
-/** Set the match value
- *
- * @param[in] obj   The WDT object
- * @param[in] value The match value in ticks
- *
- * @return The status of the set_match request
- */
-cy_rslt_t cyhal_wdt_set_match(cyhal_wdt_t *obj, uint32_t value);
-
 /** Read the current tick
  *
  * If no rollover has occurred, the seconds passed since wdt_init() or wdt_set_time()
@@ -165,13 +156,6 @@ cy_rslt_t cyhal_wdt_register_irq(cyhal_wdt_t *obj, cyhal_wdt_irq_handler handler
  * @return The status of the irq_enable request
  */
 cy_rslt_t cyhal_wdt_irq_enable(cyhal_wdt_t *obj, cyhal_wdt_irq_event_t event, bool enable);
-
-/** Manually trigger the WDT interrupt.
- *
- * @param[in] obj      The WDT object
- * @return The status of the irq_trigger request
- */
-cy_rslt_t cyhal_wdt_irq_trigger(cyhal_wdt_t *obj);
 
 /** Manually trigger the WDT interrupt.
  *

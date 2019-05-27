@@ -67,6 +67,7 @@ extern "C" {
 #define CYHAL_SDIO_CLOCK_ERROR          (0x100)   /**< Failed to initial clock for SDIO */
 #define CYHAL_SDIO_BAD_ARGUMENT         (0x200)   /**< Bad argument passed for SDIO */
 #define CYHAL_SDIO_SEMA_NOT_INITED      (0x400)   /**< Semaphore is not initiated */
+#define CYHAL_SDIO_FUNC_NOT_SUPPORTED   (0x800)   /**< Function is not supported */
 
 /* HAL return value defines */
 
@@ -260,14 +261,6 @@ cy_rslt_t cyhal_sdio_register_irq(cyhal_sdio_t *obj, cyhal_sdio_irq_handler hand
 cy_rslt_t cyhal_sdio_irq_enable(cyhal_sdio_t *obj, cyhal_sdio_irq_event_t event, bool enable);
 
 /** \} group_hal_sdio_functions */
-
-/** \cond INTERNAL */
-/* TODO: Remove these functions. Temporary added to make it workable */
-cy_rslt_t sdio_bus_interrupt_enable(const cyhal_sdio_t *obj);
-cy_rslt_t sdio_bus_interrupt_disable(const cyhal_sdio_t *obj);
-cy_rslt_t sdio_interrupt_status(const cyhal_sdio_t *obj, uint16_t* status);
-cy_rslt_t sdio_clear_pending_isr(const cyhal_sdio_t *obj);
-/** \endcond */
 
 #if defined(__cplusplus)
 }
