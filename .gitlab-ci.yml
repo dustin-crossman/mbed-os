@@ -23,7 +23,7 @@ win10-GCC_ARM:
 #    - WIN
     - capsense
   script:
-    - bash -ex -o igncr cy-build.sh win GCC_ARM
+    - bash -ex -o igncr cy-build.sh
 
 .win10-IAR:
   stage: build
