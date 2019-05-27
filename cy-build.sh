@@ -73,9 +73,9 @@ fi
 
 # Compile single test case just to check linkage issues
 mbed config ROOT .
-mbed test --compile --toolchain $2 -n tests-usb_device-basic --target CY8CKIT_062_WIFI_BT -vv
-mbed test --compile --toolchain $2 -n tests-usb_device-basic --target CY8CPROTO_062_4343W -vv
-#mbed test --compile --toolchain $2 -n tests-usb_device-basic --target CY8CKIT_062_BLE -vv
+mbed compile --library --clean --no-archive --source usb\device\targets\TARGET_Cypress\TARGET_PSOC6 --profile werror.json --toolchain GCC_ARM --target CY8CKIT_062_WIFI_BT
+mbed compile --library --clean --no-archive --source usb\device\targets\TARGET_Cypress\TARGET_PSOC6 --profile werror.json --toolchain IAR --target CY8CKIT_062_WIFI_BT
+mbed compile --library --clean --no-archive --source usb\device\targets\TARGET_Cypress\TARGET_PSOC6 --profile werror.json --toolchain ARMC6 --target CY8CKIT_062_WIFI_BT
 
 # Delete the mapped drive...
 if [[ ${windows} -ne 0 ]]; then
