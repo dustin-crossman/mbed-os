@@ -21,7 +21,7 @@ Folders containing files under different permissive license than Apache 2.0 are 
 - [drivers](./drivers) - MIT
 - [TESTS/mbed_hal/trng/pithy](./TESTS/mbed_hal/trng/pithy) - BSD-3-Clause
 - [tools/data/rpc](./tools/data/rpc) - MIT
-- [targets](./targets) - PBL, BSD-style, MIT-style, Zlib-style, Public-domain
+- [targets](./targets) - PBL, BSD-style, MIT-style, Zlib-style, Public-domain, BSD-3-Clause
 
 The Python modules used by Mbed tools are used under the following licenses:
 
@@ -53,3 +53,4 @@ The Python modules used by Mbed tools are used under the following licenses:
 - [hidapi](https://pypi.org/project/hidapi/) - BSD-style
 - [pywin32](https://pypi.org/project/pywin32/) - PSF
 - [wmi](https://pypi.org/project/WMI/) - MIT
+- [psutil](https://pypi.org/project/psutil/) - BSD

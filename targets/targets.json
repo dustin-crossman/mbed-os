@@ -1,6 +1,7 @@
 {
     "Target": {
         "core": null,
+        "trustzone": false,
         "default_toolchain": "ARM",
         "supported_toolchains": null,
         "extra_labels": [],
@@ -3195,7 +3196,8 @@
             }
         },
         "macros_add": [
-            "MBED_TICKLESS"
+            "MBED_TICKLESS",
+            "USE_FULL_LL_DRIVER"
         ],
         "overrides": { "lpticker_delay_ticks": 4 },
         "supported_form_factors": ["ARDUINO"],
@@ -5424,6 +5426,62 @@
         "reset_method": "reboot.txt",
         "overrides": {
             "target.network-default-interface-type": "ETHERNET"
+        }
+    },
+    "ARM_MUSCA_A1": {
+        "public": false,
+        "inherits": ["Target"],
+        "default_toolchain": "ARMC6",
+        "extra_labels": ["ARM_SSG", "MUSCA_A1"],
+        "forced_reset_timeout": 7,
+        "release_versions": ["5"]
+    },
+    "ARM_MUSCA_A1_NS": {
+        "inherits": ["NSPE_Target", "ARM_MUSCA_A1"],
+        "core": "Cortex-M33-NS",
+        "supported_toolchains": ["ARMC6", "GCC_ARM", "IAR"],
+        "device_has_add": ["INTERRUPTIN", "LPTICKER", "SERIAL", "SLEEP", "USTICKER"],
+        "macros": [
+            "__STARTUP_CLEAR_BSS",
+            "MBED_FAULT_HANDLER_DISABLED",
+            "CMSIS_NVIC_VIRTUAL",
+            "LPTICKER_DELAY_TICKS=1",
+            "MBED_MPU_CUSTOM",
+            "MBEDTLS_PSA_CRYPTO_C"
+        ],
+        "extra_labels_add": ["MUSCA_A1_NS", "PSA", "TFM"],
+        "post_binary_hook": {"function": "ArmMuscaA1Code.binary_hook"},
+        "secure_image_filename": "tfm.bin",
+        "overrides": {
+            "non-secure-rom-start": "0x000a0400",
+            "non-secure-rom-size": "0x5f800",
+            "non-secure-ram-start": "0x20011000",
+            "non-secure-ram-size": "0xf000"
+        }
+    },
+    "ARM_MUSCA_A1_S": {
+        "inherits": ["SPE_Target", "ARM_MUSCA_A1"],
+        "core": "Cortex-M33",
+        "supported_toolchains": ["ARMC6", "GCC_ARM"],
+        "device_has_add": ["FLASH"],
+        "macros": [
+            "__STARTUP_CLEAR_BSS_MULTIPLE",
+            "__STARTUP_COPY_MULTIPLE",
+            "MBED_MPU_CUSTOM",
+            "DAUTH_CHIP_DEFAULT",
+            "MBEDTLS_PSA_CRYPTO_SPM",
+            "MBEDTLS_PSA_CRYPTO_C",
+            "MBEDTLS_ENTROPY_NV_SEED"
+        ],
+        "components_add": ["FLASHIAP"],
+        "extra_labels_add": ["MUSCA_A1_S", "PSA", "TFM"],
+        "deliver_to_target": "ARM_MUSCA_A1_NS",
+        "delivery_dir": "TARGET_ARM_SSG/TARGET_MUSCA_A1/TARGET_MUSCA_A1_NS/prebuilt",
+        "overrides": {
+            "secure-rom-start": "0x10020400",
+            "secure-rom-size": "0x7f800",
+            "secure-ram-start": "0x30000000",
+            "secure-ram-size": "0x11000"
         }
     },
     "RZ_A1XX": {
@@ -8048,6 +8106,7 @@
             "MBED_TZ_DEFAULT_ACCESS=1",
             "LPTICKER_DELAY_TICKS=3"
         ],
+        "trustzone": true,
         "is_disk_virtual": true,
         "supported_toolchains": ["ARMC6"],
         "config": {
@@ -8104,6 +8163,7 @@
         "device_name": "M2351KIAAEES",
         "bootloader_supported": true,
         "tickless-from-us-ticker": true,
+        "forced_reset_timeout": 3,
         "mbed_rom_start"    : "0x10040000",
         "mbed_rom_size"     : "0x40000",
         "mbed_ram_start"    : "0x30008000",
@@ -8441,52 +8501,6 @@
                 "value": "50000000UL",
                 "macro_name": "CY_CLK_SLOWCLK_FREQ_HZ"
             }
-        }
-    },
-    "FUTURE_SEQUANA_M0_PSA": {
-        "inherits": ["SPE_Target", "FUTURE_SEQUANA_M0"],
-        "components_add": ["SPM_MAILBOX", "FLASHIAP"],
-        "extra_labels_add": ["PSA", "MBED_SPM"],
-        "macros_add": [
-            "MBED_TICKLESS",
-            "PSOC6_DYNSRM_DISABLE=1",
-            "MBEDTLS_PSA_CRYPTO_SPM",
-            "MBEDTLS_PSA_CRYPTO_C",
-            "MBEDTLS_ENTROPY_NV_SEED"
-        ],
-        "deliver_to_target": "FUTURE_SEQUANA_PSA",
-        "delivery_dir": "TARGET_Cypress/TARGET_PSOC6_FUTURE/TARGET_FUTURE_SEQUANA_PSA/prebuilt",
-        "overrides": {
-            "secure-rom-start": "0x10000000",
-            "secure-rom-size": "0x80000",
-            "non-secure-rom-start": "0x10080000",
-            "non-secure-rom-size": "0x78000",
-            "secure-ram-start": "0x08000000",
-            "secure-ram-size": "0x10000",
-            "non-secure-ram-start": "0x08010000",
-            "non-secure-ram-size": "0x37700",
-            "shared-ram-start": "0x08047700",
-            "shared-ram-size": "0x100"
-        }
-    },
-    "FUTURE_SEQUANA_PSA": {
-        "inherits": ["NSPE_Target", "FUTURE_SEQUANA"],
-        "extra_labels_add": ["PSA", "MBED_SPM"],
-        "extra_labels_remove": ["CORDIO"],
-        "components_add": ["SPM_MAILBOX", "FLASHIAP"],
-        "macros_add": ["PSOC6_DYNSRM_DISABLE=1", "MBEDTLS_PSA_CRYPTO_C"],
-        "hex_filename": "psa_release_1.0.hex",
-        "overrides": {
-            "secure-rom-start": "0x10000000",
-            "secure-rom-size": "0x80000",
-            "non-secure-rom-start": "0x10080000",
-            "non-secure-rom-size": "0x78000",
-            "secure-ram-start": "0x08000000",
-            "secure-ram-size": "0x10000",
-            "non-secure-ram-start": "0x08010000",
-            "non-secure-ram-size": "0x37700",
-            "shared-ram-start": "0x08047700",
-            "shared-ram-size": "0x100"
         }
     },
     "TMPM3HQ": {
