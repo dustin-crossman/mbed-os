@@ -171,11 +171,11 @@ def collect_args(toolchain, image_slot, target_type):
         sb_config = json.loads(json_str)
 
         # suppose default location for tests ./mbed-os
-        sdk_path = str(root_dir / cy_targets / Path(sb_config.get("sdk_path")).absolute())
+        sdk_path = str((root_dir / sb_config.get("sdk_path")).absolute())
 
         if not os.path.isdir(sdk_path):
             # try location for application ../mbed-os
-            sdk_path = str(root_dir / 'mbed-os' / cy_targets / Path(sb_config.get("sdk_path")).absolute())
+            sdk_path = str((root_dir / 'mbed-os' / sb_config.get("sdk_path")).absolute())
 
         args_for_signature = {
             "sdk_path": sdk_path,
