@@ -4,6 +4,8 @@
 
 echo 'devops_scripts/*' >> .mbedignore
 
+export LM_LICENSE_FILE=8224@armlmd-aus-prod-wan.licenses.cypress.com
+
 #_arm_gnu=""
 #[[ $1 = mac ]]     && _arm_gnu=OSX
 #[[ $1 = ubuntu ]]  && _arm_gnu=Linux64
