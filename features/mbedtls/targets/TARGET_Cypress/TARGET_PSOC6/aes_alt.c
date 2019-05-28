@@ -520,6 +520,9 @@ int mbedtls_aes_crypt_cfb128( mbedtls_aes_context *ctx,
 {
     int c;
     size_t n = *iv_off;
+    
+    if( n > 15 )
+        return (MBEDTLS_ERR_AES_BAD_INPUT_DATA);
 
     if( mode == MBEDTLS_AES_DECRYPT )
     {
@@ -599,6 +602,9 @@ int mbedtls_aes_crypt_ofb( mbedtls_aes_context *ctx,
 {
     int ret = 0;
     size_t n = *iv_off;
+    
+    if( n > 15 )
+        return (MBEDTLS_ERR_AES_BAD_INPUT_DATA);
 
     while( length-- )
     {
