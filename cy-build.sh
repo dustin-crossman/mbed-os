@@ -51,6 +51,9 @@ if [[ ${windows} -ne 0 ]]; then
   cd A:
 fi
 
+echo "Working with branch: " 
+echo (git rev-parse --abbrev-ref HEAD)
+
 # Only execute this in *usbdev* branches
 if [[ $(git rev-parse --abbrev-ref HEAD) =~ usbdev ]]; then
   # Integrate the latest PDL/CSP/BSP
