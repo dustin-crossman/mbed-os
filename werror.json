@@ -41,7 +41,7 @@
                    "-fshort-enums", "-fshort-wchar",
                    "-DMBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE=9600",
                    "-DMBED_CONF_PLATFORM_CTHUNK_COUNT_MAX=8",
-                   "-Werror",
+                   "-Werror", "-Wno-extern-c-compat",
                    "-Icmsis", "-Icmsis/TARGET_CORTEX_M",
                    "-IUNITTESTS/target_h", 
                    "-IUNITTESTS/target_h/events", 
