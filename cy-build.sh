@@ -51,11 +51,11 @@ if [[ ${windows} -ne 0 ]]; then
   cd A:
 fi
 
-echo "Working with branch: " 
-echo (git rev-parse --abbrev-ref HEAD)
+echo "Working with branch: $(git rev-parse --abbrev-ref HEAD)"
 
 # Only execute this in *usbdev* branches
 if [[ $(git rev-parse --abbrev-ref HEAD) =~ usbdev ]]; then
+  echo "Working contains usbdev "
   # Integrate the latest PDL/CSP/BSP
   OUT_DIR=output
   ASSET_BASEURL="http://iot-webserver.aus.cypress.com/projects/iot_release/ASSETS"
@@ -76,6 +76,14 @@ fi
 
 # Compile single test case just to check linkage issues
 mbed config ROOT .
+
+mbed config --list
+#configure mbed for toolchains
+mbed config -G GCC_ARM_PATH "C:\Program Files (x86)\GNU Tools ARM Embedded\6 2017-q2-update\bin"
+mbed config -G IAR_PATH "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm"
+mbed config -G ARM_PATH "C:\Keil_v5\ARM\ARMCC"
+mbed config -G ARMC6_PATH "C:\Program Files\ARMCompiler6.11\bin"
+
 mbed config --list
 mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain GCC_ARM --target CY8CKIT_062_WIFI_BT
 mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain IAR --target CY8CKIT_062_WIFI_BT
