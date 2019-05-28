@@ -51,10 +51,10 @@ if [[ ${windows} -ne 0 ]]; then
   cd A:
 fi
 
-echo "Working with branch: $(git rev-parse --abbrev-ref HEAD)"
+#echo "Working with branch: $(git rev-parse --abbrev-ref HEAD)"
 
 # Only execute this in *usbdev* branches
-if [[ $(git rev-parse --abbrev-ref HEAD) =~ usbdev ]]; then
+#if [[ $(git rev-parse --abbrev-ref HEAD) =~ usbdev ]]; then
   echo "Working contains usbdev "
   # Integrate the latest PDL/CSP/BSP
   OUT_DIR=output
@@ -72,9 +72,9 @@ if [[ $(git rev-parse --abbrev-ref HEAD) =~ usbdev ]]; then
   unzip -qbo "$OUT_DIR/TARGET_PSOC6.zip" -d targets/TARGET_Cypress
   echo "Extracting PDL Mbed integration asset"
   unzip -qbo "$OUT_DIR/psoc6pdl_mbed/TARGET_PSOC6.zip" -d targets/TARGET_Cypress
-else
-  echo "Working does not contain usbdev "
-fi
+#else
+#  echo "Working does not contain usbdev "
+#fi
 
 # Compile single test case just to check linkage issues
 mbed config ROOT .
