@@ -12,7 +12,7 @@
                    "-Werror",
                    "-Icmsis", "-Icmsis/TARGET_CORTEX_M",
                    "-IUNITTESTS/target_h", 
-                   "-IUNITTESTS/target_h/events/equeue", 
+                   "-IUNITTESTS/target_h/events", 
                    "-Ihal",  
                    "-Iusb/device/USBDevice",  
                    "-Iusb/device/USBPhy", 
