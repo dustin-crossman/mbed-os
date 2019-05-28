@@ -90,11 +90,9 @@ mbed config ARMC6_PATH "C:\Program Files\ARMCompiler6.11\bin"
 
 mbed config --list
 
-ls 
-
 mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain GCC_ARM --target CY8CKIT_062_WIFI_BT
-#mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain IAR --target CY8CKIT_062_WIFI_BT
-#mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain ARMC6 --target CY8CKIT_062_WIFI_BT
+mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain IAR --target CY8CKIT_062_WIFI_BT
+mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain ARMC6 --target CY8CKIT_062_WIFI_BT
 
 # Delete the mapped drive...
 if [[ ${windows} -ne 0 ]]; then
