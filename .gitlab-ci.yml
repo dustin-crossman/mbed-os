@@ -21,7 +21,8 @@ win10-GCC_ARM:
   tags:
 #    - mti-win10
 #    - WIN
-    - capsense
+#    - capsense
+    - bsp_csp_acceptance
   script:
     - bash -ex -o igncr cy-build.sh
 
