@@ -11,6 +11,7 @@
                    "-DMBED_CONF_PLATFORM_CTHUNK_COUNT_MAX=8",
                    "-Werror",
                    "-Icmsis", "-Icmsis/TARGET_CORTEX_M",
+                   "-IUNITTESTS/target_h", 
                    "-Ihal",  
                    "-Iusb/device/USBDevice",  
                    "-Iusb/device/USBPhy", 
