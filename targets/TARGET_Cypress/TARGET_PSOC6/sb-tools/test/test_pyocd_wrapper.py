@@ -253,12 +253,12 @@ class TestControlAPIs(unittest.TestCase):
         dhcsr = self.tool.read32(CYREG_DHCSR)
         self.assertFalse(dhcsr & S_HALT)
 
-    def test_reset_and_halt(self):
-        self.tool.write32(CYREG_GPIO_PORT_11_OUT, 0xDEADBEAF)
-        self.tool.reset_and_halt()
-        self.assertEqual(self.tool.read32(CYREG_GPIO_PORT_11_OUT), 0x00)
-        dhcsr = self.tool.read32(CYREG_DHCSR)
-        self.assertTrue(dhcsr & S_HALT)
+#    def test_reset_and_halt(self):
+#        self.tool.write32(CYREG_GPIO_PORT_11_OUT, 0xDEADBEAF)
+#        self.tool.reset_and_halt()
+#        self.assertEqual(self.tool.read32(CYREG_GPIO_PORT_11_OUT), 0x00)
+#        dhcsr = self.tool.read32(CYREG_DHCSR)
+#        self.assertTrue(dhcsr & S_HALT)
 
     @unittest.skip("HW frequency cannot be changed.")
     def test_set_frequency(self):
