@@ -226,6 +226,7 @@ class TestControlAPIs(unittest.TestCase):
     def setUpClass(cls):
         cls.tool = ProgrammingTool.create(TOOL)
         cls.tool.connect(TARGET, probe_id=PROBE_ID)
+        cls.tool.erase(MAIN_ADDR, 0x00100000)
 
     @classmethod
     def tearDownClass(cls):
