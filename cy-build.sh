@@ -81,9 +81,14 @@ mbed config ROOT .
 
 mbed config --list
 #configure mbed for toolchains
+ls "C:\Program Files (x86)\GNU Tools ARM Embedded"
 mbed config GCC_ARM_PATH "C:\Program Files (x86)\GNU Tools ARM Embedded\6 2017-q2-update\bin"
+
+ls "C:\Program Files (x86)\IAR Systems"
 mbed config IAR_PATH "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm"
+
 mbed config ARM_PATH "C:\Keil_v5\ARM\ARMCC"
+ls "C:\Program Files"
 mbed config ARMC6_PATH "C:\Program Files\ARMCompiler6.11\bin"
 
 mbed config --list
