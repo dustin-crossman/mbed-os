@@ -72,6 +72,8 @@ if [[ $(git rev-parse --abbrev-ref HEAD) =~ usbdev ]]; then
   unzip -qbo "$OUT_DIR/TARGET_PSOC6.zip" -d targets/TARGET_Cypress
   echo "Extracting PDL Mbed integration asset"
   unzip -qbo "$OUT_DIR/psoc6pdl_mbed/TARGET_PSOC6.zip" -d targets/TARGET_Cypress
+else
+  echo "Working does not contain usbdev "
 fi
 
 # Compile single test case just to check linkage issues
@@ -79,15 +81,15 @@ mbed config ROOT .
 
 mbed config --list
 #configure mbed for toolchains
-mbed config -G GCC_ARM_PATH "C:\Program Files (x86)\GNU Tools ARM Embedded\6 2017-q2-update\bin"
-mbed config -G IAR_PATH "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm"
-mbed config -G ARM_PATH "C:\Keil_v5\ARM\ARMCC"
-mbed config -G ARMC6_PATH "C:\Program Files\ARMCompiler6.11\bin"
+mbed config GCC_ARM_PATH "C:\Program Files (x86)\GNU Tools ARM Embedded\6 2017-q2-update\bin"
+mbed config IAR_PATH "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm"
+mbed config ARM_PATH "C:\Keil_v5\ARM\ARMCC"
+mbed config ARMC6_PATH "C:\Program Files\ARMCompiler6.11\bin"
 
 mbed config --list
 mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain GCC_ARM --target CY8CKIT_062_WIFI_BT
-mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain IAR --target CY8CKIT_062_WIFI_BT
-mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain ARMC6 --target CY8CKIT_062_WIFI_BT
+#mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain IAR --target CY8CKIT_062_WIFI_BT
+#mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain ARMC6 --target CY8CKIT_062_WIFI_BT
 
 # Delete the mapped drive...
 if [[ ${windows} -ne 0 ]]; then

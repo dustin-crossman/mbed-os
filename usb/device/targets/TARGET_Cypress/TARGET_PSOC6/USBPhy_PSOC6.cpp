@@ -17,7 +17,7 @@
 
 #include "USBPhyHw.h"
 
-static USBPhyHw *instance;
+//static USBPhyHw *instance;
 
 USBPhy *get_usb_phy()
 {
