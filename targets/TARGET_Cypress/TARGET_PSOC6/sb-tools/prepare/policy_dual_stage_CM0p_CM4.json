@@ -49,26 +49,6 @@
     },
     "wounding" :
     {
-        "title": "wounding_policy",
-        "peripherals": [
-            {
-                "title": "BLE",
-                "id": 1,
-                "base_address": 1077673984
-            }
-        ],
-        "memories": {
-                "flash": 1048576,
-                "workflash": 32768,
-                "sflash": 32768,
-                "sram": 294912
-        },
-        "software" : [
-            {
-                "id" : 1,
-                "capability" : 2
-            }
-        ]
     },
     "boot_upgrade" :
     {
