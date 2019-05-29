@@ -3,24 +3,24 @@
     {
         "m0p" : {
             "permission" : "disabled",
-            "control" : "certificate",
-            "key" : 1
+            "control" : "firmware",
+            "key" : 5
         },
         "m4" : {
             "permission" : "enabled",
-            "control" : "open",
-            "key" : 2
+            "control" : "firmware",
+            "key" : 5
         },
         "system" : {
             "permission" : "enabled",
-            "control" : "open",
-            "key" : 1,
+            "control" : "firmware",
+            "key" : 5,
             "syscall": true,
-            "mmio": false,
+            "mmio": true,
             "flash": true,
-            "workflash": false,
+            "workflash": true,
             "sflash": true,
-            "sram": false
+            "sram": true
         },
         "rma" : {
             "permission" : "allowed",
