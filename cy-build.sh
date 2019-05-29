@@ -55,13 +55,13 @@ fi
 
 echo "Getting branch name"
 
-echo "case #1: git branch | grep \* | cut -d ' ' -f2"
-echo "$(git branch | grep \* | cut -d ' ' -f2)"
-echo "case #2:  git branch | sed -n '/\* /s///p' "
-echo "$( git branch | sed -n '/\* /s///p')"
+#echo "case #1: git branch | grep \* | cut -d ' ' -f2"
+#echo "$(git branch | grep \* | cut -d ' ' -f2)"
+#echo "case #2:  git branch | sed -n '/\* /s///p' "
+#echo "$( git branch | sed -n '/\* /s///p')"
 echo "case #3: git name-rev --name-only HEAD"
 echo "$(git name-rev --name-only HEAD)"
-echo "case #4: echo ${$(git symbolic-ref --quiet HEAD)#refs/heads/}"
+echo "case #4: echo {$(git symbolic-ref --quiet HEAD)#refs/heads/}"
 echo "$(echo ${$(git symbolic-ref --quiet HEAD)#refs/heads/})"
 echo "case #5: git rev-parse --symbolic-full-name --abbrev-ref @{u}"
 echo "$(git rev-parse --symbolic-full-name --abbrev-ref @{u})"
