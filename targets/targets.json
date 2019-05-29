@@ -8291,9 +8291,9 @@
         "extra_labels_add": [
             "PSOC6_01",
             "CM0P_SLEEP",
-            "WICED",
+            "WHD",
+            "4343W",
             "CYW43XXX",
-            "CYW4343X",
             "CORDIO"
         ],
         "macros_add": ["CY8C6247BZI_D54"],
@@ -8372,9 +8372,9 @@
         "extra_labels_add": [
             "PSOC6_02",
             "CM0P_SLEEP",
-            "WICED",
+            "WHD",
+            "4343W",
             "CYW43XXX",
-            "CYW4343X",
             "CORDIO"
         ],
         "macros_add": ["CY8C624ABZI_D44"],
@@ -8400,7 +8400,10 @@
     "CY8CKIT_062_BLE": {
         "inherits": ["MCU_PSOC6_M4"],
         "supported_form_factors": ["ARDUINO"],
-        "extra_labels_add": ["PSOC6_01", "CM0P_SLEEP"],
+        "extra_labels_add": [
+            "PSOC6_01",
+            "CM0P_SLEEP"
+        ],
         "macros_add": ["CY8C6347BZI_BLD53"],
         "detect_code": ["1902"],
         "post_binary_hook": {
@@ -8417,7 +8420,8 @@
         "extra_labels_add": [
             "PSOC6_02",
             "CM0P_SLEEP",
-            "WICED",
+            "WHD",
+            "4343W",
             "CYW43XXX",
             "CYW4343X",
             "CORDIO"
@@ -8445,7 +8449,8 @@
         "extra_labels_add": [
             "PSOC6_01",
             "CM0P_SLEEP",
-            "WICED",
+            "WHD",
+            "43012",
             "CYW43XXX",
             "CYW43012",
             "CORDIO"
