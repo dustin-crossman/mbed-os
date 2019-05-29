@@ -57,7 +57,7 @@ branch_name=$(git name-rev --name-only HEAD)
 echo "Working with branch: $branch_name"
 
 # Only execute this in *usbdev* branches
-if [[ $branch_name == *"usbdev"* ]]; then
+if [[ $branch_name == *"usbdev"*  || $branch_name == *"halusb"* ]]; then
   echo "Working branch contains usbdev. Updating BSP/CSP and PSOC6PDL"
   # Integrate the latest PDL/CSP/BSP
   OUT_DIR=output
