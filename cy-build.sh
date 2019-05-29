@@ -53,31 +53,12 @@ if [[ ${windows} -ne 0 ]]; then
   cd A:
 fi
 
-echo "Getting branch name"
-
-#echo "case #1: git branch | grep \* | cut -d ' ' -f2"
-#echo "$(git branch | grep \* | cut -d ' ' -f2)"
-#echo "case #2:  git branch | sed -n '/\* /s///p' "
-#echo "$( git branch | sed -n '/\* /s///p')"
-echo "case #3: git name-rev --name-only HEAD"
-echo "$(git name-rev --name-only HEAD)"
-echo "case #4: echo {$(git symbolic-ref --quiet HEAD)#refs/heads/}"
-echo "$(echo ${$(git symbolic-ref --quiet HEAD)#refs/heads/})"
-echo "case #5: git rev-parse --symbolic-full-name --abbrev-ref @{u}"
-echo "$(git rev-parse --symbolic-full-name --abbrev-ref @{u})"
-echo "case $6: git branch | grep -e "^*" | cut -d' ' -f 2"
-echo "$(git branch | grep -e "^*" | cut -d' ' -f 2)"
-echo "case #7: git reflog HEAD | grep 'checkout:' | head -1 | rev | cut -d' ' -f1 | rev"
-echo "$(git reflog HEAD | grep 'checkout:' | head -1 | rev | cut -d' ' -f1 | rev)"
-echo "case #8: git rev-parse --abbrev-ref HEAD | grep -v ^HEAD$ || git rev-parse HEAD"
-echo "$(git rev-parse --abbrev-ref HEAD | grep -v ^HEAD$ || git rev-parse HEAD)"
-
-
-#echo "Working with branch: $(git rev-parse --abbrev-ref HEAD)"
+branch_name=$(git name-rev --name-only HEAD)
+echo "Working with branch: $branch_name"
 
 # Only execute this in *usbdev* branches
-#if [[ $(git rev-parse --abbrev-ref HEAD) =~ usbdev ]]; then
-  echo "Working contains usbdev "
+if [[ $branch_name == *"usbdev"* ]]; then
+  echo "Working branch contains usbdev. Updating BSP/CSP and PSOC6PDL"
   # Integrate the latest PDL/CSP/BSP
   OUT_DIR=output
   ASSET_BASEURL="http://iot-webserver.aus.cypress.com/projects/iot_release/ASSETS"
@@ -94,9 +75,9 @@ echo "$(git rev-parse --abbrev-ref HEAD | grep -v ^HEAD$ || git rev-parse HEAD)"
   unzip -qbo "$OUT_DIR/TARGET_PSOC6.zip" -d targets/TARGET_Cypress
   echo "Extracting PDL Mbed integration asset"
   unzip -qbo "$OUT_DIR/psoc6pdl_mbed/TARGET_PSOC6.zip" -d targets/TARGET_Cypress
-#else
-#  echo "Working does not contain usbdev "
-#fi
+else
+  echo "Working branch does not contain usbdev. Updating BSP/CSP and PSOC6PDL was not performed"
+fi
 
 # Compile single test case just to check linkage issues
 mbed config ROOT .
@@ -112,6 +93,7 @@ mbed config ARMC6_PATH "C:\Program Files\ARMCompiler6.11\bin"
 
 mbed config --list
 
+echo "Compiling of Cypress USB Device support files. "
 mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain GCC_ARM --target CY8CKIT_062_WIFI_BT
 mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain IAR --target CY8CKIT_062_WIFI_BT
 mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain ARMC6 --target CY8CKIT_062_WIFI_BT
