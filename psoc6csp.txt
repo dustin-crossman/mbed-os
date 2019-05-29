@@ -1,7 +1,0 @@
-hal/include
-hal/psoc6pdl/include:hal/include
-hal/psoc6pdl/src:hal/src
-abstraction/include
-abstraction/source
-core_lib/include
-docs
