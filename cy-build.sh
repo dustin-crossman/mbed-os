@@ -53,6 +53,11 @@ if [[ ${windows} -ne 0 ]]; then
   cd A:
 fi
 
+echo "Getting branch name"
+
+echo "case #1: git branch | grep \* | cut -d ' ' -f2 $(git branch | grep \* | cut -d ' ' -f2)"
+echo "case #2:  git branch | sed -n '/\* /s///p' $( git branch | sed -n '/\* /s///p')"
+
 #echo "Working with branch: $(git rev-parse --abbrev-ref HEAD)"
 
 # Only execute this in *usbdev* branches
