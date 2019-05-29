@@ -55,8 +55,23 @@ fi
 
 echo "Getting branch name"
 
-echo "case #1: git branch | grep \* | cut -d ' ' -f2 $(git branch | grep \* | cut -d ' ' -f2)"
-echo "case #2:  git branch | sed -n '/\* /s///p' $( git branch | sed -n '/\* /s///p')"
+echo "case #1: git branch | grep \* | cut -d ' ' -f2"
+echo "$(git branch | grep \* | cut -d ' ' -f2)"
+echo "case #2:  git branch | sed -n '/\* /s///p' "
+echo "$( git branch | sed -n '/\* /s///p')"
+echo "case #3: git name-rev --name-only HEAD"
+echo "$(git name-rev --name-only HEAD)"
+echo "case #4: echo ${$(git symbolic-ref --quiet HEAD)#refs/heads/}"
+echo "$(echo ${$(git symbolic-ref --quiet HEAD)#refs/heads/})"
+echo "case #5: git rev-parse --symbolic-full-name --abbrev-ref @{u}"
+echo "$(git rev-parse --symbolic-full-name --abbrev-ref @{u})"
+echo "case $6: git branch | grep -e "^*" | cut -d' ' -f 2"
+echo "$(git branch | grep -e "^*" | cut -d' ' -f 2)"
+echo "case #7: git reflog HEAD | grep 'checkout:' | head -1 | rev | cut -d' ' -f1 | rev"
+echo "$(git reflog HEAD | grep 'checkout:' | head -1 | rev | cut -d' ' -f1 | rev)"
+echo "case #8: git rev-parse --abbrev-ref HEAD | grep -v ^HEAD$ || git rev-parse HEAD"
+echo "$(git rev-parse --abbrev-ref HEAD | grep -v ^HEAD$ || git rev-parse HEAD)"
+
 
 #echo "Working with branch: $(git rev-parse --abbrev-ref HEAD)"
 
