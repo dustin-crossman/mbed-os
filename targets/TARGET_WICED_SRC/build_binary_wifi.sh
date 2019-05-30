@@ -18,7 +18,7 @@ fi
 set -ex
 
 TOOLCHAIN=$compiler
-if [[-z "$profile"]]; then
+if [[ -z "$profile" ]]; then
     TOOLCHAIN_FROM_FOLDER="$TOOLCHAIN"
 else
     TOOLCHAIN_FROM_FOLDER="$TOOLCHAIN-${profile^^}"
