@@ -45,7 +45,7 @@ Default arguments can be overridden with a custom:
 
 *Example:*
     
-    python.exe prod_provision_device.py --prov-jwt packet/prov_cmd.jwt --hex prebuild/CyBootloader_WithLogs/CypressBootloader_CM0p.hex --pubkey-json keys/dev_pub_key.json --pubkey-pem keys/dev_pub_key.pem
+    python.exe prod_provision_device.py --prov-jwt packet/prov_cmd.jwt --hex prebuild/CyBootloader_Release/CypressBootloader_CM0p.hex --pubkey-json keys/dev_pub_key.json --pubkey-pem keys/dev_pub_key.pem
     
 **_NOTE:_** PSoC 6 supply voltage must be 2.5 V to perform provisioning.
 
