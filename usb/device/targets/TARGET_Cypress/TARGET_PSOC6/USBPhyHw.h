@@ -21,6 +21,12 @@
 //#include "mbed.h"
 #include "USBPhy.h"
 
+#include "cy_usbfs_dev_drv.h"
+#include "cy_sysint.h"
+#include "cy_sysclk.h"
+
+#include "cyhal_usb_dev.h"
+
 
 class USBPhyHw : public USBPhy {
 public:
@@ -58,10 +64,11 @@ public:
 
     virtual void process();
 
-private:
     USBPhyEvents *events;
+private:
 
     static void _usbisr(void);
+    cyhal_usb_dev_t obj;
 };
 
 #endif
