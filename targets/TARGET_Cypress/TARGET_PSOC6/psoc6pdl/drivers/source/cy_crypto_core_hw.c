@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_crypto_core_hw.c
-* \version 2.20
+* \version 2.30
 *
 * \brief
 *  This file provides the source code to the API for the utils
@@ -149,7 +149,7 @@ void Cy_Crypto_Core_ClearVuRegisters(CRYPTO_Type *base)
 *******************************************************************************/
 void Cy_Crypto_Core_HwInit(void)
 {
-    cy_cryptoIP = (cy_device->cryptoVersion == 1u) ? &cy_cryptoIpBlockCfgPSoC6_01 : &cy_cryptoIpBlockCfgPSoC6_02;
+    cy_cryptoIP = (CY_CRYPTO_V1) ? &cy_cryptoIpBlockCfgPSoC6_01 : &cy_cryptoIpBlockCfgPSoC6_02;
 }
 
 /*******************************************************************************
@@ -169,7 +169,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Enable(CRYPTO_Type *base)
 {
     Cy_Crypto_Core_HwInit();
 
-    if (CY_CRYPTO_HW_V1)
+    if (CY_CRYPTO_V1)
     {
         /* Enable Crypto HW */
         REG_CRYPTO_CTL(base) = (uint32_t)(_VAL2FLD(CRYPTO_CTL_PWR_MODE, CY_CRYPTO_PWR_MODE_ENABLED) |
@@ -261,7 +261,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_GetLibInfo(cy_en_crypto_lib_info_t *libInfo
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_Disable(CRYPTO_Type *base)
 {
-    if (CY_CRYPTO_HW_V1)
+    if (CY_CRYPTO_V1)
     {
         /* Disable Crypto HW */
         REG_CRYPTO_CTL(base) = (uint32_t)(_VAL2FLD(CRYPTO_CTL_PWR_MODE, CY_CRYPTO_PWR_MODE_OFF) |

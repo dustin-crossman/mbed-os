@@ -1282,7 +1282,7 @@ cy_en_flashdrv_status_t Cy_Flash_RowChecksum (uint32_t rowAddr, uint32_t* checks
             {
                 result = CY_FLASH_DRV_SUCCESS;
 
-                if (1u == cy_device->ipcVersion)
+                if (CY_IPC_V1)
                 {
                     *checksumPtr = flashContext.opcode & CY_FLASH_RESULT_MASK;
                 }

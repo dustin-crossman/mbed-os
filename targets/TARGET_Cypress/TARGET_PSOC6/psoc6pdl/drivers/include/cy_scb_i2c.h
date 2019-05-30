@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_scb_i2c.h
-* \version 2.20
+* \version 2.30
 *
 * Provides I2C API declarations of the SCB driver.
 *
@@ -353,6 +353,11 @@
 * \section group_scb_i2c_changelog Changelog
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td> 2.30</td>
+*     <td>MISRA violation fix.</td>
+*     <td>MISRA compliance.</td>
+*   </tr>
 *   <tr>
 *     <td rowspan="4"> 2.20</td>
 *     <td>Flattened the organization of the driver source code into the single 
