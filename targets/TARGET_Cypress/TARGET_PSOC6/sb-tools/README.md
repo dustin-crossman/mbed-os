@@ -15,11 +15,11 @@ Execute from ./prepare folder:
 
 * To create packet for CY8CPROTO_064_SB target using single-stage policy (CM4 only):
     
-        python.exe provisioning_packet.py --policy policy_1stage_CM4.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
+        python.exe provisioning_packet.py --policy policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
 
 * To create packet for CY8CPROTO_064_SB_M0_PSA and CY8CPROTO_064_SB_PSA targets using dual-stage policy (CM0 and CM4):
     
-        python.exe provisioning_packet.py --policy policy_dual_stage_CM0p.json  --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
+        python.exe provisioning_packet.py --policy policy_dual_stage_CM0p_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
 
 Prebuild folder contains CyBootloader_WithLogs and CyBootloader_Release with corresponding hex and jwt files.
   * WithLogs enables logs print to terminal.
@@ -33,7 +33,7 @@ Prebuild folder contains CyBootloader_WithLogs and CyBootloader_Release with cor
 
 ## 4.   Perform provisioning:
 
-Execute *prod_provision_device.py*.
+Execute *provision_device_runner.py*.
 If arguments for the script are not specified it will run with the default arguments.
 
 Default arguments can be overridden with a custom:
@@ -45,7 +45,7 @@ Default arguments can be overridden with a custom:
 
 *Example:*
     
-    python.exe prod_provision_device.py --prov-jwt packet/prov_cmd.jwt --hex prebuild/CyBootloader_Release/CypressBootloader_CM0p.hex --pubkey-json keys/dev_pub_key.json --pubkey-pem keys/dev_pub_key.pem
+    python.exe provision_device_runner.py --prov-jwt packet/prov_cmd.jwt --hex prebuild/CyBootloader_Release/CypressBootloader_CM0p.hex --pubkey-json keys/dev_pub_key.json --pubkey-pem keys/dev_pub_key.pem
     
 **_NOTE:_** PSoC 6 supply voltage must be 2.5 V to perform provisioning.
 
