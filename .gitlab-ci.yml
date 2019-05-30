@@ -37,6 +37,7 @@ pyocd_wrapper:
     - cd ..
     - echo "[INFO] Start tests"
     - cd .\targets\TARGET_Cypress\TARGET_PSOC6\sb-tools\test\
+    - mbedls -m 1907:CY8CPROTO_064_SB
     - python -m unittest -v test_pyocd_wrapper.py
     - deactivate
   cache:
