@@ -69,6 +69,7 @@ typedef enum
     CYHAL_RSC_SDHC,      /*!< SD Host Controller */
     CYHAL_RSC_TCPWM,     /*!< Timer/Counter/PWM block */
     CYHAL_RSC_UDB,       /*!< UDB Array */
+    CYHAL_RSC_USB,       /*!< USB communication block */
     CYHAL_RSC_WDT,       /*!< Watchdog timer */
     CYHAL_RSC_INVALID,   /*!< Placeholder for invalid type */
 } cyhal_resource_t;
