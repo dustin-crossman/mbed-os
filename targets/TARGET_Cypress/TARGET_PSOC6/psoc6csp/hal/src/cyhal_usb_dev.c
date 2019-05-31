@@ -28,6 +28,7 @@
 #include "cyhal_usb_dev.h"
 #include "cyhal_interconnect.h"
 
+#if defined(CY_IP_MXUSBFS)
 
 // Interrupt configuration and access
 #define CYHAL_USB_DEV_DEFAULT_IRQ_PRIORITY    (3U)
@@ -515,3 +516,4 @@ void cyhal_usb_dev_register_sof_callback( cyhal_usb_dev_t *obj, cyhal_usb_dev_so
     cyhal_usb_dev_sof_user_callback = handler;
 }
 
+#endif /* CY_IP_MXUSBFS) */

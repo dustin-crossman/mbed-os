@@ -864,7 +864,7 @@ cy_rslt_t cyhal_sdio_init(cyhal_sdio_t *obj, cyhal_gpio_t cmd, cyhal_gpio_t clk,
     cy_stc_sd_host_init_config_t hostConfig;
     cy_rslt_t result;
     cy_stc_sd_host_context_t context;
-    cyhal_resource_inst_t pin_rsc;
+    cyhal_resource_inst_t pin_rsc, sdhc;
 
     memset(obj, 0, sizeof(cyhal_sdio_t));
 
@@ -986,70 +986,86 @@ cy_rslt_t cyhal_sdio_init(cyhal_sdio_t *obj, cyhal_gpio_t cmd, cyhal_gpio_t clk,
         result = cyhal_connect_pin(data3_map);
     }
     
-    bool configured = false;
-    if (result == CY_RSLT_SUCCESS)
+    if  (result == CY_RSLT_SUCCESS)
     {
-        result = cyhal_hwmgr_is_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num, &configured);
-    }
-    
-    if (result == CY_RSLT_SUCCESS && !configured)
-    {
-        /* Set HF CL to 100MHz */
-        /* TODO - uncomment once the function is implemented
-        uint8_t clk_hf = 0xff;
-        if (obj->resource.block_num == 0)
-        {
-            clk_hf = 4;
-        }
-        else if (obj->resource.block_num == 1)
-        {
-            clk_hf = 2;
-        }
-        else
-        {
-            // Do nothing as we have incorrect SDHC instance
-        }
+        sdhc.type = obj->resource.type;
+        sdhc.block_num = obj->resource.block_num;
+        sdhc.channel_num = obj->resource.channel_num;
 
-       if (clk_hf != 0xff)
-       {
-           result = cyhal_system_clock_frequency(clk_hf, SDIO_CLK_HF_HZ);
-       }
-        */
-        
+        result = cyhal_hwmgr_reserve(&sdhc);
         if (result == CY_RSLT_SUCCESS)
         {
-            obj->base = CY_SDHC_BASE_ADDRESSES[obj->resource.block_num];
+            bool configured = false;
 
-            /* Enable the SDHC block */
-            Cy_SD_Host_Enable(obj->base);
+            if (result == CY_RSLT_SUCCESS)
+            {
+                result = cyhal_hwmgr_is_configured(obj->resource.type,
+                                                   obj->resource.block_num, 
+                                                   obj->resource.channel_num, 
+                                                   &configured);
+            }
 
-            hostConfig.dmaType = CY_SD_HOST_DMA_SDMA;
-            hostConfig.emmc = false;
-            hostConfig.enableLedControl = false;
-            context.cardType = CY_SD_HOST_SDIO;
+            if (result == CY_RSLT_SUCCESS && !configured)
+            {
+                /* Set HF CL to 100MHz */
+                /* TODO - uncomment once the function is implemented
+                uint8_t clk_hf = 0xff;
+                if (obj->resource.block_num == 0)
+                {
+                    clk_hf = 4;
+                }
+                else if (obj->resource.block_num == 1)
+                {
+                    clk_hf = 2;
+                }
+                else
+                {
+                    // Do nothing as we have incorrect SDHC instance
+                }
 
-            /* Configure SD Host to operate */
-            (void) Cy_SD_Host_Init(obj->base, &hostConfig, &context);
+               if (clk_hf != 0xff)
+               {
+                   result = cyhal_system_clock_frequency(clk_hf, SDIO_CLK_HF_HZ);
+               }
+                */
 
-            /* Only enable the SDMA interrupt */
-            Cy_SD_Host_SetNormalInterruptMask(obj->base, CY_SD_HOST_DMA_INTERRUPT);
+                if (result == CY_RSLT_SUCCESS)
+                {
+                    obj->base = CY_SDHC_BASE_ADDRESSES[obj->resource.block_num];
 
-            /* Don't enable any error interrupts for now */
-            Cy_SD_Host_SetErrorInterruptMask(obj->base, 0UL);
+                    /* Enable the SDHC block */
+                    Cy_SD_Host_Enable(obj->base);
 
-            /* Clear all interrupts */
-            Cy_SD_Host_ClearErrorInterruptStatus(obj->base, 0xffff);
-            Cy_SD_Host_ClearNormalInterruptStatus(obj->base, 0xffff);
-        
-            (void)Cy_SD_Host_SetHostBusWidth(obj->base, CY_SD_HOST_BUS_WIDTH_4_BIT);
-        
-            /* Change the host SD clock to 400 kHz */
-            (void)Cy_SD_Host_SdCardChangeClock(obj->base, CY_SD_HOST_CLK_400K);
+                    hostConfig.dmaType = CY_SD_HOST_DMA_SDMA;
+                    hostConfig.emmc = false;
+                    hostConfig.enableLedControl = false;
+                    context.cardType = CY_SD_HOST_SDIO;
 
-            cyhal_hwmgr_set_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
+                    /* Configure SD Host to operate */
+                    (void) Cy_SD_Host_Init(obj->base, &hostConfig, &context);
 
-            obj->frequencyhal_hz = CY_SD_HOST_CLK_400K;
-            obj->block_size      = SDHC_SDIO_64B_BLOCK;
+                    /* Only enable the SDMA interrupt */
+                    Cy_SD_Host_SetNormalInterruptMask(obj->base, CY_SD_HOST_DMA_INTERRUPT);
+
+                    /* Don't enable any error interrupts for now */
+                    Cy_SD_Host_SetErrorInterruptMask(obj->base, 0UL);
+
+                    /* Clear all interrupts */
+                    Cy_SD_Host_ClearErrorInterruptStatus(obj->base, 0xffff);
+                    Cy_SD_Host_ClearNormalInterruptStatus(obj->base, 0xffff);
+
+                    (void)Cy_SD_Host_SetHostBusWidth(obj->base, CY_SD_HOST_BUS_WIDTH_4_BIT);
+
+                    /* Change the host SD clock to 400 kHz */
+                    (void)Cy_SD_Host_SdCardChangeClock(obj->base, CY_SD_HOST_CLK_400K);
+
+                    result = 
+                    cyhal_hwmgr_set_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
+
+                    obj->frequencyhal_hz = CY_SD_HOST_CLK_400K;
+                    obj->block_size      = SDHC_SDIO_64B_BLOCK;
+                }
+            }
         }
     }
     
@@ -1095,7 +1111,7 @@ cy_rslt_t cyhal_sdio_free(cyhal_sdio_t *obj)
     
     if ((obj->pin_cmd != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
     {
-        result = cyhal_free_pin(obj->pin_clk);
+        result = cyhal_free_pin(obj->pin_cmd);
     }
 
     if ((obj->pin_data0 != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))

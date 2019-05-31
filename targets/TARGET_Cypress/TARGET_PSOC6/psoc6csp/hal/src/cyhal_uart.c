@@ -621,7 +621,7 @@ cy_rslt_t cyhal_uart_init(cyhal_uart_t *obj, cyhal_gpio_t tx, cyhal_gpio_t rx, c
     {
         if (clk == NULL)
         {
-            result = cyhal_hwmgr_allocate_clock(&(obj->clock), CY_SYSCLK_DIV_8_BIT, true);
+            result = cyhal_hwmgr_allocate_clock(&(obj->clock), CY_SYSCLK_DIV_16_BIT, true);
         }
         else
         {
