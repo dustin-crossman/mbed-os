@@ -226,6 +226,8 @@ class TestControlAPIs(unittest.TestCase):
     def setUpClass(cls):
         cls.tool = ProgrammingTool.create(TOOL)
         cls.tool.connect(TARGET, probe_id=PROBE_ID)
+        print('Erasing flash...')
+        cls.tool.erase(MAIN_ADDR, 0x000e0000)
 
     @classmethod
     def tearDownClass(cls):
