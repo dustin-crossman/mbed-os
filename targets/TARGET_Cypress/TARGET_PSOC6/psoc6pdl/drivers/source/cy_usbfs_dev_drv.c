@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_usbfs_dev_drv.c
-* \version 1.10
+* \version 2.0
 *
 * Provides general API implementation of the USBFS driver.
 *
@@ -445,7 +445,7 @@ static void Ep0IntrHandler(USBFS_Type *base, cy_stc_usbfs_dev_drv_context_t *con
                 if (false == _FLD2BOOL(USBFS_USBDEV_EP0_CR_SETUP_RCVD, ep0Cr))
                 {
                     /* Reset EP0 data toggle */
-                    context->ep0DataToggle = 0UL;
+                    context->ep0DataToggle = 0U;
 
                     /* Call Device layer to service request */
                     context->ep0Setup(base, context);
@@ -993,10 +993,10 @@ uint32_t Cy_USBFS_Dev_Drv_Ep0Write(USBFS_Type *base, uint8_t const *buffer, uint
         }
 
         /* Update data toggle and counter */
-        context->ep0DataToggle ^= USBFS_USBDEV_EP0_CNT_DATA_TOGGLE_Msk;
+        context->ep0DataToggle ^= (uint8_t) USBFS_USBDEV_EP0_CNT_DATA_TOGGLE_Msk;
         
         /* Update CNT and CR registers to continue IN transfer */
-        Cy_USBFS_Dev_Drv_SetEp0Count (base, numBytes, context->ep0DataToggle);
+        Cy_USBFS_Dev_Drv_SetEp0Count (base, numBytes, (uint32_t) context->ep0DataToggle);
         Cy_USBFS_Dev_Drv_WriteEp0Mode(base, CY_USBFS_DEV_DRV_EP_CR_ACK_IN_STATUS_OUT);
 
         context->ep0CtrlState = CY_USBFS_DEV_DRV_EP0_CTRL_STATE_DATA;

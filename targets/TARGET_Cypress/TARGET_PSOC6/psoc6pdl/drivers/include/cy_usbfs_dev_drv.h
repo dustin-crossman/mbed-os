@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_usbfs_dev_drv.h
-* \version 1.10
+* \version 2.0
 *
 * Provides API declarations of the USBFS driver.
 *
@@ -660,7 +660,7 @@
 *         USB Device middleware.</td>
 *   </tr>
 *   <tr>
-*     <td rowspan="2"> 1.10</td>
+*     <td rowspan="2">1.10</td>
 *     <td>Fixed the \ref Cy_USBFS_Dev_Drv_Disable function to not disable DMA
 *         in CPU mode.</td>
 *     <td>Calling this function triggers assert because DMA for endpoints is not 
@@ -725,10 +725,10 @@ extern "C" {
 */
 
 /** USBFS Driver major version */
-#define CY_USBFS_VERSION_MAJOR      (1)
+#define CY_USBFS_VERSION_MAJOR      (2)
 
 /** USBFS Driver minor version */
-#define CY_USBFS_VERSION_MINOR      (10)
+#define CY_USBFS_VERSION_MINOR      (0)
 
 /** USBFS Driver identifier */
 #define CY_USBFS_ID                 CY_PDL_DRV_ID(0x3BU)

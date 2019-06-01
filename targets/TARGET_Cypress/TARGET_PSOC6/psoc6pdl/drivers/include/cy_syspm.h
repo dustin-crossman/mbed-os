@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_syspm.h
-* \version 4.10
+* \version 4.20
 *
 * Provides the function definitions for the power management API.
 *
@@ -283,7 +283,7 @@
 *
 * Before setting the regulator minimum current mode ensure that current limits 
 * are be met. After current limits are met, call the 
-* Cy_SysPm_SystemSetNormalRegulatorCurrent() function. 
+* Cy_SysPm_SystemSetMinRegulatorCurrent() function.
 * 
 * \subsection group_syspm_system_set_normal_reg_curr_mode Setting Normal System Regulator Current Mode
 *
@@ -423,10 +423,10 @@
 * We will build the prototype for an application that registers 
 * three callback functions:
 *    -# myDeepSleep1 - Handles CPU Deep Sleep.
-*    -# myDeepSleep1 - Handles CPU Deep Sleep and is associated with peripheral 
+*    -# myDeepSleep2 - Handles CPU Deep Sleep and is associated with peripheral 
 *       HW1_address (see <a href="..\..\pdl_user_guide.pdf">PDL Design</a> 
 *       section to learn about the base hardware address).
-*    -# myDeepSleep2 - Handles entering and exiting system Deep Sleep and is 
+*    -# myDeepSleep3 - Handles entering and exiting system Deep Sleep and is 
 *       associated with peripheral HW2_address.
 *
 * We set things up so that the myDeepSleep1 and myDeepSleep2 callbacks do 
@@ -442,29 +442,29 @@
 * Let's first declare the callback functions. Each gets the pointer to the 
 * \ref cy_stc_syspm_callback_params_t structure as the argument.
 *
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Callback_Func_Declaration
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Callback_Func_Declaration
 *
 * Now we setup the \ref cy_stc_syspm_callback_params_t structures that we will
-* pass to the callback functions. Note that for the myDeepSleep1 and 
-* myDeepSleep2 callbacks we also pass pointers to the peripherals related to 
+* pass to the callback functions. Note that for the myDeepSleep2 and 
+* myDeepSleep3 callbacks we also pass pointers to the peripherals related to 
 * that callback (see <a href="..\..\pdl_user_guide.pdf">PDL Design</a> section 
 * to learn about base hardware addresses). 
 * The configuration considerations related to this structure are described 
 * in \ref group_syspm_cb_parameters in \ref group_syspm_cb_config_consideration.
 *
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Callback_Params_Declaration
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Callback_Params_Declaration
 *
 * Now we setup the actual callback configuration structures. Each of these 
 * contains, among the other fields, the address of the 
 * \ref cy_stc_syspm_callback_params_t we just set up. We will use the callback 
 * configuration structures later in the code to register the callbacks in the 
 * SysPm driver. Again, we set things up so that the myDeepSleep1 and 
-* myDeepSleep1 callbacks do nothing while entering the low power mode 
+* myDeepSleep2 callbacks do nothing while entering the low power mode 
 * (skip on CY_SYSPM_SKIP_BEFORE_TRANSITION) - see 
 * \ref group_syspm_cb_function_implementation in 
 * \ref group_syspm_cb_config_consideration.
 *
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Callback_Structure_Declaration
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Callback_Structure_Declaration
 *
 * Note that in each case the last two fields are NULL. These are fields used by 
 * the SysPm driver to set up the linked list of callback functions.
@@ -478,7 +478,7 @@
 * \ref group_syspm_cb_config_consideration for the instructions on how the 
 * callback functions should be implemented.
 *
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Callback_Func_Implementation
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Callback_Func_Implementation
 *
 * Finally, we register the callbacks so that the SysPm driver knows about them. 
 * The order in which the callbacks will be called depends upon the order in 
@@ -490,7 +490,7 @@
 * entering the low power mode, and restore those resources first, as the system
 * returns from low power mode.
 *
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_RegisterCallback
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_RegisterCallback
 *
 * We are done configuring three callbacks. Now the SysPm driver will execute the
 * callbacks appropriately whenever there is a call to a power mode transition 
@@ -588,7 +588,7 @@
 * \ref Cy_SysPm_ExecuteCallback() calls each callback with the mode set to 
 * CY_SYSPM_BEFORE_TRANSITION. This triggers execution of the code for that mode 
 * inside each user callback. We then enter the low power mode after all callback
-* are executes.
+* are executed.
 * 
 * When exiting the low power mode, the SysPm driver executes 
 * \ref Cy_SysPm_ExecuteCallback() again. This time it calls each callback in 
@@ -623,7 +623,7 @@
 * Unregistering the callback might be useful when you need to dynamically manage
 * the callbacks.
 *
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_UnregisterCallback
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_UnregisterCallback
 * The callback structures after myDeepSleep2 callback is unregistered:
 * \image html syspm_2_10_unregistration.png
 *
@@ -687,6 +687,20 @@
 * \section group_syspm_changelog Changelog
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td>4.20</td>
+*     <td>TBD</td>
+*     <td>TBD</td>
+*   </tr>
+*   <tr>
+*     <td>4.10.1</td>
+*     <td>
+*           Updated the Cy_SysPm_BackupEnableVoltageMeasurement() description 
+*     </td>
+*     <td>
+*           Changed the scale number from 40% to 10% to correctly reflect a real value.
+*     </td>
+*   </tr>
 *   <tr>
 *     <td rowspan="3">4.10</td>
 *     <td>Updated the \ref Cy_SysPm_CpuEnterDeepSleep() function.</td>
@@ -1127,7 +1141,7 @@ extern "C" {
 #define CY_SYSPM_DRV_VERSION_MAJOR       4
 
 /** Driver minor version */
-#define CY_SYSPM_DRV_VERSION_MINOR       10
+#define CY_SYSPM_DRV_VERSION_MINOR       20
 
 /** SysPm driver identifier */
 #define CY_SYSPM_ID                      (CY_PDL_DRV_ID(0x10U))
@@ -1587,6 +1601,14 @@ typedef struct cy_stc_syspm_callback
                                                             link this structure to the previous registered structure.
                                                             It will be updated during callback registration. Do not 
                                                             modify this element at run-time. */
+    uint8_t priority;                                  /**< Holds the callback priority value. Range: 1-255. The lower
+                                                            the value, the higher the priority. 1 is the highest priority.
+                                                            0 is reserved for backward compatibility with the previous
+                                                            driver versions. While entering low power mode, callbacks
+                                                            with higher priorities are executed first. While exiting low
+                                                            power mode, the callbacks are executed in the opposite order.
+                                                            Callbacks with the same priority are executed in the
+                                                            order they are registered in the application. */
 } cy_stc_syspm_callback_t;
 
 /** This internal structure stores non-retained registers in the system Deep Sleep
@@ -1750,7 +1772,7 @@ cy_en_syspm_status_t Cy_SysPm_ExecuteCallback(cy_en_syspm_callback_type_t type, 
 * - False if the CM4 is not in CPU Active mode.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Cm4IsActive
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Cm4IsActive
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_Cm4IsActive(void)
@@ -1770,7 +1792,7 @@ __STATIC_INLINE bool Cy_SysPm_Cm4IsActive(void)
 * - False if the CM4 is not in CPU Sleep mode.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Cm4IsSleep
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Cm4IsSleep
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_Cm4IsSleep(void)
@@ -1790,7 +1812,7 @@ __STATIC_INLINE bool Cy_SysPm_Cm4IsSleep(void)
 * - False if the CM4 is not CPU in Deep Sleep mode.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Cm4IsDeepSleep
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Cm4IsDeepSleep
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_Cm4IsDeepSleep(void)
@@ -1810,7 +1832,7 @@ __STATIC_INLINE bool Cy_SysPm_Cm4IsDeepSleep(void)
 * - False if the CM0+ is not in CPU Sleep mode.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Cm0IsActive
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Cm0IsActive
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_Cm0IsActive(void)
@@ -1830,7 +1852,7 @@ __STATIC_INLINE bool Cy_SysPm_Cm0IsActive(void)
 * - False if the CM0+ is not in CPU Sleep mode.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Cm0IsSleep
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Cm0IsSleep
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_Cm0IsSleep(void)
@@ -1850,7 +1872,7 @@ __STATIC_INLINE bool Cy_SysPm_Cm0IsSleep(void)
 * - False if the CM0+ is not in CPU Deep Sleep mode
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Cm0IsDeepSleep
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Cm0IsDeepSleep
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_Cm0IsDeepSleep(void)
@@ -1870,7 +1892,7 @@ __STATIC_INLINE bool Cy_SysPm_Cm0IsDeepSleep(void)
 * - False the system is not in LP mode.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_IsSystemLp
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_IsSystemLp
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_IsSystemLp(void)
@@ -1890,7 +1912,7 @@ __STATIC_INLINE bool Cy_SysPm_IsSystemLp(void)
 * - False the system is is not ULP mode.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_IsSystemUlp
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_IsSystemUlp
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_IsSystemUlp(void)
@@ -1911,7 +1933,7 @@ __STATIC_INLINE bool Cy_SysPm_IsSystemUlp(void)
 * Sends the SEV (Send Event) ARM instruction to the system.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_CpuSendWakeupEvent
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_CpuSendWakeupEvent
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_CpuSendWakeupEvent(void)
@@ -1931,7 +1953,7 @@ __STATIC_INLINE void Cy_SysPm_CpuSendWakeupEvent(void)
 * - False - system is in normal regulator current mode.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_SystemSetNormalRegulatorCurrent
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_SystemSetNormalRegulatorCurrent
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_SystemIsMinRegulatorCurrentSet(void)
@@ -1958,7 +1980,7 @@ __STATIC_INLINE bool Cy_SysPm_SystemIsMinRegulatorCurrentSet(void)
 * - False if it is disabled.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_BuckIsEnabled(void)
@@ -1982,7 +2004,7 @@ __STATIC_INLINE bool Cy_SysPm_BuckIsEnabled(void)
 * See \ref cy_en_syspm_buck_voltage1_t.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
 *
 *******************************************************************************/
 __STATIC_INLINE cy_en_syspm_buck_voltage1_t Cy_SysPm_BuckGetVoltage1(void)
@@ -2015,7 +2037,7 @@ __STATIC_INLINE cy_en_syspm_buck_voltage1_t Cy_SysPm_BuckGetVoltage1(void)
 * a SIMO Buck.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BuckGetVoltage2
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BuckGetVoltage2
 *
 *******************************************************************************/
 __STATIC_INLINE cy_en_syspm_buck_voltage2_t Cy_SysPm_BuckGetVoltage2(void)
@@ -2051,7 +2073,7 @@ __STATIC_INLINE cy_en_syspm_buck_voltage2_t Cy_SysPm_BuckGetVoltage2(void)
 * contains a SIMO Buck.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BuckDisableVoltage2
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BuckDisableVoltage2
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_BuckDisableVoltage2(void)
@@ -2085,7 +2107,7 @@ __STATIC_INLINE void Cy_SysPm_BuckDisableVoltage2(void)
 * contains a SIMO Buck.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BuckSetVoltage2HwControl
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BuckSetVoltage2HwControl
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_BuckSetVoltage2HwControl(bool hwControl)
@@ -2126,7 +2148,7 @@ __STATIC_INLINE void Cy_SysPm_BuckSetVoltage2HwControl(bool hwControl)
 * SIMO Buck.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BuckIsVoltage2HwControlled
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BuckIsVoltage2HwControlled
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_BuckIsVoltage2HwControlled(void)
@@ -2161,7 +2183,7 @@ __STATIC_INLINE bool Cy_SysPm_BuckIsVoltage2HwControlled(void)
 * The nominal output voltage of the LDO. See \ref cy_en_syspm_ldo_voltage_t.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
 *
 *******************************************************************************/
 __STATIC_INLINE cy_en_syspm_ldo_voltage_t Cy_SysPm_LdoGetVoltage(void)
@@ -2185,7 +2207,7 @@ __STATIC_INLINE cy_en_syspm_ldo_voltage_t Cy_SysPm_LdoGetVoltage(void)
 * - False means it is disabled.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_LdoIsEnabled(void)
@@ -2210,7 +2232,7 @@ __STATIC_INLINE bool Cy_SysPm_LdoIsEnabled(void)
 * - False if IOs are unfrozen.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_IoUnfreeze
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_IoUnfreeze
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_IoIsFrozen(void)
@@ -2238,7 +2260,7 @@ __STATIC_INLINE bool Cy_SysPm_IoIsFrozen(void)
 * Cy_SysPm_PmicUnlock() before enabling the PMIC.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_PmicEnable
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_PmicEnable
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_PmicEnable(void)
@@ -2294,7 +2316,7 @@ __STATIC_INLINE void Cy_SysPm_PmicEnable(void)
 * device TRM.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_PmicDisable
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_PmicDisable
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_PmicDisable(cy_en_syspm_pmic_wakeup_polarity_t polarity)
@@ -2323,7 +2345,7 @@ __STATIC_INLINE void Cy_SysPm_PmicDisable(cy_en_syspm_pmic_wakeup_polarity_t pol
 * assignment in the specific devices, refer to the appropriate device TRM.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_PmicAlwaysEnable
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_PmicAlwaysEnable
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_PmicAlwaysEnable(void)
@@ -2345,7 +2367,7 @@ __STATIC_INLINE void Cy_SysPm_PmicAlwaysEnable(void)
 * specific devices, refer to the appropriate device TRM.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_PmicEnableOutput
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_PmicEnableOutput
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_PmicEnableOutput(void)
@@ -2383,7 +2405,7 @@ __STATIC_INLINE void Cy_SysPm_PmicEnableOutput(void)
 * controller must remain unlocked.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_PmicDisableOutput
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_PmicDisableOutput
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_PmicDisableOutput(void)
@@ -2411,7 +2433,7 @@ __STATIC_INLINE void Cy_SysPm_PmicDisableOutput(void)
 * disabled, the PMIC controller must remain unlocked.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_PmicLock
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_PmicLock
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_PmicLock(void)
@@ -2434,7 +2456,7 @@ __STATIC_INLINE void Cy_SysPm_PmicLock(void)
 * disabled, the PMIC must remain unlocked.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_PmicEnable
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_PmicEnable
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_PmicUnlock(void)
@@ -2454,7 +2476,7 @@ __STATIC_INLINE void Cy_SysPm_PmicUnlock(void)
 * - False if the PMIC is disabled.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_PmicLock
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_PmicLock
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_PmicIsEnabled(void)
@@ -2474,7 +2496,7 @@ __STATIC_INLINE bool Cy_SysPm_PmicIsEnabled(void)
 * - False if the PMIC output is disabled.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_PmicDisable
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_PmicDisable
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_PmicIsOutputEnabled(void)
@@ -2494,7 +2516,7 @@ __STATIC_INLINE bool Cy_SysPm_PmicIsOutputEnabled(void)
 * - False if the PMIC is unlocked.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_PmicLock
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_PmicLock
 *
 *******************************************************************************/
 __STATIC_INLINE bool Cy_SysPm_PmicIsLocked(void)
@@ -2522,7 +2544,7 @@ __STATIC_INLINE bool Cy_SysPm_PmicIsLocked(void)
 * Refer to device TRM for more detail about backup supply modes.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BackupSetSupply
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BackupSetSupply
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_BackupSetSupply(cy_en_syspm_vddbackup_control_t vddBackControl)
@@ -2546,7 +2568,7 @@ __STATIC_INLINE void Cy_SysPm_BackupSetSupply(cy_en_syspm_vddbackup_control_t vd
 * Refer to device TRM for more detail about backup supply modes.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BackupGetSupply
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BackupGetSupply
 *
 *******************************************************************************/
 __STATIC_INLINE cy_en_syspm_vddbackup_control_t Cy_SysPm_BackupGetSupply(void)
@@ -2564,13 +2586,13 @@ __STATIC_INLINE cy_en_syspm_vddbackup_control_t Cy_SysPm_BackupGetSupply(void)
 *
 * This function enables Vbackup supply measurement by the ADC. The function 
 * connects the Vbackup supply to AMuxBusA. The ADC input can then be connected 
-* to AMuxBusA. Note that the measured signal is scaled by 40% to allow full 
+* to AMuxBusA. Note that the measured signal is scaled by 10% to allow full 
 * range measurement by the ADC.
 *
 * Refer to device TRM for more detail about Vbackup supply measurement.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BackupEnableVoltageMeasurement
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BackupEnableVoltageMeasurement
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_BackupEnableVoltageMeasurement(void)
@@ -2589,7 +2611,7 @@ __STATIC_INLINE void Cy_SysPm_BackupEnableVoltageMeasurement(void)
 * Refer to device TRM for more detail about Vbackup supply measurement.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BackupDisableVoltageMeasurement
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BackupDisableVoltageMeasurement
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_BackupDisableVoltageMeasurement(void)
@@ -2614,7 +2636,7 @@ __STATIC_INLINE void Cy_SysPm_BackupDisableVoltageMeasurement(void)
 * detail.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BackupSuperCapCharge
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BackupSuperCapCharge
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_SysPm_BackupSuperCapCharge(cy_en_syspm_sc_charge_key_t key)

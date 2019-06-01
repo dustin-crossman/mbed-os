@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_crypto_server.c
-* \version 2.20
+* \version 2.30
 *
 * \brief
 *  This file provides the source code to the API for Crypto Server
@@ -145,7 +145,7 @@ cy_en_crypto_status_t Cy_Crypto_Server_Start_Base(cy_stc_crypto_config_t const *
         NULL, /* Cy_Crypto_Core_RsaVerify, */
     };
 
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_V1)
     {
         cy_CryptoFunctionTable = &cryptoV1BaseFuncs;
     }
@@ -211,7 +211,7 @@ cy_en_crypto_status_t Cy_Crypto_Server_Start_Extra(cy_stc_crypto_config_t const 
         NULL, /* Cy_Crypto_Core_RsaVerify, */
     };
 
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_V1)
     {
         cy_CryptoFunctionTable = &cryptoV1ExtraFuncs;
     }
@@ -277,7 +277,7 @@ cy_en_crypto_status_t Cy_Crypto_Server_Start_Full(cy_stc_crypto_config_t const *
         &Cy_Crypto_Core_Rsa_Verify,
     };
 
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_V1)
     {
         cy_CryptoFunctionTable = &cryptoV1FullFuncs;
     }
@@ -468,7 +468,7 @@ void Cy_Crypto_Server_Process(void)
                             cy_stc_crypto_context_aes_t *cfContext = (cy_stc_crypto_context_aes_t *)myData->xdata;
                             myData->resp =
                                 (cy_CryptoFunctionTable->aesInitFunc)(CY_CRYPTO_BASE,
-                                    (uint8_t*)cfContext->key, cfContext->keyLength, &cfContext->aesState);
+                                    (uint8_t*)cfContext->key, cfContext->keyLength, &cfContext->aesState, (cy_stc_crypto_aes_buffers_t *)(REG_CRYPTO_MEM_BUFF(CY_CRYPTO_BASE)));
                         }
                         break;
 

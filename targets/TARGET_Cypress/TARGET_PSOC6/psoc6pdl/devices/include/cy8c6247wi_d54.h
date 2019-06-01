@@ -5,7 +5,7 @@
 * CY8C6247WI-D54 device header
 *
 * \note
-* Generator version: 1.4.0.1232
+* Generator version: 1.4.0.1251
 *
 ********************************************************************************
 * \copyright
@@ -545,7 +545,7 @@ typedef enum {
 #include "gpio_psoc6_01_124_bga.h"
 
 #define CY_DEVICE_PSOC6ABLE2
-#define CY_SILICON_ID                   0xE2062100UL
+#define CY_SILICON_ID                   0xE2502100UL
 #define CY_HF_CLK_MAX_FREQ              150000000UL
 
 #define CPUSS_FLASHC_PA_SIZE_LOG2       0x7UL

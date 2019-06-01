@@ -478,7 +478,7 @@ cy_rslt_t cyhal_i2c_init(cyhal_i2c_t *obj, cyhal_gpio_t sda, cyhal_gpio_t scl, c
     if (result == CY_RSLT_SUCCESS)
     {
         obj->pin_sda = sda;
-    }
+    }   
     Cy_GPIO_SetHSIOM(CYHAL_GET_PORTADDR(sda), CYHAL_GET_PIN(sda), CY_GPIO_CFG_GET_HSIOM(scl_map->cfg));
     Cy_GPIO_SetDrivemode(CYHAL_GET_PORTADDR(sda), CYHAL_GET_PIN(sda), CY_GPIO_DM_OD_DRIVESLOW);
     
@@ -492,7 +492,7 @@ cy_rslt_t cyhal_i2c_init(cyhal_i2c_t *obj, cyhal_gpio_t sda, cyhal_gpio_t scl, c
         if (result == CY_RSLT_SUCCESS)
         {
             obj->pin_scl = scl;
-        }
+        }       
         Cy_GPIO_SetHSIOM(CYHAL_GET_PORTADDR(scl), CYHAL_GET_PIN(scl), CY_GPIO_CFG_GET_HSIOM(scl_map->cfg));
         Cy_GPIO_SetDrivemode(CYHAL_GET_PORTADDR(scl), CYHAL_GET_PIN(scl), CY_GPIO_DM_OD_DRIVESLOW);
         
@@ -536,10 +536,15 @@ cy_rslt_t cyhal_i2c_init(cyhal_i2c_t *obj, cyhal_gpio_t sda, cyhal_gpio_t scl, c
 
     if (result == CY_RSLT_SUCCESS && !configured)
     {
+        cy_stc_sysint_t irqCfg = {CY_SCB_IRQ_N[obj->resource.block_num], 7};
         /* Configure I2C to operate */
         result = (cy_rslt_t)Cy_SCB_I2C_Init(obj->base, &default_i2c_config, &(obj->context));
         /* Enable I2C to operate */
         (void) Cy_SCB_I2C_Enable(obj->base);
+        Cy_SysInt_Init(&irqCfg, cyhal_i2c_interrupts_dispatcher_table[obj->resource.block_num]);
+        NVIC_EnableIRQ(CY_SCB_IRQ_N[obj->resource.block_num]);
+        cyhal_i2c_config_structs[obj->resource.block_num] = obj;
+        cyhal_i2c_config_structs[obj->resource.block_num]->irq_cause = CYHAL_I2C_IRQ_NONE;
         cyhal_hwmgr_set_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
     }
     if (result != CY_RSLT_SUCCESS)
@@ -611,7 +616,7 @@ cy_rslt_t cyhal_i2c_set_config(cyhal_i2c_t *obj, const cyhal_i2c_cfg_t *cfg)
     }
     cy_rslt_t result = (cy_rslt_t)Cy_SCB_I2C_Init(obj->base, &config_structure, &(obj->context));
     (void) Cy_SCB_I2C_Enable(obj->base);
-
+    
     result = cyhal_hwmgr_set_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);    
     return result;
 }

@@ -8,24 +8,56 @@
 * the low level functions can be used directly.
 * 
 ********************************************************************************
-* Copyright (c) 2019 Cypress Semiconductor.  All rights reserved.
-* You may use this file only in accordance with the license, terms, conditions, 
-* disclaimers, and limitations in the end user license agreement accompanying 
-* the software package with which this file was provided.
-********************************************************************************/
+* \copyright
+* Copyright 2018-2019 Cypress Semiconductor Corporation
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************/
 
 #pragma once
 
 #include <stdint.h>
 #include <stdbool.h>
 #include "cy_result.h"
-#include "cy_hal_implementation.h"
+#include "cyhal_implementation.h"
+#include "cyhal_hwmgr.h"
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
+/**
+* \addtogroup group_hal_usb_macros
+* \{
+*/
+
+/** The usb error */
+#define CYHAL_USB_DEV_RSLT_ERR (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_USB, 0))
+
+/** \} group_hal_uart_macros */
+
+/* USB endpoint address (it consits from endpoint number and direction) */
 typedef uint8_t cyhal_usb_dev_ep_t;
+
+/** USB Device Endpoints types */
+typedef enum 
+{
+    CYHAL_USB_DEV_EP_TYPE_CTRL = 0,
+    CYHAL_USB_DEV_EP_TYPE_ISO  = 1,
+    CYHAL_USB_DEV_EP_TYPE_BULK = 2,
+    CYHAL_USB_DEV_EP_TYPE_INT  = 3
+} cyhal_usb_dev_ep_type_t;
 
 /** Service Callback Events (this enumerated type is used by middleware) */
 typedef enum
@@ -34,7 +66,6 @@ typedef enum
     CYHAL_USB_DEV_EVENT_EP0_SETUP,  /**< Callback hooked to endpoint 0 SETUP packet interrupt */
     CYHAL_USB_DEV_EVENT_EP0_IN,     /**< Callback hooked to endpoint 0 IN packet interrupt */
     CYHAL_USB_DEV_EVENT_EP0_OUT,    /**< Callback hooked to endpoint 0 OUT packet interrupt */
-    CYHAL_USB_DEV_EVENT_SOF,        /**< Callback hooked to SOF interrupt */
 } cyhal_usb_dev_event_t;
 
 /** Service Callback Events (this enumerated type is used by middleware) */
@@ -61,14 +92,13 @@ typedef struct
     /** The pointer to the buffer allocated for the USB Device endpoints. 
     * Reserved for future use.
     */
-    uint8_t  *epBuffer;
+    uint8_t  *ep_buffer;
     
     /** The size of the buffer for the USB Device endpoints. 
     * Reserved for future use.
     */
-    uint16_t  epBufferSize;
+    uint16_t  ep_buffer_size;
 } cyhal_usb_dev_cfg_t;
-
 
 /** Handler for USB Device interrupt  */
 typedef void (*cyhal_usb_dev_irq_handler_t)(void);
@@ -78,6 +108,9 @@ typedef void (* cyhal_usb_dev_endpoint_handler_t)(cyhal_usb_dev_ep_t endpoint);
 
 /** Handler for the events for USB Device */
 typedef void (*cyhal_usb_dev_event_handler_t)(void);
+
+/** Handler for the events for USB Device */
+typedef void (*cyhal_usb_dev_sof_handler_t)(uint32_t frame_number);
 
 /**
  * Initialize this USBPhy instance.
@@ -95,12 +128,6 @@ typedef void (*cyhal_usb_dev_event_handler_t)(void);
                               const cyhal_clock_divider_t *clkPll, const cyhal_clock_divider_t *clkDiv, 
                               const cyhal_usb_dev_cfg_t *cfg);
 
-/**
- * Enable USBPhy instance
- *
- * @param[in,out] obj The usb device object
- */
- void cyhal_usb_dev_enable(cyhal_usb_dev_t *obj);
 
 /**
  * Power down this USBPhy instance
@@ -118,10 +145,8 @@ typedef void (*cyhal_usb_dev_event_handler_t)(void);
  * the presence of this device.
  *
  * @param[in,out] obj The usb device object
- *
- * @return The status of the connect request
  */
- cy_rslt_t cyhal_usb_dev_connect(cyhal_usb_dev_t *obj);
+ void cyhal_usb_dev_connect(cyhal_usb_dev_t *obj);
 
 /**
  * Detach the USB phy
@@ -130,10 +155,8 @@ typedef void (*cyhal_usb_dev_event_handler_t)(void);
  * USB traffic.
  *
  * @param[in,out] obj The usb device object
- *
- * @return The status of the disconnect request
  */
- cy_rslt_t cyhal_usb_dev_disconnect(cyhal_usb_dev_t *obj);
+ void cyhal_usb_dev_disconnect(cyhal_usb_dev_t *obj);
 
 /**
  * Set this device to the configured state
@@ -142,10 +165,8 @@ typedef void (*cyhal_usb_dev_event_handler_t)(void);
  * already.
  *
  * @param[in,out] obj The usb device object
- *
- * @return The status of the configure request
  */
- cy_rslt_t cyhal_usb_dev_configure(cyhal_usb_dev_t *obj);
+ void cyhal_usb_dev_configure(cyhal_usb_dev_t *obj);
 
 /**
  * Leave the configured state
@@ -155,10 +176,8 @@ typedef void (*cyhal_usb_dev_event_handler_t)(void);
  * endpoints other than endpoint 0.
  *
  * @param[in,out] obj The usb device object
- *
- * @return The status of the unconfigure request
  */
- cy_rslt_t cyhal_usb_dev_unconfigure(cyhal_usb_dev_t *obj);
+ void cyhal_usb_dev_unconfigure(cyhal_usb_dev_t *obj);
 
 /**
  * Configure start of frame interrupt enablement.
@@ -166,20 +185,16 @@ typedef void (*cyhal_usb_dev_event_handler_t)(void);
  * @param[in,out] obj The usb device object
  * @param[in] enable  True to turn on interrupt and start calling sof callback on every frame, 
  *                    False to turn off interrupt and stop calling sof callback.
- *
- * @return The status of the sof enable request
  */
- cy_rslt_t cyhal_usb_dev_sof_enable(cyhal_usb_dev_t *obj, bool enable);
+ void cyhal_usb_dev_sof_enable(cyhal_usb_dev_t *obj, bool enable);
 
 /**
  * Set the USBPhy's address
  *
  * @param[in,out] obj The usb device object
  * @param[in] address This device's USB address
- *
- * @return The status of the set address request
  */
- cy_rslt_t cyhal_usb_dev_set_address(cyhal_usb_dev_t *obj, uint8_t address);
+ void cyhal_usb_dev_set_address(cyhal_usb_dev_t *obj, uint8_t address);
 
 /**
  * Get wMaxPacketSize of endpoint 0. 
@@ -197,10 +212,8 @@ uint32_t cyhal_usb_dev_ep0_get_max_packet(cyhal_usb_dev_t *obj);
  * @param[in,out] obj The usb device object
  * @param[in] buffer  Buffer to fill with data
  * @param[in] size    Size of buffer passed in
- * 
- * @return The status of the read endpoint 0 setup packet request
  */
- cy_rslt_t cyhal_usb_dev_ep0_setup_read_result(cyhal_usb_dev_t *obj, uint8_t *buffer, uint32_t size);
+ void cyhal_usb_dev_ep0_setup_read_result(cyhal_usb_dev_t *obj, uint8_t *buffer, uint32_t size);
 
 /**
  * Start receiving a packet of up to wMaxPacketSize on endpoint 0
@@ -211,17 +224,16 @@ uint32_t cyhal_usb_dev_ep0_get_max_packet(cyhal_usb_dev_t *obj);
  *
  * @return The status of the read endpoint 0 request
  */
- cy_rslt_t cyhal_usb_dev_ep0_read(cyhal_usb_dev_t *obj, uint8_t *buffer, uint32_t size);
+ void cyhal_usb_dev_ep0_read(cyhal_usb_dev_t *obj, uint8_t *buffer, uint32_t size);
 
 /**
  * Read the contents of a received packet
  *
  * @param[in,out] obj  The usb device object
- * @param[out] actSize Actual number of bytes that was read
  *
- * @return The status of the read results endpoint 0 request
+ * @return Actual number of bytes that was read
  */
- cy_rslt_t cyhal_usb_dev_ep0_read_result(cyhal_usb_dev_t *obj, uint32_t *actSize);
+ uint32_t cyhal_usb_dev_ep0_read_result(cyhal_usb_dev_t *obj);
 
 /**
  * Write a packet on endpoint 0
@@ -230,7 +242,7 @@ uint32_t cyhal_usb_dev_ep0_get_max_packet(cyhal_usb_dev_t *obj);
  * @param[in] buffer  Buffer fill with data to send
  * @param[in] size    Size of data to send
  *
- * @return The status of the write endpoint 0 request
+ * @return The number of bytes that were written.
  */
  cy_rslt_t cyhal_usb_dev_ep0_write(cyhal_usb_dev_t *obj, uint8_t *buffer, uint32_t size);
 
@@ -240,11 +252,9 @@ uint32_t cyhal_usb_dev_ep0_get_max_packet(cyhal_usb_dev_t *obj);
  *
  * @param[in,out] obj The usb device object
  *
- * @return The status of the stall endpoint 0 request
- *
  * @note The stall is cleared automatically when a setup packet is received
  */
- cy_rslt_t cyhal_usb_dev_ep0_stall(cyhal_usb_dev_t *obj);
+ void cyhal_usb_dev_ep0_stall(cyhal_usb_dev_t *obj);
 
 /**
  * Configure and enable an endpoint
@@ -362,10 +372,16 @@ cy_rslt_t cyhal_usb_dev_register_irq(cyhal_usb_dev_t *obj, cyhal_usb_dev_irq_han
  *
  * @param[in,out] obj The usb device object
  * @param[in] enable  True to turn on interrupts, False to turn off
- *
- * @return The status of the irq_enable request
  */
-cy_rslt_t cyhal_usb_dev_irq_enable(cyhal_usb_dev_t *obj, bool enable);
+void cyhal_usb_dev_irq_enable(cyhal_usb_dev_t *obj, bool enable);
+
+
+/** 
+ *  Default USB Device interrupt handler.
+ *
+ * @param[in,out] obj The usb device object
+ */
+void cyhal_usb_dev_process_irq(cyhal_usb_dev_t *obj);
 
 /** 
  * The USB Device endpoint complete callback handler registration
@@ -384,6 +400,15 @@ void cyhal_usb_dev_register_endpoint_callback(cyhal_usb_dev_t *obj, cyhal_usb_de
  * @param[in] handler The callback handler which will be invoked when the interrupt fires
  */
 void cyhal_usb_dev_register_event_callback(cyhal_usb_dev_t *obj, cyhal_usb_dev_event_t event, cyhal_usb_dev_event_handler_t handler);
+
+
+/** 
+ * The USB Device start of frame (SOF) complete callback handler registration.
+ *
+ * @param[in,out] obj The usb device object
+ * @param[in] handler The callback handler which will be invoked when the interrupt fires
+ */
+void cyhal_usb_dev_register_sof_callback( cyhal_usb_dev_t *obj, cyhal_usb_dev_sof_handler_t handler);
 
 
 #if defined(__cplusplus)

@@ -79,6 +79,7 @@ enum cyhal_rslt_module_chip
     CYHAL_RSLT_MODULE_SYSTEM,                                           //!< An error occurred in System module
     CYHAL_RSLT_MODULE_TIMER,                                            //!< An error occurred in Timer module
     CYHAL_RSLT_MODULE_UART,                                             //!< An error occurred in UART module
+    CYHAL_RSLT_MODULE_USB,                                              //!< An error occurred in USB module
     CYHAL_RSLT_MODULE_WDT,                                              //!< An error occurred in WDT module
 };
 

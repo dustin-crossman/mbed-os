@@ -640,6 +640,9 @@
                 <Block location="srss[0].clock[0].pathmux[4]" alias="" template="mxs40pathmux" version="1.0">
                     <Param id="sourceClock" value="imo"/>
                 </Block>
+                <Block location="srss[0].clock[0].pathmux[5]" alias="" template="mxs40pathmux" version="1.0">
+                    <Param id="sourceClock" value="imo"/>
+                </Block>
                 <Block location="srss[0].clock[0].periclk[0]" alias="" template="mxs40periclk" version="1.0">
                     <Param id="divider" value="2"/>
                 </Block>
@@ -674,7 +677,7 @@
                     <Param id="coreRegulator" value="CY_SYSPM_LDO_MODE_NORMAL"/>
                     <Param id="pmicEnable" value="false"/>
                     <Param id="backupSrc" value="VDDD"/>
-                    <Param id="idlePwrMode" value="CY_CFG_PWR_MODE_SLEEP"/>
+                    <Param id="idlePwrMode" value="CY_CFG_PWR_MODE_DEEPSLEEP"/>
                     <Param id="deepsleepLatency" value="0"/>
                     <Param id="vddaMv" value="3300"/>
                     <Param id="vdddMv" value="3300"/>

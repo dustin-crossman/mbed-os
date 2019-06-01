@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_smif_memslot.h
-* \version 1.20.1
+* \version 1.30
 *
 * \brief
 *  This file provides the constants and parameter values for the memory-level
@@ -34,6 +34,8 @@
 #include "cy_syslib.h"
 #include "cy_device_headers.h"
 #include "cy_smif.h"
+
+#ifdef CY_IP_MXSMIF
 
 #if defined(__cplusplus)
 extern "C" {
@@ -427,6 +429,8 @@ cy_en_smif_status_t    Cy_SMIF_Memslot_SfdpDetect(SMIF_Type *base,
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXSMIF */
 
 #endif /* (CY_SMIF_MEMORYSLOT_H) */
 

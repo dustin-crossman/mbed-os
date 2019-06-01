@@ -115,7 +115,7 @@ static void *cyhal_sdio_callback_args = NULL;
 *******************************************************************************/
 static void cyhal_sdio_interrupts_dispatcher_IRQHandler(void)
 {
-    if (cyhal_sdio_callback != NULL)
+    if ((cyhal_sdio_callback != NULL) && (cyhal_sdio_config_struct->irq_cause != 0U))
     {
         (void)(cyhal_sdio_callback)(cyhal_sdio_callback_args, (cyhal_sdio_irq_event_t) cyhal_sdio_config_struct->irq_cause);
     }
@@ -598,6 +598,9 @@ cy_rslt_t cyhal_sdio_init(cyhal_sdio_t *obj, cyhal_gpio_t cmd, cyhal_gpio_t clk,
                 obj->frequencyhal_hz = CY_HAL_SDIO_DEF_FREQ;
                 obj->block_size   = CY_HAL_SDIO_64B;
 
+                /* Initialize interrupt cause */
+                obj->irq_cause = 0u;
+
                 retVal = cyhal_hwmgr_set_configured(udbRsc.type, udbRsc.block_num, udbRsc.channel_num);
             }
         }
@@ -660,6 +663,7 @@ cy_rslt_t cyhal_sdio_free(cyhal_sdio_t *obj)
  * @param[in,out] obj    The SDIO object
  * @param[in]     config The SDIO configuration to apply
  * @return The status of the configure request
+ *
  */
 cy_rslt_t cyhal_sdio_configure(cyhal_sdio_t *obj, const cyhal_sdio_cfg_t *config)
 {
@@ -668,12 +672,14 @@ cy_rslt_t cyhal_sdio_configure(cyhal_sdio_t *obj, const cyhal_sdio_cfg_t *config
         return CYHAL_SDIO_RSLT_ERR_BAD_PARAM;
     }
 
+    /* Do not change frequency if requested value is zero */
     if (config->frequencyhal_hz != 0)
     {
         SDIO_SetSdClkFrequency(config->frequencyhal_hz);
         obj->frequencyhal_hz = config->frequencyhal_hz;
     }
     
+    /* Do not change block size if requested value is zero */
     if (config->block_size != 0)
     {
         SDIO_SetBlockSize(config->block_size);
@@ -754,7 +760,7 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     stc_sdio_cmd_t cmd;
     en_sdio_result_t status;
     uint32_t cmdResponse;
-    cy_rslt_t retVal = CY_RSLT_SUCCESS;;
+    cy_rslt_t retVal = CY_RSLT_SUCCESS;
 
     if (response != NULL)
     {
@@ -817,6 +823,10 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
  * @param[in]     argument  The argument to the command
  * @param[in]     data      The data to send to the SDIO device
  * @param[in]     length    The number of bytes to send
+ *
+ * \warning
+ * This function is not supported in current implementation.
+ *
  * @return The status of the configure request
  */
 cy_rslt_t cyhal_sdio_transfer_async(cyhal_sdio_t *obj, cyhal_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length)
@@ -838,6 +848,9 @@ cy_rslt_t cyhal_sdio_transfer_async(cyhal_sdio_t *obj, cyhal_transfer_t directio
  * @param[in]  obj  The SDIO peripheral to check
  * @param[out] busy Indication of whether the SDIO is still transmitting
  * @return The status of the is_busy request
+ * 
+ * \warning
+ * This function is not supported in current implementation.
  */
 cy_rslt_t cyhal_sdio_is_busy(const cyhal_sdio_t *obj, bool *busy)
 {
@@ -867,6 +880,10 @@ cy_rslt_t cyhal_sdio_abort_async(const cyhal_sdio_t *obj)
  * @param[in] obj         The SDIO object
  * @param[in] handler     The callback handler which will be invoked when the interrupt fires
  * @param[in] handler_arg Generic argument that will be provided to the handler when called
+ * 
+ * \warning 
+ * Current implementation supports CYHAL_SDIO_CARD_INTERRUPT event only.
+ * 
  * @return The status of the register_irq request
  */
 cy_rslt_t cyhal_sdio_register_irq(cyhal_sdio_t *obj, cyhal_sdio_irq_handler handler, void *handler_arg)
@@ -888,33 +905,48 @@ cy_rslt_t cyhal_sdio_register_irq(cyhal_sdio_t *obj, cyhal_sdio_irq_handler hand
  * @param[in] obj      The SDIO object
  * @param[in] event    The SDIO IRQ type
  * @param[in] enable   Set to non-zero to enable events, or zero to disable them
+ *
+ * This function must be called only after cyhal_sdio_register_irq().
+ *
+ * \warning 
+ * Current implementation supports CYHAL_SDIO_CARD_INTERRUPT event only.
+ *
  * @return The status of the irq_enable request
  */
 cy_rslt_t cyhal_sdio_irq_enable(cyhal_sdio_t *obj, cyhal_sdio_irq_event_t event, bool enable)
 {
-    if (enable)
+    cy_rslt_t retVal = CYHAL_SDIO_RSLT_ERR_BAD_PARAM;
+    
+    /* Only CYHAL_SDIO_CARD_INTERRUPT event can be registered */
+    if (event == CYHAL_SDIO_CARD_INTERRUPT)
     {
-        obj->irq_cause |= event;
-        
-        if (cyhal_sdio_config_struct != NULL)
+        if (enable)
         {
-            cyhal_sdio_config_struct->irq_cause |= event;
-        }
-        
-        SDIO_EnableChipInt();
-    }
-    else
-    {
-        obj->irq_cause &= ~event;
+            obj->irq_cause = event;
 
-        if (cyhal_sdio_config_struct != NULL)
+            if (cyhal_sdio_config_struct != NULL)
+            {
+                cyhal_sdio_config_struct->irq_cause = event;
+            }
+            
+            SDIO_EnableChipInt();
+        }
+        else
         {
-            cyhal_sdio_config_struct->irq_cause &= ~event;
+            obj->irq_cause = 0U;
+
+            if (cyhal_sdio_config_struct != NULL)
+            {
+                cyhal_sdio_config_struct->irq_cause = 0U;
+            }
+
+            SDIO_DisableChipInt();
         }
         
-        SDIO_DisableChipInt();
+        retVal = CY_RSLT_SUCCESS;
     }
-    return CY_RSLT_SUCCESS;
+
+    return retVal;
 }
 
 

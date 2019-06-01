@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_smif_memslot.c
-* \version 1.20.1
+* \version 1.30
 *
 * \brief
 *  This file provides the source code for the memory-level APIs of the SMIF driver.
@@ -53,9 +53,11 @@ static void XipRegInit(SMIF_DEVICE_Type volatile *dev,
 ****************************************************************************//**
 *
 * This function initializes the slots of the memory device in the SMIF
-* configuration. After this initialization, the memory slave devices are
-* automatically mapped into the PSoC memory map. The function needs the SMIF
-* to be running in the memory mode to have the memory mapped into the PSoC
+* configuration. It is only needed if the user wants to use the external memory
+* as memory-mapped to PSoC (XIP mode). 
+* After this initialization, the memory slave devices are automatically
+* mapped into the PSoC memory map. The function needs the SMIF to be
+* running in the memory mode to have the memory mapped into the PSoC
 * address space. This function is typically called in the System initialization
 * phase to initialize all the memory-mapped SMIF devices.
 * This function only configures the memory device portion of the SMIF
@@ -73,12 +75,12 @@ static void XipRegInit(SMIF_DEVICE_Type volatile *dev,
 * \param base
 * The address of the slave-slot device register to initialize.
 *
-* \param context
-* The SMIF internal context structure of the block.
-*
 * \param blockConfig
 * The configuration structure array that configures the SMIF memory device to be
 * mapped into the PSoC memory map. \ref cy_stc_smif_mem_config_t
+*
+* \param context
+* The SMIF internal context structure of the block.
 *
 * \return The memory slot initialization status.
 *       - \ref CY_SMIF_SUCCESS
@@ -295,11 +297,11 @@ void Cy_SMIF_Memslot_DeInit(SMIF_Type *base)
 * \param base
 * Holds the base address of the SMIF block registers.
 *
-* \param context
-* The internal SMIF context data. \ref cy_stc_smif_context_t
-*
 * \param memDevice
 * The device to which the command is sent.
+*
+* \param context
+* The internal SMIF context data. \ref cy_stc_smif_context_t
 *
 * \return A status of the command transmission.
 *       - \ref CY_SMIF_SUCCESS
@@ -345,11 +347,11 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdWriteEnable(SMIF_Type *base,
 * \param base
 * Holds the base address of the SMIF block registers.
 *
-* \param context
-* The internal SMIF context data. \ref cy_stc_smif_context_t
-*
 * \param memDevice
 * The device to which the command is sent.
+*
+* \param context
+* The internal SMIF context data. \ref cy_stc_smif_context_t
 *
 * \return A status of the command transmission.
 *       - \ref CY_SMIF_SUCCESS
@@ -396,11 +398,11 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdWriteDisable(SMIF_Type *base,
 * \param base
 * Holds the base address of the SMIF block registers.
 *
-* \param context
-* The internal SMIF context data.
-*
 * \param memDevice
 *  The device to which the command is sent.
+*
+* \param context
+* The internal SMIF context data.
 *
 * \return A status of the memory device.
 *       - True - The device is busy or a timeout occurs.
@@ -446,11 +448,11 @@ bool Cy_SMIF_Memslot_IsBusy(SMIF_Type *base, cy_stc_smif_mem_config_t *memDevice
 * \param base
 * Holds the base address of the SMIF block registers.
 *
-* \param context
-* The internal SMIF context data.
-*
 * \param memDevice
 * The device to which the command is sent.
+*
+* \param context
+* The internal SMIF context data.
 *
 * \return A status of the command.
 *   - \ref CY_SMIF_SUCCESS
@@ -543,9 +545,6 @@ cy_en_smif_status_t Cy_SMIF_Memslot_QuadEnable(SMIF_Type *base,
 * \param base
 * Holds the base address of the SMIF block registers.
 *
-* \param context
-* The internal SMIF context data.
-*
 * \param memDevice
 * The device to which the command is sent.
 *
@@ -554,6 +553,9 @@ cy_en_smif_status_t Cy_SMIF_Memslot_QuadEnable(SMIF_Type *base,
 *
 * \param command
 * The command required to read the status/configuration register.
+*
+* \param context
+* The internal SMIF context data.
 *
 * \return A status of the command reception.
 *       - \ref CY_SMIF_SUCCESS
@@ -602,9 +604,6 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdReadSts(SMIF_Type *base,
 * \param base
 * Holds the base address of the SMIF block registers.
 *
-* \param context
-* The internal SMIF context data. \ref cy_stc_smif_context_t
-*
 * \param memDevice
 * The device to which the command is sent.
 *
@@ -612,7 +611,10 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdReadSts(SMIF_Type *base,
 * The status to write into the status register.
 *
 * \param command
-* The command to write into the status/configuration register.              
+* The command to write into the status/configuration register.
+*
+* \param context
+* The internal SMIF context data. \ref cy_stc_smif_context_t              
 *
 * \return A status of the command transmission.
 *       - \ref CY_SMIF_SUCCESS
@@ -662,11 +664,11 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdWriteSts(SMIF_Type *base,
 * \param base
 * Holds the base address of the SMIF block registers.
 *
-* \param context
-* The internal SMIF context data. \ref cy_stc_smif_context_t
-*
 * \param memDevice
 * The device to which the command is sent
+*
+* \param context
+* The internal SMIF context data. \ref cy_stc_smif_context_t
 *
 * \return A status of the command transmission.
 *       - \ref CY_SMIF_SUCCESS
@@ -707,14 +709,14 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdChipErase(SMIF_Type *base,
 * \param base
 * Holds the base address of the SMIF block registers.
 *
-* \param context
-* The internal SMIF context data. \ref cy_stc_smif_context_t
-*
 * \param memDevice
 * The device to which the command is sent.
 *
 * \param sectorAddr
 * The sector address to erase.
+*
+* \param context
+* The internal SMIF context data. \ref cy_stc_smif_context_t
 *
 * \return A status of the command transmission.
 *       - \ref CY_SMIF_SUCCESS
@@ -765,9 +767,6 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdSectorErase(SMIF_Type *base,
 * \param base
 * Holds the base address of the SMIF block registers.
 *
-* \param context
-* The internal SMIF context data.
-*
 * \param memDevice
 * The device to which the command is sent.
 *
@@ -784,7 +783,6 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdSectorErase(SMIF_Type *base,
 * the FIFO transaction, this could either stall or timeout the operation 
 * \ref Cy_SMIF_TransmitData().
 *
-*
 * \param size
 * The size of data to program. The user must ensure that the data size
 * does not exceed the page size.
@@ -792,6 +790,9 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdSectorErase(SMIF_Type *base,
 * \param cmdCmpltCb
 * The callback function to call after the transfer completion. NULL interpreted
 * as no callback.
+*
+* \param context
+* The internal SMIF context data.
 *
 * \return A status of a transmission.
 *       - \ref CY_SMIF_SUCCESS
@@ -871,9 +872,6 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdProgram(SMIF_Type *base,
 * \param base
 * Holds the base address of the SMIF block registers.
 *
-* \param context
-* The internal SMIF context data.
-*
 * \param memDevice
 * The device to which the command is sent.
 *
@@ -896,6 +894,9 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdProgram(SMIF_Type *base,
 * \param cmdCmpltCb
 * The callback function to call after the transfer completion. NULL interpreted
 * as no callback.
+*
+* \param context
+* The internal SMIF context data.
 *
 * \return A status of the transmission.
 *       - \ref CY_SMIF_SUCCESS
@@ -988,9 +989,6 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdRead(SMIF_Type *base,
 * \param base
 * Holds the base address of the SMIF block registers.
 *
-* \param context
-* The internal SMIF context data.
-*
 * \param device
 * The device structure instance declared by the user. This is where the detected
 * parameters are stored and returned.
@@ -1000,6 +998,9 @@ cy_en_smif_status_t Cy_SMIF_Memslot_CmdRead(SMIF_Type *base,
 *
 * \param dataSelect
 * The data line selection options for a slave device.
+*
+* \param context
+* The internal SMIF context data.
 *
 * \return A status of the transmission.
 *       - \ref CY_SMIF_SUCCESS

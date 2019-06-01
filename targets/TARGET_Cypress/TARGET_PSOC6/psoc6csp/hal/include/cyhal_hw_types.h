@@ -387,11 +387,14 @@ typedef struct {
 typedef struct {
 #ifdef CY_IP_MXUSBFS
     USBFS_Type*                     base;
-    cy_stc_usbfs_dev_drv_context_t* context;
+    cy_stc_usbfs_dev_drv_context_t  context;
     cyhal_resource_inst_t           resource;
     cyhal_gpio_t                    pin_dp;
     cyhal_gpio_t                    pin_dm;
-    /* TODO: complete definition during implementation */
+    
+    // Allocate for 8 data endpoints and 1 for contorol endpoint
+    uint8_t *rd_data[CY_USBFS_DEV_DRV_NUM_EPS_MAX + 1U];
+    uint32_t rd_size[CY_USBFS_DEV_DRV_NUM_EPS_MAX + 1U];
 #else
     void *empty;
 #endif

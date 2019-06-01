@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_usbfs_dev_drv_reg.h
-* \version 1.10
+* \version 2.0
 *
 * Provides register access API implementation of the USBFS driver.
 *
@@ -196,7 +196,7 @@ __STATIC_INLINE void     Cy_USBFS_Dev_Drv_FlushInBuffer (USBFS_Type *base, uint3
 * \{
 */
 __STATIC_INLINE void     Cy_USBFS_Dev_Drv_SetEpType  (USBFS_Type *base, bool inDirection, uint32_t endpoint);
-__STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetSofNubmer(USBFS_Type *base);
+__STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetSofNubmer(USBFS_Type const *base);
 /** \} group_usbfs_drv_drv_reg_misc */
 
 
@@ -1516,7 +1516,7 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_SetEpType(USBFS_Type *base, bool inDirecti
 * The SOF frame number.
 *
 *******************************************************************************/
-__STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetSofNubmer(USBFS_Type *base)
+__STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetSofNubmer(USBFS_Type const *base)
 {
     return _FLD2VAL(USBFS_USBDEV_SOF16_FRAME_NUMBER16, USBFS_DEV_SOF16(base));
 }
