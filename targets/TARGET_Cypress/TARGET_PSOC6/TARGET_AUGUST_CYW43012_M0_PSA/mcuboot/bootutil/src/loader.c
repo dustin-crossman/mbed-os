@@ -64,14 +64,17 @@
 *
 ********************************************************************************/
 
+#ifdef MCUBOOT_HAVE_ASSERT_H
+#include "mcuboot_config/mcuboot_assert.h"
+#else
 #include <assert.h>
+#endif
 #include <stddef.h>
 #include <stdbool.h>
 #include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 #include <hal/hal_flash.h>
-#include <os/os_malloc.h>
 #include "bootutil/bootutil.h"
 #include "bootutil/image.h"
 #include "bootutil_priv.h"

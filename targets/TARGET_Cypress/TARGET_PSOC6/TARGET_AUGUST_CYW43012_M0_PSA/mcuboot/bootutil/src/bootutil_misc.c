@@ -17,7 +17,11 @@
  * under the License.
  */
 
+#ifdef MCUBOOT_HAVE_ASSERT_H
+#include "mcuboot_config/mcuboot_assert.h"
+#else
 #include <assert.h>
+#endif
 #include <string.h>
 #include <inttypes.h>
 #include <stddef.h>
