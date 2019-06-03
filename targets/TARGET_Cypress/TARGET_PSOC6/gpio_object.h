@@ -83,7 +83,7 @@ static inline int gpio_is_connected(const gpio_t *obj)
  */
 static inline PinName port_pin(PortName port, int pin_n)
 {
-    return (PinName)CY_GET_GPIO(port, pin_n);
+    return (PinName)CYHAL_GET_GPIO(port, pin_n);
 }
 
 
