@@ -59,10 +59,8 @@
 * so agrees to indemnify Cypress against all liability.
 *
 ********************************************************************************/
-#include "flash.h"
 #include <stdbool.h>
 
-#include "cy_flash.h"
 #include <flash_map/flash_map.h>
 #include <hal/hal_flash.h>
 #include <sysflash/sysflash.h>
@@ -72,7 +70,11 @@
 
 #include "bootutil/bootutil_log.h"
 
+#include "flash.h"
 #include "flash_psoc6.h"
+#include "flash_smif.h"
+#include "cy_flash.h"
+#include "cy_pdl.h"
 /* The following 4 macros are taken from zephyr project, util.h file. */
 
 /*
@@ -225,28 +227,61 @@ void zephyr_flash_area_warn_on_open(void)
 int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
             uint32_t len)
 {
-    BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);    
-    return psoc6_flash_read(area->fa_off + off, dst, len);
+    int rc = 0;
+    uint32_t addr = area->fa_off + off;
+
+    BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
+    if(IS_FLASH_SMIF(addr))
+    {
+        rc = Flash_SMIF_ReadMemory(SMIF0             /* SMIF_Type *baseaddr*/,
+                                    &QSPIContext   /* cy_stc_smif_context_t *smifContext*/,
+                                    dst             /* uint8_t rxBuffer[]*/,
+                                    len             /* uint32_t rxSize*/,
+                                    &addr           /* uint8_t *address */);
+    }
+    else
+    {
+        rc = psoc6_flash_read(addr, dst, len);
+    }
+    return rc;
 }
 
 int flash_area_write(const struct flash_area *area, uint32_t off, const void *src,
              uint32_t len)
 {
     int rc = 0;
+    uint32_t addr = area->fa_off + off;
 
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
-    rc = psoc6_flash_write(area->fa_off + off, src, len);
-
+    if(IS_FLASH_SMIF(addr))
+    {
+        rc = Flash_SMIF_WriteMemory(SMIF0    /* SMIF_Type *baseaddr */,
+                                    &QSPIContext       /* cy_stc_smif_context_t *smifContext */,
+                                    src     /* uint8_t txBuffer[] */,
+                                    len     /* uint32_t txSize */,
+                                    &addr   /* uint8_t *address */);
+    }
+    else
+    {
+        rc = psoc6_flash_write(area->fa_off + off, src, len);
+    }
     return rc;
 }
 
 int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
 {
     int rc;
+    uint32_t addr = area->fa_off + off;
 
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
-    rc = psoc6_flash_erase(area->fa_off + off, len);
-
+    if(IS_FLASH_SMIF(addr))
+    {
+        // TODO: implement something useful
+    }
+    else
+    {
+        rc = psoc6_flash_erase(area->fa_off + off, len);
+    }
     return rc;
 }
 

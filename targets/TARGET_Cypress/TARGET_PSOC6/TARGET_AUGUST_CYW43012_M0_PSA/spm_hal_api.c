@@ -213,7 +213,7 @@ void spm_hal_start_nspe(void)
 
     cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
 
-    qspi_status = QSPI_Start();
+    qspi_status = Flash_SMIF_QSPI_Start();
 
     if(0 != qspi_status)
     {
