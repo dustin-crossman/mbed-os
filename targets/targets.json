@@ -8447,6 +8447,7 @@
             "MCUBOOT_POLICY=1",
             "MCUBOOT_LOG_LEVEL=0",
             "MCUBOOT_USE_FLASHBOOT_CRYPTO",
+            "MCUBOOT_HAVE_ASSERT_H",
             "CONFIG_FLASH_PAGE_LAYOUT"
         ],
         "deliver_to_target": "AUGUST_CYW43012_PSA",
