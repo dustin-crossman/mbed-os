@@ -86,77 +86,77 @@ static void ioss_interrupts_gpio_14_IRQHandler (void) __attribute__((unused));
 
 static void ioss_interrupts_gpio_0_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_0);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_0);
 }
 
 static void ioss_interrupts_gpio_1_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_1);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_1);
 }
 
 static void ioss_interrupts_gpio_2_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_2);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_2);
 }
 
 static void ioss_interrupts_gpio_3_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_3);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_3);
 }
 
 static void ioss_interrupts_gpio_4_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_4);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_4);
 }
 
 static void ioss_interrupts_gpio_5_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_5);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_5);
 }
 
 static void ioss_interrupts_gpio_6_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_6);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_6);
 }
 
 static void ioss_interrupts_gpio_7_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_7);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_7);
 }
 
 static void ioss_interrupts_gpio_8_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_8);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_8);
 }
 
 static void ioss_interrupts_gpio_9_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_9);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_9);
 }
 
 static void ioss_interrupts_gpio_10_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_10);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_10);
 }
 
 static void ioss_interrupts_gpio_11_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_11);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_11);
 }
 
 static void ioss_interrupts_gpio_12_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_12);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_12);
 }
 
 static void ioss_interrupts_gpio_13_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_13);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_13);
 }
 
 static void ioss_interrupts_gpio_14_IRQHandler (void)
 {
-    ioss_interrupts_dispatcher_IRQHandler(CY_PORT_14);
+    ioss_interrupts_dispatcher_IRQHandler(CYHAL_PORT_14);
 }
 
 static void (*ioss_interrupts_dispatcher_table[IOSS_GPIO_GPIO_PORT_NR])(void) =
