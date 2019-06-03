@@ -211,6 +211,7 @@ void spm_hal_start_nspe(void)
     struct boot_rsp rsp;
     int rc = 0;
 
+#ifdef MCUBOOT_USE_SMIF_STAGE
     cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
 
     qspi_status = Flash_SMIF_QSPI_Start();
@@ -219,6 +220,7 @@ void spm_hal_start_nspe(void)
     {
          BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
     }
+#endif
 
     boot_flash_device = (struct device*)&psoc6_flash_device;
 

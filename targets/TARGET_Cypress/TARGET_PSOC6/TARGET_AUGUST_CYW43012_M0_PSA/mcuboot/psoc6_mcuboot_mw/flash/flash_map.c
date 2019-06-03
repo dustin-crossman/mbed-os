@@ -229,8 +229,8 @@ int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
 {
     int rc = 0;
     uint32_t addr = area->fa_off + off;
-
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
+#ifdef MCUBOOT_USE_SMIF_STAGE
     if(IS_FLASH_SMIF(addr))
     {
         rc = Flash_SMIF_ReadMemory(SMIF0             /* SMIF_Type *baseaddr*/,
@@ -240,6 +240,7 @@ int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
                                     &addr           /* uint8_t *address */);
     }
     else
+#endif
     {
         rc = psoc6_flash_read(addr, dst, len);
     }
@@ -251,8 +252,8 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
 {
     int rc = 0;
     uint32_t addr = area->fa_off + off;
-
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
+#ifdef MCUBOOT_USE_SMIF_STAGE
     if(IS_FLASH_SMIF(addr))
     {
         rc = Flash_SMIF_WriteMemory(SMIF0    /* SMIF_Type *baseaddr */,
@@ -262,6 +263,7 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
                                     &addr   /* uint8_t *address */);
     }
     else
+#endif
     {
         rc = psoc6_flash_write(area->fa_off + off, src, len);
     }
@@ -272,13 +274,14 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
 {
     int rc;
     uint32_t addr = area->fa_off + off;
-
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
+#ifdef MCUBOOT_USE_SMIF_STAGE
     if(IS_FLASH_SMIF(addr))
     {
         // TODO: implement something useful
     }
     else
+#endif
     {
         rc = psoc6_flash_erase(area->fa_off + off, len);
     }
