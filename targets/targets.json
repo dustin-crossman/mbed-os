@@ -8312,8 +8312,7 @@
             "PU_ENABLE",
             "MCUBOOT_POLICY=1",
             "MCUBOOT_LOG_LEVEL=0",
-            "MCUBOOT_USE_FLASHBOOT_CRYPTO",
-            "CONFIG_FLASH_PAGE_LAYOUT"
+            "MCUBOOT_USE_FLASHBOOT_CRYPTO"
         ],
         "deliver_to_target": "CY8CPROTO_064_SB_PSA",
         "delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_CY8CPROTO_064_SB_PSA/prebuilt",
