@@ -24,6 +24,8 @@
 #include "spm_internal.h"
 #include "cy_device.h"
 
+#include "flash_smif.h"
+
 #ifdef PU_ENABLE
 #include "cyprotection_config.h"
 #endif // PU_ENABLE
@@ -208,7 +210,16 @@ void spm_hal_start_nspe(void)
     /* MCUBoot integration starts here */
     struct boot_rsp rsp;
     int rc = 0;
-   
+
+    cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
+
+    qspi_status = QSPI_Start();
+
+    if(0 != qspi_status)
+    {
+         BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
+    }
+
     boot_flash_device = (struct device*)&psoc6_flash_device;
 
 #if(MCUBOOT_POLICY == MCUBOOT_POLICY_JWT)
