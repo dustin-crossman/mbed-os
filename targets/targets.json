@@ -8260,6 +8260,7 @@
         "components_add": ["SPM_MAILBOX", "FLASHIAP"],
         "device_has_remove": ["TRNG", "CRC"],
         "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
+        "macros_remove": ["MBEDTLS_CONFIG_HW_SUPPORT"],
         "hex_filename": "psa_release_1.0.hex",
         "overrides": {
             "secure-rom-start": "0x10000000",
@@ -8342,6 +8343,7 @@
         "components_add": ["SPM_MAILBOX", "FLASHIAP"],
         "device_has_remove": ["TRNG", "CRC"],
         "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
+        "macros_remove": ["MBEDTLS_CONFIG_HW_SUPPORT"],
         "hex_filename": "psa_release_1.0.hex",
         "post_binary_hook": {
             "function": "PSOC6Code.sign_complete"
