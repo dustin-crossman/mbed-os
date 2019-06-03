@@ -59,7 +59,11 @@
 *
 ********************************************************************************/
 
+#ifdef MCUBOOT_HAVE_ASSERT_H
+#include "mcuboot_config/mcuboot_assert.h"
+#else
 #include <assert.h>
+#endif
 #include <stddef.h>
 #include <inttypes.h>
 #include <string.h>

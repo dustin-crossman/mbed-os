@@ -76,6 +76,6 @@ int psoc6_flash_write_hal(uint8_t data[],
                              uint32_t address,
                              uint32_t len);
 
-const struct flash_driver_api psoc6_flash_api;
+extern const struct flash_driver_api psoc6_flash_api;
 
 #endif /* FLASH_PSOC6_H_ */
