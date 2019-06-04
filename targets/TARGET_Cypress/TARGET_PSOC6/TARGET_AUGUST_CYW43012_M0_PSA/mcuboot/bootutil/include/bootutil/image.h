@@ -145,8 +145,10 @@ struct image_tlv {
     uint16_t it_len;    /* Data length (not including TLV header). */
 };
 
+#if !defined(__GNUC__) /* not GCC */
 _Static_assert(sizeof(struct image_header) == IMAGE_HEADER_SIZE,
                "struct image_header not required size");
+#endif
 
 #if defined(MCUBOOT_USE_FLASHBOOT_CRYPTO)
 int bootutil_img_validate(struct image_header *hdr,
