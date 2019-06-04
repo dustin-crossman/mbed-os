@@ -237,9 +237,11 @@ void spm_hal_start_nspe(void)
          BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
     }
 #if defined(MCUBOOT_USE_SMIF_XIP)
+    BOOT_LOG_INF("SMIF Memory Mode");
     /* Forcing default mode to Memory/XIP. */
     Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
 #else
+    BOOT_LOG_INF("SMIF Normal Mode");
     /* Default mode is Memory/XIP. Switching to Normal/CMD */
     Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
 #endif

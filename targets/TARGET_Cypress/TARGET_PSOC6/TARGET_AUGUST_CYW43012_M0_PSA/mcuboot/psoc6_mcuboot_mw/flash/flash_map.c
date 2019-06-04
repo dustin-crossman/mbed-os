@@ -236,6 +236,7 @@ int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
     uint8_t addrBuf[4];
     if(IS_FLASH_SMIF(addr))
     {
+        BOOT_LOG_INF("Area Read from SMIF, address %x", addr);
         /* Default mode is Memory/XIP. Switching to Normal/CMD */
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
         Flash_SMIF_GetAddrBuff(addr, addrBuf)
@@ -269,6 +270,7 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
         /* Default mode is Memory/XIP. Switching to Normal/CMD */
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
 #endif
+        BOOT_LOG_INF("Area Write to SMIF, address %x", addr);
         Flash_SMIF_GetAddrBuff(addr, addrBuf);
         rc = Flash_SMIF_WriteMemory(SMIF0    /* SMIF_Type *baseaddr */,
                                     &QSPIContext       /* cy_stc_smif_context_t *smifContext */,
@@ -304,6 +306,7 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
         uint8_t zero_buff[SMIF_ZERO_BUFF_SIZE];
         uint32_t buff_num, rem_num, cur_addr;
 
+        BOOT_LOG_INF("Area Erase to SMIF, address %x", addr);
         /* Zeroise data on external Flash instead of Erasing */
         memset(zero_buff, 0x00, sizeof(zero_buff));
 
