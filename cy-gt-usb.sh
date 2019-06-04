@@ -57,9 +57,17 @@ mbed config ARMC6_PATH "C:\Program Files\ARMCompiler6.11\bin"
 mbed config --list
 
 echo "Compiling of Cypress USB Device support files. "
-mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain GCC_ARM --target CY8CKIT_062_WIFI_BT -v
-mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain IAR --target CY8CKIT_062_WIFI_BT -v
-mbed compile --library --clean --no-archive --source usb/device/targets/TARGET_Cypress/TARGET_PSOC6 --profile werror.json --toolchain ARMC6 --target CY8CKIT_062_WIFI_BT -v
+#mbed test --compile -n TESTS-usb_device-* --toolchain GCC_ARM --target NUCLEO_F767ZI
+#mbed test --run --toolchain GCC_ARM --target NUCLEO_F767ZI
 
+
+mbed test --compile -n TESTS-usb_device-* --toolchain GCC_ARM --target CY8CKIT_062_WIFI_BT -vv
+mbed test --run --toolchain GCC_ARM --target CY8CKIT_062_WIFI_BT
+#
+#mbed test --compile -n TESTS-usb_device-* --toolchain IAR --target CY8CKIT_062_WIFI_BT
+#mbed test --run --toolchain IAR --target CY8CKIT_062_WIFI_BT
+#
+#mbed test --compile -n TESTS-usb_device-* --toolchain ARMC6 --target CY8CKIT_062_WIFI_BT
+#mbed test --run --toolchain ARMC6 --target CY8CKIT_062_WIFI_BT
 
 echo "... done"
