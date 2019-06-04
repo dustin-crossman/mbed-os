@@ -33,6 +33,8 @@ cy_stc_smif_context_t QSPIContext;
 
 void Flash_SMIF_Interrupt_User(void);
 
+void Flash_SMIF_GetAddrBuff(uint32_t address, uint8_t * addrBuf);
+
 /* QSPI initialization */
 cy_en_smif_status_t Flash_SMIF_QSPI_Start(void);
 
