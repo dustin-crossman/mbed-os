@@ -28,15 +28,14 @@ int32_t flash_init(flash_t *obj)
     if (CY_RSLT_SUCCESS != cyhal_flash_init(&(obj->flash))) {
         return -1;
     }
-    if (CY_RSLT_SUCCESS != cyhal_flash_get_info(&(obj->flash), &(obj->info))) {
-        return -1;
-    }
+    cyhal_flash_get_info(&(obj->flash), &(obj->info));
     return 0;
 }
 
 int32_t flash_free(flash_t *obj)
 {
-    return CY_RSLT_SUCCESS == cyhal_flash_free(&(obj->flash)) ? 0 : -1;
+    cyhal_flash_free(&(obj->flash));
+    return 0;
 }
 
 int32_t flash_erase_sector(flash_t *obj, uint32_t address)

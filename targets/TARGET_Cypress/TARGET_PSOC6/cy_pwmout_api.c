@@ -39,9 +39,7 @@ void pwmout_init(pwmout_t *obj, PinName pin)
 
 void pwmout_free(pwmout_t *obj)
 {
-    if (CY_RSLT_SUCCESS != cyhal_pwm_free(&(obj->hal_pwm))) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_PWM, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_pwm_free");
-    }
+    cyhal_pwm_free(&(obj->hal_pwm));
 }
 
 void pwmout_write(pwmout_t *obj, float percent)

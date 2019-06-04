@@ -39,11 +39,7 @@ float analogin_read(analogin_t *obj)
 
 uint16_t analogin_read_u16(analogin_t *obj)
 {
-    uint16_t value;
-    if (CY_RSLT_SUCCESS != cyhal_adc_read_u16(&(obj->hal_adc), &value)) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_ANALOG, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_adc_read");
-    }
-    return value;
+    return cyhal_adc_read_u16(&(obj->hal_adc));
 }
 
 const PinMap *analogin_pinmap(void)

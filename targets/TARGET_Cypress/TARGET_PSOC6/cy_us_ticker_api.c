@@ -75,9 +75,7 @@ void us_ticker_init(void)
             MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_timer_set_cfg");
         }
         Cy_TCPWM_ClearInterrupt(cy_us_timer.base, cy_us_timer.resource.channel_num, CY_TCPWM_INT_ON_CC_OR_TC);
-        if (CY_RSLT_SUCCESS != cyhal_timer_register_irq(&cy_us_timer, CY_US_TICKER_IRQ_PRIORITY, &cy_us_ticker_irq_handler, NULL)) {
-            MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_timer_register_irq");
-        }
+        cyhal_timer_register_irq(&cy_us_timer, CY_US_TICKER_IRQ_PRIORITY, &cy_us_ticker_irq_handler, NULL);
         if (CY_RSLT_SUCCESS != cyhal_timer_start(&cy_us_timer)) {
             MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_timer_start");
         }
@@ -98,9 +96,7 @@ void us_ticker_free(void)
         if (CY_RSLT_SUCCESS != cyhal_timer_stop(&cy_us_timer)) {
             MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_timer_stop");
         }
-        if (CY_RSLT_SUCCESS != cyhal_timer_free(&cy_us_timer)) {
-            MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_timer_free");
-        }
+        cyhal_timer_free(&cy_us_timer);
     }
 }
 
@@ -116,18 +112,14 @@ void us_ticker_set_interrupt(timestamp_t timestamp)
     Cy_TCPWM_Counter_SetCompare0(cy_us_timer.base, cy_us_timer.resource.channel_num, timestamp);
     if (CY_TCPWM_INT_NONE == Cy_TCPWM_GetInterruptMask(cy_us_timer.base, cy_us_timer.resource.channel_num)) {
         Cy_TCPWM_ClearInterrupt(cy_us_timer.base, cy_us_timer.resource.channel_num, CY_TCPWM_INT_ON_CC_OR_TC);
-        if (CY_RSLT_SUCCESS != cyhal_timer_irq_enable(&cy_us_timer, CYHAL_TIMER_IRQ_CAPTURE_COMPARE, true)) {
-            MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_timer_irq_enable");
-        }
+        cyhal_timer_irq_enable(&cy_us_timer, CYHAL_TIMER_IRQ_CAPTURE_COMPARE, true);
     }
 }
 
 void us_ticker_disable_interrupt(void)
 {
     MBED_ASSERT(cy_us_ticker_initialized);
-    if (CY_RSLT_SUCCESS != cyhal_timer_irq_enable(&cy_us_timer, CYHAL_TIMER_IRQ_CAPTURE_COMPARE, false)) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_timer_irq_enable");
-    }
+    cyhal_timer_irq_enable(&cy_us_timer, CYHAL_TIMER_IRQ_CAPTURE_COMPARE, false);
 }
 
 void us_ticker_clear_interrupt(void)

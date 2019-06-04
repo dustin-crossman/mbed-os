@@ -36,9 +36,7 @@ void rtc_init(void)
 
 void rtc_free(void)
 {
-    if (CY_RSLT_SUCCESS != cyhal_rtc_free(&cy_rtc)) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_rtc_free");
-    }
+    cyhal_rtc_free(&cy_rtc);
 }
 
 int rtc_isenabled(void)
