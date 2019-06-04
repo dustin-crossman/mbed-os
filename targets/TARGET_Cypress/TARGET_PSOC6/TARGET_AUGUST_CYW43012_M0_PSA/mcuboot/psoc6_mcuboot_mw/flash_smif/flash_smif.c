@@ -46,6 +46,7 @@ void handle_error(void)
 }
 
 
+#ifdef MCUBOOT_USE_SMIF_STAGE
 /*******************************************************************************
 * Function Name: SMIF_Interrupt_User
 ********************************************************************************
@@ -54,10 +55,11 @@ void handle_error(void)
 * memory are processed inside the SMIF ISR.
 *
 *******************************************************************************/
-void SMIF_Interrupt_User(void)
+void Flash_SMIF_Interrupt_User(void)
 {
-//    Cy_SMIF_Interrupt(SMIF_HW, &SMIF_context);
+    Cy_SMIF_Interrupt(SMIF_HW, &SMIF_context);
 }
+#endif
 
 
 /*******************************************************************************
@@ -260,13 +262,12 @@ int Flash_SMIF_ReadMemory(SMIF_Type *baseaddr,
     if(CY_SMIF_SUCCESS == status)
     {
         /* The 4 Page program command */
+        // TODO: this uses non-blocking API
         status = Cy_SMIF_Memslot_CmdRead(baseaddr, smifMemConfigs[0], address, rxBuffer, rxSize, NULL, smifContext);
 //    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdRead failed\r\n",status);
 
-        while(Cy_SMIF_BusyCheck(baseaddr))
-        {
-            /* Wait until the SMIF IP operation is completed. */
-        }
+        /* Wait until receive transaction completed */
+        while(Cy_SMIF_GetTxfrStatus(SMIF0, &QSPIContext) != CY_SMIF_REC_CMPLT);
     }
     /* Send received data to the console */
 //    PrintArray("Received Data: ",rxBuffer, rxSize);

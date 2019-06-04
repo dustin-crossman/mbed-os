@@ -31,6 +31,8 @@ extern "C" {
 /* Create context for peripheral operation */
 cy_stc_smif_context_t QSPIContext;
 
+void Flash_SMIF_Interrupt_User(void);
+
 /* QSPI initialization */
 cy_en_smif_status_t Flash_SMIF_QSPI_Start(void);
 

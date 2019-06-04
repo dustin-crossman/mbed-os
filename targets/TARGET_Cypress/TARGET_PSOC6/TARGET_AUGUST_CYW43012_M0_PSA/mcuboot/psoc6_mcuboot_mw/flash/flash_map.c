@@ -118,6 +118,7 @@ extern struct device *boot_flash_device;
 #define FLASH_DEVICE_ID 	111
 #define FLASH_MAP_ENTRY_MAGIC 0xd00dbeef
 
+#define SMIF_ZERO_BUFF_SIZE (256)
 /*
  * The flash area describes essentially the partition table of the
  * flash.  In this case, it starts with FLASH_AREA_IMAGE_0.
@@ -230,14 +231,21 @@ int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
     int rc = 0;
     uint32_t addr = area->fa_off + off;
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
-#ifdef MCUBOOT_USE_SMIF_STAGE
+    /* Expecting command mode READ will only be used in non-XIP mode per user settings */
+#if (defined(MCUBOOT_USE_SMIF_STAGE) && !defined(MCUBOOT_USE_SMIF_XIP))
+    uint8_t address[4];
     if(IS_FLASH_SMIF(addr))
     {
+        // TODO: add uint32_t to uint8_t [] address converter
+        /* Default mode is Memory/XIP. Switching to Normal/CMD */
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
         rc = Flash_SMIF_ReadMemory(SMIF0             /* SMIF_Type *baseaddr*/,
                                     &QSPIContext   /* cy_stc_smif_context_t *smifContext*/,
                                     dst             /* uint8_t rxBuffer[]*/,
                                     len             /* uint32_t rxSize*/,
-                                    &addr           /* uint8_t *address */);
+                                    address           /* uint8_t *address */);
+        /* Forcing default mode back to Memory/XIP. */
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
     }
     else
 #endif
@@ -254,13 +262,23 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
     uint32_t addr = area->fa_off + off;
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
 #ifdef MCUBOOT_USE_SMIF_STAGE
+    uint8_t address[4];
     if(IS_FLASH_SMIF(addr))
     {
+#ifdef MCUBOOT_USE_SMIF_XIP
+        /* Default mode is Memory/XIP. Switching to Normal/CMD */
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
+#endif
+        // TODO: add uint32_t to uint8_t [] address converter
         rc = Flash_SMIF_WriteMemory(SMIF0    /* SMIF_Type *baseaddr */,
                                     &QSPIContext       /* cy_stc_smif_context_t *smifContext */,
                                     src     /* uint8_t txBuffer[] */,
                                     len     /* uint32_t txSize */,
-                                    &addr   /* uint8_t *address */);
+                                    address   /* uint8_t *address */);
+#ifdef MCUBOOT_USE_SMIF_XIP
+        /* Forcing default mode back to Memory/XIP. */
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
+#endif
     }
     else
 #endif
@@ -272,18 +290,60 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
 
 int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
 {
-    int rc;
+    int rc = 0;
     uint32_t addr = area->fa_off + off;
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
 #ifdef MCUBOOT_USE_SMIF_STAGE
+    uint8_t address[4];
     if(IS_FLASH_SMIF(addr))
     {
-        // TODO: implement something useful
+#ifdef MCUBOOT_USE_SMIF_XIP
+        /* Default mode is Memory/XIP. Switching to Normal/CMD */
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
+#endif
+        uint8_t zero_buff[SMIF_ZERO_BUFF_SIZE];
+        uint32_t buff_num, rem_num, cur_addr;
+
+        /* Zeroise data on external Flash instead of Erasing */
+        memset(zero_buff, 0x00, sizeof(zero_buff));
+
+        /* We do not know how big piece of data needs
+         * to be Erased, so splitting it into 256-bytes
+         * chunks to save zero-buffer RAM */
+        buff_num = len/SMIF_ZERO_BUFF_SIZE;
+        rem_num  = len%SMIF_ZERO_BUFF_SIZE;
+        cur_addr = addr;
+
+        for(;(buff_num>0)&&(0 == rc); buff_num--)
+        {
+            // TODO: add uint32_t to uint8_t [] address converter
+            rc = Flash_SMIF_WriteMemory(SMIF0       /* SMIF_Type *baseaddr */,
+                                        &QSPIContext/* cy_stc_smif_context_t *smifContext */,
+                                        zero_buff   /* uint8_t txBuffer[] */,
+                                        SMIF_ZERO_BUFF_SIZE     /* uint32_t txSize */,
+                                        address   /* uint8_t *address */);
+
+            cur_addr += SMIF_ZERO_BUFF_SIZE;
+        }
+
+        if((0 != rem_num)&&(0 == rc))
+        {
+            // TODO: add uint32_t to uint8_t [] address converter
+            rc = Flash_SMIF_WriteMemory(SMIF0       /* SMIF_Type *baseaddr */,
+                                        &QSPIContext/* cy_stc_smif_context_t *smifContext */,
+                                        zero_buff   /* uint8_t txBuffer[] */,
+                                        rem_num     /* uint32_t txSize */,
+                                        address   /* uint8_t *address */);
+        }
+#ifdef MCUBOOT_USE_SMIF_XIP
+        /* Forcing default mode back to Memory/XIP. */
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
+#endif
     }
     else
 #endif
     {
-        rc = psoc6_flash_erase(area->fa_off + off, len);
+        rc = psoc6_flash_erase(addr, len);
     }
     return rc;
 }

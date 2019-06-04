@@ -214,12 +214,36 @@ void spm_hal_start_nspe(void)
 #ifdef MCUBOOT_USE_SMIF_STAGE
     cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
 
+    /* Configure SMIF interrupt */
+    cy_stc_sysint_t smifIntConfig =
+    {
+       .intrSrc = smif_interrupt_IRQn,     /* SMIF interrupt */
+       .intrPriority = (1u)       /* SMIF interrupt priority */
+    };
+
+    /* SMIF interrupt initialization status */
+    cy_en_sysint_status_t intr_init_status;
+    intr_init_status = Cy_SysInt_Init(&smifIntConfig, Flash_SMIF_Interrupt_User);
+
+    if(0 != intr_init_status)
+    {
+         BOOT_LOG_ERR("SMIF Interrupt initialization failed with error code %i", intr_init_status);
+    }
+
     qspi_status = Flash_SMIF_QSPI_Start();
 
     if(0 != qspi_status)
     {
          BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
     }
+#if defined(MCUBOOT_USE_SMIF_XIP)
+    /* Forcing default mode to Memory/XIP. */
+    Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
+#else
+    /* Default mode is Memory/XIP. Switching to Normal/CMD */
+    Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
+#endif
+
 #endif
 
     boot_flash_device = (struct device*)&psoc6_flash_device;
