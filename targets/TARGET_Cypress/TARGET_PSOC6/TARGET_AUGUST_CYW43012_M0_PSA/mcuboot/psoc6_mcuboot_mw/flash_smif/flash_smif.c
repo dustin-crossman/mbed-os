@@ -133,10 +133,7 @@ cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
         Cy_SMIF_SetDataSelect(SMIF0, CY_SMIF_SLAVE_SELECT_0, CY_SMIF_DATA_SEL0);
         Cy_SMIF_Enable(SMIF0, &QSPIContext);
         BOOT_LOG_INF("SMIF Block Enabled\r\n");
-//    }
-//
-//    if(qspiStatus == CY_SMIF_SUCCESS)
-//    {
+
         /* Map memory device to memory map */
         qspiStatus = Cy_SMIF_Memslot_Init(SMIF0, &smifBlockConfig, &QSPIContext);
     }
@@ -149,6 +146,27 @@ cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
     }
 
     return qspiStatus;
+}
+
+void Flash_SMIF_GetAddrBuff(uint32_t address, uint8_t * addrBuf)
+{
+    uint32_t numAddrBytes = smifMemConfigs[0]->deviceCfg->numOfAddrBytes;
+
+    if(3u == numAddrBytes)
+    {
+        addrBuf[3] = 0x00;
+        addrBuf[2] = CY_LO8(CY_LO16(address));
+        addrBuf[1] = CY_HI8(CY_LO16(address));
+        addrBuf[0] = CY_LO8(CY_HI16(address));
+    }
+    else
+    if(4u == numAddrBytes)
+    {
+        addrBuf[3] = CY_LO8(CY_LO16(address));
+        addrBuf[2] = CY_HI8(CY_LO16(address));
+        addrBuf[1] = CY_LO8(CY_HI16(address));
+        addrBuf[0] = CY_HI8(CY_HI16(address));
+    }
 }
 
 /*******************************************************************************
@@ -254,23 +272,14 @@ int Flash_SMIF_ReadMemory(SMIF_Type *baseaddr,
 
     /* Read data from the external memory configuration register */
     status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, smifMemConfigs[0], &rxBuffer_reg, (uint8_t)cmdreadStsRegQe->command , smifContext);
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdReadSts failed\r\n", status);
-//
-//    printf("Received Data: 0x%X\r\n", (unsigned int) rxBuffer_reg);
-//    printf("\r\nQuad I/O Read (QIOR 0x%0X) \r\n", 0x38);
 
     if(CY_SMIF_SUCCESS == status)
     {
-        /* The 4 Page program command */
-        // TODO: this uses non-blocking API
         status = Cy_SMIF_Memslot_CmdRead(baseaddr, smifMemConfigs[0], address, rxBuffer, rxSize, NULL, smifContext);
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdRead failed\r\n",status);
 
         /* Wait until receive transaction completed */
         while(Cy_SMIF_GetTxfrStatus(SMIF0, &QSPIContext) != CY_SMIF_REC_CMPLT);
     }
-    /* Send received data to the console */
-//    PrintArray("Received Data: ",rxBuffer, rxSize);
     return (int)status;
 }
 
@@ -315,24 +324,13 @@ int Flash_SMIF_WriteMemory(SMIF_Type *baseaddr,
 
     if(CY_SMIF_SUCCESS == status)
     {
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdReadSts failed\r\n", status);
-
-//    printf("Received Data: 0x%X\r\n", (unsigned int) rxBuffer_reg);
-
-    /* Send Write Enable to external memory */
+        /* Send Write Enable to external memory */
         status = Cy_SMIF_Memslot_CmdWriteEnable(baseaddr, smifMemConfigs[0], smifContext);
     }
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdWriteEnable failed\r\n", status);
-
-//    printf("\r\nQuad Page Program (QPP 0x%0X) \r\n", 0x38);
-
     if(CY_SMIF_SUCCESS == status)
     {
         /* Quad Page Program command */
         status = Cy_SMIF_Memslot_CmdProgram(baseaddr, smifMemConfigs[0], address, txBuffer, txSize, NULL, smifContext);
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdProgram failed\r\n", status);
-//
-//    PrintArray("Written Data: ", txBuffer, txSize);
     }
 
     if(CY_SMIF_SUCCESS == status)
@@ -345,9 +343,6 @@ int Flash_SMIF_WriteMemory(SMIF_Type *baseaddr,
         status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, smifMemConfigs[0], &rxBuffer_reg,
                                  (uint8_t)cmdreadStsRegWip->command , smifContext);
     }
-//    CheckStatus("\r\n\r\nSMIF ReadStatusReg failed\r\n", status);
-//
-//    printf("Received Data: 0x%X\r\n", (unsigned int) rxBuffer_reg);
     return (int)status;
 }
 
@@ -379,10 +374,7 @@ int Flash_SMIF_EraseMemory(SMIF_Type *baseaddr, cy_stc_smif_mem_config_t *memCon
     status = Cy_SMIF_Memslot_CmdWriteEnable(baseaddr, memConfig, smifContext);
     if(CY_SMIF_SUCCESS == status)
     {
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdWriteEnable failed\r\n", status);
         status = Cy_SMIF_Memslot_CmdSectorErase(baseaddr, memConfig, address, smifContext);
-
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdSectorErase failed\r\n", status);
 
         /* Wait until the memory is erased */
         while(Cy_SMIF_Memslot_IsBusy(baseaddr, memConfig, smifContext))

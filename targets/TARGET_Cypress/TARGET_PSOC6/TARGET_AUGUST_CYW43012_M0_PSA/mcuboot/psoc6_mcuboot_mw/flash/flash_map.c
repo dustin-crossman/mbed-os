@@ -233,17 +233,17 @@ int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
     /* Expecting command mode READ will only be used in non-XIP mode per user settings */
 #if (defined(MCUBOOT_USE_SMIF_STAGE) && !defined(MCUBOOT_USE_SMIF_XIP))
-    uint8_t address[4];
+    uint8_t addrBuf[4];
     if(IS_FLASH_SMIF(addr))
     {
-        // TODO: add uint32_t to uint8_t [] address converter
         /* Default mode is Memory/XIP. Switching to Normal/CMD */
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
+        Flash_SMIF_GetAddrBuff(addr, addrBuf)
         rc = Flash_SMIF_ReadMemory(SMIF0             /* SMIF_Type *baseaddr*/,
                                     &QSPIContext   /* cy_stc_smif_context_t *smifContext*/,
                                     dst             /* uint8_t rxBuffer[]*/,
                                     len             /* uint32_t rxSize*/,
-                                    address           /* uint8_t *address */);
+                                    addrBuf           /* uint8_t *address */);
         /* Forcing default mode back to Memory/XIP. */
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
     }
@@ -262,19 +262,19 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
     uint32_t addr = area->fa_off + off;
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
 #ifdef MCUBOOT_USE_SMIF_STAGE
-    uint8_t address[4];
+    uint8_t addrBuf[4];
     if(IS_FLASH_SMIF(addr))
     {
 #ifdef MCUBOOT_USE_SMIF_XIP
         /* Default mode is Memory/XIP. Switching to Normal/CMD */
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
 #endif
-        // TODO: add uint32_t to uint8_t [] address converter
+        Flash_SMIF_GetAddrBuff(addr, addrBuf);
         rc = Flash_SMIF_WriteMemory(SMIF0    /* SMIF_Type *baseaddr */,
                                     &QSPIContext       /* cy_stc_smif_context_t *smifContext */,
                                     src     /* uint8_t txBuffer[] */,
                                     len     /* uint32_t txSize */,
-                                    address   /* uint8_t *address */);
+                                    addrBuf   /* uint8_t *address */);
 #ifdef MCUBOOT_USE_SMIF_XIP
         /* Forcing default mode back to Memory/XIP. */
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
@@ -294,7 +294,7 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
     uint32_t addr = area->fa_off + off;
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
 #ifdef MCUBOOT_USE_SMIF_STAGE
-    uint8_t address[4];
+    uint8_t addrBuf[4];
     if(IS_FLASH_SMIF(addr))
     {
 #ifdef MCUBOOT_USE_SMIF_XIP
@@ -316,24 +316,24 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
 
         for(;(buff_num>0)&&(0 == rc); buff_num--)
         {
-            // TODO: add uint32_t to uint8_t [] address converter
+            Flash_SMIF_GetAddrBuff(addr, addrBuf);
             rc = Flash_SMIF_WriteMemory(SMIF0       /* SMIF_Type *baseaddr */,
                                         &QSPIContext/* cy_stc_smif_context_t *smifContext */,
                                         zero_buff   /* uint8_t txBuffer[] */,
                                         SMIF_ZERO_BUFF_SIZE     /* uint32_t txSize */,
-                                        address   /* uint8_t *address */);
+                                        addrBuf   /* uint8_t *address */);
 
             cur_addr += SMIF_ZERO_BUFF_SIZE;
         }
 
         if((0 != rem_num)&&(0 == rc))
         {
-            // TODO: add uint32_t to uint8_t [] address converter
+            Flash_SMIF_GetAddrBuff(addr, addrBuf);
             rc = Flash_SMIF_WriteMemory(SMIF0       /* SMIF_Type *baseaddr */,
                                         &QSPIContext/* cy_stc_smif_context_t *smifContext */,
                                         zero_buff   /* uint8_t txBuffer[] */,
                                         rem_num     /* uint32_t txSize */,
-                                        address   /* uint8_t *address */);
+                                        addrBuf   /* uint8_t *address */);
         }
 #ifdef MCUBOOT_USE_SMIF_XIP
         /* Forcing default mode back to Memory/XIP. */
