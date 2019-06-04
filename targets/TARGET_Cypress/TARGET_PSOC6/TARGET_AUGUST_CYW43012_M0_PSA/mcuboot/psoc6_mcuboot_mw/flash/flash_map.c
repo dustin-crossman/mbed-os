@@ -239,6 +239,7 @@ int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
         BOOT_LOG_INF("Area Read from SMIF, address %x", addr);
         /* Default mode is Memory/XIP. Switching to Normal/CMD */
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
+        addr = addr - smifMemConfigs[0]->baseAddress-FLASH_DEVICE_BASE;
         Flash_SMIF_GetAddrBuff(addr, addrBuf)
         rc = Flash_SMIF_ReadMemory(SMIF0             /* SMIF_Type *baseaddr*/,
                                     &QSPIContext   /* cy_stc_smif_context_t *smifContext*/,
@@ -251,6 +252,7 @@ int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
     else
 #endif
     {
+        BOOT_LOG_INF("Direct Flash Read, address %x", addr);
         rc = psoc6_flash_read(addr, dst, len);
     }
     return rc;
@@ -271,6 +273,7 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
 #endif
         BOOT_LOG_INF("Area Write to SMIF, address %x", addr);
+        addr = addr - smifMemConfigs[0]->baseAddress-FLASH_DEVICE_BASE;
         Flash_SMIF_GetAddrBuff(addr, addrBuf);
         rc = Flash_SMIF_WriteMemory(SMIF0    /* SMIF_Type *baseaddr */,
                                     &QSPIContext       /* cy_stc_smif_context_t *smifContext */,
@@ -285,6 +288,7 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
     else
 #endif
     {
+        BOOT_LOG_INF("Direct Flash Write, address %x", addr);
         rc = psoc6_flash_write(area->fa_off + off, src, len);
     }
     return rc;
@@ -315,11 +319,18 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
          * chunks to save zero-buffer RAM */
         buff_num = len/SMIF_ZERO_BUFF_SIZE;
         rem_num  = len%SMIF_ZERO_BUFF_SIZE;
-        cur_addr = addr;
+        cur_addr = addr - smifMemConfigs[0]->baseAddress-FLASH_DEVICE_BASE;
 
-        for(;(buff_num>0)&&(0 == rc); buff_num--)
+        BOOT_LOG_INF("buff_num %i", buff_num);
+        BOOT_LOG_INF("rem_num %i", rem_num);
+
+        for(;((buff_num>0)&&(0 == rc)); buff_num--)
         {
-            Flash_SMIF_GetAddrBuff(addr, addrBuf);
+            BOOT_LOG_INF("curr_addr %i", cur_addr);
+            BOOT_LOG_INF("buff_num %i", buff_num);
+            BOOT_LOG_INF("rem_num %i", rem_num);
+
+            Flash_SMIF_GetAddrBuff(cur_addr, addrBuf);
             rc = Flash_SMIF_WriteMemory(SMIF0       /* SMIF_Type *baseaddr */,
                                         &QSPIContext/* cy_stc_smif_context_t *smifContext */,
                                         zero_buff   /* uint8_t txBuffer[] */,
@@ -331,7 +342,7 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
 
         if((0 != rem_num)&&(0 == rc))
         {
-            Flash_SMIF_GetAddrBuff(addr, addrBuf);
+            Flash_SMIF_GetAddrBuff(cur_addr, addrBuf);
             rc = Flash_SMIF_WriteMemory(SMIF0       /* SMIF_Type *baseaddr */,
                                         &QSPIContext/* cy_stc_smif_context_t *smifContext */,
                                         zero_buff   /* uint8_t txBuffer[] */,
@@ -346,6 +357,7 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
     else
 #endif
     {
+        BOOT_LOG_INF("Direct Flash Erase, address %x", addr);
         rc = psoc6_flash_erase(addr, len);
     }
     return rc;
