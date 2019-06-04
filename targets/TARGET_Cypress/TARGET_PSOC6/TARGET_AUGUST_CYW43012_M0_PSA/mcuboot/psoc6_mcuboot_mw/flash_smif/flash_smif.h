@@ -26,7 +26,7 @@ extern "C" {
 #define PACKET_SIZE   (64u)     /* The memory Read/Write packet */
 #define TIMEOUT_1_MS  (1000u)
 
-#define IS_FLASH_SMIF(x) ((x)>(smifMemConfigs[0]->baseAddress-FLASH_DEVICE_BASE))
+#define IS_FLASH_SMIF(x) ((x)>=(smifMemConfigs[0]->baseAddress-FLASH_DEVICE_BASE))
 
 /* Create context for peripheral operation */
 cy_stc_smif_context_t QSPIContext;
