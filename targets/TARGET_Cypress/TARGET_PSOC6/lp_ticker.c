@@ -131,47 +131,72 @@ uint32_t lp_ticker_read(void)
 void lp_ticker_set_interrupt(timestamp_t timestamp)
 {
     uint32_t delay;
-    uint16_t c0_count = Cy_MCWDT_GetCount(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER0);
-    uint16_t c1_count = Cy_MCWDT_GetCount(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER1);
-    uint32_t c2_count = Cy_MCWDT_GetCount(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER2);
+    uint16_t c0_current_count = Cy_MCWDT_GetCount(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER0);
+    uint16_t c1_current_count = Cy_MCWDT_GetCount(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER1);
+    uint32_t c2_current_count = Cy_MCWDT_GetCount(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER2);
 
-    uint32_t new_ts = (uint32_t)timestamp;
-
-    delay = new_ts - c2_count;
+    delay = (uint32_t)timestamp - c2_current_count;
     lp_ticker_clear_interrupt();
+
+    /* Use MCWDT C0,C1 and C2 to implement a 32bit free running counter
+       C2 alone can not be used as it does not support interrupt on match feature
+       C2 is used to keep track of time, while C0 and C1 are used to set interrupts
+       To set an interrupt:
+       1. delay = diff between timestamp(time in future) vs current value of C2
+       2. if delay > 2seconds (Max time that can be counted by C0)
+          Yes
+            - use both C0 and C1
+            - Increment C0 by delay % (MCWDT_COUNTER0_MAX_COUNT + 1)
+            - Increment C1 by delay / (MCWDT_COUNTER1_MAX_COUNT + 1)
+            - Special case : In case delay is multiple of (MCWDT_COUNTER0_MAX_COUNT + 1), then
+              delay % (MCWDT_COUNTER0_MAX_COUNT + 1) will be 0, in this case
+              - Increment C0 by c0_current_count -1
+              - Increment C1 by (delay / (MCWDT_COUNTER1_MAX_COUNT + 1)) -1
+          No
+            - Use only C1
+    */
 
     if (delay > MCWDT_COUNTER0_MAX_COUNT) {
         uint32_t c0_increment = delay % (MCWDT_COUNTER0_MAX_COUNT + 1);
-        uint32_t counter0_count = (c0_count + delay) % (MCWDT_COUNTER0_MAX_COUNT + 1);
-        uint32_t counter1_count =  (delay - c0_increment) / (MCWDT_COUNTER1_MAX_COUNT + 1) ;
-        counter1_count = (c1_count + counter1_count) % (MCWDT_COUNTER1_MAX_COUNT + 1);
+        uint32_t c0_count     = (c0_current_count + c0_increment) % (MCWDT_COUNTER0_MAX_COUNT + 1);
+        uint32_t c1_increment = ( delay ) / (MCWDT_COUNTER1_MAX_COUNT + 1);
+        uint32_t c1_count     = (c1_current_count + c1_increment) % (MCWDT_COUNTER1_MAX_COUNT + 1);
 
-        if(counter1_count == 0) {
-            counter1_count = 1;
+        /* Special case - delay is  multiple of (MCWDT_COUNTER0_MAX_COUNT + 1) */
+        if (c0_increment == 0) {
+            c0_count = c0_current_count - 1;
+            c1_count = c1_count -1;
         }
-        if(counter0_count == 0) {
-            counter0_count = 1;
+
+        if(c1_count == 0) {
+            c1_count = 1;
         }
-        Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER1, counter1_count, LPT_MCWDT_DELAY_NO_WAIT);
-        Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER0, counter0_count, LPT_MCWDT_DELAY_NO_WAIT);
+
+        if(c0_count == 0) {
+            c0_count = 1;
+        }
+
+        Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER0, c0_count, LPT_MCWDT_DELAY_NO_WAIT);
+        Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER1, c1_count, LPT_MCWDT_DELAY_NO_WAIT);
         Cy_MCWDT_SetInterruptMask(LPT_MCWDT_UNIT, CY_MCWDT_CTR1);
 
     }
     else {
-        uint16_t counter0_count = c0_count + (uint16_t)delay;
+        uint16_t c0_count = c0_current_count + (uint16_t)delay;
 
         // MCWDT has internal delay of about 1.5 LF clock ticks, so this is the minimum
         // that we can schedule.
         if (delay < 3) {
             // Cheating a bit here.
-            counter0_count = c0_count + 3;
+            c0_count = c0_current_count + 3;
         }
 
-        if(counter0_count == 0) {
-            counter0_count = 1;
+        if(c0_count == 0) {
+            c0_count = 1;
         }
+
         Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER1, MCWDT_COUNTER1_MAX_COUNT, LPT_MCWDT_DELAY_NO_WAIT);
-        Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER0, counter0_count, LPT_MCWDT_DELAY_NO_WAIT);
+        Cy_MCWDT_SetMatch(LPT_MCWDT_UNIT, CY_MCWDT_COUNTER0, c0_count, LPT_MCWDT_DELAY_NO_WAIT);
         Cy_MCWDT_SetInterruptMask(LPT_MCWDT_UNIT, CY_MCWDT_CTR0);
     }
 }
