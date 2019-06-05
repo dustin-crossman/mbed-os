@@ -80,16 +80,25 @@ cy_rslt_t cyhal_rtc_init(cyhal_rtc_t *obj)
     cy_rslt_t rslt = CY_RSLT_SUCCESS;
     if (cyhal_rtc_initialized == CY_RTC_STATE_UNINITIALIZED)
     {
-        static const struct tm initial_time = {
-            .tm_mday = 1,
-            .tm_year = 70,
-            // _rtc_maketime does not use tm_wday or tm_yday
-        };
-        if (CY_RSLT_SUCCESS != (rslt = (cyhal_rtc_write(obj, &initial_time))))
-            return rslt;
+        if (Cy_RTC_IsExternalResetOccurred())
+        {
+            // Reset to default time
+            static const cy_stc_rtc_config_t defaultTime = {
+                .dayOfWeek = CY_RTC_THURSDAY,
+                .date = 1,
+                .month = 1,
+                .year = 70
+            };
+            Cy_RTC_SetDateAndTime(&defaultTime);
+        }
+        else
+        {
+            // Time is already set (possibly after sw reset). Assume century.
+            cyhal_rtc_century = 2000;
+        }
         Cy_RTC_ClearInterrupt(CY_RTC_INTR_CENTURY);
         Cy_RTC_SetInterruptMask(CY_RTC_INTR_CENTURY);
-        static const cy_stc_sysint_t irqCfg = {srss_interrupt_backup_IRQn, CY_RTC_DEFAULT_PRIORITY};
+        static const cy_stc_sysint_t irqCfg = {.intrSrc = srss_interrupt_backup_IRQn, .intrPriority = CY_RTC_DEFAULT_PRIORITY};
         Cy_SysInt_Init(&irqCfg, &cyhal_rtc_internal_handler);
         NVIC_EnableIRQ(srss_interrupt_backup_IRQn);
         Cy_SysPm_RegisterCallback(&cyhal_rtc_pm_cb);
@@ -114,8 +123,10 @@ cy_rslt_t cyhal_rtc_read(cyhal_rtc_t *obj, struct tm *time)
     // The number of days that precede each month of the year, not including Fdb 29
     static const uint16_t CUMULATIVE_DAYS[] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
     cy_stc_rtc_config_t dateTime;
+    uint32_t savedIntrStatus = cyhal_system_critical_section_enter();
     Cy_RTC_GetDateAndTime(&dateTime);
     int year = dateTime.year + cyhal_rtc_century;
+    cyhal_system_critical_section_exit(savedIntrStatus);
     time->tm_sec = dateTime.sec;
     time->tm_min = dateTime.min;
     time->tm_hour = dateTime.hour;
@@ -142,10 +153,19 @@ cy_rslt_t cyhal_rtc_write(cyhal_rtc_t *obj, const struct tm *time)
     .month = time->tm_mon + 1,
     .year = year2digit
     };
-    NVIC_DisableIRQ(srss_interrupt_backup_IRQn);
-    cy_rslt_t rslt = (cy_rslt_t)Cy_RTC_SetDateAndTime(&newtime);
-    cyhal_rtc_century = time->tm_year - year2digit + CY_TM_YEAR_BASE;
-    NVIC_EnableIRQ(srss_interrupt_backup_IRQn);
+    cy_rslt_t rslt;
+    uint32_t retry = 0;
+    static const uint32_t MAX_RETRY = 10, RETRY_DELAY_MS = 1;
+    do {
+        if (retry != 0)
+            Cy_SysLib_Delay(RETRY_DELAY_MS);
+        uint32_t savedIntrStatus = cyhal_system_critical_section_enter();
+        rslt = (cy_rslt_t)Cy_RTC_SetDateAndTime(&newtime);
+        if (rslt == CY_RSLT_SUCCESS)
+            cyhal_rtc_century = time->tm_year - year2digit + CY_TM_YEAR_BASE;
+        cyhal_system_critical_section_exit(savedIntrStatus);
+        ++retry;
+    } while (rslt == CY_RTC_INVALID_STATE && retry < MAX_RETRY);
     while (CY_RTC_BUSY == Cy_RTC_GetSyncStatus()) { }
     if (rslt == CY_RSLT_SUCCESS)
         cyhal_rtc_initialized = CY_RTC_STATE_TIME_SET;
@@ -175,16 +195,16 @@ cy_rslt_t cyhal_rtc_alarm(cyhal_rtc_t *obj, const struct tm *time)
 
 cy_rslt_t cyhal_rtc_register_irq(cyhal_rtc_t *obj, cyhal_rtc_irq_handler handler, void *handler_arg)
 {
-    NVIC_DisableIRQ(srss_interrupt_backup_IRQn);
+    uint32_t savedIntrStatus = cyhal_system_critical_section_enter();
     cyhal_rtc_handler_arg = handler_arg;
     cyhal_rtc_user_handler = handler;
-    NVIC_EnableIRQ(srss_interrupt_backup_IRQn);
+    cyhal_system_critical_section_exit(savedIntrStatus);
     return CY_RSLT_SUCCESS;
 }
 
 cy_rslt_t cyhal_rtc_irq_enable(cyhal_rtc_t *obj, cyhal_rtc_irq_event_t event, bool enable)
 {
-    Cy_RTC_ClearInterrupt(~Cy_RTC_GetInterruptMask());
+    Cy_RTC_ClearInterrupt(CY_RTC_INTR_ALARM1 | CY_RTC_INTR_ALARM2);
     Cy_RTC_SetInterruptMask((enable ? CY_RTC_INTR_ALARM1 : 0) | CY_RTC_INTR_CENTURY);
     return CY_RSLT_SUCCESS;
 }

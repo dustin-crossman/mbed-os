@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_syspm.c
-* \version 4.10
+* \version 4.20
 *
 * This driver provides the source code for API power management.
 *
@@ -294,7 +294,7 @@ static cy_stc_syspm_backup_regs_t bkpRegs;
 * The current power mode. See \ref group_syspm_return_status.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_ReadStatus
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_ReadStatus
 *
 *******************************************************************************/
 uint32_t Cy_SysPm_ReadStatus(void)
@@ -448,7 +448,7 @@ uint32_t Cy_SysPm_ReadStatus(void)
 * CM4 CPU after wakeup from WFE.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_CpuEnterSleep
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_CpuEnterSleep
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_CpuEnterSleep(cy_en_syspm_waitfor_t waitFor)
@@ -675,7 +675,7 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterSleep(cy_en_syspm_waitfor_t waitFor)
 * is settled prior executing the WFI/WFE instruction.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_CpuEnterDeepSleep
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_CpuEnterDeepSleep
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_CpuEnterDeepSleep(cy_en_syspm_waitfor_t waitFor)
@@ -900,7 +900,7 @@ cy_en_syspm_status_t Cy_SysPm_CpuEnterDeepSleep(cy_en_syspm_waitfor_t waitFor)
 * Entered status, see \ref cy_en_syspm_status_t.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_SystemEnterHibernate
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_SystemEnterHibernate
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_SystemEnterHibernate(void)
@@ -1042,7 +1042,7 @@ he LP mode
 * - CY_SYSPM_FAIL - The system LP mode is not entered.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_SystemEnterLp
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_SystemEnterLp
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_SystemEnterLp(void)
@@ -1184,7 +1184,7 @@ cy_en_syspm_status_t Cy_SysPm_SystemEnterLp(void)
 * - CY_SYSPM_FAIL - The system ULP mode is not entered.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_SystemEnterUlp
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_SystemEnterUlp
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_SystemEnterUlp(void)
@@ -1295,7 +1295,7 @@ cy_en_syspm_status_t Cy_SysPm_SystemEnterUlp(void)
 * current mode.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_SystemSetMinRegulatorCurrent
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_SystemSetMinRegulatorCurrent
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_SystemSetMinRegulatorCurrent(void)
@@ -1358,7 +1358,7 @@ cy_en_syspm_status_t Cy_SysPm_SystemSetMinRegulatorCurrent(void)
 *   ready to enter into the normal regulator current mode
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_SystemSetNormalRegulatorCurrent
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_SystemSetNormalRegulatorCurrent
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_SystemSetNormalRegulatorCurrent(void)
@@ -1431,7 +1431,7 @@ cy_en_syspm_status_t Cy_SysPm_SystemSetNormalRegulatorCurrent(void)
 * - False if disable sleep-on-exit feature.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_CpuSleepOnExit
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_CpuSleepOnExit
 *
 *******************************************************************************/
 void Cy_SysPm_CpuSleepOnExit(bool enable)
@@ -1503,7 +1503,7 @@ void Cy_SysPm_CpuSleepOnExit(bool enable)
 * Cy_SysPm_SetHibernateWakeupSource(CY_SYSPM_HIBERNATE_LPCOMP0_LOW, CY_SYSPM_HIBERNATE_LPCOMP0_HIGH);
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_SetHibernateWakeupSource
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_SetHibernateWakeupSource
 *
 *******************************************************************************/
 void Cy_SysPm_SetHibernateWakeupSource(uint32_t wakeupSource)
@@ -1557,7 +1557,7 @@ void Cy_SysPm_SetHibernateWakeupSource(uint32_t wakeupSource)
 * Cy_SysPm_ClearHibernateWakeupSource(CY_SYSPM_HIBERNATE_LPCOMP0_HIGH | CY_SYSPM_HIBERNATE_WDT).
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_ClearHibernateWakeupSource
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_ClearHibernateWakeupSource
 *
 *******************************************************************************/
 void Cy_SysPm_ClearHibernateWakeupSource(uint32_t wakeupSource)
@@ -1676,7 +1676,7 @@ void Cy_SysPm_ClearHibernateWakeupSource(uint32_t wakeupSource)
 * switch.
 * 
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BuckEnable
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BuckEnable
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_BuckEnable(cy_en_syspm_buck_voltage1_t voltage)
@@ -1838,7 +1838,7 @@ cy_en_syspm_status_t Cy_SysPm_BuckEnable(cy_en_syspm_buck_voltage1_t voltage)
 *   the function returns CY_SYSPM_SUCCESS. See \ref cy_en_syspm_status_t.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_BuckSetVoltage1(cy_en_syspm_buck_voltage1_t voltage)
@@ -1934,7 +1934,7 @@ cy_en_syspm_status_t Cy_SysPm_BuckSetVoltage1(cy_en_syspm_buck_voltage1_t voltag
 * - False if the requested output is disabled.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BuckIsOutputEnabled
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BuckIsOutputEnabled
 *
 *******************************************************************************/
 bool Cy_SysPm_BuckIsOutputEnabled(cy_en_syspm_buck_out_t output)
@@ -1986,7 +1986,7 @@ bool Cy_SysPm_BuckIsOutputEnabled(cy_en_syspm_buck_out_t output)
 * the SIMO Buck.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BuckEnableVoltage2
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BuckEnableVoltage2
 *
 *******************************************************************************/
 void Cy_SysPm_BuckEnableVoltage2(void)
@@ -2035,7 +2035,7 @@ void Cy_SysPm_BuckEnableVoltage2(void)
 * SIMO Buck.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_BuckSetVoltage2
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_BuckSetVoltage2
 *
 *******************************************************************************/
 void Cy_SysPm_BuckSetVoltage2(cy_en_syspm_buck_voltage2_t voltage, bool waitToSettle)
@@ -2124,7 +2124,7 @@ void Cy_SysPm_BuckSetVoltage2(cy_en_syspm_buck_voltage2_t voltage, bool waitToSe
 *   the function returns CY_SYSPM_SUCCESS. See \ref cy_en_syspm_status_t.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_VoltageRegulator
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_LdoSetVoltage(cy_en_syspm_ldo_voltage_t voltage)
@@ -2346,65 +2346,77 @@ cy_en_syspm_ldo_mode_t Cy_SysPm_LdoGetMode(void)
 * allocated during power mode transition.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Callback_Func_Declaration
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Callback_Params_Declaration
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Callback_Structure_Declaration
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_Callback_Func_Implementation
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_RegisterCallback
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Callback_Func_Declaration
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Callback_Params_Declaration
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Callback_Structure_Declaration
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_Callback_Func_Implementation
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_RegisterCallback
 *
 *******************************************************************************/
 bool Cy_SysPm_RegisterCallback(cy_stc_syspm_callback_t* handler)
 {
     bool retVal = false;
 
-    /* Verify input */
+    /* Verify the input parameters. */
     if ((handler != NULL) && (handler->callbackParams != NULL) && (handler->callback != NULL))
     {
         uint32_t callbackRootIdx = (uint32_t) handler->type;
-        retVal = true;
 
-        /* Get the required power mode root */
-        cy_stc_syspm_callback_t* curCallback = pmCallbackRoot[callbackRootIdx];
-        cy_stc_syspm_callback_t* lastRegCallback = NULL;
-        
-        /* Search last registered callback item */
-        while (curCallback != NULL)
+        /* If the callback list is not empty. */
+        if (pmCallbackRoot[callbackRootIdx] != NULL)
         {
-            if (curCallback == handler)
+            cy_stc_syspm_callback_t* curCallback = pmCallbackRoot[callbackRootIdx];
+            cy_stc_syspm_callback_t* insertPos  = curCallback;
+
+            /* Find the callback after which the new callback is to be
+             * inserted. Ensure the given callback has not been registered.
+             */
+            while ((NULL != curCallback->nextItm) && (curCallback != handler))
             {
-                /* Do not register already registered callback item */
-                retVal = false;
-                break;
+                curCallback = curCallback->nextItm;
+                /* Callbacks with the same priority are stored in the order
+                 * they are registered.
+                 */
+                if (curCallback->priority <= handler->priority)
+                {
+                    insertPos = curCallback;
+                }
             }
+            /* If the callback has not been registered. */
+            if (curCallback != handler)
+            {
+                /* If the callback is to be inserted at the beginning of the list. */
+                if ((insertPos->prevItm == NULL) && (handler->priority < insertPos->priority))
+                {
+                    handler->nextItm = insertPos;
+                    handler->prevItm = NULL;
+                    handler->nextItm->prevItm = handler;
+                    pmCallbackRoot[callbackRootIdx] = handler;
+                }
+                else
+                {
+                    handler->nextItm = insertPos->nextItm;
+                    handler->prevItm = insertPos;
 
-            /* Safe callback before switching into the next item */
-            lastRegCallback = curCallback;
-
-            curCallback = curCallback->nextItm;
+                    /* If the callback is not inserted at the end of the list. */
+                    if (handler->nextItm != NULL)
+                    {
+                        handler->nextItm->prevItm = handler;
+                    }
+                    insertPos->nextItm = handler;
+                }
+                retVal = true;
+            }
         }
-
-        /* Link requested callback item to the linked list */
-        if (retVal)
+        else
         {
-            if (pmCallbackRoot[callbackRootIdx] == NULL)
-            {
-                /* Link first callback item to the linked list */
-                pmCallbackRoot[callbackRootIdx] = handler;
-            }
-            else
-            {
-                /* Link requested item to previous item */
-                lastRegCallback->nextItm = handler;
-            }
-
-            /* Update links to next and previous callback items of requested
-            *  callback item
-            */
-            handler->prevItm = lastRegCallback;
+            /* The callback list is empty. */
+            pmCallbackRoot[callbackRootIdx] = handler;
             handler->nextItm = NULL;
+            handler->prevItm = NULL;
+            retVal = true;
         }
     }
-
     return retVal;
 }
 
@@ -2426,7 +2438,7 @@ bool Cy_SysPm_RegisterCallback(cy_stc_syspm_callback_t* handler)
 * - False if it was not unregistered or no callbacks are registered.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_UnregisterCallback
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_UnregisterCallback
 *
 *******************************************************************************/
 bool Cy_SysPm_UnregisterCallback(cy_stc_syspm_callback_t const *handler)
@@ -2526,7 +2538,7 @@ bool Cy_SysPm_UnregisterCallback(cy_stc_syspm_callback_t const *handler)
 * - CY_SYSPM_FAIL one of the executed callback(s) returned fail.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_ExecuteCallback
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_ExecuteCallback
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_ExecuteCallback(cy_en_syspm_callback_type_t type, cy_en_syspm_callback_mode_t mode)
@@ -2635,7 +2647,7 @@ cy_en_syspm_status_t Cy_SysPm_ExecuteCallback(cy_en_syspm_callback_type_t type, 
 * configuration becomes effective only after the pins are unfrozen.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_IoUnfreeze
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_IoUnfreeze
 *
 *******************************************************************************/
 void Cy_SysPm_IoUnfreeze(void)
@@ -2680,7 +2692,7 @@ void Cy_SysPm_IoUnfreeze(void)
 *   the function returns CY_SYSPM_SUCCESS. See \ref cy_en_syspm_status_t.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_WriteVoltageBitForFlash
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_WriteVoltageBitForFlash
 *
 *******************************************************************************/
 cy_en_syspm_status_t Cy_SysPm_WriteVoltageBitForFlash(cy_en_syspm_flash_voltage_bit_t value)
@@ -2765,7 +2777,7 @@ cy_en_syspm_status_t Cy_SysPm_WriteVoltageBitForFlash(cy_en_syspm_flash_voltage_
 * The structure where the registers are saved.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_SaveRestoreRegisters
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_SaveRestoreRegisters
 *
 *******************************************************************************/
 void Cy_SysPm_SaveRegisters(cy_stc_syspm_backup_regs_t *regs)
@@ -2805,7 +2817,7 @@ void Cy_SysPm_SaveRegisters(cy_stc_syspm_backup_regs_t *regs)
 * required non-retained registers after Deep Sleep.
 *
 * \funcusage
-* \snippet syspm/4.0/snippet/main.c snippet_Cy_SysPm_SaveRestoreRegisters
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_SaveRestoreRegisters
 *
 *******************************************************************************/
 void Cy_SysPm_RestoreRegisters(cy_stc_syspm_backup_regs_t const *regs)

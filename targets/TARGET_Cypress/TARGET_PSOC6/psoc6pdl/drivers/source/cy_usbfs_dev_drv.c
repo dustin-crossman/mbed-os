@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_usbfs_dev_drv.c
-* \version 1.10
+* \version 2.0
 *
 * Provides general API implementation of the USBFS driver.
 *
@@ -254,7 +254,6 @@ void Cy_USBFS_Dev_Drv_DeInit(USBFS_Type *base, cy_stc_usbfs_dev_drv_context_t *c
 
     USBFS_DEV_SIE_EP_INT_EN(base) = 0UL;
     USBFS_DEV_SIE_EP_INT_SR(base) = 0UL;
-
     
     for (endpoint = 0UL; endpoint < CY_USBFS_DEV_DRV_NUM_EPS_MAX; ++endpoint)
     {
@@ -422,68 +421,88 @@ static void SofIntrHandler(USBFS_Type *base, cy_stc_usbfs_dev_drv_context_t *con
 static void Ep0IntrHandler(USBFS_Type *base, cy_stc_usbfs_dev_drv_context_t *context)
 {
     /* Read CR register */
-    uint32_t ep0Cr = USBFS_DEV_EP0_CR(base);
+    uint32_t ep0Cr = Cy_USBFS_Dev_Drv_ReadEp0Mode(base);
 
     /* Check whether packet was ACKed */
     if (0U != (ep0Cr & USBFS_USBDEV_EP0_CR_ACKED_TXN_Msk))
     {
-        bool updateCr0 = false;
-
         /* Check packet direction */
         if (_FLD2BOOL(USBFS_USBDEV_EP0_CR_SETUP_RCVD, ep0Cr))
         {
+            /* Setup packet received */
+            context->ep0CtrlState = CY_USBFS_DEV_DRV_EP0_CTRL_STATE_SETUP;
+            
             /* Handle SETUP */
             if (_FLD2VAL(USBFS_USBDEV_EP0_CR_MODE, ep0Cr) == CY_USBFS_DEV_DRV_EP_CR_NAK_INOUT)
             {
                 /* Try to unlock CR0 register: read and then write.
                 * The success write clears 8-4 bits in the register.
                 */
-                ep0Cr = USBFS_DEV_EP0_CR(base);
-                USBFS_DEV_EP0_CR(base) = ep0Cr;
+            	Cy_USBFS_Dev_Drv_WriteEp0Mode(base, ep0Cr);
 
                 /* Check whether CR0 register unlocked (bits cleared) */
-                ep0Cr = USBFS_DEV_EP0_CR(base);
+                ep0Cr = Cy_USBFS_Dev_Drv_ReadEp0Mode(base);
                 if (false == _FLD2BOOL(USBFS_USBDEV_EP0_CR_SETUP_RCVD, ep0Cr))
                 {
-                    /* Reset EP0 CNT register (data toggle 0) */
-                    context->ep0CntReg = 0UL;
+                    /* Reset EP0 data toggle */
+                    context->ep0DataToggle = 0U;
 
                     /* Call Device layer to service request */
                     context->ep0Setup(base, context);
-
-                    updateCr0 = true;
+                }
+                else
+                {
+                	/* CR0 still locked, set interrupt pending to retry */
+                	Cy_USBFS_Dev_Drv_SetSieInterrupt(base, USBFS_USBLPM_INTR_CAUSE_EP0_INTR_Msk);
                 }
             }
         }
         /* Handle IN */
         else if (_FLD2BOOL(USBFS_USBDEV_EP0_CR_IN_RCVD, ep0Cr))
         {
-            context->ep0In(base, context);
-            updateCr0 = true;
+        	if (CY_USBFS_DEV_DRV_EP0_CTRL_STATE_DATA == context->ep0CtrlState)
+        	{
+        		/* Data stage: invoke callback to proceed control transfer */
+        		context->ep0In(base, context);
+        	}
+        	else if (CY_USBFS_DEV_DRV_EP0_CTRL_STATE_STATUS_IN == context->ep0CtrlState)
+        	{
+    			/* Set address after STATUS Stage complete */
+    			if (context->setAddress)
+    			{
+    				Cy_USBFS_Dev_Drv_SetDeviceAddress(base, context->address);
+    				context->setAddress = false;
+    			}
+
+    			/* Complete control transfer */
+    			context->ep0CtrlState = CY_USBFS_DEV_DRV_EP0_CTRL_STATE_IDLE;
+        	}
+        	else if (CY_USBFS_DEV_DRV_EP0_CTRL_STATE_STATUS_OUT == context->ep0CtrlState)
+			{
+				/* Update CNT and CR registers to continue IN/OUT transfer */
+            	Cy_USBFS_Dev_Drv_SetEp0Count (base, 0U, USBFS_USBDEV_EP0_CNT_DATA_TOGGLE_Msk);
+            	Cy_USBFS_Dev_Drv_WriteEp0Mode(base, CY_USBFS_DEV_DRV_EP_CR_STATUS_OUT_ONLY);
+
+				/* Transfer completed */
+				context->ep0CtrlState = CY_USBFS_DEV_DRV_EP0_CTRL_STATE_IDLE;
+			}
+        	else
+        	{
+        		/* Nothing to handle in this state */
+        	}
         }
+        /* Handle OUT */
         else if (_FLD2BOOL(USBFS_USBDEV_EP0_CR_OUT_RCVD, ep0Cr))
         {
-            /* Handle OUT */
-            context->ep0Out(base, context);
-            updateCr0 = true;
+        	if (CY_USBFS_DEV_DRV_EP0_CTRL_STATE_DATA == context->ep0CtrlState)
+        	{
+        		/* Data stage: invoke callback to proceed control transfer */
+        		context->ep0Out(base, context);
+        	}
         }
         else
         {
             /* Do nothing - unknown source */
-        }
-
-        if (updateCr0)
-        {
-            /* Check whether CR0 register unlocked (bits are cleared) */
-            ep0Cr = USBFS_DEV_EP0_CR(base);
-
-            if (false == _FLD2BOOL(USBFS_USBDEV_EP0_CR_SETUP_RCVD, ep0Cr))
-            {
-                /* Update count and mode registers */
-                USBFS_DEV_EP0_CNT(base) = CY_USBFS_DEV_DRV_WRITE_ODD(context->ep0CntReg);
-                USBFS_DEV_EP0_CR(base)  = context->ep0ModeReg;
-                USBFS_DEV_EP0_CR(base);
-            }
         }
     }
 }
@@ -520,6 +539,11 @@ static void BusResetIntrHandler(USBFS_Type *base, cy_stc_usbfs_dev_drv_context_t
 
         /* Set EP0.CR: ACK Setup, NAK IN/OUT */
         USBFS_DEV_EP0_CR(base) = CY_USBFS_DEV_DRV_EP_CR_NAK_INOUT;
+
+        /* Reset driver context variables into the default state */
+        context->setAddress   = false;
+        context->ep0CtrlState = CY_USBFS_DEV_DRV_EP0_CTRL_STATE_IDLE;
+        context->curBufAddr   = 0U;
 
         /* Enable device to responds to USB traffic with address 0 */
         USBFS_DEV_CR0(base) = USBFS_USBDEV_CR0_USB_ENABLE_Msk;
@@ -838,7 +862,7 @@ static uint32_t WriteEp0Buffer(USBFS_Type *base, uint8_t const *buffer, uint32_t
 {
     uint32_t idx;
     
-    /* Cut message size if too many bytes are requested to write  */
+    /* Cut message size if too many bytes are requested to write */
     if (size > CY_USBFS_DEV_DRV_EP0_BUFFER_SIZE)
     {
         size = CY_USBFS_DEV_DRV_EP0_BUFFER_SIZE;
@@ -847,15 +871,7 @@ static uint32_t WriteEp0Buffer(USBFS_Type *base, uint8_t const *buffer, uint32_t
     /* Write data into the hardware buffer */
     for (idx = 0UL; idx < size; ++idx)
     {
-        if (0U == (idx & 0x1U))
-        {
-            USBFS_DEV_EP0_DR(base, idx) = buffer[idx];
-        }
-        else
-        {
-            /* Apply special write for odd offset registers */
-            USBFS_DEV_EP0_DR(base, idx) = CY_USBFS_DEV_DRV_WRITE_ODD(buffer[idx]);
-        }
+    	Cy_USBFS_Dev_Drv_WriteEp0Data(base, idx, (uint32_t) buffer[idx]);
     }
     
     return idx;
@@ -897,15 +913,7 @@ static uint32_t ReadEp0Buffer(USBFS_Type const *base, uint8_t *buffer, uint32_t 
     /* Get data from the buffer */
     for (idx = 0UL; idx < size; ++idx)
     {
-        if (0U == (idx & 0x1U))
-        {
-            buffer[idx] = (uint8_t) USBFS_DEV_EP0_DR(base, idx);
-        }
-        else
-        {
-            /* Apply special write for odd offset registers */
-            buffer[idx] = (uint8_t) CY_USBFS_DEV_READ_ODD(USBFS_DEV_EP0_DR(base, idx));
-        }
+    	buffer[idx] = (uint8_t) Cy_USBFS_Dev_Drv_ReadEp0Data(base, idx);
     }
     
     return idx;
@@ -953,10 +961,11 @@ void Cy_USBFS_Dev_Drv_Ep0GetSetup(USBFS_Type const *base, uint8_t *buffer,
 *
 * \param buffer
 * The pointer to the buffer containing data bytes to write.
+* To switch transfer from data stage to status pass NULL as a pointer.
 *
 * \param size
 * The number of bytes to write.
-* This value must be less than or equal to endpoint 0 maximum packet size.
+* Setting sizeo to zero sends on the bus zero length data packet.
 *
 * \param context
 * The pointer to the context structure \ref cy_stc_usbfs_dev_drv_context_t
@@ -969,31 +978,38 @@ void Cy_USBFS_Dev_Drv_Ep0GetSetup(USBFS_Type const *base, uint8_t *buffer,
 *
 *******************************************************************************/
 uint32_t Cy_USBFS_Dev_Drv_Ep0Write(USBFS_Type *base, uint8_t const *buffer, uint32_t size, 
-                                   cy_stc_usbfs_dev_drv_context_t *context)
+                                    cy_stc_usbfs_dev_drv_context_t *context)
 {
-    CY_ASSERT_L1((size > 0U) ? (NULL != buffer) : true);
-    
     uint32_t numBytes = 0UL;
 
-    if (buffer != NULL)
+    if (NULL != buffer)
     {
-        /* DATA stage (IN direction): load data to be sent (include zero length packet) */
-        
+    	/* Data stage (IN): load data to be sent */
+
         /* Put data into the buffer */
-        numBytes = WriteEp0Buffer(base, buffer, size);
+        if (size > 0U)
+        {
+            numBytes = WriteEp0Buffer(base, buffer, size);
+        }
 
         /* Update data toggle and counter */
-        context->ep0CntReg ^= USBFS_USBDEV_EP0_CNT_DATA_TOGGLE_Msk;
-        context->ep0CntReg  = _CLR_SET_FLD32U(context->ep0CntReg, USBFS_USBDEV_EP0_CNT_BYTE_COUNT, numBytes);
+        context->ep0DataToggle ^= (uint8_t) USBFS_USBDEV_EP0_CNT_DATA_TOGGLE_Msk;
         
-        /* Update EP0 mode register to continue transfer */
-        context->ep0ModeReg = CY_USBFS_DEV_DRV_EP_CR_ACK_IN_STATUS_OUT;
+        /* Update CNT and CR registers to continue IN transfer */
+        Cy_USBFS_Dev_Drv_SetEp0Count (base, numBytes, (uint32_t) context->ep0DataToggle);
+        Cy_USBFS_Dev_Drv_WriteEp0Mode(base, CY_USBFS_DEV_DRV_EP_CR_ACK_IN_STATUS_OUT);
+
+        context->ep0CtrlState = CY_USBFS_DEV_DRV_EP0_CTRL_STATE_DATA;
     }
     else
     {
-        /* STATUS stage (IN direction): prepare return zero-length and get ACK response */
-        context->ep0CntReg  = USBFS_USBDEV_EP0_CNT_DATA_TOGGLE_Msk;
-        context->ep0ModeReg = CY_USBFS_DEV_DRV_EP_CR_STATUS_IN_ONLY;
+        /* Status stage (IN): complete status stage, send ACK handshake */
+      
+        /* Update CNT and CR registers to continue IN transfer */
+    	Cy_USBFS_Dev_Drv_SetEp0Count (base, numBytes, USBFS_USBDEV_EP0_CNT_DATA_TOGGLE_Msk);
+    	Cy_USBFS_Dev_Drv_WriteEp0Mode(base, CY_USBFS_DEV_DRV_EP_CR_STATUS_IN_ONLY);
+
+        context->ep0CtrlState = CY_USBFS_DEV_DRV_EP0_CTRL_STATE_STATUS_IN;
     }
 
     return numBytes;
@@ -1004,7 +1020,7 @@ uint32_t Cy_USBFS_Dev_Drv_Ep0Write(USBFS_Type *base, uint8_t const *buffer, uint
 * Function Name: Cy_USBFS_Dev_Drv_Ep0Read
 ****************************************************************************//**
 *
-* Reads data from Endpoint 0 hardware and returns how many bytes were read.
+* Start receiving a packet into the Endpoint 0 hardware buffer.
 *
 * \param base
 * The pointer to the USBFS instance.
@@ -1014,6 +1030,48 @@ uint32_t Cy_USBFS_Dev_Drv_Ep0Write(USBFS_Type *base, uint8_t const *buffer, uint
 *
 * \param size
 * The number of bytes to read.
+* Reading zero bytes switch control transfer to status stage.
+*
+* \param context
+* The pointer to the context structure \ref cy_stc_usbfs_dev_drv_context_t
+* allocated by the user. The structure is used during the USBFS Device 
+* operation for internal configuration and data retention. The user must not 
+* modify anything in this structure.
+*
+*******************************************************************************/
+void Cy_USBFS_Dev_Drv_Ep0Read(USBFS_Type *base, uint8_t *buffer, uint32_t size,
+                                cy_stc_usbfs_dev_drv_context_t *context)
+{    
+    if (0U != size)
+    {
+    	/* Data stage (OUT): prepare to receive data */
+        
+        /* Stores Endpoint 0 buffer to put read operation results */
+        context->ep0Buffer     = buffer;
+        context->ep0BufferSize = size;
+
+        /* Update CNT and CR registers to continue OUT transfer */
+    	Cy_USBFS_Dev_Drv_SetEp0Count (base, 0U, 0U);
+    	Cy_USBFS_Dev_Drv_WriteEp0Mode(base, CY_USBFS_DEV_DRV_EP_CR_ACK_OUT_STATUS_IN);
+
+        context->ep0CtrlState = CY_USBFS_DEV_DRV_EP0_CTRL_STATE_DATA;
+    }
+    else
+    {
+    	/* Status stage (OUT): prepare to complete status stage after IN transfer is finished */
+        context->ep0CtrlState = CY_USBFS_DEV_DRV_EP0_CTRL_STATE_STATUS_OUT;
+    }
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_USBFS_Dev_Drv_Ep0ReadResult
+****************************************************************************//**
+*
+* Reads data from Endpoint 0 hardware and returns how many bytes were read.
+*
+* \param base
+* The pointer to the USBFS instance.
 *
 * \param context
 * The pointer to the context structure \ref cy_stc_usbfs_dev_drv_context_t
@@ -1025,30 +1083,10 @@ uint32_t Cy_USBFS_Dev_Drv_Ep0Write(USBFS_Type *base, uint8_t const *buffer, uint
 * The number of bytes which were read.
 *
 *******************************************************************************/
-uint32_t Cy_USBFS_Dev_Drv_Ep0Read(USBFS_Type const *base, uint8_t *buffer, uint32_t size, 
-                                  cy_stc_usbfs_dev_drv_context_t *context)
-{    
-    uint32_t numBytes = 0UL;
-
-    if (buffer != NULL)
-    {
-        /* DATA stage (OUT direction): get receive data and continue */
-
-        /* Get received data */
-        numBytes = ReadEp0Buffer(base, buffer, size);
-
-        /* Update EP0 registers to continue transfer */
-        context->ep0CntReg ^= USBFS_USBDEV_EP0_CNT_DATA_TOGGLE_Msk;
-        context->ep0ModeReg = CY_USBFS_DEV_DRV_EP_CR_ACK_OUT_STATUS_IN;
-    }
-    else
-    {
-        /* STATUS stage (OUT direction): prepare to send ACK handshake */
-        context->ep0CntReg  = USBFS_USBDEV_EP0_CNT_DATA_TOGGLE_Msk;
-        context->ep0ModeReg = CY_USBFS_DEV_DRV_EP_CR_STATUS_OUT_ONLY;
-    }
-
-    return numBytes;
+uint32_t Cy_USBFS_Dev_Drv_Ep0ReadResult(USBFS_Type const *base, cy_stc_usbfs_dev_drv_context_t *context)
+{
+    /* Store received data in the buffer */
+    return ReadEp0Buffer(base, context->ep0Buffer, context->ep0BufferSize);
 }
 
 
@@ -1132,8 +1170,7 @@ static void RestoreDeviceConfiguration(USBFS_Type *base,
 {
     uint32_t endpoint = 0U;
 
-    /* Set default device configuration */
-    Cy_USBFS_Dev_Drv_ConfigDevice(base, context);
+    /* Due to DeepSleep non-retention registers set into the default state */
 
     for (endpoint = 0U; endpoint < CY_USBFS_DEV_DRV_NUM_EPS_MAX; ++endpoint)
     {
@@ -1151,8 +1188,8 @@ static void RestoreDeviceConfiguration(USBFS_Type *base,
         }
     }
 
-    /* Complete configuration */
-    Cy_USBFS_Dev_Drv_ConfigDeviceComplete(base, context);
+    /* Complete device configuration */
+    Cy_USBFS_Dev_Drv_ConfigDevice(base, context);
 }
 
 

@@ -23,16 +23,23 @@
 // if the RTOS is not present.
 #ifndef MBED_CONF_RTOS_PRESENT
 
+#include "hal/lp_ticker_api.h"
 #include "hal/us_ticker_api.h"
 
 void wait(float s)
 {
-    wait_us(s * 1000000.0f);
+    wait_ms(s * 1000.0f);
 }
 
 void wait_ms(int ms)
 {
+#if DEVICE_LPTICKER
+    const ticker_data_t *const ticker = get_lp_ticker_data();
+    uint32_t start = ticker_read(ticker);
+    while ((ticker_read(ticker) - start) < (uint32_t)(ms * 1000));
+#else
     wait_us(ms * 1000);
+#endif
 }
 
 void wait_us(int us)
@@ -105,7 +112,10 @@ static const uint16_t delay_loop_code[] = {
 /* Take the address of the code, set LSB to indicate Thumb, and cast to void() function pointer */
 #define delay_loop ((void(*)()) ((uintptr_t) delay_loop_code | 1))
 
-void wait_ns(unsigned int ns)
+/* Some targets may not provide zero-wait-state flash performance. Export this function
+ * to be overridable for targets to provide more accurate implementation like locating
+ * 'delay_loop_code' in SRAM. */
+MBED_WEAK void wait_ns(unsigned int ns)
 {
     uint32_t cycles_per_us = SystemCoreClock / 1000000;
     // Note that this very calculation, plus call overhead, will take multiple

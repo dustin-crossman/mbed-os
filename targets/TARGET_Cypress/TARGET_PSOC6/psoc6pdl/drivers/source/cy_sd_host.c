@@ -892,7 +892,6 @@ cy_en_sd_host_status_t Cy_SD_Host_Read(SDHC_Type *base,
     cy_en_sd_host_status_t       ret  = CY_SD_HOST_ERROR_INVALID_PARAMETER;
     cy_stc_sd_host_cmd_config_t  cmd;
     cy_stc_sd_host_data_config_t dataConfig;
-    uint32_t                     dataAddress = config->address;
     uint32_t aDmaDescriptTbl[CY_SD_HOST_ADMA2_DESCR_SIZE]; /* The ADMA2 descriptor table. */
     uint32_t length; /* The length of data to transfer for a descriptor. */
 
@@ -901,6 +900,8 @@ cy_en_sd_host_status_t Cy_SD_Host_Read(SDHC_Type *base,
         CY_ASSERT_L3(CY_SD_HOST_IS_AUTO_CMD_VALID(config->autoCommand));
         CY_ASSERT_L2(CY_SD_HOST_IS_TIMEOUT_VALID(config->dataTimeout));
         CY_ASSERT_L3(CY_SD_HOST_IS_DMA_WR_RD_VALID(context->dmaType));
+        
+        uint32_t dataAddress = config->address;
         
         /* 0 < maxSectorNum check is needed for legacy cards. */
         if (!((0UL < context->maxSectorNum) &&
@@ -1021,7 +1022,6 @@ cy_en_sd_host_status_t Cy_SD_Host_Write(SDHC_Type *base,
     cy_en_sd_host_status_t       ret  = CY_SD_HOST_ERROR_INVALID_PARAMETER;
     cy_stc_sd_host_cmd_config_t  cmd;
     cy_stc_sd_host_data_config_t dataConfig;
-    uint32_t                     dataAddress = config->address;
     uint32_t aDmaDescriptTbl[CY_SD_HOST_ADMA2_DESCR_SIZE]; /* The ADMA2 descriptor table. */
     uint32_t length;  /* The length of data to transfer for a descriptor. */
 
@@ -1030,6 +1030,8 @@ cy_en_sd_host_status_t Cy_SD_Host_Write(SDHC_Type *base,
         CY_ASSERT_L3(CY_SD_HOST_IS_AUTO_CMD_VALID(config->autoCommand));
         CY_ASSERT_L2(CY_SD_HOST_IS_TIMEOUT_VALID(config->dataTimeout));
         CY_ASSERT_L3(CY_SD_HOST_IS_DMA_WR_RD_VALID(context->dmaType));
+
+        uint32_t dataAddress = config->address;
 
         /* 0 < maxSectorNum check is needed for legacy cards */
         if (!((0UL < context->maxSectorNum) &&

@@ -138,8 +138,8 @@ static cy_rslt_t reserve_peri_diviers(void)
     // Divider 0 is used for This kit need 4 dividers allocated.
     cyhal_resource_inst_t divider;
     divider.type = CYHAL_RSC_CLOCK;
-    divider.block_num = CY_SYSCLK_DIV_8_BIT; // 8 bit diviers
-    // SDHC
+    // USB
+    divider.block_num = CY_SYSCLK_DIV_16_BIT; // 16 bit diviers
     divider.channel_num = peri_0_div_16_0_NUM;
     cy_rslt_t result = cyhal_hwmgr_reserve(&divider);
     if (result != CY_RSLT_SUCCESS)
@@ -147,6 +147,7 @@ static cy_rslt_t reserve_peri_diviers(void)
         return result;
     }
     // I2C
+    divider.block_num = CY_SYSCLK_DIV_8_BIT; // 8 bit diviers
     divider.channel_num = peri_0_div_8_1_NUM;
     result = cyhal_hwmgr_reserve(&divider);
     if (result != CY_RSLT_SUCCESS)

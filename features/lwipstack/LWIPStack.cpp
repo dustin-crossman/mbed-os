@@ -16,6 +16,7 @@
 #include "nsapi.h"
 #include "mbed_interface.h"
 #include "mbed_assert.h"
+#include "Semaphore.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -50,8 +51,11 @@ void LWIP::socket_callback(struct netconn *nc, enum netconn_evt eh, u16_t len)
     }
 
     LWIP &lwip = LWIP::get_instance();
-
     lwip.adaptation.lock();
+
+    if (eh == NETCONN_EVT_RCVPLUS && nc->state == NETCONN_NONE) {
+        lwip._event_flag.set(TCP_CLOSED_FLAG);
+    }
 
     for (int i = 0; i < MEMP_NUM_NETCONN; i++) {
         if (lwip.arena[i].in_use
@@ -149,8 +153,7 @@ static bool convert_mbed_addr_to_lwip(ip_addr_t *out, const nsapi_addr_t *in)
 
 void LWIP::tcpip_init_irq(void *eh)
 {
-    LWIP *lwip = static_cast<LWIP *>(eh);
-    lwip->tcpip_inited.release();
+    static_cast<rtos::Semaphore *>(eh)->release();
     sys_tcpip_thread_set();
 }
 
@@ -169,8 +172,10 @@ LWIP::LWIP()
     }
     lwip_init_tcp_isn(0, (u8_t *) &tcp_isn_secret);
 
-    tcpip_init(&LWIP::tcpip_init_irq, this);
-    tcpip_inited.wait(0);
+    rtos::Semaphore tcpip_inited;
+
+    tcpip_init(&LWIP::tcpip_init_irq, &tcpip_inited);
+    tcpip_inited.acquire();
 
     // Zero out socket set
     arena_init();
@@ -193,6 +198,39 @@ nsapi_error_t LWIP::get_dns_server(int index, SocketAddress *address, const char
         }
     }
     return NSAPI_ERROR_NO_ADDRESS;
+}
+
+nsapi_error_t LWIP::add_dns_server(const SocketAddress &address, const char *interface_name)
+{
+    int index;
+    nsapi_addr_t addr = address.get_addr();
+    const ip_addr_t *ip_addr_move;
+    ip_addr_t ip_addr;
+
+    convert_mbed_addr_to_lwip(&ip_addr, &addr);
+
+    if (ip_addr_isany(&ip_addr)) {
+        return NSAPI_ERROR_NO_ADDRESS;
+    }
+
+    if (interface_name == NULL) {
+        for (index = DNS_MAX_SERVERS - 1; index > 0; index--) {
+            ip_addr_move = dns_getserver(index - 1, NULL);
+            if (!ip_addr_isany(ip_addr_move)) {
+                dns_setserver(index, ip_addr_move, NULL);
+            }
+        }
+        dns_setserver(0, &ip_addr, NULL);
+    } else {
+        for (index = DNS_MAX_SERVERS - 1; index > 0; index--) {
+            ip_addr_move = dns_get_interface_server(index - 1, interface_name);
+            if (!ip_addr_isany(ip_addr_move)) {
+                dns_add_interface_server(index, interface_name, ip_addr_move);
+            }
+        }
+        dns_add_interface_server(0, interface_name, &ip_addr);
+    }
+    return NSAPI_ERROR_OK;
 }
 
 void LWIP::tcpip_thread_callback(void *ptr)
@@ -292,7 +330,17 @@ nsapi_error_t LWIP::socket_open(nsapi_socket_t *handle, nsapi_protocol_t proto)
 nsapi_error_t LWIP::socket_close(nsapi_socket_t handle)
 {
     struct mbed_lwip_socket *s = (struct mbed_lwip_socket *)handle;
-
+#if LWIP_TCP
+    /* Check if TCP FSM is in ESTABLISHED state.
+     * Then give extra time for connection close handshaking  until TIME_WAIT state.
+     * The purpose is to prevent eth/wifi driver stop and  FIN ACK corrupt.
+     * This may happend if network interface disconnect follows immediately after socket_close.*/
+    if (NETCONNTYPE_GROUP(s->conn->type) == NETCONN_TCP && s->conn->pcb.tcp->state == ESTABLISHED) {
+        _event_flag.clear(TCP_CLOSED_FLAG);
+        netconn_shutdown(s->conn, false, true);
+        _event_flag.wait_any(TCP_CLOSED_FLAG, TCP_CLOSE_TIMEOUT);
+    }
+#endif
     netbuf_delete(s->buf);
     err_t err = netconn_delete(s->conn);
     arena_dealloc(s);

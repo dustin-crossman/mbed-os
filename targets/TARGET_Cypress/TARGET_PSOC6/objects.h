@@ -83,9 +83,12 @@ struct trng_s {
 struct i2c_s {
     cyhal_i2c_t hal_i2c;
     cyhal_i2c_cfg_t cfg;
+#ifdef DEVICE_I2C_ASYNCH
     void (*async_handler)(void);
-    cyhal_i2c_irq_event_t event;
+    uint32_t async_event;
     size_t async_rx_size;
+#endif
+    uint8_t slave_event;
 };
 #endif
 

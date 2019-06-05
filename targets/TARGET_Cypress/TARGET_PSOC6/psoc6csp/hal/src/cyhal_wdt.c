@@ -49,6 +49,7 @@ static MCWDT_STRUCT_Type * const cyhal_wdt_base[] = {
 };
 
 static const uint16_t CY_MCWDT_RESET_TIME_US = 62;
+static const uint16_t CY_MCWDT_SETMATCH_TIME_US = 93;
 
 typedef struct {
     cyhal_wdt_irq_handler handler;
@@ -131,8 +132,9 @@ cy_rslt_t cyhal_wdt_reload(cyhal_wdt_t *obj)
 
 cy_rslt_t cyhal_wdt_set_time(cyhal_wdt_t *obj, uint32_t time)
 {
-    Cy_MCWDT_SetMatch(obj->base, CY_MCWDT_COUNTER0, time, 0);
+    Cy_MCWDT_SetMatch(obj->base, CY_MCWDT_COUNTER0, time, CY_MCWDT_SETMATCH_TIME_US);
     Cy_MCWDT_SetClearOnMatch(obj->base, CY_MCWDT_COUNTER0, 1);
+    Cy_MCWDT_ResetCounters(obj->base, CY_MCWDT_CTR0,  CY_MCWDT_RESET_TIME_US);
     return CY_RSLT_SUCCESS;
 }
 

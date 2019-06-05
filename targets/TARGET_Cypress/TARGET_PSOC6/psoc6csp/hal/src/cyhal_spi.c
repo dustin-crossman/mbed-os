@@ -827,21 +827,13 @@ cy_rslt_t cyhal_spi_write(cyhal_spi_t *obj, uint32_t value)
 
 cy_rslt_t cyhal_spi_is_readable(cyhal_spi_t *obj, bool *readable)
 {
-    if (NULL == obj)
-        return CYHAL_SPI_RSLT_BAD_ARGUMENT;
-
-    uint32_t count = Cy_SCB_SPI_GetNumInRxFifo(obj->base);
-    *readable = count == 0;
+    *readable = (0UL == (CY_SCB_SPI_TRANSFER_ACTIVE & obj->context.status));
     return CY_RSLT_SUCCESS;
 }
 
 cy_rslt_t cyhal_spi_is_writable(cyhal_spi_t *obj, bool *writable)
 {
-    if (NULL == obj)
-        return CYHAL_SPI_RSLT_BAD_ARGUMENT;
-
-    uint32_t count = Cy_SCB_SPI_GetNumInTxFifo(obj->base);
-    *writable = count < CY_SCB_BUFFER_SIZE[obj->resource.block_num];
+    *writable = (0UL == (CY_SCB_SPI_TRANSFER_ACTIVE & obj->context.status));
     return CY_RSLT_SUCCESS;
 }
 

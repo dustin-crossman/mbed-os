@@ -273,9 +273,15 @@ typedef struct {
     cyhal_resource_inst_t       resource;
     bool                        emmc;
     cy_en_sd_host_dma_type_t    dmaType;
-    bool                        enableLedControl;
     cy_stc_sd_host_context_t    context;
-    cyhal_gpio_t                resetPin;
+    cyhal_gpio_t                pin_clk;
+    cyhal_gpio_t                pin_cmd;
+    cyhal_gpio_t                pin_data0;
+    cyhal_gpio_t                pin_data1;
+    cyhal_gpio_t                pin_data2;
+    cyhal_gpio_t                pin_data3;
+    uint32_t                    frequencyhal_hz;
+    uint16_t                    block_size;
     uint32_t                    irq_cause;
 
 #elif defined(CY8C6247BZI_D54) /* TODO: BSP-525 */
@@ -381,11 +387,14 @@ typedef struct {
 typedef struct {
 #ifdef CY_IP_MXUSBFS
     USBFS_Type*                     base;
-    cy_stc_usbfs_dev_drv_context_t* context;
+    cy_stc_usbfs_dev_drv_context_t  context;
     cyhal_resource_inst_t           resource;
     cyhal_gpio_t                    pin_dp;
     cyhal_gpio_t                    pin_dm;
-    /* TODO: complete definition during implementation */
+    
+    // Allocate for 8 data endpoints and 1 for contorol endpoint
+    uint8_t *rd_data[CY_USBFS_DEV_DRV_NUM_EPS_MAX + 1U];
+    uint32_t rd_size[CY_USBFS_DEV_DRV_NUM_EPS_MAX + 1U];
 #else
     void *empty;
 #endif

@@ -62,9 +62,6 @@ protected:
         ATHandler_stub::read_string_table[kRead_string_table_size];
         ATHandler_stub::resp_stop_success_count = kResp_stop_count_default;
         CellularDevice_stub::connect_counter = 2;
-        for (int i=0; i < kATHandler_urc_table_max_size; i++) {
-            ATHandler_stub::callback[i] = NULL;
-        }
     }
 
     void TearDown()
@@ -477,7 +474,7 @@ TEST_F(TestAT_CellularContext, connect_disconnect_sync)
 
     my_AT_CTX ctx1(at, &dev);
     ctx1.attach(&network_cb);
-    Semaphore_stub::wait_return_value = 1;
+    Semaphore_stub::acquire_return_value = true;
 
     // call callback so that network is opened which is needed in disconnect
     cell_callback_data_t data;
@@ -606,15 +603,22 @@ TEST_F(TestAT_CellularContext, connect_disconnect_async)
     ASSERT_EQ(network_cb_count, 5);
     ASSERT_EQ(ctx1.connect(), NSAPI_ERROR_IS_CONNECTED);
     EXPECT_TRUE(ctx1.is_connected() == true);
+    ASSERT_EQ(ctx1.disconnect(), NSAPI_ERROR_NO_MEMORY);
+    EXPECT_TRUE(ctx1.is_connected() == true);
+
+    struct equeue_event ptr;
+    equeue_stub.void_ptr = &ptr;
+    equeue_stub.call_cb_immediately = true;
     ASSERT_EQ(ctx1.disconnect(), NSAPI_ERROR_OK);
     EXPECT_TRUE(ctx1.is_connected() == false);
 
     // sdet CellularDevice_stub::connect_counter = 0 so device is already attached and will return NSAPI_ERROR_ALREADY to context when calling connect
+    equeue_stub.void_ptr = &ptr;
+    equeue_stub.call_cb_immediately = false;
     CellularDevice_stub::connect_counter = 0;
     // queue can't allocate so return NSAPI_ERROR_NO_MEMORY
     ASSERT_EQ(ctx1.connect(), NSAPI_ERROR_NO_MEMORY);
 
-    struct equeue_event ptr;
     equeue_stub.void_ptr = &ptr;
     equeue_stub.call_cb_immediately = true;
     ASSERT_EQ(ctx1.connect(), NSAPI_ERROR_OK);

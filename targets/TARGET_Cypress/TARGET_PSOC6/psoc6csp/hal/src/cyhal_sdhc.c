@@ -38,12 +38,13 @@
 
 #ifdef CY_IP_MXSDHC
 
-#define CY_HAL_SDHC_RETRY_TIME               (1000UL)  /* The number loops to make the timeout in msec. */
-#define CY_HAL_SDHC_FUJE_TIMEOUT_MS          (1000U)   /* The Fuje timeout for one block. */
-#define CY_HAL_SDHC_READ_WRITE_TIMEOUT_MS    (500U)    /* The Read/Write timeout for one block. */
-#define CY_HAL_SDHC_CMD_TIMEOUT_MS           (5U)      /* The Command timeout. */
-#define CY_HAL_SDHC_TRANSFER_TIMEOUT         (0xCUL)   /* The transfer timeout. */
-#define CY_HAL_SDHC_EMMC_TRIM_TIMEOUT        (100U)    /* The EMMC TRIM timeout. */
+#define CY_HAL_SDHC_RETRY_TIME               (1000UL)  /* The number loops to make the timeout in msec */
+#define CY_HAL_SDHC_FUJE_TIMEOUT_MS          (1000U)   /* The Fuje timeout for one block */
+#define CY_HAL_SDHC_READ_WRITE_TIMEOUT_MS    (500U)    /* The Read/Write timeout for one block */
+#define CY_HAL_SDHC_OPER_CMPLT_US            (250U)    /* Delay in uS to complete all internal pending operations */
+#define CY_HAL_SDHC_CMD_TIMEOUT_MS           (5U)      /* The Command timeout */
+#define CY_HAL_SDHC_TRANSFER_TIMEOUT         (0xCUL)   /* The transfer timeout */
+#define CY_HAL_SDHC_EMMC_TRIM_TIMEOUT        (100U)    /* The EMMC TRIM timeout */
 #ifndef SDIO_ENUMERATION_TIMEOUT_MS
     #define SDIO_ENUMERATION_TIMEOUT_MS      (500)
 #endif
@@ -58,12 +59,18 @@
 #define ENABLE_ALL_INTERRUPT_ENABLE         (0x0000FFFFUL)
 #define DISABLE_ALL_INTERRUPT_MASK          (0x0UL)
 #define DISABLE_ALL_INTERRUPT_ENABLE        (0x0UL)
+#define CY_SDIO_BULK_TRANSF_TRIES           (50)
+
+
+/* Clock frequency which is connected to SDHC divider */
+#define SDIO_CLK_HF_HZ                      (100000000UL)
 
 #define BIT_MASK( x )                       (( 1 << x ) - 1 )
 
+#define SDIO_PINS_NC    ((cyhal_gpio_t) CYHAL_NC_PIN_VALUE)
 
 /* List of available SDHC instances */
-static SDHC_Type * sdhc_base_addresses[CY_IP_MXSDHC_INSTANCES] =
+static SDHC_Type * CY_SDHC_BASE_ADDRESSES[CY_IP_MXSDHC_INSTANCES] =
 {
 #ifdef SDHC0
     SDHC0,
@@ -84,14 +91,8 @@ static IRQn_Type CY_SDHC_IRQ_N[CY_IP_MXSDHC_INSTANCES] =
 #endif /* ifdef SDHC1 */
 };
 
-
-static cy_en_sd_host_status_t sdio_delay_milliseconds( uint32_t num_ms );
-static cy_en_sd_host_status_t sdio_delay_milliseconds( uint32_t num_ms )
-{
-    Cy_SysLib_DelayUs(num_ms);
-
-    return CY_SD_HOST_SUCCESS;
-}
+/* Internal global variable to indicate pending sdio async status */
+static bool isTransferInProcess = false;
 
 static cy_en_sd_host_bus_width_t convert_buswidth(uint8_t stopbits);
 static cy_en_sd_host_bus_width_t convert_buswidth(uint8_t stopbits)
@@ -130,7 +131,7 @@ static cy_en_sd_host_status_t Cy_SD_Host_SdCardChangeClock(SDHC_Type *base, uint
 {
     cy_en_sd_host_status_t ret = CY_SD_HOST_ERROR_INVALID_PARAMETER;
     uint32_t               clkDiv;
-    uint32_t               clockInput = 100000000UL;
+    uint32_t               clockInput = SDIO_CLK_HF_HZ;
 
     if (NULL != base)
     {
@@ -222,7 +223,7 @@ static cy_en_sd_host_status_t Cy_SD_Host_PollTransferComplete(SDHC_Type *base)
 }
 
 /* Disconnect (interconnect) pin and free it (hwmgr) as resource */
-static cy_rslt_t cyhal_sdhc_free_pin(cyhal_gpio_t pin)
+static cy_rslt_t cyhal_free_pin(cyhal_gpio_t pin)
 {
     cyhal_resource_inst_t rsc;
     cy_rslt_t result = cyhal_disconnect_pin(pin);
@@ -449,7 +450,6 @@ cy_rslt_t cyhal_sdhc_init(cyhal_sdhc_t *obj,
     
         /* Configure SD Host to operate */
         hostConfig.dmaType = obj->dmaType;
-        hostConfig.enableLedControl = obj->enableLedControl;
         hostConfig.emmc = obj->emmc;
         obj->context.cardType = CY_SD_HOST_NOT_EMMC;
 
@@ -477,82 +477,82 @@ cy_rslt_t cyhal_sdhc_free(cyhal_sdhc_t *obj)
     /* Free pins */
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_cmd);
+        result = cyhal_free_pin(obj->pin_cmd);
     }
 
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_clk);
+        result = cyhal_free_pin(obj->pin_clk);
     }
 
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_data0);
+        result = cyhal_free_pin(obj->pin_data0);
     }
 
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_data1);
+        result = cyhal_free_pin(obj->pin_data1);
     }
 
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_data2);
+        result = cyhal_free_pin(obj->pin_data2);
     }
 
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_data3);
+        result = cyhal_free_pin(obj->pin_data3);
     }
 
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_data4);
+        result = cyhal_free_pin(obj->pin_data4);
     }
 
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_data5);
+        result = cyhal_free_pin(obj->pin_data5);
     }
     
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_data6);
+        result = cyhal_free_pin(obj->pin_data6);
     }
     
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_data7);
+        result = cyhal_free_pin(obj->pin_data7);
     }
     
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_cardDetect);
+        result = cyhal_free_pin(obj->pin_cardDetect);
     }
     
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_ioVoltSel);
+        result = cyhal_free_pin(obj->pin_ioVoltSel);
     }
     
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_cardIfPwrEn);
+        result = cyhal_free_pin(obj->pin_cardIfPwrEn);
     }
     
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_cardMechWriteProt);
+        result = cyhal_free_pin(obj->pin_cardMechWriteProt);
     }
     
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_ledCtrl);
+        result = cyhal_free_pin(obj->pin_ledCtrl);
     }
     
     if (CY_RSLT_SUCCESS == result)
     {
-        result = cyhal_sdhc_free_pin(obj->pin_cardEmmcReset);
+        result = cyhal_free_pin(obj->pin_cardEmmcReset);
     }
 
     Cy_SD_Host_DeInit(obj->base);
@@ -862,183 +862,327 @@ cy_rslt_t cyhal_sdhc_irq_enable(cyhal_sdhc_t *obj, cyhal_sdhc_irq_event_t event,
 cy_rslt_t cyhal_sdio_init(cyhal_sdio_t *obj, cyhal_gpio_t cmd, cyhal_gpio_t clk, cyhal_gpio_t data0, cyhal_gpio_t data1, cyhal_gpio_t data2, cyhal_gpio_t data3)
 {
     cy_stc_sd_host_init_config_t hostConfig;
-    cy_rslt_t ret = CY_RSLT_SUCCESS;
-    GPIO_PRT_Type *port;
-    const uint32_t outputVal = 0UL;
+    cy_rslt_t result;
     cy_stc_sd_host_context_t context;
+    cyhal_resource_inst_t pin_rsc, sdhc;
 
-    /* TODO need to take it from manager! HW manager should give base address if available */
-    obj->base = sdhc_base_addresses[0];
+    memset(obj, 0, sizeof(cyhal_sdio_t));
 
+    obj->resource.type = CYHAL_RSC_INVALID;
+    obj->pin_cmd = SDIO_PINS_NC;
+    obj->pin_clk = SDIO_PINS_NC;
+    obj->pin_data0 = SDIO_PINS_NC;
+    obj->pin_data1 = SDIO_PINS_NC;
+    obj->pin_data2 = SDIO_PINS_NC;
+    obj->pin_data3 = SDIO_PINS_NC;
 
-    /* TODO This should be removed???*/
-    /*This is for WiFi reset pin, and will put the part in the reset */
-    port = Cy_GPIO_PortToAddr(CYHAL_GET_PORT(obj->resetPin));
-    Cy_GPIO_Pin_FastInit(port, CYHAL_GET_PIN(obj->resetPin), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_GPIO);
+    /* Get pins from package */
+    const cyhal_resource_pin_mapping_t *cmd_map = CY_UTILS_GET_RESOURCE(cmd, cyhal_pin_map_sdhc_card_cmd);
 
-    /* Enable the SDHC block. */
-    Cy_SD_Host_Enable(obj->base);
+    const cyhal_resource_pin_mapping_t *clk_map = CY_UTILS_GET_RESOURCE(clk, cyhal_pin_map_sdhc_clk_card);
+    
+    const cyhal_resource_pin_mapping_t *data0_map = CY_UTILS_GET_RESOURCE(data0, cyhal_pin_map_sdhc_card_dat_3to0);
+    const cyhal_resource_pin_mapping_t *data1_map = CY_UTILS_GET_RESOURCE(data1, cyhal_pin_map_sdhc_card_dat_3to0);
+    const cyhal_resource_pin_mapping_t *data2_map = CY_UTILS_GET_RESOURCE(data2, cyhal_pin_map_sdhc_card_dat_3to0);
+    const cyhal_resource_pin_mapping_t *data3_map = CY_UTILS_GET_RESOURCE(data3, cyhal_pin_map_sdhc_card_dat_3to0);
 
-    /* Configure GPIO pins. */
-    port = Cy_GPIO_PortToAddr(CYHAL_GET_PORT(cmd));
-    Cy_GPIO_Pin_FastInit(port, CYHAL_GET_PIN(cmd), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
-
-    port = Cy_GPIO_PortToAddr(CYHAL_GET_PORT(clk));
-    Cy_GPIO_Pin_FastInit(port, CYHAL_GET_PIN(clk), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
-
-    port = Cy_GPIO_PortToAddr(CYHAL_GET_PORT(data0));
-    Cy_GPIO_Pin_FastInit(port, CYHAL_GET_PIN(data0), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
-
-    if (NC != data1)
+    if ((NULL == cmd_map) || (NULL == clk_map) || (NULL == data0_map) || (NULL == data1_map) || (NULL == data2_map) || (NULL == data3_map))
     {
-        port = Cy_GPIO_PortToAddr(CYHAL_GET_PORT(data1));
-        Cy_GPIO_Pin_FastInit(port, CYHAL_GET_PIN(data1), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
+        return CYHAL_SDIO_RSLT_ERR_BAD_PARAM;
     }
 
-    if (NC != data2)
+    obj->resource = *cmd_map->inst;
+
+    /* Reserve the CMD pin */
+    pin_rsc = cyhal_utils_get_gpio_resource(cmd);
+    result = cyhal_hwmgr_reserve(&pin_rsc);
+    if (result == CY_RSLT_SUCCESS)
     {
-        port = Cy_GPIO_PortToAddr(CYHAL_GET_PORT(data2));
-        Cy_GPIO_Pin_FastInit(port, CYHAL_GET_PIN(data2), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
+        obj->pin_cmd = cmd;
     }
 
-    if (NC != data3)
+    /* Reserve the CLK pin */
+    if (result == CY_RSLT_SUCCESS)
     {
-        port = Cy_GPIO_PortToAddr(CYHAL_GET_PORT(data3));
-        Cy_GPIO_Pin_FastInit(port, CYHAL_GET_PIN(data3), CY_GPIO_DM_STRONG, outputVal, HSIOM_SEL_ACT_14);
+        pin_rsc = cyhal_utils_get_gpio_resource(clk);
+        result = cyhal_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {
+            obj->pin_clk = clk;
+        }
+    }
+    
+    /* Reserve the DATA0 pin */
+    if (result == CY_RSLT_SUCCESS)
+    {
+        pin_rsc = cyhal_utils_get_gpio_resource(data0);
+        result = cyhal_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {
+            obj->pin_data0 = data0;
+        }
+    }
+    
+    /* Reserve the DATA1 pin */
+    if (result == CY_RSLT_SUCCESS)
+    {
+        pin_rsc = cyhal_utils_get_gpio_resource(data1);
+        result = cyhal_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {
+            obj->pin_data1 = data1;
+        }
+    }
+    
+    /* Reserve the DATA2 pin */
+    if (result == CY_RSLT_SUCCESS)
+    {
+        pin_rsc = cyhal_utils_get_gpio_resource(data2);
+        result = cyhal_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {
+            obj->pin_data2 = data2;
+        }
     }
 
-    hostConfig.dmaType = CY_SD_HOST_DMA_SDMA;
-    hostConfig.emmc = false;
-    hostConfig.enableLedControl = false;
-    context.cardType = CY_SD_HOST_SDIO;
+    /* Reserve the DATA3 pin */
+    if (result == CY_RSLT_SUCCESS)
+    {
+        pin_rsc = cyhal_utils_get_gpio_resource(data3);
+        result = cyhal_hwmgr_reserve(&pin_rsc);
+        if (result == CY_RSLT_SUCCESS)
+        {
+            obj->pin_data3 = data3;
+        }
+    }
 
-    /* Configure SD Host to operate */
-    (void) Cy_SD_Host_Init(obj->base, &hostConfig, &context);
+    if (result == CY_RSLT_SUCCESS)
+    {
+        result = cyhal_connect_pin(cmd_map);
+    }
+    
+    if (result == CY_RSLT_SUCCESS)
+    {
+        result = cyhal_connect_pin(clk_map);
+    }
+    
+    if (result == CY_RSLT_SUCCESS)
+    {
+        result = cyhal_connect_pin(data0_map);
+    }
+    
+    if (result == CY_RSLT_SUCCESS)
+    {
+        result = cyhal_connect_pin(data1_map);
+    }
+    
+    if (result == CY_RSLT_SUCCESS)
+    {
+        result = cyhal_connect_pin(data2_map);
+    }
+    
+    if (result == CY_RSLT_SUCCESS)
+    {
+        result = cyhal_connect_pin(data3_map);
+    }
+    
+    if  (result == CY_RSLT_SUCCESS)
+    {
+        sdhc.type = obj->resource.type;
+        sdhc.block_num = obj->resource.block_num;
+        sdhc.channel_num = obj->resource.channel_num;
 
-    /*Only enable the Card and SDMA interrupt*/
-    Cy_SD_Host_SetNormalInterruptMask(obj->base, (CY_SD_HOST_CARD_INTERRUPT | CY_SD_HOST_DMA_INTERRUPT));
+        result = cyhal_hwmgr_reserve(&sdhc);
+        if (result == CY_RSLT_SUCCESS)
+        {
+            bool configured = false;
 
-    /*Don't enable any error interrupts for now*/
-    Cy_SD_Host_SetErrorInterruptMask(obj->base, 0UL);
+            if (result == CY_RSLT_SUCCESS)
+            {
+                result = cyhal_hwmgr_is_configured(obj->resource.type,
+                                                   obj->resource.block_num, 
+                                                   obj->resource.channel_num, 
+                                                   &configured);
+            }
 
-    /*Clear all interrupts*/
-    Cy_SD_Host_ClearErrorInterruptStatus(obj->base, 0xffff);
-    Cy_SD_Host_ClearNormalInterruptStatus(obj->base, 0xffff);
+            if (result == CY_RSLT_SUCCESS && !configured)
+            {
+                /* Set HF CL to 100MHz */
+                /* TODO - uncomment once the function is implemented
+                uint8_t clk_hf = 0xff;
+                if (obj->resource.block_num == 0)
+                {
+                    clk_hf = 4;
+                }
+                else if (obj->resource.block_num == 1)
+                {
+                    clk_hf = 2;
+                }
+                else
+                {
+                    // Do nothing as we have incorrect SDHC instance
+                }
 
-    (void)Cy_SD_Host_SetHostBusWidth(obj->base, CY_SD_HOST_BUS_WIDTH_4_BIT);
+               if (clk_hf != 0xff)
+               {
+                   result = cyhal_system_clock_frequency(clk_hf, SDIO_CLK_HF_HZ);
+               }
+                */
 
-    /* Change the host SD clock to 400 kHz */
-    (void)Cy_SD_Host_SdCardChangeClock(obj->base, CY_SD_HOST_CLK_400K);
+                if (result == CY_RSLT_SUCCESS)
+                {
+                    obj->base = CY_SDHC_BASE_ADDRESSES[obj->resource.block_num];
 
-    return ret;
+                    /* Enable the SDHC block */
+                    Cy_SD_Host_Enable(obj->base);
+
+                    hostConfig.dmaType = CY_SD_HOST_DMA_SDMA;
+                    hostConfig.emmc = false;
+                    hostConfig.enableLedControl = false;
+                    context.cardType = CY_SD_HOST_SDIO;
+
+                    /* Configure SD Host to operate */
+                    (void) Cy_SD_Host_Init(obj->base, &hostConfig, &context);
+
+                    /* Only enable the SDMA interrupt */
+                    Cy_SD_Host_SetNormalInterruptMask(obj->base, CY_SD_HOST_DMA_INTERRUPT);
+
+                    /* Don't enable any error interrupts for now */
+                    Cy_SD_Host_SetErrorInterruptMask(obj->base, 0UL);
+
+                    /* Clear all interrupts */
+                    Cy_SD_Host_ClearErrorInterruptStatus(obj->base, 0xffff);
+                    Cy_SD_Host_ClearNormalInterruptStatus(obj->base, 0xffff);
+
+                    (void)Cy_SD_Host_SetHostBusWidth(obj->base, CY_SD_HOST_BUS_WIDTH_4_BIT);
+
+                    /* Change the host SD clock to 400 kHz */
+                    (void)Cy_SD_Host_SdCardChangeClock(obj->base, CY_SD_HOST_CLK_400K);
+
+                    result = 
+                    cyhal_hwmgr_set_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
+
+                    obj->frequencyhal_hz = CY_SD_HOST_CLK_400K;
+                    obj->block_size      = SDHC_SDIO_64B_BLOCK;
+                }
+            }
+        }
+    }
+    
+    if (result != CY_RSLT_SUCCESS)
+    {
+        cyhal_sdio_free(obj);
+    }
+
+    return result;
 }
 
 cy_rslt_t cyhal_sdio_free(cyhal_sdio_t *obj)
 {
-    Cy_SD_Host_DeInit(obj->base);
-    return CY_RSLT_SUCCESS;
+    cy_rslt_t result = CY_RSLT_SUCCESS;
+
+    if (NULL == obj)
+    {
+        return CYHAL_SDIO_RSLT_ERR_BAD_PARAM;
+    }
+
+    if ((NULL != obj->base) && (obj->resource.type != CYHAL_RSC_INVALID))
+    {
+        Cy_SD_Host_DeInit(obj->base);
+        result = cyhal_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
+        
+        if (result == CY_RSLT_SUCCESS)
+        {
+            result = cyhal_hwmgr_free(&(obj->resource));
+        }
+
+        if (result == CY_RSLT_SUCCESS)
+        {
+            obj->base = NULL;
+            obj->resource.type = CYHAL_RSC_INVALID;
+        }
+    }
+
+    /* Free pins */
+    if ((obj->pin_clk != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    {
+        result = cyhal_free_pin(obj->pin_clk);
+    }
+    
+    if ((obj->pin_cmd != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    {
+        result = cyhal_free_pin(obj->pin_cmd);
+    }
+
+    if ((obj->pin_data0 != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    {
+        result = cyhal_free_pin(obj->pin_data0);
+    }
+    
+    if ((obj->pin_data1 != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    {
+        result = cyhal_free_pin(obj->pin_data1);
+    }
+    
+    if ((obj->pin_data2 != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    {
+        result = cyhal_free_pin(obj->pin_data2);
+    }
+
+    if ((obj->pin_data3 != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    {
+        result = cyhal_free_pin(obj->pin_data3);
+    }
+
+    return result;
 }
 
 
-/* TODO this should be all removed - only change freq and block size */
 cy_rslt_t cyhal_sdio_configure(cyhal_sdio_t *obj, const cyhal_sdio_cfg_t *config)
 {
-    cy_rslt_t ret = CY_RSLT_SUCCESS;
-    cy_en_sd_host_status_t result;
-    uint32_t    rca, loop_count = 0UL;
-    cy_stc_sd_host_cmd_config_t cmd;
-
-    rca = obj->context.RCA;
-
-    do
+    cy_en_sd_host_status_t result = CY_SD_HOST_ERROR_TIMEOUT;
+    
+    if ((NULL == obj) && (config == NULL))
     {
-        /* Send CMD0 to set it to idle state */
-        cmd.commandIndex                    = (uint32_t)CYHAL_SDIO_CMD_GO_IDLE_STATE;
-        cmd.commandArgument                 = (uint32_t)0;
-        cmd.enableCrcCheck                  = false;
-        cmd.enableAutoResponseErrorCheck    = false;
-        cmd.respType                        = CY_SD_HOST_RESPONSE_NONE;
-        cmd.enableIdxCheck                  = false;
-        cmd.dataPresent                     = false;
-        cmd.cmdType                         = CY_SD_HOST_CMD_NORMAL;
-
-        (void)Cy_SD_Host_SendCommand(obj->base, &cmd);
-        (void)Cy_SD_Host_PollCmdComplete(obj->base);
-
-        /* CMD5 */
-        cmd.commandIndex                    = (uint32_t)CYHAL_SDIO_CMD_IO_SEND_OP_COND;
-        cmd.commandArgument                 = (uint32_t)0;
-        cmd.enableCrcCheck                  = false;
-        cmd.enableAutoResponseErrorCheck    = false;
-        cmd.respType                        = CY_SD_HOST_RESPONSE_LEN_48;
-        cmd.enableIdxCheck                  = false;
-        cmd.dataPresent                     = false;
-        cmd.cmdType                         = CY_SD_HOST_CMD_NORMAL;
-
-        (void)Cy_SD_Host_SendCommand(obj->base, &cmd);
-        (void)Cy_SD_Host_PollCmdComplete(obj->base);
-
-        /* Send CMD3 to get RCA. */
-        cmd.commandIndex                    = (uint32_t)CYHAL_SDIO_CMD_SEND_RELATIVE_ADDR;
-        cmd.commandArgument                 = (uint32_t)0;
-        cmd.enableCrcCheck                  = true;
-        cmd.enableAutoResponseErrorCheck    = false;
-        cmd.respType                        = CY_SD_HOST_RESPONSE_LEN_48;
-        cmd.enableIdxCheck                  = true;
-        cmd.dataPresent                     = false;
-        cmd.cmdType                         = CY_SD_HOST_CMD_NORMAL;
-
-        result = Cy_SD_Host_SendCommand(obj->base, &cmd);
-
-        if (CY_SD_HOST_SUCCESS == result)
-        {
-            result = Cy_SD_Host_PollCmdComplete(obj->base);
-
-            (void)Cy_SD_Host_GetResponse(obj->base, &rca, false);
-        }
-
-        loop_count++;
-        if ( loop_count >= (uint32_t) SDIO_ENUMERATION_TIMEOUT_MS )
-        {
-            result = CY_SD_HOST_ERROR_TIMEOUT;
-            break;
-        }
-    } while ( ( CY_SD_HOST_SUCCESS != result ) && ( sdio_delay_milliseconds( (uint32_t) 1 ), ( 1 == 1 ) ) );
-
-    if (CY_SD_HOST_SUCCESS == result)
-    {
-        /* Send CMD7 with the returned RCA to select the card */
-        cmd.commandIndex                    = (uint32_t)CYHAL_SDIO_CMD_SELECT_CARD;
-        cmd.commandArgument                 = (uint32_t)rca;
-        cmd.enableCrcCheck                  = true;
-        cmd.enableAutoResponseErrorCheck    = false;
-        cmd.respType                        = CY_SD_HOST_RESPONSE_LEN_48B;
-        cmd.enableIdxCheck                  = true;
-        cmd.dataPresent                     = false;
-        cmd.cmdType                         = CY_SD_HOST_CMD_NORMAL;
-
-        result = Cy_SD_Host_SendCommand(obj->base, &cmd);
-
-        if (CY_SD_HOST_SUCCESS == result)
-        {
-            result = Cy_SD_Host_PollCmdComplete(obj->base);
-        }
+        return CYHAL_SDIO_RSLT_ERR_BAD_PARAM;
     }
 
-    if (CY_SD_HOST_SUCCESS != result)
+    if (config->frequencyhal_hz != 0)
     {
-        ret = CY_RSLT_TYPE_ERROR;
+        result = Cy_SD_Host_SdCardChangeClock(obj->base, config->frequencyhal_hz);
+        obj->frequencyhal_hz = config->frequencyhal_hz;
     }
 
-    return ret;
+    if (config->block_size != 0)
+    {
+        /* No need to change anything in HW, because it will be overwritten 
+        *  in cyhal_sdio_bulk_transfer()/cyhal_sdio_transfer_async() functions.
+        *  The HW block size will taken based on obj->block_size, which is 
+        *  updated here.
+        */
+        obj->block_size = config->block_size;
+    }
+
+    return result;
 }
 
-cy_rslt_t cyhal_sdio_send_cmd(const cyhal_sdio_t *obj, cyhal_transfer_t direction, cyhal_sdio_command_t command, uint32_t argument, uint32_t* response)
+/*******************************************************************************
+* Note that during this function execution the CY_SD_HOST_CMD_COMPLETE 
+* interrupt is disabled.
+*******************************************************************************/
+cy_rslt_t cyhal_sdio_send_cmd(const cyhal_sdio_t *obj, cyhal_transfer_t direction, \
+                              cyhal_sdio_command_t command, uint32_t argument, uint32_t* response)
 {
+    if (NULL == obj)
+    {
+        return CYHAL_SDIO_RSLT_ERR_BAD_PARAM;
+    }
+
     cy_rslt_t                   ret = CY_RSLT_SUCCESS;
     cy_en_sd_host_status_t      result = CY_SD_HOST_ERROR_TIMEOUT;
     cy_stc_sd_host_cmd_config_t cmd;
     uint32_t                    retry = 50UL;
+    uint32_t                    regIntrSts = Cy_SD_Host_GetNormalInterruptMask(obj->base);
 
     /* Clear out the response */
     if ( response != NULL )
@@ -1046,16 +1190,18 @@ cy_rslt_t cyhal_sdio_send_cmd(const cyhal_sdio_t *obj, cyhal_transfer_t directio
         *response = 0UL;
     }
 
-    /* TODO Need to have already pulled correct obj->base element */
     while ((CY_SD_HOST_SUCCESS != result) && (retry-- > 0UL))
     {
         /* First clear out the command complete and transfer complete statuses */
-        Cy_SD_Host_ClearNormalInterruptStatus(obj->base, (CY_SD_HOST_XFER_COMPLETE | CY_SD_HOST_CMD_COMPLETE));
+        Cy_SD_Host_ClearNormalInterruptStatus(obj->base, CY_SD_HOST_CMD_COMPLETE);
+
+        /* Disable CMD Done interrupt, will be enabled after transition is complete */
+        Cy_SD_Host_SetNormalInterruptMask(obj->base, (regIntrSts & (uint16_t)~CY_SD_HOST_CMD_COMPLETE));
 
         /* Check if an error occurred on any previous transactions */
         if( Cy_SD_Host_GetNormalInterruptStatus(obj->base) & CY_SD_HOST_ERR_INTERRUPT )
         {
-            /* Reset the block if there was an error.  Note a full reset usually
+            /* Reset the block if there was an error. Note a full reset usually
              * requires more time, but this short version is working quite well and
              * successfully clears out the error state.
              */
@@ -1066,18 +1212,21 @@ cy_rslt_t cyhal_sdio_send_cmd(const cyhal_sdio_t *obj, cyhal_transfer_t directio
             obj->base->CORE.SW_RST_R = 0x00;
         }
 
-        cmd.commandIndex                    = (uint32_t)command;
-        cmd.commandArgument                 = argument;
-        cmd.enableCrcCheck                  = true;
-        cmd.enableAutoResponseErrorCheck    = false;
-        cmd.respType                        = CY_SD_HOST_RESPONSE_LEN_48;
-        cmd.enableIdxCheck                  = true;
-        cmd.dataPresent                     = false;
-        cmd.cmdType                         = CY_SD_HOST_CMD_NORMAL;
+        cmd.commandIndex                 = (uint32_t)command;
+        cmd.commandArgument              = argument;
+        cmd.enableCrcCheck               = true;
+        cmd.enableAutoResponseErrorCheck = false;
+        cmd.respType                     = CY_SD_HOST_RESPONSE_LEN_48;
+        cmd.enableIdxCheck               = true;
+        cmd.dataPresent                  = false;
+        cmd.cmdType                      = CY_SD_HOST_CMD_NORMAL;
 
         result = Cy_SD_Host_SendCommand(obj->base, &cmd);
-
-        result = Cy_SD_Host_PollCmdComplete(obj->base);
+        
+        if (CY_SD_HOST_SUCCESS == result)
+        {
+            result = Cy_SD_Host_PollCmdComplete(obj->base);
+        }
     }
 
     (void)Cy_SD_Host_GetResponse(obj->base, response, false);
@@ -1086,28 +1235,33 @@ cy_rslt_t cyhal_sdio_send_cmd(const cyhal_sdio_t *obj, cyhal_transfer_t directio
     {
         ret = CY_RSLT_TYPE_ERROR;
     }
-    
-    /* TODO - Looks like we do not need this when no data transfer command is used
-    *  will investigate once 2m support is added.
-    */
-    /* This interrupt is disabled in interrupt handler so need to enable it here */
-    Cy_SD_Host_SetNormalInterruptEnable(obj->base, (Cy_SD_Host_GetNormalInterruptEnable(obj->base) | CY_SD_HOST_CARD_INTERRUPT));
-    
+
+    /* Restore interrupts after transition */
+    Cy_SD_Host_SetNormalInterruptMask(obj->base, regIntrSts);
+
     return ret;
 }
 
-cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length, uint32_t* response)
+
+/*******************************************************************************
+* Note that during this function execution the CY_SD_HOST_CMD_COMPLETE and 
+* CY_SD_HOST_CMD_COMPLETE interrupts are disabled.
+*******************************************************************************/
+cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction, 
+                                   uint32_t argument, const uint32_t* data, 
+                                   uint16_t length, uint32_t* response)
 {
+    if (NULL == obj)
+    {
+        return CYHAL_SDIO_RSLT_ERR_BAD_PARAM;
+    }
+    
     cy_rslt_t                    ret = CY_RSLT_SUCCESS;
-    uint32_t                     retry = 50UL;
-    const uint32_t               block_size = SDHC_SDIO_64B_BLOCK;
+    uint32_t                     retry = CY_SDIO_BULK_TRANSF_TRIES;
     cy_stc_sd_host_cmd_config_t  cmd;
     cy_stc_sd_host_data_config_t dat;
     cy_en_sd_host_status_t       result = CY_SD_HOST_ERROR_TIMEOUT;
-    cyhal_sdio_transfer_mode_t      mode = (64U <= length) ? CYHAL_SDIO_BLOCK_MODE : CYHAL_SDIO_BYTE_MODE;
-
-    /* TODO - perhaps it would be better to allocate static 2048b ? */
-    uint32_t* temp_Buffer = (uint32_t*)malloc(length + 64 - 1);
+    uint32_t                     regIntrSts = Cy_SD_Host_GetNormalInterruptMask(obj->base);;
 
     /* Initialize data constants*/
     dat.autoCommand         = CY_SD_HOST_AUTO_CMD_NONE;
@@ -1115,6 +1269,8 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     dat.enableIntAtBlockGap = false;
     dat.enReliableWrite     = false;
     dat.enableDma           = true;
+
+    uint32_t* temp_Buffer = (uint32_t*)malloc(length + obj->block_size - 1);
 
     /* Clear out the response */
     if ( response != NULL )
@@ -1124,126 +1280,253 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
 
     while ((CY_SD_HOST_SUCCESS != result) && (retry-- > 0UL))
     {
-        /*  Add SDIO Error Handling
-         *  SDIO write timeout is expected when doing first write to register after KSO bit disable (as it goes to AOS core).
-         *  This timeout, however, triggers an error state in the hardware.  So, check for the error and then recover from it
-         *  as needed via reset issuance.  This is the only time known that a write timeout occurs.
+        /* Add SDIO Error Handling
+         * SDIO write timeout is expected when doing first write to register 
+         * after KSO bit disable (as it goes to AOS core).
+         * This timeout, however, triggers an error state in the hardware. 
+         * So, check for the error and then recover from it
+         * as needed via reset issuance. This is the only time known that 
+         * a write timeout occurs.
          */
 
         /* First clear out the command complete and transfer complete statuses */
         Cy_SD_Host_ClearNormalInterruptStatus(obj->base, (CY_SD_HOST_XFER_COMPLETE | CY_SD_HOST_CMD_COMPLETE));
 
-        /* Check if an error occurred on any previous transactions */
-        if( Cy_SD_Host_GetNormalInterruptStatus(obj->base) & CY_SD_HOST_ERR_INTERRUPT )
+        /* Check if an error occurred on any previous transactions or reset 
+        *  after the first unsuccessful bulk transfer try 
+        */
+        if( (Cy_SD_Host_GetNormalInterruptStatus(obj->base) & CY_SD_HOST_ERR_INTERRUPT) ||
+            (retry < CY_SDIO_BULK_TRANSF_TRIES))
         {
             /* Reset the block if there was an error. Note a full reset usually
-             * requires more time, but this short version is working quite well and
-             * successfully clears out the error state.
+             * requires more time, but this short version is working quite well 
+             * and successfully clears out the error state.
              */
             Cy_SD_Host_ClearErrorInterruptStatus(obj->base, 0xffffU);
-            Cy_SD_Host_SoftwareReset(obj->base,    CY_SD_HOST_RESET_CMD_LINE);
-            Cy_SD_Host_SoftwareReset(obj->base,    CY_SD_HOST_RESET_DATALINE);
+            Cy_SD_Host_SoftwareReset(obj->base, CY_SD_HOST_RESET_CMD_LINE);
+            Cy_SD_Host_SoftwareReset(obj->base, CY_SD_HOST_RESET_DATALINE);
             Cy_SysLib_DelayUs(1);
             obj->base->CORE.SW_RST_R = 0x00;
         }
 
         /* Prepare the data transfer register */
-        cmd.commandIndex                    = 53u;
-        cmd.commandArgument                 = argument;
-        cmd.enableCrcCheck                  = true;
-        cmd.enableAutoResponseErrorCheck    = false;
-        cmd.respType                        = CY_SD_HOST_RESPONSE_LEN_48;
-        cmd.enableIdxCheck                  = true;
-        cmd.dataPresent                     = true;
-        cmd.cmdType                         = CY_SD_HOST_CMD_NORMAL;
-        dat.data                            = (uint32_t*)data;
+        cmd.commandIndex                 = (uint32_t) CYHAL_SDIO_CMD_IO_RW_EXTENDED;
+        cmd.commandArgument              = argument;
+        cmd.enableCrcCheck               = true;
+        cmd.enableAutoResponseErrorCheck = false;
+        cmd.respType                     = CY_SD_HOST_RESPONSE_LEN_48;
+        cmd.enableIdxCheck               = true;
+        cmd.dataPresent                  = true;
+        cmd.cmdType                      = CY_SD_HOST_CMD_NORMAL;
+        dat.data                         = (uint32_t*)data;
 
         dat.read = ( direction == CYHAL_WRITE ) ? false : true;
 
-        /* TODO - fix as is in udb sdio or try to have two transitions BSP-542*/
-        if( mode == CYHAL_SDIO_BLOCK_MODE )
+        /* TODO - BSP-542 */
+        /* Block mode */
+        if (length >= obj->block_size)
         {
-            dat.blockSize     = block_size;
-            dat.numberOfBlock = ( length + block_size - 1 ) / block_size;
+            dat.blockSize     = obj->block_size;
+            dat.numberOfBlock = ( length + obj->block_size - 1 ) / obj->block_size;
             
             if (dat.read)
             {
                 dat.data = (uint32_t*) temp_Buffer;
             }
         }
+        /* Byte mode */
         else
         {
-              dat.blockSize       = length;
-              dat.numberOfBlock   = 1UL;
+            dat.blockSize     = length;
+            dat.numberOfBlock = 1UL;
         }
 
-       /* Disable XFER Done interrupt */
-       obj->base->CORE.NORMAL_INT_SIGNAL_EN_R  &= (uint16_t)~CY_SD_HOST_XFER_COMPLETE;
+        /* Disable XFER Done interrupt */
+        Cy_SD_Host_SetNormalInterruptMask(obj->base, (regIntrSts & 
+                                                     (uint16_t)~(CY_SD_HOST_XFER_COMPLETE | CY_SD_HOST_CMD_COMPLETE)));
 
-       (void)Cy_SD_Host_InitDataTransfer(obj->base, &dat);
+        (void)Cy_SD_Host_InitDataTransfer(obj->base, &dat);
 
-       result = Cy_SD_Host_SendCommand(obj->base, &cmd);
-       if ( CY_SD_HOST_SUCCESS == result )
-       {
-           result = Cy_SD_Host_PollCmdComplete(obj->base);
+        result = Cy_SD_Host_SendCommand(obj->base, &cmd);
+        if ( CY_SD_HOST_SUCCESS == result )
+        {
+            result = Cy_SD_Host_PollCmdComplete(obj->base);
 
-           if ( CY_SD_HOST_SUCCESS == result )
-           {
-               result = Cy_SD_Host_PollTransferComplete(obj->base);
-           }
+            if ( CY_SD_HOST_SUCCESS == result )
+            {
+                result = Cy_SD_Host_PollTransferComplete(obj->base);
+            }
+        }
 
-       }
+        Cy_SysLib_DelayUs(CY_HAL_SDHC_OPER_CMPLT_US);
     }
 
     if (response != NULL )
     {
         (void)Cy_SD_Host_GetResponse(obj->base, response, false);
     }
+    
+    /* Restore interrupts after transition */
+    Cy_SD_Host_SetNormalInterruptMask(obj->base, regIntrSts);
 
     if (CY_SD_HOST_SUCCESS != result)
     {
         ret = CY_RSLT_TYPE_ERROR;
     }
 
-
-    if(result == CY_RSLT_SUCCESS && mode == CYHAL_SDIO_BLOCK_MODE && dat.read)
+    if(result == CY_RSLT_SUCCESS && length >= obj->block_size && dat.read)
     {
         memcpy((uint32_t *)data, temp_Buffer, (size_t)length);
     }
 
-    /* This interrupt is disabled in interrupt handler so need to enable it here */
-    Cy_SD_Host_SetNormalInterruptEnable(obj->base, (Cy_SD_Host_GetNormalInterruptEnable(obj->base) | CY_SD_HOST_CARD_INTERRUPT));
-
     free(temp_Buffer);
 
-    /* Make sure all previous changes are applied */
-    Cy_SysLib_DelayUs(250U);
-    __DSB();
+    if (0u != (CY_SD_HOST_CARD_INTERRUPT & obj->irq_cause))
+    {
+        uint32_t intrStsEn = Cy_SD_Host_GetNormalInterruptEnable(obj->base);
+        
+        /* This interrupt is disabled in interrupt handler so need to enable it here */
+        Cy_SD_Host_SetNormalInterruptEnable(obj->base, (intrStsEn | CY_SD_HOST_CARD_INTERRUPT));
+    }
 
     return ret;
 }
 
-cy_rslt_t cyhal_sdio_transfer_async(cyhal_sdio_t *obj, cyhal_transfer_t direction, uint32_t argument, const uint32_t* data, uint16_t length)
+
+/*******************************************************************************
+*
+* Asynchronous transfer is implemented on the CY_SD_HOST_CMD_COMPLETE and 
+* CY_SD_HOST_CMD_COMPLETE interrupts.
+* Function setup data and enables CY_SD_HOST_CMD_COMPLETE and 
+* CY_SD_HOST_CMD_COMPLETE. After this the cyhal_sdio_is_busy() function returns 
+* true result to show asynchronous transfer is in progress.
+* Once transfer is complete the interrupt is fired.
+* After servicing the interrupt the cyhal_sdio_is_busy() function returns 
+* false to indicate than asynchronous transfer is complete.
+*
+*******************************************************************************/
+cy_rslt_t cyhal_sdio_transfer_async(cyhal_sdio_t *obj, cyhal_transfer_t direction, 
+                                    uint32_t argument, const uint32_t* data, uint16_t length)
 {
-    cy_rslt_t ret = CY_RSLT_SUCCESS;
-    /* TODO: implement */
+    if (NULL == obj)
+    {
+        return CYHAL_SDIO_RSLT_ERR_BAD_PARAM;
+    }
+
+    cy_rslt_t                    ret = CY_RSLT_SUCCESS;
+    uint32_t                     retry = CY_SDIO_BULK_TRANSF_TRIES;
+    cy_stc_sd_host_cmd_config_t  cmd;
+    cy_stc_sd_host_data_config_t dat;
+    cy_en_sd_host_status_t       result = CY_SD_HOST_ERROR_TIMEOUT;
+    uint32_t                     intMaskReg = Cy_SD_Host_GetNormalInterruptMask(obj->base);
+    uint32_t                     intEnableReg = Cy_SD_Host_GetNormalInterruptEnable(obj->base);
+
+    /* Initialize data constants*/
+    dat.autoCommand         = CY_SD_HOST_AUTO_CMD_NONE;
+    dat.dataTimeout         = 0x0dUL;
+    dat.enableIntAtBlockGap = false;
+    dat.enReliableWrite     = false;
+    dat.enableDma           = true;
+
+    while ((CY_SD_HOST_SUCCESS != result) && (retry-- > 0UL))
+    {
+        /* Check if an error occurred on any previous transactions or reset after the first unsuccessful bulk transfer try */
+        if( (Cy_SD_Host_GetNormalInterruptStatus(obj->base) & CY_SD_HOST_ERR_INTERRUPT) || 
+            (retry < CY_SDIO_BULK_TRANSF_TRIES))
+        {
+            /* Reset the block if there was an error. Note a full reset usually
+             * requires more time, but this short version is working quite well and
+             * successfully clears out the error state.
+             */
+            Cy_SD_Host_ClearErrorInterruptStatus(obj->base, 0xffffU);
+            Cy_SD_Host_SoftwareReset(obj->base, CY_SD_HOST_RESET_CMD_LINE);
+            Cy_SD_Host_SoftwareReset(obj->base, CY_SD_HOST_RESET_DATALINE);
+            Cy_SysLib_DelayUs(1);
+            obj->base->CORE.SW_RST_R = 0x00;
+        }
+
+        /* Prepare the data transfer register */
+        cmd.commandIndex                 = (uint32_t) CYHAL_SDIO_CMD_IO_RW_EXTENDED;
+        cmd.commandArgument              = argument;
+        cmd.enableCrcCheck               = true;
+        cmd.enableAutoResponseErrorCheck = false;
+        cmd.respType                     = CY_SD_HOST_RESPONSE_LEN_48;
+        cmd.enableIdxCheck               = true;
+        cmd.dataPresent                  = true;
+        cmd.cmdType                      = CY_SD_HOST_CMD_NORMAL;
+        dat.data                         = (uint32_t*)data;
+
+        dat.read = ( direction == CYHAL_WRITE ) ? false : true;
+
+        /* TODO - BSP-542 */
+        /* Block mode */
+        if (length >= obj->block_size)
+        {
+            dat.blockSize     = obj->block_size;
+            dat.numberOfBlock = ( length + obj->block_size - 1 ) / obj->block_size;
+        }
+        /* Byte mode */
+        else
+        {
+            dat.blockSize     = length;
+            dat.numberOfBlock = 1UL;
+        }
+
+        /* Enable XFER Done interrupt */
+        Cy_SD_Host_SetNormalInterruptMask(obj->base, (intMaskReg | (uint16_t) CY_SD_HOST_XFER_COMPLETE));
+        Cy_SD_Host_SetNormalInterruptEnable(obj->base, (intEnableReg | (uint16_t) CY_SD_HOST_XFER_COMPLETE));
+
+        (void)Cy_SD_Host_InitDataTransfer(obj->base, &dat);
+
+        result = Cy_SD_Host_SendCommand(obj->base, &cmd);
+        Cy_SysLib_DelayUs(CY_HAL_SDHC_OPER_CMPLT_US);
+    }
+
+    if (CY_SD_HOST_SUCCESS != result)
+    {
+        ret = CY_RSLT_TYPE_ERROR;
+    }
+    else
+    {
+        /* Indicate that async transfer in progress */
+        isTransferInProcess = true;
+    }
+
+    if (0u != (CY_SD_HOST_CARD_INTERRUPT & obj->irq_cause))
+    {
+        /* This interrupt is disabled in interrupt handler so need to enable it here */
+        Cy_SD_Host_SetNormalInterruptEnable(obj->base, (intEnableReg | CY_SD_HOST_CARD_INTERRUPT));
+    }
+
     return ret;
 }
+
 
 cy_rslt_t cyhal_sdio_is_busy(const cyhal_sdio_t *obj, bool *busy)
 {
-    *busy = (CY_SD_HOST_XFER_COMPLETE != (CY_SD_HOST_XFER_COMPLETE & Cy_SD_Host_GetNormalInterruptStatus(obj->base)));
+    if (NULL == obj)
+    {
+        return CYHAL_SDIO_RSLT_ERR_BAD_PARAM;
+    }
+    
+    *busy = isTransferInProcess;
 
     return CY_RSLT_SUCCESS;
 }
 
+
 cy_rslt_t cyhal_sdio_abort_async(const cyhal_sdio_t *obj)
 {
     cy_rslt_t ret = CY_RSLT_SUCCESS;
-    /* TODO: implement */
+
+    /* To abort transition reset dat and cmd lines (software reset) */
+    Cy_SD_Host_SoftwareReset(obj->base, CY_SD_HOST_RESET_CMD_LINE);
+    Cy_SD_Host_SoftwareReset(obj->base, CY_SD_HOST_RESET_DATALINE);
+    Cy_SysLib_DelayUs(1);
+    obj->base->CORE.SW_RST_R = 0x00;
+
     return ret;
 }
-
 
 /* Callback array for SDHC SDIO interrupts */
 static cyhal_sdio_irq_handler callbacks[CY_IP_MXSDHC_INSTANCES];
@@ -1257,6 +1540,8 @@ static cyhal_sdio_t *cy_sdio_config_structs[CY_IP_MXSDHC_INSTANCES];
 
 static void isr_sdio_handler(uint8_t index, SDHC_Type *blockAddr)
 {
+    uint32_t interruptStatus = Cy_SD_Host_GetNormalInterruptStatus(blockAddr);
+    
     if (callbacks[index] != NULL)
     {
         /* Call registered callbacks here */
@@ -1265,17 +1550,25 @@ static void isr_sdio_handler(uint8_t index, SDHC_Type *blockAddr)
 
     Cy_SD_Host_ClearNormalInterruptStatus(blockAddr, cy_sdio_config_structs[index]->irq_cause);
 
-    /* To clear SD Card interrupt need to disable SD Card interrupt Enable mask.
-     * The SD Card interrupt is enabled in the bulk transfer function later on
-     * the next data transfer.
-     */
-    if (0 != (Cy_SD_Host_GetNormalInterruptStatus(blockAddr) & CY_SD_HOST_CARD_INTERRUPT))
+    /* To clear SD Card interrupt need to disable SD Card Interrupt Enable mask.
+    * The SD Card interrupt is enabled in the bulk transfer function later on
+    * the next data transfer.
+    */
+    if (0u != (cy_sdio_config_structs[index]->irq_cause & CY_SD_HOST_CARD_INTERRUPT))
     {
-        uint32_t interruptMask = Cy_SD_Host_GetNormalInterruptEnable(blockAddr);
-        interruptMask &= (uint32_t) ~CY_SD_HOST_CARD_INTERRUPT;
+        if (0u != (interruptStatus & CY_SD_HOST_CARD_INTERRUPT))
+        {
+            uint32_t interruptMask = Cy_SD_Host_GetNormalInterruptEnable(blockAddr);
+            interruptMask &= (uint32_t) ~CY_SD_HOST_CARD_INTERRUPT;
 
-        /* Disable SD Card interrupt */
-        Cy_SD_Host_SetNormalInterruptEnable(blockAddr, interruptMask);
+            /* Disable SD Card interrupt */
+            Cy_SD_Host_SetNormalInterruptEnable(blockAddr, interruptMask);
+        }
+    }
+    
+    if (0u != (interruptStatus & CY_SD_HOST_XFER_COMPLETE) && isTransferInProcess)
+    {
+        isTransferInProcess = false;
     }
 }
 
@@ -1302,10 +1595,12 @@ static void isr_sdio_0_handler (void)
 {
     isr_sdio_handler(0, SDHC0);
 }
+
 static void isr_sdio_1_handler (void)
 {
     isr_sdio_handler(1, SDHC1);
 }
+
 
 cy_rslt_t cyhal_sdio_register_irq(cyhal_sdio_t *obj, cyhal_sdio_irq_handler handler, void *handler_arg)
 {
@@ -1318,20 +1613,21 @@ cy_rslt_t cyhal_sdio_register_irq(cyhal_sdio_t *obj, cyhal_sdio_irq_handler hand
     callback_args[index] = handler_arg;
 
     /* Only enable if it's not already enabled */
-    //if ((NVIC_GetEnableIRQ(irqn) == 0) && (ret != CY_RSLT_SUCCESS))
+    if (NVIC_GetEnableIRQ(irqn) == 0)
     {
         cy_stc_sysint_t irqCfg = {irqn, SDIO_IRQ_PRIORITY};
 
         Cy_SysInt_Init(&irqCfg, interrupts_dispatcher_table[index]);
         NVIC_EnableIRQ(irqn);
     }
-   // else
+    else
     {
-       // NVIC_SetPriority(irqn, SDIO_IRQ_PRIORITY);
+        NVIC_SetPriority(irqn, SDIO_IRQ_PRIORITY);
     }
 
     return ret;
 }
+
 
 cy_rslt_t cyhal_sdio_irq_enable(cyhal_sdio_t *obj, cyhal_sdio_irq_event_t event, bool enable)
 {
@@ -1349,7 +1645,6 @@ cy_rslt_t cyhal_sdio_irq_enable(cyhal_sdio_t *obj, cyhal_sdio_irq_event_t event,
 
         obj->irq_cause |= event;
     }
-    /* Disable interrupt */
     else
     {
         interruptEnable &= ~(event);
@@ -1358,51 +1653,11 @@ cy_rslt_t cyhal_sdio_irq_enable(cyhal_sdio_t *obj, cyhal_sdio_irq_event_t event,
         obj->irq_cause &= ~event;
     }
 
-    /* TODO: Need to double check is this flow is safe */
-    //Cy_SD_Host_SetErrorInterruptEnable(obj->base, interruptEnable);
-    //Cy_SD_Host_SetErrorInterruptMask(obj->base, interruptMask);
-
     Cy_SD_Host_SetNormalInterruptMask(obj->base, interruptMask);
     Cy_SD_Host_SetNormalInterruptEnable(obj->base, interruptEnable);
 
     return ret;
 }
 
-/* TODO: Remove these functions. Temporary added to make it workable */
-cy_rslt_t sdio_bus_interrupt_enable(const cyhal_sdio_t *obj)
-{
-    uint32_t interrupt = Cy_SD_Host_GetNormalInterruptEnable(obj->base);
-
-    interrupt |= CY_SD_HOST_CARD_INTERRUPT;
-
-    Cy_SD_Host_SetNormalInterruptEnable(obj->base, interrupt);
-
-    return CY_RSLT_SUCCESS;
-}
-
-cy_rslt_t sdio_bus_interrupt_disable(const cyhal_sdio_t *obj)
-{
-    uint32_t interrupt = Cy_SD_Host_GetNormalInterruptEnable(obj->base);
-
-    interrupt &=~CY_SD_HOST_CARD_INTERRUPT;
-
-    Cy_SD_Host_SetNormalInterruptEnable(obj->base, interrupt);
-
-    return CY_RSLT_SUCCESS;
-}
-
-cy_rslt_t sdio_interrupt_status(const cyhal_sdio_t *obj, uint16_t* status)
-{
-    *status = (uint16_t)Cy_SD_Host_GetNormalInterruptStatus(obj->base);
-
-    return CY_RSLT_SUCCESS;
-}
-
-cy_rslt_t sdio_clear_pending_isr(const cyhal_sdio_t *obj)
-{
-    NVIC_ClearPendingIRQ(sdhc_0_interrupt_general_IRQn);
-
-    return CY_RSLT_SUCCESS;
-}
 
 #endif /* CY_IP_MXSDHC */

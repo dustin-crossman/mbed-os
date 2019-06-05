@@ -41,7 +41,7 @@
 * To configure the BLE ECO clock, call Cy_BLE_EcoConfigure(). 
 *
 * The following code shows how to configure the BLE ECO clock:
-* \snippet bleclk\3.0\snippet\main.c BLE ECO clock API: Cy_BLE_EcoConfigure()
+* \snippet bleclk/snippet/main.c BLE ECO clock API: Cy_BLE_EcoConfigure()
 *
 * \section group_ble_clk_more_information More Information
 * See the BLE chapter of the device technical reference manual (TRM).

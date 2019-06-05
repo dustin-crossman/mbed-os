@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_usbfs_dev_drv_io_dma.c
-* \version 1.10
+* \version 2.0
 *
 * Provides data transfer API implementation of the USBFS driver.
 *
@@ -717,6 +717,10 @@ cy_en_usbfs_dev_drv_status_t AddEndpointRamBuffer(USBFS_Type *base,
                                                              IN_ENDPOINT_ARB_INTR_SOURCES :
                                                              OUT_ENDPOINT_ARB_INTR_SOURCES));
         
+        /* Set arbiter configuration */
+        Cy_USBFS_Dev_Drv_SetArbEpConfig(base, endpoint, (USBFS_USBDEV_ARB_EP1_CFG_CRC_BYPASS_Msk |
+                                                         USBFS_USBDEV_ARB_EP1_CFG_RESET_PTR_Msk));
+
         /* Enable SIE and arbiter interrupt for endpoint */
         Cy_USBFS_Dev_Drv_EnableSieEpInterrupt(base, endpoint);
         Cy_USBFS_Dev_Drv_EnableArbEpInterrupt(base, endpoint);
@@ -781,6 +785,9 @@ void RestoreEndpointRamBuffer(USBFS_Type *base,
         Cy_DMA_Channel_Enable(endpointData->base, endpointData->chNum);
     }
 
+    /* Set arbiter configuration */
+    Cy_USBFS_Dev_Drv_SetArbEpConfig(base, endpoint, (USBFS_USBDEV_ARB_EP1_CFG_CRC_BYPASS_Msk |
+                                                     USBFS_USBDEV_ARB_EP1_CFG_RESET_PTR_Msk));
     /* Set SIE mode to respond to host */
     Cy_USBFS_Dev_Drv_SetSieEpMode(base, endpoint, GetEndpointInactiveMode((uint32_t) endpointData->sieMode));
 }
