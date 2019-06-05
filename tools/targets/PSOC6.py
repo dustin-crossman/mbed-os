@@ -24,7 +24,7 @@ import errno
 from array import array
 from struct import (pack, unpack)
 from shutil import copy2
-from intelhex import IntelHex
+from intelhex import IntelHex, hex2bin, bin2hex
 from intelhex.compat import asbytes
 
 from ..config import ConfigException
@@ -140,57 +140,209 @@ def find_cm0_image(toolchain, resources, elf, hexf, hex_filename):
     return m0hexf
 
 
-# Make a dictionary with arguments for signing image
-def collect_args(toolchain, image_slot, target_type):
+# check if policy parameters are consistent
+def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=None):
 
-    cy_targets = Path("targets/TARGET_Cypress/TARGET_PSOC6/")
-    sb_params_file_name = Path("secure_image_parameters.json")
-    root_dir = Path(os.getcwd())
+    print("+++++++++++++ from check_args_integrity function")
 
-    # suppose default location for application ../mbed-os
-    sb_params_file_path = root_dir / cy_targets / Path("TARGET_" + target_type["name"]) / sb_params_file_name
+    print(fw_cyb)
+    print(fw_spe)
+    print(fw_nspe)
+    print(target_data)
 
-    if not os.path.isfile(str(sb_params_file_path)):
-        # may be muboot target
-        sb_params_file_path = root_dir / cy_targets / 'TARGET_MCUBOOT' / \
-                              Path("TARGET_" + target_type["name"]) / sb_params_file_name
-        if not os.path.isfile(str(sb_params_file_path)):
-            # consider tests build
-            sb_params_file_path = root_dir / 'mbed-os' / cy_targets / \
-                              Path("TARGET_" + target_type["name"]) / sb_params_file_name
-            if not os.path.isfile(str(sb_params_file_path)):
-                # tests build may also be muboot target
-                sb_params_file_path = root_dir / 'mbed-os' / cy_targets / 'TARGET_MCUBOOT' / \
-                              Path("TARGET_" + target_type["name"]) / sb_params_file_name
-                if not os.path.isfile(str(sb_params_file_path)):
-                    toolchain.notify.debug("[PSOC6.sign_image] ERROR: Target not found!")
+    if fw_spe is None:
+        img_id = fw_nspe["id"]
+
+        # check single stage scheme
+        if not (fw_cyb["launch"] == img_id):
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: ID of build image"
+                                   " does not correspond launch ID in CyBootloader!")
+        # check slots addresses and sizes if upgrade is set to True
+        if fw_nspe["upgrade"] and True:
+
+            for slot in fw_nspe["resources"]:
+                if slot["type"] == "BOOT":
+                    slot0 = slot
+                    print(slot0)
+                elif slot["type"] == "UPGRADE":
+                    slot1 = slot
+                    print(slot1)
+                else:
+                    toolchain.notify.debug("[PSOC6.sign_image] ERROR: BOOT or UPGRADE sections can't be found in policy file ")
                     raise Exception("imgtool finished execution with errors!")
 
-    with open(str(sb_params_file_path)) as f:
-        json_str = f.read()
-        sb_config = json.loads(json_str)
+    else:
+        # check if PSA targets flash map correspond to slots addresses and sizes in policy
+        if not (int(target_data["overrides"]["secure-rom-start"], 16) - 1024) ==\
+                int(fw_spe["resources"][0]["address"]):
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: SPE start address "
+                                   "does not correspond BOOT slot start address defined in policy. "
+                                   "Check if MCUboot header offset 0x400 is included in SPE flash start")
+            # raise Exception("imgtool finished execution with errors!")
 
-        # suppose default location for tests ./mbed-os
-        sdk_path = str((root_dir / sb_config.get("sdk_path")).absolute())
+        if not (int(target_data["overrides"]["non-secure-rom-start"], 16) - 1024) ==\
+                int(fw_nspe["resources"][0]["address"]):
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: NSPE start address "
+                                   "does not correspond BOOT slot start address defined in policy. "
+                                   "Check if MCUboot header offset 0x400 is included in NSPE flash start")
+            # raise Exception("imgtool finished execution with errors!")
 
-        if not os.path.isdir(sdk_path):
-            # try location for application ../mbed-os
-            sdk_path = str((root_dir / 'mbed-os' / sb_config.get("sdk_path")).absolute())
+        if (int(target_data["overrides"]["secure-rom-size"], 16) + 1024) > int(fw_spe["resources"][0]["size"]):
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: SPE flash size "
+                                   "does not fit in BOOT slot size defined in policy.")
+            # raise Exception("imgtool finished execution with errors!")
 
-        args_for_signature = {
-            "sdk_path": sdk_path,
-            "priv_key": str(sdk_path + sb_config["priv_key_file"]),
-            "imgtool": str(sdk_path + "/imgtool/imgtool.py"),
-            "version": str(sb_config[target_type["core"]][image_slot]["VERSION"]),
-            "id": str(sb_config[target_type["core"]][image_slot]["IMAGE_ID"]),
-            "rollback_counter": str(sb_config[target_type["core"]][image_slot]["ROLLBACK_COUNTER"]),
-            "slot_size": str(sb_config[target_type["core"]][image_slot]["SLOT_SIZE"]),
-            "header_size": "0x400",
-            "align": "8",
-            "pad": sb_config[target_type["core"]][image_slot]["PAD"]
-        }
+        if (int(target_data["overrides"]["non-secure-rom-size"], 16) + 1024) > int(fw_nspe["resources"][0]["size"]):
 
-    return args_for_signature
+            print(int(target_data["overrides"]["non-secure-rom-size"], 16))
+            print(int(fw_nspe["resources"][0]["size"]))
+
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: NSPE flash size "
+                                   "does not fit in BOOT slot size defined in policy.")
+            # raise Exception("imgtool finished execution with errors!")
+
+        img_id = fw_spe["id"]
+        # check dual stage scheme
+        if img_id != 1:
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: Image ID of SPE image"
+                                   " is not equal to 1!")
+            raise Exception("imgtool finished execution with errors!")
+
+        if not (fw_cyb["launch"] == img_id):
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: ID of build image"
+                                   " does not correspond launch ID in CyBootloader!")
+            raise Exception("imgtool finished execution with errors!")
+
+        if not (fw_spe["launch"] == fw_nspe["id"]):
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: ID of NSPE image"
+                                   " does not correspond launch ID in SPE part!")
+            raise Exception("imgtool finished execution with errors!")
+
+        # check slots addresses and sizes if upgrade is set to True
+        if fw_spe["upgrade"] and True:
+
+            for slot in fw_spe["resources"]:
+                if slot["type"] == "BOOT":
+                    slot0 = slot
+                elif slot["type"] == "UPGRADE":
+                    slot1 = slot
+                else:
+                    toolchain.notify.debug("[PSOC6.sign_image] ERROR: BOOT or UPGRADE sections can't be found in policy file ")
+                    raise Exception("imgtool finished execution with errors!")
+
+    # bigger or equal to 0x18000000 hex
+    if slot1["address"] >= 402653184:
+        toolchain.notify.debug("[PSOC6.sign_image] INFO: UPGRADE slot will be resided in external flash")
+
+    # TODO: implement slots do not overlap check?
+
+    if slot0["size"] != slot1["size"]:
+        toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT and UPGRADE slots sizes are not equal")
+        # raise Exception("imgtool finished execution with errors!")
+
+    return [slot0, slot1, img_id]
+
+
+# Resolve Secure Boot policy sections considering target
+def process_target(toolchain, target, binf):
+
+    targets_json = Path("targets/targets.json")
+    cy_targets = Path("targets/TARGET_Cypress/TARGET_PSOC6/")
+    sb_params_file_name = Path("secure_image_parameters.json")
+    # assume root dir is ./mbed-os
+    root_dir = Path(os.getcwd())
+
+    mbed_os_targets = root_dir / targets_json
+
+    if not os.path.isfile(str(mbed_os_targets)):
+        # try location for tests
+        mbed_os_targets = root_dir / 'mbed-os' / targets_json
+        root_dir = root_dir / 'mbed-os'
+        if not os.path.isfile(str(mbed_os_targets)):
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: targets.json not found!")
+            raise Exception("imgtool finished execution with errors!")
+
+    # print("+++++++++++++")
+    # print(mbed_os_targets)
+
+    with open(str(mbed_os_targets)) as j:
+        json_str = j.read()
+        all_targets = json.loads(json_str)
+        j.close()
+
+    processing_target = all_targets[target]
+
+    # print("+++++++++++++")
+    # print(processing_target)
+
+    sb_params_file_path = root_dir / cy_targets / Path("TARGET_" + str(target)) / sb_params_file_name
+
+    if os.path.isfile(str(sb_params_file_path)):
+        with open(str(sb_params_file_path)) as f:
+            json_str = f.read()
+            sb_config = json.loads(json_str)
+            f.close()
+    else:
+        toolchain.notify.debug("[PSOC6.sign_image] ERROR: secure_image_parametest.json not found!")
+        raise Exception("imgtool finished execution with errors!")
+
+    print("+++++++++++++")
+    print(sb_config)
+
+    sdk_path = root_dir / sb_config["sdk_path"]
+
+    priv_key_path = sdk_path / Path(sb_config["priv_key_file"])
+
+    if not os.path.isfile(str(priv_key_path)):
+        toolchain.notify.debug("[PSOC6.sign_image] ERROR: Private key file not found in " + priv_key_path)
+        raise Exception("imgtool finished execution with errors!")
+
+    if "_PSA" in target:
+        # assume dual stage bootloading scheme
+        with open(sdk_path / "prepare/policy_dual_stage_CM0p_CM4.json") as p:
+            policy_str = p.read()
+            policy_file = json.loads(policy_str)
+            p.close()
+
+            firmware_list = policy_file["boot_upgrade"]["firmware"]
+
+            firmware_cyb_cm0p = firmware_list[0]
+        if "_M0_" in target:
+            firmware_spe_cm0p = firmware_list[1]
+            firmware_nspe_cm4 = firmware_list[2]
+            print("+++++++++_________________===========")
+            print(firmware_spe_cm0p)
+
+            slots = check_slots_integrity(toolchain, fw_cyb=firmware_cyb_cm0p, fw_spe=firmware_spe_cm0p,
+                                          fw_nspe=firmware_nspe_cm4, target_data=processing_target)
+        else:
+            firmware_nspe_cm4 = firmware_list[2]
+            slots = check_slots_integrity(toolchain, fw_cyb=firmware_cyb_cm0p, fw_nspe=firmware_nspe_cm4,
+                                          target_data=processing_target)
+
+    else:
+        # consider single stage bootloading scheme
+        with open(sdk_path / "prepare/policy_single_stage_CM4.json") as p:
+            policy_str = p.read()
+            policy_file = json.loads(policy_str)
+            p.close()
+
+        firmware_list = policy_file["boot_upgrade"]["firmware"]
+        firmware_cyb_cm0p = firmware_list[0]
+        firmware_nspe_cm4 = firmware_list[1]
+        slots = check_slots_integrity(toolchain, fw_cyb=firmware_cyb_cm0p,
+                                      fw_nspe=firmware_nspe_cm4, target_data=processing_target)
+
+
+    print("++++++ slots info")
+    print(slots)
+
+    target_sig_data = [{"img_data": sb_config["boot0"], "slot_data": slots[0],
+                        "key_file": sb_config["priv_key_file"], "sdk_path": sdk_path, "id": slots[2]},
+                       {"img_data": sb_config["boot1"], "slot_data": slots[1],
+                        "key_file": sb_config["priv_key_file"], "sdk_path": sdk_path, "id": slots[2]}]
+
+    return target_sig_data
 
 
 # Sign binary image with Secure Boot SDK tools
@@ -198,52 +350,66 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
     target = {"name": "UNDEFINED", "core": "UNDEFINED"}
     img_start_addr = 0
 
-    # find target name and type before processing
-    for part in PurePath(binf).parts:
-        if "CY" in part:
-            if "_M0_" in part:
-                target = {"name": part, "core": "cm0p"}
-                # SPE image flash address start
-                img_start_addr = "0x10080000"
-            elif "_PSA" in part:
-                # NSPE image flash address start
-                img_start_addr = "0x10000000"
-                target = {"name": part, "core": "cm4"}
-
-            else:
-                # CM4 SB image flash address start
-                img_start_addr = "0x10002000"
-                target = {"name": part, "core": "cm4"}
-
     # preserve original hex file from mbed-os build
     binf_orig = str(binf)[:-4] + "_unsigned.hex"
     copy2(str(binf), binf_orig)
 
-    # gather arguments for signature command invoking
-    if target["name"] != "UNDEFINED":
-        sign_args = collect_args(toolchain, image_slot="boot1", target_type=target)
-    else:
-        toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Target not found!")
-        exit(1)
+    # find target name and type before processing
+    for part in PurePath(binf).parts:
+        if "CY" in part:
+            target_sig_data = process_target(toolchain=toolchain, target=part, binf=binf)
+        # else:
+        #     toolchain.notify.tool_error("[PSOC6.sign_image] ERROR: Target not found!")
+        #     exit(1)
 
-    # call imgtool for signature
-    process = subprocess.Popen([sys.executable, sign_args.get("imgtool"), "sign", "--key", sign_args.get("priv_key"),
-                                "--header-size", sign_args.get("header_size"), "--pad-header", "--align",
-                                sign_args.get("align"), "--version", sign_args.get("version"), "--image-id",
-                                sign_args.get("id"), "--rollback_counter", sign_args.get("rollback_counter"),
-                                "--slot-size", sign_args.get("slot_size"), "--overwrite-only", sign_args.get("pad"), binf_orig, binf],
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    for slot in target_sig_data:
+        # sign_args = collect_args(toolchain, slot)
 
-    # catch stderr outputs
-    stderr = process.communicate()
-    rc = process.wait()
+        if slot["slot_data"]["type"] == "UPGRADE":
+            out_bin_name = str(binf)[:-4] + "_upgrade.hex"
+        else:
+            out_bin_name = binf
 
-    if rc != 0:
-        toolchain.notify.debug("[PSOC6.sign_image] ERROR: Signature is not added!")
-        toolchain.notify.debug("[PSOC6.sign_image] Message from imgtool: " + stderr[1].decode("utf-8"))
-        raise Exception("imgtool finished execution with errors!")
-    else:
-        toolchain.notify.info("[PSOC6.sign_image] SUCCESS: Image is signed with no errors!")
+        print(str(hex(slot["slot_data"]["size"])))
+
+        # call imgtool for signature
+        process = subprocess.Popen([sys.executable, str(slot["sdk_path"] / "imgtool/imgtool.py"),
+                                    "sign", "--key", str(slot["sdk_path"] / slot["key_file"]),
+                                    "--header-size", "0x400", "--pad-header", "--align", "8",
+                                    "--version", str(slot["img_data"]["VERSION"]), "--image-id",
+                                    str(slot["id"]), "--rollback_counter", str(slot["img_data"]["ROLLBACK_COUNTER"]),
+                                    "--slot-size", str(hex(slot["slot_data"]["size"])), "--overwrite-only", "--pad",
+                                    binf_orig, out_bin_name],
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        print("IMAGE TOOL ------------------------------------------------")
+        print(str(slot["sdk_path"] / "imgtool/imgtool.py") +
+                                    " sign " + "--key " + str(slot["sdk_path"] / slot["key_file"]) +
+                                    " --header-size " + "0x400 " + " --pad-header " + "--align " + "8 " +
+                                    "--version " + str(slot["img_data"]["VERSION"]) + " --image-id",
+                                    str(slot["id"]) + " --rollback_counter " +str(slot["img_data"]["ROLLBACK_COUNTER"]) +
+                                    " --slot-size " + str(hex(slot["slot_data"]["size"])) + "--overwrite-only " + "--pad " +
+              str(binf_orig) + " " + str(out_bin_name))
+
+
+        # catch stderr outputs
+        stderr = process.communicate()
+        rc = process.wait()
+
+        if rc != 0:
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: Signature is not added!")
+            toolchain.notify.debug("[PSOC6.sign_image] Message from imgtool: " + stderr[1].decode("utf-8"))
+            raise Exception("imgtool finished execution with errors!")
+        else:
+            toolchain.notify.info("[PSOC6.sign_image] SUCCESS: Image for slot " +
+                                  slot["slot_data"]["type"] + " is signed with no errors!")
+
+        if slot["slot_data"]["type"] == "UPGRADE":
+            print(str(hex(slot["slot_data"]["address"])))
+            #bin2hex(out_bin_name, out_bin_name, offset=0x18000000) #str(hex(slot["slot_data"]["address"]))
+            subprocess.Popen(["arm-none-eabi-objcopy", "--change-address", "0x8000000",
+                               "-I", "ihex", "-O", "ihex", out_bin_name, out_bin_name])
+
 
 def complete(toolchain, elf0, hexf0, hexf1=None):
     if os.path.isfile(str(hexf0)) and os.path.isfile(str(hexf1)):

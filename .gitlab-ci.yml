@@ -55,7 +55,7 @@ test_mbed_062_crypto:
     - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
 
 # Compile TARGET_PSOC6_PSA
-test_mbed_064_psa:
+.test_mbed_064_psa:
   stage: test
   tags:
     - MBED_TEST
