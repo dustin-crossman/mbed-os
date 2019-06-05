@@ -8,7 +8,7 @@ before_script:
 
 # Run pyocd wrapper functional tests
 pyocd_wrapper:
-  stage: test
+  stage: disabled_test
   tags:
     - MBED_TEST
   script:
