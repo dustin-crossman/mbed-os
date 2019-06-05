@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019, Arm Limited and affiliates.
+ * Copyright (c) 2019, Arm Limited and affiliates.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,13 +18,8 @@
 #ifndef USBPHYHW_H
 #define USBPHYHW_H
 
-//#include "mbed.h"
+#include "mbed.h"
 #include "USBPhy.h"
-
-#include "cy_usbfs_dev_drv.h"
-#include "cy_sysint.h"
-#include "cy_sysclk.h"
-
 #include "cyhal_usb_dev.h"
 
 
@@ -44,6 +39,7 @@ public:
     virtual void set_address(uint8_t address);
     virtual void remote_wakeup();
     virtual const usb_ep_table_t* endpoint_table();
+    virtual void suspend(bool suspended);
 
     virtual uint32_t ep0_set_max_packet(uint32_t max_packet);
     virtual void ep0_setup_read_result(uint8_t *buffer, uint32_t size);
@@ -65,8 +61,13 @@ public:
     virtual void process();
 
     USBPhyEvents *events;
+    
+    uint8_t in_event_mask;
+    uint8_t out_event_mask;
+    uint8_t ep_abort_mask;
+    
 private:
-
+    virtual void usb_dev_execute_ep_callbacks(void);
     static void _usbisr(void);
     cyhal_usb_dev_t obj;
 };
