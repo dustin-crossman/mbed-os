@@ -7,8 +7,8 @@ before_script:
     - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
 
 # Run pyocd wrapper functional tests
-pyocd_wrapper:
-  stage: disabled_test
+.pyocd_wrapper:
+  stage: test
   tags:
     - MBED_TEST
   script:
