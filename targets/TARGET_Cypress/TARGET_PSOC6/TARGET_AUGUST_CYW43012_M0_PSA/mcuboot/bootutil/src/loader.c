@@ -1186,12 +1186,12 @@ boot_validated_swap_type(void)
     	/* Boot loader wants to switch to slot 1. Ensure image is valid. */
     	if(true == bnu_policy.bnu_img_policy.encrypt)
     	{	/* validate slot_1 encrypted */
-    		printf("Encrypted");
+    	    BOOT_LOG_INF("Encrypted");
     		rc = boot_validate_slot_1();
     	}
     	else
     	{	/* validate slot 1 as generic */
-    		printf("NON-Encrypted");
+    	    BOOT_LOG_INF("NON-Encrypted");
     		rc = boot_validate_slot(1);
     	}
     	if(0 != rc)
