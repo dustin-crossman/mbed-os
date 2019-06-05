@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019, Arm Limited and affiliates.
+ * Copyright (c) 2019, Arm Limited and affiliates.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,22 +16,24 @@
  */
 
 #include "USBPhyHw.h"
+#include "mbed_assert.h"
 
-#include "PinNamesTypes.h"
-// Convert physical endpoint number to bit array
-#define EP_BIT(endpoint) (1UL<<CY_USBFS_DEV_DRV_EPADDR2EP(endpoint))
+#define USB_EP_ATTR_DATA_EP             (USB_EP_ATTR_ALLOW_BULK | USB_EP_ATTR_ALLOW_INT | USB_EP_ATTR_ALLOW_ISO)
+#define USB_EP_ATTR_NON_ISO             (USB_EP_ATTR_ALLOW_BULK | USB_EP_ATTR_ALLOW_INT)
+#define USB_DEV_EP_NON_ISOC_MAX_PACKET  (64U)
+#define USB_DEV_EP_ISOC_MAX_PACKET      (128U)
+#define USB_DEV_IN_DIR                  (0x80U)
 
-// Bit array of aborted data endpoints
-static uint32_t aborted_ep;
+// Converts endpoint to the bit mask
+#define USB_DEV_EP_BIT(endpoint)         (1U << CYHAL_USB_DEV_GET_EP_IDX(endpoint))
 
-
-// Callbacks for event processing to tie driver and 
+// Callbacks to notify stack about event occurrence
 static void usb_dev_bus_reset_callback(void);
 static void usb_dev_ep0_setup_callback(void);
 static void usb_dev_ep0_in_callback(void);
 static void usb_dev_ep0_out_callback(void); 
-static void usb_dev_endpoint_callback(cyhal_usb_dev_ep_t endpointAddr);
-static void sof_callback(uint32_t frame_number);
+static void usb_dev_sof_callback(uint32_t frame_number);
+static void usb_dev_endpoint_callback(cyhal_usb_dev_ep_t endpoint);
 
 static USBPhyHw *instance;
 
@@ -43,90 +45,65 @@ USBPhy *get_usb_phy()
 
 USBPhyHw::USBPhyHw(): events(NULL)
 {
-
 }
 
 USBPhyHw::~USBPhyHw()
 {
-
 }
-
-
-static void usb_dev_endpoint_callback(cyhal_usb_dev_ep_t endpointAddr)
-{
-    
-    if(0U == (aborted_ep & EP_BIT(endpointAddr)))
-    {
-        if (CY_USBFS_DEV_DRV_IS_EP_DIR_IN(endpointAddr))
-        {
-            // Execute callback for endpoint IN
-            instance->events->in(endpointAddr);
-        }
-        else
-        {
-            // Execute callback for endpoint OUT
-            instance->events->out(endpointAddr);
-        }
-    }
-}
-
 
 void USBPhyHw::init(USBPhyEvents *events)
 {
-    cyhal_usb_dev_t *obj;
+    // Get access to the CYHAL USB object
+    cyhal_usb_dev_t *hal_obj = &obj;
+
+    // Disable IRQ
+    cyhal_usb_dev_irq_enable(hal_obj, false);
+
     // Initialize instance to access class data
     instance = this;
 
-    // Get access to the usb object
-    obj = &(instance->obj);
-
-    // Disable IRQ
-    cyhal_usb_dev_irq_enable(obj, false);
-    
     // Store events
-    this->events = events;
-
-    // TODO -  Setup clocks
-
-    // TODO - Enable USB module
-
-    // Init USB driver
-    cyhal_clock_divider_t clkPll = 
-    {
-        /* .div_type */ CY_SYSCLK_DIV_16_BIT,
-        /* .div_num  */ 0U
-    }; 
-    cyhal_clock_divider_t clkDiv = 
-    {
-        /* .div_type */ CY_SYSCLK_DIV_16_BIT,
-        /* .div_num  */ 0U
-    }; ; 
+    instance->events = events;
     
-    if (CY_RSLT_SUCCESS != cyhal_usb_dev_init(obj, USBDP, USBDM, &clkPll, &clkDiv, NULL))
+    // Initialize USB Device (CYHAL find required resources).
+    if (CY_RSLT_SUCCESS != cyhal_usb_dev_init(hal_obj, USBDP, USBDM, NULL, NULL, NULL))
     {
-        //error("usb: driver initialization failed (Cy_USBFS_Dev_Drv_Init).");
+        // The CYHAL USB Device initialization failed
+        MBED_ASSERT(0);
     }
     
     // Hook device handlers to be called by driver
-    cyhal_usb_dev_register_event_callback(obj, CYHAL_USB_DEV_EVENT_BUS_RESET, &usb_dev_bus_reset_callback);
-    cyhal_usb_dev_register_event_callback(obj, CYHAL_USB_DEV_EVENT_EP0_SETUP, &usb_dev_ep0_setup_callback);
-    cyhal_usb_dev_register_event_callback(obj, CYHAL_USB_DEV_EVENT_EP0_IN, &usb_dev_ep0_in_callback);
-    cyhal_usb_dev_register_event_callback(obj, CYHAL_USB_DEV_EVENT_EP0_OUT, &usb_dev_ep0_out_callback);
+    cyhal_usb_dev_register_event_callback(hal_obj, CYHAL_USB_DEV_EVENT_BUS_RESET, &usb_dev_bus_reset_callback);
+    cyhal_usb_dev_register_event_callback(hal_obj, CYHAL_USB_DEV_EVENT_EP0_SETUP, &usb_dev_ep0_setup_callback);
+    cyhal_usb_dev_register_event_callback(hal_obj, CYHAL_USB_DEV_EVENT_EP0_IN,    &usb_dev_ep0_in_callback);
+    cyhal_usb_dev_register_event_callback(hal_obj, CYHAL_USB_DEV_EVENT_EP0_OUT,   &usb_dev_ep0_out_callback);
 
-    cyhal_usb_dev_register_sof_callback(obj, &sof_callback);
+    // Hook SOF callback
+    cyhal_usb_dev_register_sof_callback(hal_obj, &usb_dev_sof_callback);
 
-    // Configure interrupt and hook it interrupt handler
-    cyhal_usb_dev_register_irq(obj, (cyhal_usb_dev_irq_handler_t)&_usbisr);
-    cyhal_usb_dev_irq_enable(obj, true);
+    // Divide hardware buffer (512 bytes) statically accordingly to the lpc_table
+    // Only 6 endpoint out of 8 (supported by hardware) are supported because of buffer space limitation
+    (void) cyhal_usb_dev_endpoint_add(hal_obj, true, false, 1U, USB_DEV_EP_NON_ISOC_MAX_PACKET, CYHAL_USB_DEV_EP_TYPE_BULK);
+    (void) cyhal_usb_dev_endpoint_add(hal_obj, true, false, 2U, USB_DEV_EP_NON_ISOC_MAX_PACKET, CYHAL_USB_DEV_EP_TYPE_BULK);
+    (void) cyhal_usb_dev_endpoint_add(hal_obj, true, false, 3U, USB_DEV_EP_NON_ISOC_MAX_PACKET, CYHAL_USB_DEV_EP_TYPE_BULK);
+    (void) cyhal_usb_dev_endpoint_add(hal_obj, true, false, 4U, USB_DEV_EP_NON_ISOC_MAX_PACKET, CYHAL_USB_DEV_EP_TYPE_BULK);
+    (void) cyhal_usb_dev_endpoint_add(hal_obj, true, false, 5U, USB_DEV_EP_ISOC_MAX_PACKET,     CYHAL_USB_DEV_EP_TYPE_ISO);
+    (void) cyhal_usb_dev_endpoint_add(hal_obj, true, false, 6U, USB_DEV_EP_ISOC_MAX_PACKET,     CYHAL_USB_DEV_EP_TYPE_ISO);
+    // Clear IN and OUT data endpoint event masks 
+    in_event_mask  = 0;
+    out_event_mask = 0;
+    // Clear abort mask
+    ep_abort_mask = 0;
+    
+    // Configure interrupt and hook interrupt handler 
+    cyhal_usb_dev_register_irq(hal_obj, (cyhal_usb_dev_irq_handler_t)&_usbisr);
+    cyhal_usb_dev_irq_enable(hal_obj, true);
 }
-
 
 static void usb_dev_bus_reset_callback(void)
 {
-    // Process usb bus reset
     instance->events->reset();
 }
-
 
 static void usb_dev_ep0_setup_callback(void)
 {
@@ -134,102 +111,137 @@ static void usb_dev_ep0_setup_callback(void)
     instance->events->ep0_setup();
 }
 
-
 static void usb_dev_ep0_in_callback(void)
 {
-    // Process endpoint 0 IN packet (Data or Status stages)
+    // Process endpoint 0 IN packet (Data stage)
     instance->events->ep0_in();
 }
 
-
 static void usb_dev_ep0_out_callback(void)
 {
-    // Process endpoint 0 OUT packet (Data or Status stages)
+    // Process endpoint 0 OUT packet (Data stages)
     instance->events->ep0_out();
 }
 
-
-static void sof_callback(uint32_t frame_number)
+static void usb_dev_sof_callback(uint32_t frame_number)
 {
     // Calls SOF packet callback
     instance->events->sof(frame_number);
 }
 
+static void usb_dev_endpoint_callback(cyhal_usb_dev_ep_t endpoint)
+{
+    if (0 == (instance->ep_abort_mask & USB_DEV_EP_BIT(endpoint)))
+    {
+        if (CYHAL_USB_DEV_IS_IN_EP(endpoint))
+        {
+            instance->in_event_mask  |= USB_DEV_EP_BIT(endpoint);
+        }
+        else
+        {
+            instance->out_event_mask |= USB_DEV_EP_BIT(endpoint);
+        }
+    }
+}
+
+void USBPhyHw::usb_dev_execute_ep_callbacks(void)
+{
+    if ((0 != in_event_mask) || (0 != out_event_mask))
+    {
+        uint32_t mask;
+        uint32 endpoint;
+
+        // USBPhy must send IN endpoint events before OUT endpoint events if both are pending.
+    
+        // Notify IN endpoint transfer complete events
+        endpoint = 1U;
+        mask = (uint32_t) in_event_mask;
+        while (0 != mask)
+        {
+            if (0 != (mask & 0x1U))
+            {
+                events->in(USB_DEV_IN_DIR | endpoint);
+            }
+
+            mask >>= 1U;
+            ++endpoint;
+        }
+
+        // Notify OUT endpoint transfer complete events
+        endpoint = 1U;
+        mask = (uint32_t) out_event_mask;
+        while (0 != mask)
+        {
+            if (0 != (mask & 0x1U))
+            {
+                events->out(endpoint);
+            }
+
+              mask >>= 1U;
+              ++endpoint;
+        }
+        
+        out_event_mask = 0;
+        in_event_mask  = 0;
+    }
+}
 
 void USBPhyHw::deinit()
 {
-    cyhal_usb_dev_t *obj = &(instance->obj);
-
-    // Disconnect and disable interrupt
-    cyhal_usb_dev_free(obj);
+    cyhal_usb_dev_free(&obj);
 }
 
 bool USBPhyHw::powered()
 {
-    // TODO - return true if powered false otherwise. Devices which don't support
-    //    this should always return true
+    // Not implemented for this target
     return true;
 }
 
 void USBPhyHw::connect()
 {
-    cyhal_usb_dev_t *obj = &(instance->obj);
-
-    // Enable block for operation: enable pull-up on D+
-    cyhal_usb_dev_connect(obj);
+    cyhal_usb_dev_connect(&obj);
 }
 
 void USBPhyHw::disconnect()
 {
-    cyhal_usb_dev_t *obj = &(instance->obj);
-
-    // Disable block for operation: Disable pull-up on D+
-    cyhal_usb_dev_disconnect(obj);
+    cyhal_usb_dev_disconnect(&obj);
 }
 
 void USBPhyHw::configure()
 {
-    cyhal_usb_dev_t *obj = &(instance->obj);
-    cyhal_usb_dev_configure(obj);
+    cyhal_usb_dev_configure(&obj);
 }
 
 void USBPhyHw::unconfigure()
 {
-    cyhal_usb_dev_t *obj = &(instance->obj);
-    cyhal_usb_dev_unconfigure(obj);
+    cyhal_usb_dev_unconfigure(&obj);
 }
 
 void USBPhyHw::sof_enable()
 {
-    cyhal_usb_dev_t *obj = &(instance->obj);
-
-    cyhal_usb_dev_sof_enable(obj, true);
+    cyhal_usb_dev_sof_enable(&obj, true);
 }
 
 void USBPhyHw::sof_disable()
 {
-    cyhal_usb_dev_t *obj = &(instance->obj);
-
-    cyhal_usb_dev_sof_enable(obj, false);
+    cyhal_usb_dev_sof_enable(&obj, false);
 }
 
 void USBPhyHw::set_address(uint8_t address)
-{   
-    // set the device address. Address must take effect
-    // after the status phase of the current transfer
-  
-    cyhal_usb_dev_t *obj = &(instance->obj);
- 
-    cyhal_usb_dev_set_address(obj, address);
+{
+    cyhal_usb_dev_set_address(&obj, address);
 }
 
 void USBPhyHw::remote_wakeup()
 {
-    // TODO - Sent remote wakeup over USB lines (if supported)
+    // Not implemented for this target
 }
 
-#define USB_EP_ATTR_DATA_EP     (USB_EP_ATTR_ALLOW_BULK | USB_EP_ATTR_ALLOW_INT | USB_EP_ATTR_ALLOW_ISO)
-#define USB_EP_ATTR_NON_ISO     (USB_EP_ATTR_ALLOW_BULK | USB_EP_ATTR_ALLOW_INT )
+void USBPhyHw::suspend(bool suspended)
+{
+    // Not implemented for this target
+    (void) suspended;
+}
 
 const usb_ep_table_t *USBPhyHw::endpoint_table()
 {
@@ -242,8 +254,9 @@ const usb_ep_table_t *USBPhyHw::endpoint_table()
         // The static allocation of max packet for BULK and INT allows to handle change interface 
         // alternates properly if endpoint size is changed (the endpoint is not overlapped with 
         // endpoints of neighborhood interface).
+        // The CY USB IP has separate endpoint 0 hardware buffer of 8 bytes.
         {
-            {USB_EP_ATTR_ALLOW_CTRL | USB_EP_ATTR_DIR_IN_AND_OUT, 0, 0}, //corresponds to dedicated endpoint 0 hardware buffer (separate buffer from data endpoint buffer)
+            {USB_EP_ATTR_ALLOW_CTRL | USB_EP_ATTR_DIR_IN_AND_OUT, 0, 0}, 
             {USB_EP_ATTR_NON_ISO    | USB_EP_ATTR_DIR_IN_OR_OUT,  0, 0},
             {USB_EP_ATTR_NON_ISO    | USB_EP_ATTR_DIR_IN_OR_OUT,  0, 0},
             {USB_EP_ATTR_NON_ISO    | USB_EP_ATTR_DIR_IN_OR_OUT,  0, 0},
@@ -260,230 +273,122 @@ const usb_ep_table_t *USBPhyHw::endpoint_table()
 
 uint32_t USBPhyHw::ep0_set_max_packet(uint32_t max_packet)
 {
+    // Ignore max packet because endpoint 0 has dedicated hardware buffer
     (void) max_packet;
-    cyhal_usb_dev_t *obj = &(instance->obj);
     
-    // Endpoint 0 has dedicated hardware 8 bytes buffer.
-    return cyhal_usb_dev_ep0_get_max_packet(obj);
+    return cyhal_usb_dev_ep0_get_max_packet(&obj);
 }
 
-// read setup packet
 void USBPhyHw::ep0_setup_read_result(uint8_t *buffer, uint32_t size)
 {
-     cyhal_usb_dev_t *obj = &(instance->obj);
-  
-    cyhal_usb_dev_ep0_setup_read_result(obj, buffer, size);
+    cyhal_usb_dev_ep0_setup_read_result(&obj, buffer, size);
 }
 
 void USBPhyHw::ep0_read(uint8_t *data, uint32_t size)
 {
-    // Setup data buffer to receive next endpoint 0 OUT packet
-    cyhal_usb_dev_t *obj = &(instance->obj);
-    
-    cyhal_usb_dev_ep0_read(obj, data, size);
+    cyhal_usb_dev_ep0_read(&obj, data, size);
 }
 
 uint32_t USBPhyHw::ep0_read_result()
 {
-    // Return the size of the last OUT packet received on endpoint 0
-    cyhal_usb_dev_t *obj = &(instance->obj);
-    
-    return cyhal_usb_dev_ep0_read_result(obj);
+    return cyhal_usb_dev_ep0_read_result(&obj);
 }
 
 void USBPhyHw::ep0_write(uint8_t *buffer, uint32_t size)
 {
-    //Start transferring buffer on endpoint 0 IN
-    cyhal_usb_dev_t *obj = &(instance->obj);
-
-    cyhal_usb_dev_ep0_write(obj, buffer, size);
+    cyhal_usb_dev_ep0_write(&obj, buffer, size);
 }
 
 void USBPhyHw::ep0_stall()
 {
-    cyhal_usb_dev_t *obj = &(instance->obj);
-
-    cyhal_usb_dev_ep0_stall(obj);
+    cyhal_usb_dev_ep0_stall(&obj);
 }
-
-#define USB_MAX_NON_ISO_SIZE                    (64U)
-#define USB_MAX_ISO_SIZE                        (128U)
 
 bool USBPhyHw::endpoint_add(usb_ep_t endpoint, uint32_t max_packet, usb_ep_type_t type)
 {
-    bool status = false;
-    cy_stc_usb_dev_ep_config_t epConfig;
-
-    epConfig.enableEndpoint = true;     // MBED adds only active endpoints
-    epConfig.allocBuffer = true;        // MBED needs buffer allocation (the buffer size is predefined in advance)
-    epConfig.maxPacketSize = (USB_EP_TYPE_ISO == type) ? USB_MAX_ISO_SIZE : USB_MAX_NON_ISO_SIZE;
-    epConfig.bufferSize = (uint16_t) max_packet; // Buffer size is predefined
-    epConfig.endpointAddr = endpoint;            // Includes direction bit
-    epConfig.attributes = type;                  // Type equal to attributes
-
-    cyhal_usb_dev_t *obj = &(instance->obj);
+    bool result = false;
     
-    if(CY_USBFS_DEV_DRV_SUCCESS ==  Cy_USBFS_Dev_Drv_AddEndpoint(obj->base, 
-                                        &epConfig, &obj->context))
+    // The endpoint type is USB spec defined therefore it is safe to cast into the different type used for the same
+    result = (CY_RSLT_SUCCESS == cyhal_usb_dev_endpoint_add(&obj, false, true ,endpoint, max_packet, (cyhal_usb_dev_ep_type_t) type));
+
+    if (result)
     {
-        cyhal_usb_dev_register_endpoint_callback(obj, endpoint, &usb_dev_endpoint_callback);
-        status = true;
+        // Hook endpoint callback to get a notification about transfer completion events
+        cyhal_usb_dev_register_endpoint_callback(&obj, endpoint, &usb_dev_endpoint_callback);
     }
 
-    return status;
+    return result;
 }
 
 void USBPhyHw::endpoint_remove(usb_ep_t endpoint)
 {
-    // disable and remove this endpoint
-    cyhal_usb_dev_t *obj = &(instance->obj);
-    (void) Cy_USBFS_Dev_Drv_RemoveEndpoint(obj->base, endpoint, &obj->context);
+    (void) cyhal_usb_dev_endpoint_remove(&obj, endpoint);
+    
+    // Clear endpoint masks
+    in_event_mask  &= ~USB_DEV_EP_BIT(endpoint);
+    out_event_mask &= ~USB_DEV_EP_BIT(endpoint);
+    ep_abort_mask  &= ~USB_DEV_EP_BIT(endpoint);
 }
 
 void USBPhyHw::endpoint_stall(usb_ep_t endpoint)
 {
-    // stall this endpoint until it is explicitly cleared (remove direction bit)
-    cyhal_usb_dev_t *obj = &(instance->obj);
-    (void) Cy_USBFS_Dev_Drv_StallEndpoint(obj->base, CY_USBFS_DEV_DRV_EPADDR2EP(endpoint), &obj->context);
+    (void) cyhal_usb_dev_endpoint_stall(&obj, endpoint);
 }
 
 void USBPhyHw::endpoint_unstall(usb_ep_t endpoint)
 {
-    // unstall this endpoint (remove direction bit)
-    cyhal_usb_dev_t *obj = &(instance->obj);
-    (void) Cy_USBFS_Dev_Drv_UnStallEndpoint(obj->base, CY_USBFS_DEV_DRV_EPADDR2EP(endpoint), &obj->context);
+    (void) cyhal_usb_dev_endpoint_unstall(&obj, endpoint);
 }
 
 bool USBPhyHw::endpoint_read(usb_ep_t endpoint, uint8_t *data, uint32_t size)
 {
-    bool retStatus = false;
-    cyhal_usb_dev_t *obj = &(instance->obj);    
-    cy_en_usb_dev_ep_state_t epState;
-    
-    // Remove direction bit 
-    uint32_t ep_num = CY_USBFS_DEV_DRV_EPADDR2EP(endpoint);
-    
-    epState = Cy_USBFS_Dev_Drv_GetEndpointState(obj->base, ep_num, &obj->context);
-    
-    if ((CY_USB_DEV_EP_IDLE == epState) || (CY_USB_DEV_EP_COMPLETED == epState))
-    {
-        Cy_USBFS_Dev_Drv_EnableOutEndpoint(obj->base, ep_num, &obj->context);
-        
-        //Save pointer and size
-        obj->rd_data[ep_num] = data;
-        obj->rd_size[ep_num] = size; 
-
-        retStatus = true;
-    }
-
-    return retStatus;
+    return (CY_RSLT_SUCCESS == cyhal_usb_dev_endpoint_read(&obj, endpoint, data, size));
 }
 
 uint32_t USBPhyHw::endpoint_read_result(usb_ep_t endpoint)
 {
-    uint32_t actSize = 0;    
-    cyhal_usb_dev_t *obj = &(instance->obj);
-    cy_en_usb_dev_ep_state_t epState;  
-  
-    // Remove direction bit 
-    uint32_t ep_num = CY_USBFS_DEV_DRV_EPADDR2EP(endpoint);
+    uint32_t actSize = 0;
 
-    epState = Cy_USBFS_Dev_Drv_GetEndpointState(obj->base, ep_num, &obj->context);
-
-    if (CY_USB_DEV_EP_COMPLETED == epState)
-    {
-        cy_en_usbfs_dev_drv_status_t drvStatus;
-        drvStatus = Cy_USBFS_Dev_Drv_ReadOutEndpoint(obj->base, ep_num, 
-                                                     obj->rd_data[ep_num], 
-                                                     obj->rd_size[ep_num], 
-                                                     &actSize, 
-                                                     &obj->context);
-
-        if (CY_USBFS_DEV_DRV_SUCCESS != drvStatus)
-        {
-            actSize = 0U;
-        }
-    }
+    // The read result return actual size zero in case of failure
+    (void) cyhal_usb_dev_endpoint_read_result(&obj, endpoint, &actSize);
 
     return actSize;
 }
 
 bool USBPhyHw::endpoint_write(usb_ep_t endpoint, uint8_t *data, uint32_t size)
 {
-    uint32_t retStatus = false;
-    cyhal_usb_dev_t *obj = &(instance->obj);
-    cy_en_usb_dev_ep_state_t epState;
-    
-    // Remove direction bit 
-    uint32_t ep_num = CY_USBFS_DEV_DRV_EPADDR2EP(endpoint);    
-    
-    epState = Cy_USBFS_Dev_Drv_GetEndpointState(obj->base, ep_num, &obj->context);
-
-    // Check that endpoint is ready for operation 
-    if ((CY_USB_DEV_EP_IDLE == epState) || (CY_USB_DEV_EP_COMPLETED == epState))
-    {
-        cy_en_usbfs_dev_drv_status_t drvStatus;
-        drvStatus = Cy_USBFS_Dev_Drv_LoadInEndpoint(obj->base, ep_num, 
-                                                    data, 
-                                                    size, 
-                                                    &obj->context);
-                    
-        if (CY_USBFS_DEV_DRV_SUCCESS == drvStatus)
-        {
-            retStatus = true;
-        }
-    }
-    
-    return retStatus;
+    return (CY_RSLT_SUCCESS == cyhal_usb_dev_endpoint_write(&obj, endpoint, data, size));
 }
 
 void USBPhyHw::endpoint_abort(usb_ep_t endpoint)
 {
-    // stop the current transfer on this endpoint and don't call the IN or OUT callback
-    cyhal_usb_dev_t *obj = &(instance->obj);
-    cy_en_usb_dev_ep_state_t epState;
+    // Set flag to avoid generation of event
+    ep_abort_mask |= USB_DEV_EP_BIT(endpoint);
 
-    // Remove direction bit 
-    uint32_t ep_num = CY_USBFS_DEV_DRV_EPADDR2EP(endpoint); 
-
-    //Set flag to avoid generation of event
-    aborted_ep |= EP_BIT(endpoint);
-
-    // Request abort operation
-    epState = Cy_USBFS_Dev_Drv_Abort(obj->base, ep_num, &obj->context);
-
-    if (CY_USB_DEV_EP_PENDING == epState)
-    {
-        // Wait 1 ms to complete possible on-going transfer
-        //wait_ms(1); Need to remove wait per ARM request
-
-        epState = Cy_USBFS_Dev_Drv_GetEndpointState(obj->base, ep_num, &obj->context);
-        if (CY_USB_DEV_EP_PENDING == epState)
-        {
-            (void) Cy_USBFS_Dev_Drv_AbortComplete(obj->base, ep_num, &obj->context);
-        }
-    }
+    // Request abort operation: does not work completely now. Tracked in MIDDLEWARE-990
+    (void) cyhal_usb_dev_endpoint_abort(&obj, endpoint);
 
     // Abort completed release flag
-    aborted_ep &= ~EP_BIT(endpoint);
+    ep_abort_mask &= ~USB_DEV_EP_BIT(endpoint);
 }
 
 void USBPhyHw::process()
 {
-    cyhal_usb_dev_t *obj = &(instance->obj);
+    // Process interrupt 
+    cyhal_usb_dev_process_irq(&obj);
 
-    // Handle interrupt 
-    cyhal_usb_dev_process_irq(obj);
+    // Calls data endpoint IN and OUT event in the required order
+    usb_dev_execute_ep_callbacks();
 
-    // Re-enable interrupt
-    cyhal_usb_dev_irq_enable(obj, true);
+    // Enable interrupt after interrupt processing completed
+    cyhal_usb_dev_irq_enable(&obj, true);
 }
 
-void USBPhyHw::_usbisr(void) 
+void USBPhyHw::_usbisr(void)
 {
-    
-    cyhal_usb_dev_t *obj = &(instance->obj);
-    cyhal_usb_dev_irq_enable(obj, false);
-    
+    cyhal_usb_dev_t *hal_obj = &(instance->obj);
+
+    // Disable interrupt before start interrupt processing
+    cyhal_usb_dev_irq_enable(hal_obj, false);
     instance->events->start_process();
 }
