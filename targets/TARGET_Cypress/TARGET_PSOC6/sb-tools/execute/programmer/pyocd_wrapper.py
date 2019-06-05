@@ -253,5 +253,5 @@ class Pyocd(ProgrammerBase):
         """
         if self.session is None:
             raise ValueError('Debug session is not initialized.')
-        programmer = loader.FileProgrammer(self.session, chip_erase=False)
+        programmer = loader.FileProgrammer(self.session, chip_erase='sector')
         programmer.program(filename, base_address=address, file_format=file_format)
