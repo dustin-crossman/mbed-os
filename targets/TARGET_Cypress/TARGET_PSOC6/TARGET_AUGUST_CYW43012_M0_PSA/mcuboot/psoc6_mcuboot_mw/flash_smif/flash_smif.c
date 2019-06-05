@@ -140,10 +140,13 @@ cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
 
     if(qspiStatus == CY_SMIF_SUCCESS)
     {
-        /* Put the device in XIP mode */
-        BOOT_LOG_INF("\r\nEntering XIP Mode\r\n");
-        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
+        BOOT_LOG_INF("SMIF Normal Mode");
+        /* Need to start from CommandMode as we will switch FlashMemory to Quad first */
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
     }
+
+    /* Enable the SMIF interrupt */
+    NVIC_EnableIRQ(smif_interrupt_IRQn);
 
     return qspiStatus;
 }
@@ -188,18 +191,18 @@ void Flash_SMIF_GetAddrBuff(uint32_t address, uint8_t * addrBuf)
 void Flash_SMIF_EnableQuadMode(SMIF_Type *baseaddr, cy_stc_smif_mem_config_t *memConfig,
                     cy_stc_smif_context_t const *smifContext)
 {
-//    cy_en_smif_status_t status;
-//    uint8_t readStatus = 0;
-//    uint32_t statusCmd = memConfig->deviceCfg->readStsRegQeCmd->command;
-//    uint8_t maskQE = (uint8_t) memConfig->deviceCfg->stsRegQuadEnableMask;
-//
-//    status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, memConfig, &readStatus, statusCmd,
-//                                        smifContext);
+    cy_en_smif_status_t status;
+    uint8_t readStatus = 0;
+    uint32_t statusCmd = memConfig->deviceCfg->readStsRegQeCmd->command;
+    uint8_t maskQE = (uint8_t) memConfig->deviceCfg->stsRegQuadEnableMask;
+
+    status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, memConfig, &readStatus, statusCmd,
+                                        smifContext);
 //    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_QuadEnable failed\r\n", status);
-//
-//    if(maskQE != (readStatus & maskQE))
-//    {
-//        /* Check user confirmation to do QE*/
+
+    if(maskQE != (readStatus & maskQE))
+    {
+        /* Check user confirmation to do QE*/
 //        printf("\r\nQuad is NOT enabled. Pleas press button to continue\r\n");
 //        bool btnPressed = false;
 //        while (!btnPressed)
@@ -220,19 +223,20 @@ void Flash_SMIF_EnableQuadMode(SMIF_Type *baseaddr, cy_stc_smif_mem_config_t *me
 //
 //            }
 //        }
-//
-//        status = Cy_SMIF_Memslot_QuadEnable(baseaddr, memConfig, smifContext);
+
+        status = Cy_SMIF_Memslot_QuadEnable(baseaddr, memConfig, smifContext);
 //        CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_QuadEnable failed\r\n", status);
-//
-//        while(Cy_SMIF_Memslot_IsBusy(baseaddr, memConfig, smifContext))
-//        {
-//            /* Wait until the QE operation is completed */
-//        }
-//    }
-//    else
-//    {
+
+        while(Cy_SMIF_Memslot_IsBusy(baseaddr, memConfig, smifContext))
+        {
+            /* Wait until the QE operation is completed */
+        }
+    }
+    else
+    {
+        // TODO: add LOG_ERR
 //        printf("\r\nQuad is enabled. Enabling operation skipped\r\n");
-//    }
+    }
 }
 
 
@@ -277,8 +281,12 @@ int Flash_SMIF_ReadMemory(SMIF_Type *baseaddr,
     {
         status = Cy_SMIF_Memslot_CmdRead(baseaddr, smifMemConfigs[0], address, rxBuffer, rxSize, NULL, smifContext);
 
-        /* Wait until receive transaction completed */
-        while(Cy_SMIF_GetTxfrStatus(SMIF0, &QSPIContext) != CY_SMIF_REC_CMPLT);
+        while(Cy_SMIF_BusyCheck(baseaddr))
+        {
+            /* Wait until the SMIF IP operation is completed. */
+        }
+//        /* Wait until receive transaction completed */
+//        while(Cy_SMIF_GetTxfrStatus(SMIF0, &QSPIContext) != CY_SMIF_REC_CMPLT);
     }
     return (int)status;
 }
@@ -337,7 +345,7 @@ int Flash_SMIF_WriteMemory(SMIF_Type *baseaddr,
     {
         while(Cy_SMIF_Memslot_IsBusy(baseaddr, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], smifContext))
         {
-            /* Wait until the Erase operation is completed */
+            /* Wait until the operation is completed */
         }
         /* Read data from the external memory status register */
         status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, smifMemConfigs[0], &rxBuffer_reg,

@@ -139,6 +139,26 @@ void cy_assert(int expr)
     }
 }
 
+/********************************************
+ * NOTE:
+ * SPE CM0p Debug is disabled by default.
+ *
+ * Please, add ENABLE_CM0P_DEBUG symbol
+ * into targets.json into "macros_add"
+ * section of CY8CPROTO_064_SB_M0_PSA
+ * target if debugging is required.
+ *
+ * ******************************************/
+#if defined(ENABLE_CM0P_DEBUG)
+void Cy_SystemInit(void)
+{
+    if((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL)
+    {
+		IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
+		while((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL);
+    }
+}
+#endif
 static void turn_on_cm4(void)
 {
     uint32_t regValue;
@@ -221,6 +241,9 @@ void spm_hal_start_nspe(void)
        .intrPriority = (1u)       /* SMIF interrupt priority */
     };
 
+    /* enable interrupts, and the CM4 */
+    __enable_irq();
+
     /* SMIF interrupt initialization status */
     cy_en_sysint_status_t intr_init_status;
     intr_init_status = Cy_SysInt_Init(&smifIntConfig, Flash_SMIF_Interrupt_User);
@@ -236,17 +259,27 @@ void spm_hal_start_nspe(void)
     {
          BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
     }
-#if defined(MCUBOOT_USE_SMIF_XIP)
-    BOOT_LOG_INF("SMIF Memory Mode");
-    /* Forcing default mode to Memory/XIP. */
-    Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
-#else
-    BOOT_LOG_INF("SMIF Normal Mode");
-    /* Default mode is Memory/XIP. Switching to Normal/CMD */
-    Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
+
+    /* Set QE */
+    Flash_SMIF_EnableQuadMode(SMIF0, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
 #endif
 
-#endif
+    // TODO: BOHD Debug code
+    uint8_t txBuffer[3];
+    uint8_t rxBuffer[64];
+    uint8_t aaa[3];
+
+    aaa[0] = 0;
+    aaa[1] = 0;
+    aaa[2] = 0;
+
+    txBuffer[0] = 0xaa;
+    txBuffer[1] = 0x55;
+    txBuffer[2] = 0xcc;
+
+    rc = Flash_SMIF_ReadMemory(SMIF0,  &QSPIContext, rxBuffer, 64, aaa);
+    rc = Flash_SMIF_WriteMemory(SMIF0, &QSPIContext, txBuffer, 3, aaa);
+    rc = Flash_SMIF_ReadMemory(SMIF0,  &QSPIContext, rxBuffer, 64, aaa);
 
     boot_flash_device = (struct device*)&psoc6_flash_device;
 
