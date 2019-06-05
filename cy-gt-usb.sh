@@ -91,7 +91,6 @@ function fetch_asset()
     echo "Extract $asset_zip to $asset_dir"
     mkdir -p "$(dirname "$asset_dir")"
     unzip -qbo "$OUT_DIR/$asset_zip" -d "$asset_dir"
-    save_timestamp "$asset_timestamp"
 }
 
 function fetch_psoc6pdl_mbed()
