@@ -236,7 +236,6 @@ int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
     uint8_t addrBuf[4];
     if(IS_FLASH_SMIF(addr))
     {
-        BOOT_LOG_INF("Area Read from SMIF, address %x", addr);
         addr = addr - smifMemConfigs[0]->baseAddress + FLASH_DEVICE_BASE;
         Flash_SMIF_GetAddrBuff(addr, addrBuf)
         rc = Flash_SMIF_ReadMemory(SMIF0             /* SMIF_Type *baseaddr*/,
@@ -252,12 +251,7 @@ int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
         /* Preferable READ mode is Memory/XIP. */
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
 #endif
-        BOOT_LOG_INF("Direct Flash Read, address %x", addr);
         rc = psoc6_flash_read(addr, dst, len);
-//#if (defined(MCUBOOT_USE_SMIF_STAGE) && defined(MCUBOOT_USE_SMIF_XIP))
-//        /* Memory/XIP Read is Done. Switching back to Normal/CMD */
-//        Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
-//#endif
     }
     return rc;
 }
@@ -276,7 +270,6 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
         /* Memory/XIP Read is Done. Switching back to Normal/CMD */
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
 #endif
-        BOOT_LOG_INF("Area Write to SMIF, address %x", addr);
         addr = addr - smifMemConfigs[0]->baseAddress+FLASH_DEVICE_BASE;
         Flash_SMIF_GetAddrBuff(addr, addrBuf);
         rc = Flash_SMIF_WriteMemory(SMIF0    /* SMIF_Type *baseaddr */,
@@ -284,15 +277,10 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
                                     src     /* uint8_t txBuffer[] */,
                                     len     /* uint32_t txSize */,
                                     addrBuf   /* uint8_t *address */);
-//#ifdef MCUBOOT_USE_SMIF_XIP
-//        /* Forcing default mode back to Memory/XIP. */
-//        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
-//#endif
     }
     else
 #endif
     {
-        BOOT_LOG_INF("Direct Flash Write, address %x", addr);
         rc = psoc6_flash_write(area->fa_off + off, src, len);
     }
     return rc;
@@ -313,8 +301,6 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
 #endif
         uint8_t zero_buff[SMIF_ZERO_BUFF_SIZE];
         uint32_t buff_num, rem_num, cur_addr;
-
-        BOOT_LOG_INF("Area Erase to SMIF, address %x", addr);
         /* Zeroise data on external Flash instead of Erasing */
         memset(zero_buff, 0x00, sizeof(zero_buff));
 
@@ -325,21 +311,10 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
         rem_num  = len%SMIF_ZERO_BUFF_SIZE;
         cur_addr = addr-smifMemConfigs[0]->baseAddress+FLASH_DEVICE_BASE;
 
-        BOOT_LOG_INF("addr %x", addr);
-        BOOT_LOG_INF("buff_num %i", buff_num);
-        BOOT_LOG_INF("rem_num %i", rem_num);
-
         for(;((buff_num>0)&&(0 == rc)); buff_num--)
         {
-            BOOT_LOG_INF("curr_addr %x", cur_addr);
-            BOOT_LOG_INF("buff_num %i", buff_num);
-            BOOT_LOG_INF("rem_num %i", rem_num);
-
             Flash_SMIF_GetAddrBuff(cur_addr, addrBuf);
 
-            BOOT_LOG_INF("addr_0 %i", addrBuf[0]);
-            BOOT_LOG_INF("addr_1 %i", addrBuf[1]);
-            BOOT_LOG_INF("addr_2 %i", addrBuf[2]);
             rc = Flash_SMIF_WriteMemory(SMIF0       /* SMIF_Type *baseaddr */,
                                         &QSPIContext/* cy_stc_smif_context_t *smifContext */,
                                         zero_buff   /* uint8_t txBuffer[] */,
@@ -358,15 +333,10 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
                                         rem_num     /* uint32_t txSize */,
                                         addrBuf   /* uint8_t *address */);
         }
-//#ifdef MCUBOOT_USE_SMIF_XIP
-//        /* Forcing default mode back to Memory/XIP. */
-//        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
-//#endif
     }
     else
 #endif
     {
-        BOOT_LOG_INF("Direct Flash Erase, address %x", addr);
         rc = psoc6_flash_erase(addr, len);
     }
     return rc;
