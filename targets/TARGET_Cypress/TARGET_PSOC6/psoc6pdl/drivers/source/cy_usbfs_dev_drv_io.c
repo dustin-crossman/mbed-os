@@ -118,25 +118,23 @@ void Cy_USBFS_Dev_Drv_ConfigDevice(USBFS_Type *base, cy_stc_usbfs_dev_drv_contex
 {
     if (CY_USBFS_DEV_DRV_EP_MANAGEMENT_CPU != context->mode)
     {
-    	uint32_t autoMemMask = 0U;
+        uint32_t autoMemMask = 0U;
 
         if (CY_USBFS_DEV_DRV_EP_MANAGEMENT_DMA_AUTO == context->mode)
         {
-        	/* USBFS_DEV_EP_ACTIVE and USBFS_DEV_EP_TYPE are set when endpoint is added */
-
-            /* Configure DMA burst size */
-            USBFS_DEV_BUF_SIZE(base)    = ENDPOINTS_BUFFER_SIZE;
-            USBFS_DEV_DMA_THRES16(base) = DMA_YLOOP_INCREMENT;
-
             autoMemMask = USBFS_USBDEV_ARB_CFG_AUTO_MEM_Msk;
+            
+            /* Configure DMA burst size */
+            USBFS_DEV_DMA_THRES16(base) = DMA_YLOOP_INCREMENT;
+            USBFS_DEV_BUF_SIZE(base)    = ENDPOINTS_BUFFER_SIZE;
+
+            /* USBFS_DEV_EP_ACTIVE and USBFS_DEV_EP_TYPE are set when endpoint is added */
         }
 
-        /* Configuration complete: set configuration complete bit (generate rising edge)
-         * Note Restores other register bits to be used for during resume operation
-         */
-        USBFS_DEV_ARB_CFG(base) = _VAL2FLD(USBFS_USBDEV_ARB_CFG_DMA_CFG, context->mode) |
-        		                   autoMemMask |
-        						   USBFS_USBDEV_ARB_CFG_CFG_CMP_Msk;
+        /* Configuration complete: generate rising edge for USBDEV_ARB_CFG.CFG_CMP bit */
+        USBFS_DEV_ARB_CFG(base)  = _VAL2FLD(USBFS_USBDEV_ARB_CFG_DMA_CFG, context->mode) |
+                                   autoMemMask;
+        USBFS_DEV_ARB_CFG(base) |= USBFS_USBDEV_ARB_CFG_CFG_CMP_Msk;
         (void) USBFS_DEV_ARB_CFG(base);
     }
 }
@@ -166,18 +164,10 @@ void Cy_USBFS_Dev_Drv_UnConfigureDevice(USBFS_Type *base, cy_stc_usbfs_dev_drv_c
 
     /* Clear buffer pointer */
     context->curBufAddr = 0U;
+    
+    /* Remove all active endpoints */
+    context->activeEpMask = 0U;
 
-    if (CY_USBFS_DEV_DRV_EP_MANAGEMENT_CPU != context->mode)
-    {
-    	/* Clear configuration complete bit */
-		USBFS_DEV_ARB_CFG(base)   &= ~USBFS_USBDEV_ARB_CFG_CFG_CMP_Msk;
-		(void) USBFS_DEV_ARB_CFG(base);
-
-		/* Reset endpoints configuration registers */
-		USBFS_DEV_EP_ACTIVE(base)  = 0UL;
-		USBFS_DEV_EP_TYPE(base)    = CY_USBFS_DEV_DRV_WRITE_ODD(0UL);
-    }
-	
     /* Disable SIE and Arbiter interrupts */
     USBFS_DEV_SIE_EP_INT_EN(base) = 0UL;
     USBFS_DEV_ARB_INT_EN(base)    = 0UL;
@@ -298,11 +288,11 @@ void RestoreEndpointHwBuffer(USBFS_Type *base,
     }
 
     /* Enable SIE interrupt for endpoint */
-    Cy_USBFS_Dev_Drv_EnableSieEpInterrupt(base, endpoint);	
+    Cy_USBFS_Dev_Drv_EnableSieEpInterrupt(base, endpoint);  
 
     /* Set arbiter configuration */
     Cy_USBFS_Dev_Drv_SetArbEpConfig(base, endpoint, (USBFS_USBDEV_ARB_EP1_CFG_CRC_BYPASS_Msk |
-                                                     USBFS_USBDEV_ARB_EP1_CFG_RESET_PTR_Msk));	
+                                                     USBFS_USBDEV_ARB_EP1_CFG_RESET_PTR_Msk));  
 
     /* Set endpoint mode to not respond to host */
     Cy_USBFS_Dev_Drv_SetSieEpMode(base, endpoint, GetEndpointInactiveMode((uint32_t) endpointData->sieMode));
@@ -373,6 +363,10 @@ cy_en_usbfs_dev_drv_status_t AddEndpointHwBuffer(USBFS_Type *base,
         endpointData->sieMode = GetEndpointActiveMode(inDirection, config->attributes);
         endpointData->isPending = false;
 
+        /* Set arbiter configuration (clears DMA requests) */
+        Cy_USBFS_Dev_Drv_SetArbEpConfig(base, endpoint, (USBFS_USBDEV_ARB_EP1_CFG_CRC_BYPASS_Msk |
+                                                         USBFS_USBDEV_ARB_EP1_CFG_RESET_PTR_Msk));
+
         /* Flush IN endpoint buffer to discard loaded data. 
         * It happens when: alternate settings change is requested and IN 
         * endpoint buffer is full (not read by the Host).
@@ -405,10 +399,6 @@ cy_en_usbfs_dev_drv_status_t AddEndpointHwBuffer(USBFS_Type *base,
             /* Enable error interrupt triggered by SIE */
             Cy_USBFS_Dev_Drv_SetArbEpInterruptMask(base, endpoint, ENDPOINT_ARB_INTR_SOURCES_CPU);
         }
-
-        /* Set arbiter configuration */
-        Cy_USBFS_Dev_Drv_SetArbEpConfig(base, endpoint, (USBFS_USBDEV_ARB_EP1_CFG_CRC_BYPASS_Msk |
-                                                         USBFS_USBDEV_ARB_EP1_CFG_RESET_PTR_Msk));
 
         /* Enable SIE interrupt for endpoint */
         Cy_USBFS_Dev_Drv_EnableSieEpInterrupt(base, endpoint);
@@ -447,7 +437,15 @@ cy_en_usbfs_dev_drv_status_t Cy_USBFS_Dev_Drv_RemoveEndpoint(USBFS_Type *base,
                                                              uint32_t    endpointAddr,
                                                              cy_stc_usbfs_dev_drv_context_t *context)
 {
-    uint32_t endpoint = EPADDR2PHY(endpointAddr);
+    uint32_t endpoint = EPADDR2EP(endpointAddr);
+
+    /* Check if endpoint is supported by driver */
+    if (false == IS_EP_VALID(endpoint))
+    {
+        return CY_USBFS_DEV_DRV_BAD_PARAM;
+    }
+
+    endpoint = EP2PHY(endpoint);
 
     /* Disable endpoint operation */
     DisableEndpoint(base, endpoint, context);
@@ -459,6 +457,9 @@ cy_en_usbfs_dev_drv_status_t Cy_USBFS_Dev_Drv_RemoveEndpoint(USBFS_Type *base,
     /* Clear SIE and Arbiter interrupt for endpoint */
     Cy_USBFS_Dev_Drv_ClearSieEpInterrupt(base, endpoint);
     Cy_USBFS_Dev_Drv_ClearArbEpInterrupt(base, endpoint, ENDPOINT_ARB_INTR_SOURCES_ALL);
+
+    /* Remove active endpoint */
+    context->activeEpMask &= (uint8_t) ~EP2MASK(endpont);
 
     return CY_USBFS_DEV_DRV_SUCCESS;
 }
@@ -502,7 +503,7 @@ void Cy_USBFS_Dev_Drv_EnableOutEndpoint(USBFS_Type *base,
     /* Get pointer to endpoint data */
     cy_stc_usbfs_dev_drv_endpoint_data_t *endpointData = &context->epPool[endpoint];
 
-    /* Clear transfer complete notification */
+    /* Endpoint pending: waits for the host write data after exit this function */
     endpointData->state = CY_USB_DEV_EP_PENDING;
 
     /* Arm endpoint: Host is allowed to write data */
@@ -555,7 +556,7 @@ cy_en_usbfs_dev_drv_status_t LoadInEndpointCpu(USBFS_Type   *base,
         return CY_USBFS_DEV_DRV_BAD_PARAM;
     }
 
-    /* Clear transfer completion notification */
+    /* Endpoint pending: waits for the host read data after exit this function */
     endpointData->state = CY_USB_DEV_EP_PENDING;
 
     /* Set count and data toggle */
@@ -584,7 +585,7 @@ cy_en_usbfs_dev_drv_status_t LoadInEndpointCpu(USBFS_Type   *base,
             /* Write the last byte */
             if (0U != (size & 0x1U))
             {
-            	Cy_USBFS_Dev_Drv_WriteData16(base, endpoint, (uint16_t) buffer[idx * 2U]);
+                Cy_USBFS_Dev_Drv_WriteData16(base, endpoint, (uint16_t) buffer[idx * 2U]);
             }
         }
         else
@@ -686,7 +687,7 @@ cy_en_usbfs_dev_drv_status_t ReadOutEndpointCpu(USBFS_Type *base,
         /* Read the last byte */
         if (0U != (numToCopy & 0x1U))
         {
-        	buffer[idx * 2U] = (uint8_t) Cy_USBFS_Dev_Drv_ReadData16(base, endpoint);
+            buffer[idx * 2U] = (uint8_t) Cy_USBFS_Dev_Drv_ReadData16(base, endpoint);
         }
     }
     else
@@ -738,7 +739,7 @@ cy_en_usb_dev_ep_state_t Cy_USBFS_Dev_Drv_Abort(USBFS_Type *base,
                                                  uint32_t   endpoint,
                                                  cy_stc_usbfs_dev_drv_context_t const *context)
 {
-    cy_en_usb_dev_ep_state_t epState = CY_USB_DEV_EP_INVALID;
+    cy_en_usb_dev_ep_state_t epState;
 
     CY_ASSERT_L1(CY_USBFS_DEV_DRV_IS_EP_VALID(endpoint));
 

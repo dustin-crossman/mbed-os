@@ -46,7 +46,7 @@ static const cy_stc_smif_config_t default_qspi_config =
 {
     .mode = (uint32_t)CY_SMIF_NORMAL,
     .deselectDelay = QSPI_DESELECT_DELAY,
-    .rxClockSel = (uint32_t)CY_SMIF_SEL_INTERNAL_CLK,
+    .rxClockSel = (uint32_t)CY_SMIF_SEL_INV_INTERNAL_CLK,
     .blockEvent = (uint32_t)CY_SMIF_BUS_ERROR,
 };
 
@@ -1041,7 +1041,7 @@ cy_rslt_t cyhal_qspi_write(cyhal_qspi_t *obj, const cyhal_qspi_command_t *comman
             status = (cy_rslt_t)Cy_SMIF_SendDummyCycles(obj->base, command->dummy_count);
         }
 
-        if (CY_SMIF_SUCCESS == status)
+        if ((CY_SMIF_SUCCESS == status) && (*length > 0))
         {
             status = (cy_rslt_t)Cy_SMIF_TransmitDataBlocking(obj->base, (uint8_t *)data, *length,
                                                       get_cyhal_bus_width(command->data.bus_width), &obj->context);
@@ -1063,7 +1063,7 @@ cy_rslt_t cyhal_qspi_write_async(cyhal_qspi_t *obj, const cyhal_qspi_command_t *
             status = (cy_rslt_t)Cy_SMIF_SendDummyCycles(obj->base, command->dummy_count);
         }
 
-        if (CY_SMIF_SUCCESS == status)
+        if ((CY_SMIF_SUCCESS == status) && (*length > 0))
         {
             cy_smif_event_cb_t callback_dispatcher_ptr;
             if (obj->irq_cause & CYHAL_QSPI_IRQ_TRANSMIT_DONE)
@@ -1076,7 +1076,6 @@ cy_rslt_t cyhal_qspi_write_async(cyhal_qspi_t *obj, const cyhal_qspi_command_t *
             }
             status = (cy_rslt_t)Cy_SMIF_TransmitData(obj->base, (uint8_t *)data, *length, 
                 get_cyhal_bus_width(command->data.bus_width), callback_dispatcher_ptr, &obj->context);
-
         }
     }
     return status;

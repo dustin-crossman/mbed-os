@@ -491,6 +491,10 @@ static cy_rslt_t free_resources(cyhal_uart_t *obj)
             error_accum = error;
         }
     }
+    if (!(obj->is_user_clock))
+    {
+        cyhal_hwmgr_free_clock(&(obj->clock));
+    }
     return error_accum;
 }
 
@@ -621,10 +625,12 @@ cy_rslt_t cyhal_uart_init(cyhal_uart_t *obj, cyhal_gpio_t tx, cyhal_gpio_t rx, c
     {
         if (clk == NULL)
         {
+            obj->is_user_clock = false;
             result = cyhal_hwmgr_allocate_clock(&(obj->clock), CY_SYSCLK_DIV_16_BIT, true);
         }
         else
         {
+            obj->is_user_clock = true;
             obj->clock = *clk;
         }
     }
@@ -679,6 +685,19 @@ cy_rslt_t cyhal_uart_init(cyhal_uart_t *obj, cyhal_gpio_t tx, cyhal_gpio_t rx, c
         }        
         cyhal_hwmgr_set_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
     }
+
+    if (result == CY_RSLT_SUCCESS)
+    {
+        if (obj->is_user_clock)
+        {
+            Cy_SCB_UART_Enable(obj->base);
+        }
+        else
+        {
+            result = cyhal_uart_baud(obj, CYHAL_UART_DEFAULT_BAUD);
+        }
+    }
+
     if (result != CY_RSLT_SUCCESS)
     {
         free_resources(obj);
@@ -707,6 +726,7 @@ cy_rslt_t cyhal_uart_free(cyhal_uart_t *obj)
 
 static uint32_t cyhal_divider_value(uint32_t frequency, uint32_t frac_bits)
 {
+    CY_ASSERT(frequency != 0);
     /* UARTs use peripheral clock */
     return ((cy_PeriClkFreqHz * (1 << frac_bits)) + (frequency / 2)) / frequency;
 }

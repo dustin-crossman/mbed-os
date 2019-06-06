@@ -59,6 +59,8 @@ extern "C" {
 #define CYHAL_UART_RSLT_ERR_PM_CALLBACK (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_UART, 1))
 /** The getc call timed out with no received data */
 #define CY_RSLT_ERR_CSP_UART_GETC_TIMEOUT (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_UART, 2))
+/** The baud rate to set to if no clock is specfied in the init function */
+#define CYHAL_UART_DEFAULT_BAUD 115200
 
 /** \} group_hal_uart_macros */
 
@@ -123,7 +125,8 @@ typedef void (*cyhal_uart_irq_handler_t)(void *handler_arg, cyhal_uart_irq_event
  * @param[out] obj The uart object
  * @param[in]  tx  The TX pin name
  * @param[in]  rx  The RX pin name
- * @param[in]  clk The clock to use can be shared, if not provided a new clock will be allocated
+ * @param[in]  clk The clock to use can be shared, if not provided a new clock will be,
+ *                  allocated and the default baud rate set
  * @param[in]  cfg The uart configuration data for data bits, stop bits and parity,
  *                  if not provided, default values of (8, 1, none) will be used
  * @return The status of the init request

@@ -132,6 +132,7 @@ static cy_en_sd_host_status_t Cy_SD_Host_SdCardChangeClock(SDHC_Type *base, uint
     cy_en_sd_host_status_t ret = CY_SD_HOST_ERROR_INVALID_PARAMETER;
     uint32_t               clkDiv;
     uint32_t               clockInput = SDIO_CLK_HF_HZ;
+    cy_en_sd_host_bus_speed_mode_t busSpeed;
 
     if (NULL != base)
     {
@@ -139,6 +140,25 @@ static cy_en_sd_host_status_t Cy_SD_Host_SdCardChangeClock(SDHC_Type *base, uint
         Cy_SD_Host_DisableSdClk(base);
         ret = Cy_SD_Host_SetSdClkDiv(base, (uint16_t)clkDiv);
         Cy_SD_Host_EnableSdClk(base);
+
+        /* Update bus speed mode based on new frequency */
+        if (ret == CY_SD_HOST_SUCCESS)
+        {
+            if (clkDiv == 0u)
+            {
+                busSpeed = CY_SD_HOST_BUS_SPEED_SDR50;
+            }
+            else if (clkDiv == 1u)
+            {
+                busSpeed = CY_SD_HOST_BUS_SPEED_SDR25;
+            }
+            else
+            {
+                busSpeed = CY_SD_HOST_BUS_SPEED_SDR12_5;
+            }
+
+            ret = Cy_SD_Host_SetBusSpeedMode(base, busSpeed, NULL);
+        }
     }
 
     return ret;
@@ -1262,7 +1282,8 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     cy_stc_sd_host_data_config_t dat;
     cy_en_sd_host_status_t       result = CY_SD_HOST_ERROR_TIMEOUT;
     uint32_t                     regIntrSts = Cy_SD_Host_GetNormalInterruptMask(obj->base);;
-
+    uint32_t* temp_Buffer = NULL;
+    
     /* Initialize data constants*/
     dat.autoCommand         = CY_SD_HOST_AUTO_CMD_NONE;
     dat.dataTimeout         = 0x0dUL;
@@ -1270,7 +1291,13 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     dat.enReliableWrite     = false;
     dat.enableDma           = true;
 
-    uint32_t* temp_Buffer = (uint32_t*)malloc(length + obj->block_size - 1);
+    dat.read = ( direction == CYHAL_WRITE ) ? false : true;
+
+    /* Allocate only on read operation */
+    if (dat.read)
+    {
+        temp_Buffer = (uint32_t*)malloc(length + obj->block_size - 1);
+    }
 
     /* Clear out the response */
     if ( response != NULL )
@@ -1319,8 +1346,6 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
         cmd.dataPresent                  = true;
         cmd.cmdType                      = CY_SD_HOST_CMD_NORMAL;
         dat.data                         = (uint32_t*)data;
-
-        dat.read = ( direction == CYHAL_WRITE ) ? false : true;
 
         /* TODO - BSP-542 */
         /* Block mode */
@@ -1379,7 +1404,10 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
         memcpy((uint32_t *)data, temp_Buffer, (size_t)length);
     }
 
-    free(temp_Buffer);
+    if (temp_Buffer != NULL)
+    {
+        free(temp_Buffer);
+    }
 
     if (0u != (CY_SD_HOST_CARD_INTERRUPT & obj->irq_cause))
     {

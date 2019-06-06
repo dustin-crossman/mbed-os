@@ -463,7 +463,7 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_SetSieInterrupt(USBFS_Type *base, uint32_t
 __STATIC_INLINE void Cy_USBFS_Dev_Drv_WriteEp0Mode(USBFS_Type *base, uint32_t mode)
 {
     USBFS_DEV_EP0_CR(base) = mode;
-    USBFS_DEV_EP0_CR(base);
+    (void) USBFS_DEV_EP0_CR(base);
 }
 
 /*******************************************************************************
@@ -482,7 +482,7 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_WriteEp0Mode(USBFS_Type *base, uint32_t mo
 *******************************************************************************/
 __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_ReadEp0Mode(USBFS_Type const *base)
 {
-	return USBFS_DEV_EP0_CR(base);
+    return USBFS_DEV_EP0_CR(base);
 }
 
 
@@ -506,8 +506,8 @@ __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_ReadEp0Mode(USBFS_Type const *base)
 *******************************************************************************/
 __STATIC_INLINE void Cy_USBFS_Dev_Drv_SetEp0Count(USBFS_Type *base, uint32_t count, uint32_t toggle)
 {
-	count = _VAL2FLD(USBFS_USBDEV_EP0_CNT_BYTE_COUNT, count);
-	USBFS_DEV_EP0_CNT(base) = CY_USBFS_DEV_DRV_WRITE_ODD(count | toggle);
+    count = _VAL2FLD(USBFS_USBDEV_EP0_CNT_BYTE_COUNT, count);
+    USBFS_DEV_EP0_CNT(base) = CY_USBFS_DEV_DRV_WRITE_ODD(count | toggle);
 }
 
 
@@ -552,15 +552,15 @@ __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetEp0Count(USBFS_Type const *base)
 *******************************************************************************/
 __STATIC_INLINE void Cy_USBFS_Dev_Drv_WriteEp0Data(USBFS_Type *base, uint32_t idx, uint32_t value)
 {
-	if (0U == (idx & 0x1U))
-	{
-		USBFS_DEV_EP0_DR(base, idx) = value;
-	}
-	else
-	{
-		/* Apply special write for odd offset registers */
-		USBFS_DEV_EP0_DR(base, idx) = CY_USBFS_DEV_DRV_WRITE_ODD(value);
-	}
+    if (0U == (idx & 0x1U))
+    {
+        USBFS_DEV_EP0_DR(base, idx) = value;
+    }
+    else
+    {
+        /* Apply special write for odd offset registers */
+        USBFS_DEV_EP0_DR(base, idx) = CY_USBFS_DEV_DRV_WRITE_ODD(value);
+    }
 }
 
 
@@ -583,19 +583,19 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_WriteEp0Data(USBFS_Type *base, uint32_t id
 *******************************************************************************/
 __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_ReadEp0Data(USBFS_Type const *base, uint32_t idx)
 {
-	uint32_t value;
+    uint32_t value;
 
-	if (0U == (idx & 0x1U))
-	{
-		value = USBFS_DEV_EP0_DR(base, idx);
-	}
-	else
-	{
-		/* Apply special write for odd offset registers */
-		value = CY_USBFS_DEV_READ_ODD(USBFS_DEV_EP0_DR(base, idx));
-	}
+    if (0U == (idx & 0x1U))
+    {
+        value = USBFS_DEV_EP0_DR(base, idx);
+    }
+    else
+    {
+        /* Apply special write for odd offset registers */
+        value = CY_USBFS_DEV_READ_ODD(USBFS_DEV_EP0_DR(base, idx));
+    }
 
-	return (value);
+    return (value);
 }
 /** \} group_usbfs_drv_drv_reg_ep0_access */
 

@@ -360,6 +360,7 @@ typedef struct {
     cyhal_gpio_t                pin_tx;
     cyhal_gpio_t                pin_cts;
     cyhal_gpio_t                pin_rts;
+    bool                        is_user_clock;
     cyhal_clock_divider_t       clock;
     cy_stc_scb_uart_context_t   context;
     uint32_t                    irq_cause;
@@ -391,10 +392,9 @@ typedef struct {
     cyhal_resource_inst_t           resource;
     cyhal_gpio_t                    pin_dp;
     cyhal_gpio_t                    pin_dm;
-    
-    // Allocate for 8 data endpoints and 1 for contorol endpoint
-    uint8_t *rd_data[CY_USBFS_DEV_DRV_NUM_EPS_MAX + 1U];
-    uint32_t rd_size[CY_USBFS_DEV_DRV_NUM_EPS_MAX + 1U];
+    cyhal_clock_divider_t           clock;
+    uint8_t *rd_data[CY_USBFS_DEV_DRV_NUM_EPS_MAX];
+    uint32_t rd_size[CY_USBFS_DEV_DRV_NUM_EPS_MAX];
 #else
     void *empty;
 #endif
