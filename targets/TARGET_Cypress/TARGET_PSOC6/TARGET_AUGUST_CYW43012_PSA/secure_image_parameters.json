@@ -1,14 +1,13 @@
 {
-    "cm4" : {
-                "boot1" : { 
-                    "VERSION" : "0.1",
-                    "ROLLBACK_COUNTER" : "0",
-                    "IMAGE_ID" : "16",
-                    "SLOT_SIZE" : "0x30000",
-                    "PAD" : "--pad"
-                }
-            },
+    "boot0" : { 
+        "VERSION" : "0.1",
+        "ROLLBACK_COUNTER" : "0"
+    },
+    "boot1" : { 
+        "VERSION" : "0.1",
+        "ROLLBACK_COUNTER" : "0"
+    },
 
     "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/",
-    "priv_key_file": "/keys/USERAPP_CM4_KEY_PRIV.pem"
+    "priv_key_file": "keys/USERAPP_CM4_KEY_PRIV.pem"
 }
