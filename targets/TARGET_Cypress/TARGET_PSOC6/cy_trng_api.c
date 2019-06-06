@@ -28,14 +28,16 @@ extern "C" {
 
 void trng_init(trng_t *obj)
 {
-    if (CY_RSLT_SUCCESS != cyhal_trng_init(&(obj->trng)))
+    if (CY_RSLT_SUCCESS != cyhal_trng_init(&(obj->trng))) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_trng_init");
+    }
 }
 
 void trng_free(trng_t *obj)
 {
-    if (CY_RSLT_SUCCESS != cyhal_trng_free(&(obj->trng)))
+    if (CY_RSLT_SUCCESS != cyhal_trng_free(&(obj->trng))) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_trng_init");
+    }
 }
 
 int trng_get_bytes(trng_t *obj, uint8_t *output, size_t length, size_t *output_length)
@@ -43,28 +45,28 @@ int trng_get_bytes(trng_t *obj, uint8_t *output, size_t length, size_t *output_l
     uint32_t offset = 0;
     // If output is not word-aligned, write partial word
     uint32_t prealign = (uint32_t)((uintptr_t)output % sizeof(uint32_t));
-    if (prealign != 0)
-    {
+    if (prealign != 0) {
 
         uint32_t value;
-        if (CY_RSLT_SUCCESS != cyhal_trng_generate(&(obj->trng), &value))
+        if (CY_RSLT_SUCCESS != cyhal_trng_generate(&(obj->trng), &value)) {
             return -1;
+        }
         uint32_t count = sizeof(uint32_t) - prealign;
         memmove(&output[0], &value, count);
         offset += count;
     }
     // Write aligned full words
-    for (; offset < length - (sizeof(uint32_t) - 1u); offset += sizeof(uint32_t))
-    {
-        if (CY_RSLT_SUCCESS != cyhal_trng_generate(&(obj->trng), (uint32_t *)&output[offset]))
+    for (; offset < length - (sizeof(uint32_t) - 1u); offset += sizeof(uint32_t)) {
+        if (CY_RSLT_SUCCESS != cyhal_trng_generate(&(obj->trng), (uint32_t *)&output[offset])) {
             return -1;
+        }
     }
     // Write partial trailing word if requested
-    if (offset < length)
-    {
+    if (offset < length) {
         uint32_t value;
-        if (CY_RSLT_SUCCESS != cyhal_trng_generate(&(obj->trng), &value))
+        if (CY_RSLT_SUCCESS != cyhal_trng_generate(&(obj->trng), &value)) {
             return -1;
+        }
         uint32_t count = length - offset;
         memmove(&output[offset], &value, count);
         offset += count;

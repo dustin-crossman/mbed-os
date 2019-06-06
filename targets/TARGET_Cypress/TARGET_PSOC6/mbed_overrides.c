@@ -76,13 +76,13 @@ void mbed_sdk_init(void)
     * based on the System Idle Power Mode parameter value in the Device
     * Configurator. The default value is system deep sleep.
     */
-    #if (CY_CFG_PWR_SYS_IDLE_MODE == CY_CFG_PWR_MODE_ACTIVE)
-        rtos_attach_idle_hook(&active_idle_hook);
-    #elif (CY_CFG_PWR_SYS_IDLE_MODE == CY_CFG_PWR_MODE_SLEEP)
-        sleep_manager_lock_deep_sleep();
-    #else
-        /* Deep sleep is default state */
-    #endif
+#if (CY_CFG_PWR_SYS_IDLE_MODE == CY_CFG_PWR_MODE_ACTIVE)
+    rtos_attach_idle_hook(&active_idle_hook);
+#elif (CY_CFG_PWR_SYS_IDLE_MODE == CY_CFG_PWR_MODE_SLEEP)
+    sleep_manager_lock_deep_sleep();
+#else
+    /* Deep sleep is default state */
+#endif
 #endif
 }
 
