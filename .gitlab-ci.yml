@@ -7,6 +7,13 @@ before_script:
   - set
   - git clone git@git-ore.aus.cypress.com:devops/devops_scripts.git
 
+astyle:
+  stage: build
+  tags:
+    - mti-win10
+  script:
+    - bash -ex cy-astyle.sh
+
 ##############################################################################
 # Win10 - ARM, GCC_ARM and IAR
 ##############################################################################

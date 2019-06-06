@@ -25,10 +25,12 @@ extern "C" {
 
 int32_t flash_init(flash_t *obj)
 {
-    if (CY_RSLT_SUCCESS != cyhal_flash_init(&(obj->flash)))
+    if (CY_RSLT_SUCCESS != cyhal_flash_init(&(obj->flash))) {
         return -1;
-    if (CY_RSLT_SUCCESS != cyhal_flash_get_info(&(obj->flash), &(obj->info)))
+    }
+    if (CY_RSLT_SUCCESS != cyhal_flash_get_info(&(obj->flash), &(obj->info))) {
         return -1;
+    }
     return 0;
 }
 
@@ -52,16 +54,18 @@ int32_t flash_program_page(flash_t *obj, uint32_t address, const uint8_t *data, 
     MBED_ASSERT(0 == (address % obj->info.page_size));
     MBED_ASSERT(0 == (size % obj->info.page_size));
     for (uint32_t offset = 0; offset < size; offset += obj->info.page_size) {
-        if (CY_RSLT_SUCCESS != cyhal_flash_program(&(obj->flash), address + offset, (const uint32_t *)(data + offset)))
+        if (CY_RSLT_SUCCESS != cyhal_flash_program(&(obj->flash), address + offset, (const uint32_t *)(data + offset))) {
             return -1;
+        }
     }
     return 0;
 }
 
 uint32_t flash_get_sector_size(const flash_t *obj, uint32_t address)
 {
-    if (address < obj->info.start_address || address >= obj->info.start_address + obj->info.size)
+    if (address < obj->info.start_address || address >= obj->info.start_address + obj->info.size) {
         return MBED_FLASH_INVALID_SIZE;
+    }
     return obj->info.sector_size;
 }
 
