@@ -92,25 +92,62 @@ static USBFS_Type* const CYHAL_USB_DEV_BASE_ADDRESSES[CY_IP_MXUSBFS_INSTANCES] =
 #endif
 };
 
-static void cyhal_usb_dev_bus_reset_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext);
-static void cyhal_usb_dev_ep0_setup_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext);
-static void cyhal_usb_dev_ep0_in_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext);
-static void cyhal_usb_dev_ep0_out_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext);
-static cyhal_usb_dev_event_handler_t cyhal_usb_dev_event_callback_table[CYHAL_USB_DEV_EVENT_NUM]; 
+IRQn_Type CYHAL_USBDEV_IRQ_N[CY_IP_MXUSBFS_INSTANCES] =
+{
+#ifdef USBFS0
+    usb_interrupt_lo_IRQn,
+#endif
+};
 
-static void cyhal_usb_dev_sof_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext);
-static cyhal_usb_dev_sof_handler_t cyhal_usb_dev_sof_user_callback = NULL;
+static void cyhal_usb_0_dev_bus_reset_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext);
+static void cyhal_usb_0_dev_ep0_setup_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext);
+static void cyhal_usb_0_dev_ep0_in_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext);
+static void cyhal_usb_0_dev_ep0_out_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext);
+static cyhal_usb_dev_event_handler_t cyhal_usb_dev_event_callback_table[CY_IP_MXUSBFS_INSTANCES][CYHAL_USB_DEV_EVENT_NUM]; 
+static cy_cb_usbfs_dev_drv_callback_t cyhal_usb_dev_drv_event_cb_table[CY_IP_MXUSBFS_INSTANCES][CYHAL_USB_DEV_EVENT_NUM] = 
+{
+    /* USBFS0 */
+    {
+        &cyhal_usb_0_dev_bus_reset_callback,    /* CY_USB_DEV_BUS_RESET = 0U */ 
+        &cyhal_usb_0_dev_ep0_setup_callback,    /* CY_USB_DEV_EP0_SETUP = 1U */ 
+        &cyhal_usb_0_dev_ep0_in_callback,       /* CY_USB_DEV_EP0_IN    = 2U */ 
+        &cyhal_usb_0_dev_ep0_out_callback       /* CY_USB_DEV_EP0_OUT   = 3U */  
+    },
+};
 
-static void cyhal_usb_dev_ep_callback (uint32_t endpoint);
-static void cyhal_usb_dev_ep1_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
-static void cyhal_usb_dev_ep2_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
-static void cyhal_usb_dev_ep3_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
-static void cyhal_usb_dev_ep4_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
-static void cyhal_usb_dev_ep5_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
-static void cyhal_usb_dev_ep6_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
-static void cyhal_usb_dev_ep7_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
-static void cyhal_usb_dev_ep8_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
-static cyhal_usb_dev_ep_handler_attr_t cyhal_usb_dev_ep_handler_table[CYHAL_USB_DEV_EP_EVENT_NUM];
+static void cyhal_usb_0_dev_sof_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext);
+static cyhal_usb_dev_sof_handler_t cyhal_usb_dev_sof_user_callback[CY_IP_MXUSBFS_INSTANCES];
+static cy_cb_usbfs_dev_drv_callback_t cyhal_usb_dev_drv_sof_cb_table[CY_IP_MXUSBFS_INSTANCES]=
+{
+    /* USBFS0 */
+    &cyhal_usb_0_dev_sof_callback,
+};
+
+static void cyhal_usb_dev_ep_callback (uint32_t idx, uint32_t endpoint);
+static void cyhal_usb_0_dev_ep1_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
+static void cyhal_usb_0_dev_ep2_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
+static void cyhal_usb_0_dev_ep3_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
+static void cyhal_usb_0_dev_ep4_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
+static void cyhal_usb_0_dev_ep5_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
+static void cyhal_usb_0_dev_ep6_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
+static void cyhal_usb_0_dev_ep7_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
+static void cyhal_usb_0_dev_ep8_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext);
+static cyhal_usb_dev_ep_handler_attr_t cyhal_usb_dev_ep_handler_table[CY_IP_MXUSBFS_INSTANCES][CYHAL_USB_DEV_EP_EVENT_NUM];
+
+static cy_cb_usbfs_dev_drv_ep_callback_t cyhal_usb_dev_drv_ep_cb_table[CY_IP_MXUSBFS_INSTANCES][CYHAL_USB_DEV_EP_EVENT_NUM] =
+{
+    /* USBFS0 */
+    {
+        &cyhal_usb_0_dev_ep1_callback,
+        &cyhal_usb_0_dev_ep2_callback,
+        &cyhal_usb_0_dev_ep3_callback,
+        &cyhal_usb_0_dev_ep4_callback,
+        &cyhal_usb_0_dev_ep5_callback,
+        &cyhal_usb_0_dev_ep6_callback,
+        &cyhal_usb_0_dev_ep7_callback,
+        &cyhal_usb_0_dev_ep8_callback,
+    },
+};
 
 static cy_rslt_t cyhal_usb_dev_clock_setup(cyhal_clock_divider_t *clk_div, cyhal_clock_divider_t *user_clk_div);
 static cy_rslt_t cyhal_usb_dev_pin_setup(cyhal_usb_dev_t *obj, cyhal_gpio_t dp, 
@@ -118,102 +155,110 @@ static cy_rslt_t cyhal_usb_dev_pin_setup(cyhal_usb_dev_t *obj, cyhal_gpio_t dp,
 static void cyhal_usb_dev_free_pin(cyhal_gpio_t pin);
 static void cyhal_usb_dev_free_resources(cyhal_usb_dev_t *obj);
 
-static void cyhal_usb_dev_bus_reset_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext)
+static void cyhal_usb_0_dev_bus_reset_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext)
 {
     (void) base; (void) drvContext;
-    cyhal_usb_dev_event_callback_table[CYHAL_USB_DEV_EVENT_BUS_RESET]();
+
+    cyhal_usb_dev_event_callback_table[0][CYHAL_USB_DEV_EVENT_BUS_RESET]();
 }
 
-static void cyhal_usb_dev_ep0_setup_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext)
+static void cyhal_usb_0_dev_ep0_setup_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext)
 {
     (void) base; (void) drvContext;
-    cyhal_usb_dev_event_callback_table[CYHAL_USB_DEV_EVENT_EP0_SETUP]();
+
+    cyhal_usb_dev_event_callback_table[0][CYHAL_USB_DEV_EVENT_EP0_SETUP]();
 }
 
-static void cyhal_usb_dev_ep0_in_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext)
+static void cyhal_usb_0_dev_ep0_in_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext)
 {
     (void) base; (void) drvContext;
-    cyhal_usb_dev_event_callback_table[CYHAL_USB_DEV_EVENT_EP0_IN]();
+
+    cyhal_usb_dev_event_callback_table[0][CYHAL_USB_DEV_EVENT_EP0_IN]();
 }
 
-static void cyhal_usb_dev_ep0_out_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext)
+static void cyhal_usb_0_dev_ep0_out_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext)
 {
     (void) base; (void) drvContext;
-    cyhal_usb_dev_event_callback_table[CYHAL_USB_DEV_EVENT_EP0_OUT]();
+
+    cyhal_usb_dev_event_callback_table[0][CYHAL_USB_DEV_EVENT_EP0_OUT]();
 }
 
 void cyhal_usb_dev_register_event_callback(cyhal_usb_dev_t *obj, cyhal_usb_dev_event_t event, cyhal_usb_dev_event_handler_t handler)
 {
     CY_ASSERT_L1(CYHAL_USB_DEV_IS_EVENT_VALID(event));
-    cyhal_usb_dev_event_callback_table[event] = handler;
+    uint32_t idx = (uint32_t)obj->resource.block_num;
+
+    cyhal_usb_dev_event_callback_table[idx][event] = handler;
 }
 
-static void cyhal_usb_dev_ep_callback(uint32_t endpoint_idx)
+
+static void cyhal_usb_dev_ep_callback(uint32_t idx, uint32_t endpoint_idx)
 {
-    cyhal_usb_dev_endpoint_handler_t ep_handler = cyhal_usb_dev_ep_handler_table[endpoint_idx].ep_handler;
+    cyhal_usb_dev_endpoint_handler_t ep_handler = cyhal_usb_dev_ep_handler_table[idx][endpoint_idx].ep_handler;
 
     if (NULL != ep_handler)
     {
-        ep_handler(cyhal_usb_dev_ep_handler_table[endpoint_idx].ep_address);
+        ep_handler(cyhal_usb_dev_ep_handler_table[idx][endpoint_idx].ep_address);
     }
 }
 
-static void cyhal_usb_dev_ep1_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
+static void cyhal_usb_0_dev_ep1_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
 {   
     (void) base; (void) errorType; (void) drvContext; 
-    cyhal_usb_dev_ep_callback(CYHAL_USB_DEV_EP1_IDX);
+    cyhal_usb_dev_ep_callback(0U, CYHAL_USB_DEV_EP1_IDX);
 }
 
-static void cyhal_usb_dev_ep2_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
+static void cyhal_usb_0_dev_ep2_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
 {
     (void) base; (void) errorType; (void) drvContext; 
-    cyhal_usb_dev_ep_callback(CYHAL_USB_DEV_EP2_IDX);
+    cyhal_usb_dev_ep_callback(0U, CYHAL_USB_DEV_EP2_IDX);
 }
 
-static void cyhal_usb_dev_ep3_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
+static void cyhal_usb_0_dev_ep3_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
 {
     (void) base; (void) errorType; (void) drvContext; 
-    cyhal_usb_dev_ep_callback(CYHAL_USB_DEV_EP3_IDX);
+    cyhal_usb_dev_ep_callback(0U,CYHAL_USB_DEV_EP3_IDX);
 }
 
-static void cyhal_usb_dev_ep4_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
+static void cyhal_usb_0_dev_ep4_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
 {
     (void) base; (void) errorType; (void) drvContext; 
-    cyhal_usb_dev_ep_callback(CYHAL_USB_DEV_EP4_IDX);
+    cyhal_usb_dev_ep_callback(0U, CYHAL_USB_DEV_EP4_IDX);
 }
 
-static void cyhal_usb_dev_ep5_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
+static void cyhal_usb_0_dev_ep5_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
 {
     (void) base; (void) errorType; (void) drvContext; 
-    cyhal_usb_dev_ep_callback(CYHAL_USB_DEV_EP5_IDX);
+    cyhal_usb_dev_ep_callback(0U, CYHAL_USB_DEV_EP5_IDX);
 }
 
-static void cyhal_usb_dev_ep6_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
+static void cyhal_usb_0_dev_ep6_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
 {
     (void) base; (void) errorType; (void) drvContext; 
-    cyhal_usb_dev_ep_callback(CYHAL_USB_DEV_EP6_IDX);
+    cyhal_usb_dev_ep_callback(0U, CYHAL_USB_DEV_EP6_IDX);
 }
 
-static void cyhal_usb_dev_ep7_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
+static void cyhal_usb_0_dev_ep7_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
 {
     (void) base; (void) errorType; (void) drvContext; 
-    cyhal_usb_dev_ep_callback(CYHAL_USB_DEV_EP7_IDX);
+    cyhal_usb_dev_ep_callback(0U, CYHAL_USB_DEV_EP7_IDX);
 }
 
-static void cyhal_usb_dev_ep8_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
+static void cyhal_usb_0_dev_ep8_callback(USBFS_Type *base, uint32_t errorType, cy_stc_usbfs_dev_drv_context_t *drvContext)
 {
     (void) base; (void) errorType; (void) drvContext; 
-    cyhal_usb_dev_ep_callback(CYHAL_USB_DEV_EP8_IDX);
+    cyhal_usb_dev_ep_callback(0U, CYHAL_USB_DEV_EP8_IDX);
 }
 
 void cyhal_usb_dev_register_endpoint_callback(cyhal_usb_dev_t *obj, cyhal_usb_dev_ep_t endpoint, cyhal_usb_dev_endpoint_handler_t handler)
 {
     uint32_t endpoint_num = CYHAL_USB_DEV_GET_EP_NUM(endpoint);
+    uint32_t idx = (uint32_t)obj->resource.block_num;
 
     CY_ASSERT_L1(CYHAL_USB_DEV_IS_EP_NUM_VALID(endpoint_num));
 
-    cyhal_usb_dev_ep_handler_table[CYHAL_USB_DEV_GET_EP_IDX(endpoint_num)].ep_address = endpoint;
-    cyhal_usb_dev_ep_handler_table[CYHAL_USB_DEV_GET_EP_IDX(endpoint_num)].ep_handler = handler;
+    cyhal_usb_dev_ep_handler_table[idx][CYHAL_USB_DEV_GET_EP_IDX(endpoint_num)].ep_address = endpoint;
+    cyhal_usb_dev_ep_handler_table[idx][CYHAL_USB_DEV_GET_EP_IDX(endpoint_num)].ep_handler = handler;
 }
 
 static cy_rslt_t cyhal_usb_dev_clock_setup(cyhal_clock_divider_t *clk_div, cyhal_clock_divider_t *user_clk_div)
@@ -271,9 +316,9 @@ static cy_rslt_t cyhal_usb_dev_clock_setup(cyhal_clock_divider_t *clk_div, cyhal
     {
         /* PLL configuration for 48MHz 0.25% */
         static const cy_stc_pll_manual_config_t pll_config_48MHz = {
-            .feedbackDiv = 30,    
-            .referenceDiv = 1,    
-            .outputDiv = 5,       
+            .feedbackDiv = 30U,    
+            .referenceDiv = 1U,    
+            .outputDiv = 5U,       
             .lfMode = false,      
             .outputMode = CY_SYSCLK_FLLPLL_OUTPUT_AUTO, 
         };
@@ -372,15 +417,17 @@ cy_rslt_t cyhal_usb_dev_init(cyhal_usb_dev_t *obj, cyhal_gpio_t dp, cyhal_gpio_t
                              const cyhal_usb_dev_cfg_t *cfg)
 {
     cy_rslt_t result = cyhal_usb_dev_pin_setup(obj, dp, dm);
+    uint32_t idx = 0; 
 
     if (CY_RSLT_SUCCESS == result)
     {
         result = cyhal_usb_dev_clock_setup(&(obj->clock), clkDiv);
+        idx = (uint32_t)obj->resource.block_num;
     }
 
     if (CY_RSLT_SUCCESS == result)
     {
-        obj->base = CYHAL_USB_DEV_BASE_ADDRESSES[obj->resource.block_num];
+        obj->base = CYHAL_USB_DEV_BASE_ADDRESSES[idx];
     }
 
     bool configured = false;
@@ -443,34 +490,35 @@ cy_rslt_t cyhal_usb_dev_init(cyhal_usb_dev_t *obj, cyhal_gpio_t dp, cyhal_gpio_t
     
     if (CY_RSLT_SUCCESS == result)
     {
+        uint32_t cb_num;
+        
         /* Register service callbacks */
         Cy_USBFS_Dev_Drv_RegisterServiceCallback(obj->base, CY_USB_DEV_BUS_RESET, 
-                                                &cyhal_usb_dev_bus_reset_callback, 
+                                                cyhal_usb_dev_drv_event_cb_table[idx][CY_USB_DEV_BUS_RESET], 
                                                 &(obj->context));
         Cy_USBFS_Dev_Drv_RegisterServiceCallback(obj->base, CY_USB_DEV_EP0_SETUP, 
-                                                &cyhal_usb_dev_ep0_setup_callback, 
+                                                cyhal_usb_dev_drv_event_cb_table[idx][CY_USB_DEV_EP0_SETUP], 
                                                 &(obj->context));
         Cy_USBFS_Dev_Drv_RegisterServiceCallback(obj->base, CY_USB_DEV_EP0_IN, 
-                                                &cyhal_usb_dev_ep0_in_callback, 
+                                                cyhal_usb_dev_drv_event_cb_table[idx][CY_USB_DEV_EP0_IN], 
                                                 &(obj->context));
         Cy_USBFS_Dev_Drv_RegisterServiceCallback(obj->base, CY_USB_DEV_EP0_OUT,
-                                                &cyhal_usb_dev_ep0_out_callback,
+                                                cyhal_usb_dev_drv_event_cb_table[idx][CY_USB_DEV_EP0_OUT],
                                                 &(obj->context));
 
-        /* Register sof callback (it enables sof interrupt, so disable it after registration) */
-        Cy_USBFS_Dev_Drv_RegisterSofCallback(obj->base, &cyhal_usb_dev_sof_callback, 
+        /* Register sof callback (it enables sof interrupt, so disable it after registration)*/
+        Cy_USBFS_Dev_Drv_RegisterSofCallback(obj->base, cyhal_usb_dev_drv_sof_cb_table[idx], 
                                              &(obj->context));
         cyhal_usb_dev_sof_enable(obj, false);
 
         /* Register data endpoint handlers*/
-        Cy_USBFS_Dev_Drv_RegisterEndpointCallback(obj->base, 1U, &cyhal_usb_dev_ep1_callback, &(obj->context));
-        Cy_USBFS_Dev_Drv_RegisterEndpointCallback(obj->base, 2U, &cyhal_usb_dev_ep2_callback, &(obj->context));
-        Cy_USBFS_Dev_Drv_RegisterEndpointCallback(obj->base, 3U, &cyhal_usb_dev_ep3_callback, &(obj->context));
-        Cy_USBFS_Dev_Drv_RegisterEndpointCallback(obj->base, 4U, &cyhal_usb_dev_ep4_callback, &(obj->context));
-        Cy_USBFS_Dev_Drv_RegisterEndpointCallback(obj->base, 5U, &cyhal_usb_dev_ep5_callback, &(obj->context));
-        Cy_USBFS_Dev_Drv_RegisterEndpointCallback(obj->base, 6U, &cyhal_usb_dev_ep6_callback, &(obj->context));
-        Cy_USBFS_Dev_Drv_RegisterEndpointCallback(obj->base, 7U, &cyhal_usb_dev_ep7_callback, &(obj->context));
-        Cy_USBFS_Dev_Drv_RegisterEndpointCallback(obj->base, 8U, &cyhal_usb_dev_ep8_callback, &(obj->context));
+        for (cb_num = 0; cb_num < CYHAL_USB_DEV_EP_EVENT_NUM; cb_num++)
+        {
+            Cy_USBFS_Dev_Drv_RegisterEndpointCallback(obj->base, 
+                                                      (cb_num + 1U), 
+                                                      cyhal_usb_dev_drv_ep_cb_table[idx][cb_num], 
+                                                      &(obj->context));
+        }
     }
     else
     {
@@ -755,10 +803,11 @@ cy_rslt_t cyhal_usb_dev_register_irq(cyhal_usb_dev_t *obj, cyhal_usb_dev_irq_han
 {
     cy_rslt_t result = CYHAL_USB_DEV_RSLT_ERR;
     cy_stc_sysint_t config;
+    uint32_t idx = (uint32_t)obj->resource.block_num;
     
     /* Configure NVIC parameters */
     config.intrPriority = CYHAL_USB_DEV_DEFAULT_IRQ_PRIORITY;
-    config.intrSrc = (IRQn_Type)usb_interrupt_lo_IRQn;
+    config.intrSrc = CYHAL_USBDEV_IRQ_N[idx];
 
     /* Setup interrupt in NVIC to trigger the handler */
     if (CY_SYSINT_SUCCESS == Cy_SysInt_Init(&config, (cy_israddress)handler))
@@ -772,14 +821,15 @@ cy_rslt_t cyhal_usb_dev_register_irq(cyhal_usb_dev_t *obj, cyhal_usb_dev_irq_han
 
 void cyhal_usb_dev_irq_enable(cyhal_usb_dev_t *obj, bool enable)
 {
+    uint32_t idx = (uint32_t)obj->resource.block_num;
     if (enable)
     {
-        NVIC_ClearPendingIRQ(usb_interrupt_lo_IRQn);
-        NVIC_EnableIRQ(usb_interrupt_lo_IRQn);
+        NVIC_ClearPendingIRQ(CYHAL_USBDEV_IRQ_N[idx]);
+        NVIC_EnableIRQ(CYHAL_USBDEV_IRQ_N[idx]);
     }
     else
     {
-        NVIC_DisableIRQ(usb_interrupt_lo_IRQn);
+        NVIC_DisableIRQ(CYHAL_USBDEV_IRQ_N[idx]);
     }
 }
 
@@ -791,21 +841,22 @@ void cyhal_usb_dev_process_irq(cyhal_usb_dev_t *obj)
                                &(obj->context));
 }
 
-static void cyhal_usb_dev_sof_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext)
+static void cyhal_usb_0_dev_sof_callback(USBFS_Type *base, struct cy_stc_usbfs_dev_drv_context *drvContext)
 {
     (void) drvContext;
     
-    if (NULL != cyhal_usb_dev_sof_user_callback)
+    if (NULL != cyhal_usb_dev_sof_user_callback[0])
     {
         uint32_t frame_number = Cy_USBFS_Dev_Drv_GetSofNubmer(base);
-        cyhal_usb_dev_sof_user_callback(frame_number);
+        cyhal_usb_dev_sof_user_callback[0](frame_number);
     }
 }
 
 
 void cyhal_usb_dev_register_sof_callback( cyhal_usb_dev_t *obj, cyhal_usb_dev_sof_handler_t handler)
 {
-    cyhal_usb_dev_sof_user_callback = handler;
+    uint32_t idx = (uint32_t)obj->resource.block_num;
+    cyhal_usb_dev_sof_user_callback[idx] = handler;
 }
 
 #endif /* CY_IP_MXUSBFS) */
