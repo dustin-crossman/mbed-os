@@ -234,52 +234,14 @@ void spm_hal_start_nspe(void)
 #ifdef MCUBOOT_USE_SMIF_STAGE
     cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
 
-    /* Configure SMIF interrupt */
-    cy_stc_sysint_t smifIntConfig =
-    {
-       .intrSrc = smif_interrupt_IRQn,     /* SMIF interrupt */
-       .intrPriority = (1u)       /* SMIF interrupt priority */
-    };
-
-    /* enable interrupts, and the CM4 */
-    __enable_irq();
-
-    /* SMIF interrupt initialization status */
-    cy_en_sysint_status_t intr_init_status;
-    intr_init_status = Cy_SysInt_Init(&smifIntConfig, Flash_SMIF_Interrupt_User);
-
-    if(0 != intr_init_status)
-    {
-         BOOT_LOG_ERR("SMIF Interrupt initialization failed with error code %i", intr_init_status);
-    }
-
     qspi_status = Flash_SMIF_QSPI_Start();
-
     if(0 != qspi_status)
     {
          BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
     }
-
     /* Set QE */
     Flash_SMIF_EnableQuadMode(SMIF0, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
 #endif
-
-    // TODO: BOHD Debug code
-    uint8_t txBuffer[3];
-    uint8_t rxBuffer[64];
-    uint8_t aaa[3];
-
-    aaa[0] = 0;
-    aaa[1] = 0;
-    aaa[2] = 0;
-
-    txBuffer[0] = 0xaa;
-    txBuffer[1] = 0x55;
-    txBuffer[2] = 0xcc;
-
-    rc = Flash_SMIF_ReadMemory(SMIF0,  &QSPIContext, rxBuffer, 64, aaa);
-    rc = Flash_SMIF_WriteMemory(SMIF0, &QSPIContext, txBuffer, 3, aaa);
-    rc = Flash_SMIF_ReadMemory(SMIF0,  &QSPIContext, rxBuffer, 64, aaa);
 
     boot_flash_device = (struct device*)&psoc6_flash_device;
 

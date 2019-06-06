@@ -11,9 +11,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <cycfg_qspi_memslot.h>
+#include <cycfg_peripherals.h>
+
 #include "cy_pdl.h"
 #include "cycfg.h"
-#include "cycfg_qspi_memslot.h"
 #include "flash_smif.h"
 
 /***************************************************************************
@@ -21,10 +23,11 @@
 ***************************************************************************/
 
 #define SMIF_PRIORITY       (1u)      /* SMIF interrupt priority */
-#define TIMEOUT_1_MS        (1000ul)  /* 1 ms timeout for all blocking functions */
+#define SMIF_TIMEOUT_1_MS   (1000ul)  /* 1 ms timeout for all blocking functions */
 #define PACKET_SIZE         (64u)    /* The memory Read/Write packet */
 #define ADDRESS_SIZE        (3u)      /* Memory address size */
 #define SUCCESS             (0u)
+#define SMIF_NVIC_IRQN      (NvicMux7_IRQn)
 /***************************************************************************
 * Global variables
 ***************************************************************************/
@@ -46,7 +49,7 @@ void handle_error(void)
 }
 
 
-#ifdef MCUBOOT_USE_SMIF_STAGE
+//#ifdef MCUBOOT_USE_SMIF_STAGE
 /*******************************************************************************
 * Function Name: SMIF_Interrupt_User
 ********************************************************************************
@@ -57,9 +60,9 @@ void handle_error(void)
 *******************************************************************************/
 void Flash_SMIF_Interrupt_User(void)
 {
-    Cy_SMIF_Interrupt(SMIF_HW, &SMIF_context);
+    Cy_SMIF_Interrupt(SMIF0, &QSPIContext);
 }
-#endif
+//#endif
 
 
 /*******************************************************************************
@@ -126,7 +129,37 @@ cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
 {
     cy_en_smif_status_t qspiStatus = CY_SMIF_BAD_PARAM;
 
-    qspiStatus = Cy_SMIF_Init(SMIF0, &SMIF_config, TIMEOUT_1_MS, &QSPIContext);
+    /* Configure SMIF interrupt */
+    cy_stc_sysint_t smifIntConfig =
+    {
+#if (CY_CPU_CORTEX_M0P)
+        .intrSrc = SMIF_NVIC_IRQN,
+        .cm0pSrc = smif_interrupt_IRQn,
+#else
+        .intrSrc = smif_interrupt_IRQn, /* SMIF interrupt number (non M0 core)*/
+#endif
+        .intrPriority = SMIF_PRIORITY
+    };
+
+    /* enable interrupts */
+    __enable_irq();
+
+    /* SMIF interrupt initialization status */
+    cy_en_sysint_status_t intr_init_status;
+    intr_init_status = Cy_SysInt_Init(&smifIntConfig, Flash_SMIF_Interrupt_User);
+
+    if(0 != intr_init_status)
+    {
+         BOOT_LOG_ERR("SMIF Interrupt initialization failed with error code %i", intr_init_status);
+    }
+
+    /*
+     * cy_en_smif_status_t Cy_SMIF_Init(SMIF_Type *base,
+                                    cy_stc_smif_config_t const *config,
+                                    uint32_t timeout,
+                                    cy_stc_smif_context_t *context)
+    */
+    qspiStatus = Cy_SMIF_Init(SMIF0, &QSPI_config, SMIF_TIMEOUT_1_MS, &QSPIContext);
 
     if(qspiStatus == CY_SMIF_SUCCESS)
     {
@@ -145,8 +178,11 @@ cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
     }
 
-    /* Enable the SMIF interrupt */
-    NVIC_EnableIRQ(smif_interrupt_IRQn);
+#if (CY_CPU_CORTEX_M0P)
+	NVIC_EnableIRQ(SMIF_NVIC_IRQN);
+#else
+	NVIC_EnableIRQ(smif_interrupt_IRQn);
+#endif
 
     return qspiStatus;
 }
@@ -198,45 +234,27 @@ void Flash_SMIF_EnableQuadMode(SMIF_Type *baseaddr, cy_stc_smif_mem_config_t *me
 
     status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, memConfig, &readStatus, statusCmd,
                                         smifContext);
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_QuadEnable failed\r\n", status);
-
-    if(maskQE != (readStatus & maskQE))
+    if(CY_SMIF_SUCCESS != status)
     {
-        /* Check user confirmation to do QE*/
-//        printf("\r\nQuad is NOT enabled. Pleas press button to continue\r\n");
-//        bool btnPressed = false;
-//        while (!btnPressed)
-//        {   /* 50 ms delay for button press check*/
-//            Cy_SysLib_Delay(50u);
-//            if (Cy_GPIO_Read(PIN_SW2_PORT, PIN_SW2_PIN) == 0u)
-//            {
-//                /* 50 ms delay for button debounce on button press */
-//                Cy_SysLib_Delay(50u);
-//                if (Cy_GPIO_Read(PIN_SW2_PORT, PIN_SW2_PIN) == 0u)
-//                {
-//                    while (Cy_GPIO_Read(PIN_SW2_PORT, PIN_SW2_PIN) == 0u)
-//                    {   /* 50 ms delay for button debounce on button release */
-//                        Cy_SysLib_Delay(50u);
-//                    }
-//                    btnPressed = true;
-//                }
-//
-//            }
-//        }
-
-        status = Cy_SMIF_Memslot_QuadEnable(baseaddr, memConfig, smifContext);
-//        CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_QuadEnable failed\r\n", status);
-
-        while(Cy_SMIF_Memslot_IsBusy(baseaddr, memConfig, smifContext))
-        {
-            /* Wait until the QE operation is completed */
-        }
+        BOOT_LOG_ERR("Memory Module Read Status failed with error code %i", status);
     }
     else
+    if(maskQE != (readStatus & maskQE))
     {
-        // TODO: add LOG_ERR
-//        printf("\r\nQuad is enabled. Enabling operation skipped\r\n");
+        status = Cy_SMIF_Memslot_QuadEnable(baseaddr, memConfig, smifContext);
+        if(CY_SMIF_SUCCESS == status)
+        {
+            while(Cy_SMIF_Memslot_IsBusy(baseaddr, memConfig, smifContext))
+            {
+                /* Wait until the QE operation is completed */
+            }
+        }
+        else
+        {
+            BOOT_LOG_ERR("Memory Module QuadEnable failed with error code %i", status);
+        }
     }
+    // TODO: return status
 }
 
 
@@ -280,7 +298,7 @@ int Flash_SMIF_ReadMemory(SMIF_Type *baseaddr,
     if(CY_SMIF_SUCCESS == status)
     {
         status = Cy_SMIF_Memslot_CmdRead(baseaddr, smifMemConfigs[0], address, rxBuffer, rxSize, NULL, smifContext);
-
+		// TODO: check status
         while(Cy_SMIF_BusyCheck(baseaddr))
         {
             /* Wait until the SMIF IP operation is completed. */
