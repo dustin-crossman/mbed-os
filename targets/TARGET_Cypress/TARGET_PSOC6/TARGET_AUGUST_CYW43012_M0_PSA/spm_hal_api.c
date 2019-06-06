@@ -240,7 +240,11 @@ void spm_hal_start_nspe(void)
          BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
     }
     /* Set QE */
-    Flash_SMIF_EnableQuadMode(SMIF0, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
+    qspi_status = Flash_SMIF_EnableQuadMode(SMIF0, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
+    if(0 != qspi_status)
+    {
+         BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
+    }
 #endif
 
     boot_flash_device = (struct device*)&psoc6_flash_device;

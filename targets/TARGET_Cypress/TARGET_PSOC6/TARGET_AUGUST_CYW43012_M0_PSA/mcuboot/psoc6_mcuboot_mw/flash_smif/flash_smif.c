@@ -35,22 +35,6 @@ cy_stc_scb_uart_context_t UART_context;
 cy_stc_smif_context_t SMIF_context;
 
 /*******************************************************************************
-* Function Name: handle_error
-********************************************************************************
-*
-* This function processes unrecoverable errors
-*
-*******************************************************************************/
-void handle_error(void)
-{
-     /* Disable all interrupts */
-    __disable_irq();
-    while(1u) {}
-}
-
-
-//#ifdef MCUBOOT_USE_SMIF_STAGE
-/*******************************************************************************
 * Function Name: SMIF_Interrupt_User
 ********************************************************************************
 *
@@ -62,69 +46,6 @@ void Flash_SMIF_Interrupt_User(void)
 {
     Cy_SMIF_Interrupt(SMIF0, &QSPIContext);
 }
-//#endif
-
-
-/*******************************************************************************
-* Function Name: InitBuffers
-****************************************************************************//**
-*
-* This function initializes the transfer buffers.
-*
-* \param txBuffer - The buffer for Write data.
-*
-* \param rxBuffer - The buffer for Read data.
-*
-*******************************************************************************/
-void InitBuffers(uint8_t txBuffer[],uint8_t rxBuffer[], uint32_t bufferSize)
-{
-    for(uint32_t index=0; index<bufferSize; index++)
-    {
-        txBuffer[index] = (uint8_t) (index & 0xFF);
-        rxBuffer[index] = 0;
-    }
-}
-
-
-/*******************************************************************************
-* Function Name: PrintArray
-****************************************************************************//**
-*
-* This function prints the content of the RX buffer to the UART console.
-*
-* \param msg - message print before array output
-*
-* \param  rxBuffer - The buffer to the console output.
-*
-* \param  size - The size of the buffer to the console output.
-*
-*******************************************************************************/
-void PrintArray(char * msg, uint8_t * buff, uint32_t size)
-{
-    printf("%s", msg);
-    for(uint32_t index=0; index<size; index++)
-    {
-        printf("0x%02X ", (unsigned int) buff[index]);
-    }
-    printf("\r\n=======================\r\n");
-}
-
-/*******************************************************************************
-* Function Name: CheckStatus
-****************************************************************************//**
-*
-* Check if status is SUCCES and call handle error function
-*
-*******************************************************************************/
-void CheckStatus(char * msg, uint32_t status)
-{
-    if(SUCCESS != status)
-    {
-        printf("%s", msg);
-        handle_error();
-    }
-}
-
 cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
 {
     cy_en_smif_status_t qspiStatus = CY_SMIF_BAD_PARAM;
@@ -232,29 +153,29 @@ void Flash_SMIF_EnableQuadMode(SMIF_Type *baseaddr, cy_stc_smif_mem_config_t *me
     uint32_t statusCmd = memConfig->deviceCfg->readStsRegQeCmd->command;
     uint8_t maskQE = (uint8_t) memConfig->deviceCfg->stsRegQuadEnableMask;
 
-    status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, memConfig, &readStatus, statusCmd,
-                                        smifContext);
+    status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, memConfig, &readStatus, statusCmd, smifContext);
     if(CY_SMIF_SUCCESS != status)
     {
         BOOT_LOG_ERR("Memory Module Read Status failed with error code %i", status);
     }
     else
-    if(maskQE != (readStatus & maskQE))
     {
-        status = Cy_SMIF_Memslot_QuadEnable(baseaddr, memConfig, smifContext);
-        if(CY_SMIF_SUCCESS == status)
+        if(maskQE != (readStatus & maskQE))
         {
-            while(Cy_SMIF_Memslot_IsBusy(baseaddr, memConfig, smifContext))
+            status = Cy_SMIF_Memslot_QuadEnable(baseaddr, memConfig, smifContext);
+            if(CY_SMIF_SUCCESS == status)
             {
-                /* Wait until the QE operation is completed */
+                while(Cy_SMIF_Memslot_IsBusy(baseaddr, memConfig, smifContext))
+                {
+                    /* Wait until the QE operation is completed */
+                }
+            }
+            else
+            {
+                BOOT_LOG_ERR("Memory Module QuadEnable failed with error code %i", status);
             }
         }
-        else
-        {
-            BOOT_LOG_ERR("Memory Module QuadEnable failed with error code %i", status);
-        }
     }
-    // TODO: return status
 }
 
 
@@ -294,14 +215,15 @@ int Flash_SMIF_ReadMemory(SMIF_Type *baseaddr,
 
     /* Read data from the external memory configuration register */
     status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, smifMemConfigs[0], &rxBuffer_reg, (uint8_t)cmdreadStsRegQe->command , smifContext);
-
     if(CY_SMIF_SUCCESS == status)
     {
         status = Cy_SMIF_Memslot_CmdRead(baseaddr, smifMemConfigs[0], address, rxBuffer, rxSize, NULL, smifContext);
-		// TODO: check status
-        while(Cy_SMIF_BusyCheck(baseaddr))
+        if(CY_SMIF_SUCCESS == status)
         {
-            /* Wait until the SMIF IP operation is completed. */
+            while(Cy_SMIF_BusyCheck(baseaddr))
+            {
+                /* Wait until the SMIF IP operation is completed. */
+            }
         }
 //        /* Wait until receive transaction completed */
 //        while(Cy_SMIF_GetTxfrStatus(SMIF0, &QSPIContext) != CY_SMIF_REC_CMPLT);
@@ -358,7 +280,6 @@ int Flash_SMIF_WriteMemory(SMIF_Type *baseaddr,
         /* Quad Page Program command */
         status = Cy_SMIF_Memslot_CmdProgram(baseaddr, smifMemConfigs[0], address, txBuffer, txSize, NULL, smifContext);
     }
-
     if(CY_SMIF_SUCCESS == status)
     {
         while(Cy_SMIF_Memslot_IsBusy(baseaddr, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], smifContext))
@@ -401,7 +322,6 @@ int Flash_SMIF_EraseMemory(SMIF_Type *baseaddr, cy_stc_smif_mem_config_t *memCon
     if(CY_SMIF_SUCCESS == status)
     {
         status = Cy_SMIF_Memslot_CmdSectorErase(baseaddr, memConfig, address, smifContext);
-
         /* Wait until the memory is erased */
         while(Cy_SMIF_Memslot_IsBusy(baseaddr, memConfig, smifContext))
         {
