@@ -3,7 +3,7 @@
 *
 * \brief
 * Provides a struct definitions for configuration resources in the SCB (UART, I2C, SPI).
-* 
+*
 ********************************************************************************
 * \copyright
 * Copyright 2018-2019 Cypress Semiconductor Corporation

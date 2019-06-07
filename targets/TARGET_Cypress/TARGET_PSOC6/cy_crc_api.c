@@ -76,9 +76,7 @@ uint32_t hal_crc_get_result(void)
     if (CY_RSLT_SUCCESS != cyhal_crc_finish(&cy_crc, &value)) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_crc_finish");
     }
-    if (CY_RSLT_SUCCESS != cyhal_crc_free(&cy_crc)) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_crc_free");
-    }
+    cyhal_crc_free(&cy_crc);
     cy_crc_initialized = false;
     // mbed expects result to be aligned unusually in this case
     if (0 != (cy_crc_cfg.width % 8) && 0 == cy_crc_cfg.remReverse) {

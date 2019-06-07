@@ -24,11 +24,11 @@
 *******************************************************************************/
 
 /**
-* \addtogroup group_bsp_cy8ckit_062_wifi-bt CY8CKIT-062-WIFI-BT
+* \addtogroup group_bsp_cy8ckit_062_wifi_bt CY8CKIT-062-WIFI-BT
 * \ingroup group_bsp
 * \{
-* \defgroup group_bsp_cy8cproto_062_4343w_macros Macros
-* \defgroup group_bsp_cy8cproto_062_4343w_enums Enumerated Types
+* \defgroup group_bsp_cy8ckit_062_wifi_bt_macros Macros
+* \defgroup group_bsp_cy8ckit_062_wifi_bt_enums Enumerated Types
 */
 
 #pragma once
@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 /**
-* \addtogroup group_bsp_cy8cproto_062_4343w_enums
+* \addtogroup group_bsp_cy8ckit_062_wifi_bt_macros
 * \{
 */
 
@@ -136,10 +136,15 @@ extern "C" {
 /** Pin: QUAD SPI SCK */
 #define CYBSP_QSPI_SCK         P11_7
 
-/** \} group_bsp_cy8cproto_062_4343w_macros */
+/** Host-wake GPIO drive mode */
+#define CYBSP_WIFI_HOST_WAKE_GPIO_DM CYHAL_GPIO_DRIVE_ANALOG
+/** Host-wake IRQ event */
+#define CYBSP_WIFI_HOST_WAKE_IRQ_EVENT CYHAL_GPIO_IRQ_RISE
+
+/** \} group_bsp_cy8ckit_062_wifi_bt_macros */
 
 /**
-* \addtogroup group_bsp_cy8cproto_062_4343w_enums
+* \addtogroup group_bsp_cy8ckit_062_wifi_bt_enums
 * \{
 */
 
@@ -180,10 +185,10 @@ typedef enum
     CYBSP_USER_BTN = CYBSP_USER_BTN0,
 } cybsp_btn_t;
 
-/** \} group_bsp_cy8cproto_062_4343w_enums */
+/** \} group_bsp_cy8ckit_062_wifi_bt_enums */
 
 #if defined(__cplusplus)
 }
 #endif
 
-/** \} group_bsp_cy8cproto_062_4343w */
+/** \} group_bsp_cy8ckit_062_wifi_bt */
