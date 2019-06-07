@@ -761,6 +761,7 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     en_sdio_result_t status;
     uint32_t cmdResponse;
     cy_rslt_t retVal = CY_RSLT_SUCCESS;
+    uint8_t* tempBuffer = NULL;
 
     if (response != NULL)
     {
@@ -776,7 +777,11 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     cmd.bRead = (direction != CYHAL_READ) ? false : true;
 
     /* Cypress ID BSP-542 */
-    uint8_t* tempBuffer = (uint8_t*)malloc(length + obj->block_size - 1);
+    if (cmd.bRead)
+    {
+        tempBuffer = (uint8_t*)malloc(length + obj->block_size - 1);
+    }
+
     if (length >= obj->block_size)
     {
         cmd.u16BlockCnt = (uint16_t) ((length + obj->block_size - 1)/obj->block_size);
@@ -795,6 +800,8 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     }
 
     status = SDIO_SendCommandAndWait(&cmd);
+    Cy_SysLib_DelayUs(30);
+    __DSB();
 
     if (Ok != status)
     {
@@ -811,7 +818,10 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
         *response = cmdResponse;
     }
 
-    free(tempBuffer);
+    if (tempBuffer != NULL)
+    {
+        free(tempBuffer);
+    }
 
     return retVal;
 }

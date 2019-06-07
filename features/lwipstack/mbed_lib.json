@@ -175,14 +175,53 @@
             "pbuf-pool-size": 16,
             "mem-size": 51200
         },
+        "CYW943012P6EVB_01": {
+            "tcpip-thread-stacksize": 1328,
+            "default-thread-stacksize": 640,
+            "ppp-thread-stacksize": 896,
+            "memp-num-tcp-seg": 48,
+            "tcp-socket-max": 10,
+            "udp-socket-max":10,
+            "socket-max":18,
+            "tcp-mss": 1440,
+            "tcp-snd-buf": "(12 * TCP_MSS)",
+            "tcp-wnd": "(TCP_MSS * 12)",
+            "pbuf-pool-size": 64,
+            "mem-size": 16362
+        },
+         "CY8CPROTO_062_4343W": {
+            "tcpip-thread-stacksize": 1328,
+            "default-thread-stacksize": 640,
+            "ppp-thread-stacksize": 896,
+            "memp-num-tcp-seg": 48,
+            "tcp-socket-max": 10,
+            "udp-socket-max":10,
+            "socket-max":18,
+            "tcp-mss": 1440,
+            "tcp-snd-buf": "(12 * TCP_MSS)",
+            "tcp-wnd": "(TCP_MSS * 12)",
+            "pbuf-pool-size": 64,
+            "mem-size": 16362
+        },
+         "CY8CKIT_062_WIFI_BT": {
+            "tcpip-thread-stacksize": 8192,
+            "default-thread-stacksize": 640,
+            "ppp-thread-stacksize": 896,
+            "memp-num-tcp-seg": 48,
+            "tcp-socket-max": 10,
+            "udp-socket-max":10,
+            "socket-max":18,
+            "tcp-mss": 1440,
+            "tcp-snd-buf": "(12 * TCP_MSS)",
+            "tcp-wnd": "(TCP_MSS * 12)",
+            "pbuf-pool-size": 48,
+            "mem-size": 65536
+        },
         "MIMXRT1050_EVK": {
             "mem-size": 36560
         },
         "FVP_MPS2_M3": {
             "mem-size": 36560
-        },
-        "MTS_DRAGONFLY_F411RE": {
-            "tcpip-thread-stacksize": 1600
         }
     }
 }
