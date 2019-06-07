@@ -147,6 +147,8 @@ def find_cm0_image(toolchain, resources, elf, hexf, hex_filename):
 
 # check if policy parameters are consistent
 def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=None):
+    slot0 = None
+    slot1 = None
 
     if fw_spe is None:
         img_id = fw_nspe["id"]
@@ -155,20 +157,22 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
         if not (fw_cyb["launch"] == img_id):
             # may be PSA NSPE part
             if not fw_cyb["launch"] == SPE_IMAGE_ID:
-                toolchain.notify.debug("[PSOC6.sign_image] ERROR: ID of build image"
-                                       " does not correspond launch ID in CyBootloader!")
-        # check slots addresses and sizes if upgrade is set to True
-        if fw_nspe["upgrade"] and True:
+                toolchain.notify.debug("[PSOC6.sign_image] WARNING: ID of build image " + str(img_id) +
+                                       " does not correspond launch ID in CyBootloader - " + str(fw_cyb["launch"]))
+            else:
+                toolchain.notify.info("[PSOC6.sign_image] INFO: NSPE image ID is " + str(img_id) +
+                                      ". It will be launched by SPE part.")
 
-            for slot in fw_nspe["resources"]:
-                if slot["type"] == "BOOT":
-                    slot0 = slot
-                elif slot["type"] == "UPGRADE":
+        # check slots addresses and sizes if upgrade is set to True
+        for slot in fw_nspe["resources"]:
+            if slot["type"] == "BOOT":
+                slot0 = slot
+            if slot["type"] == "UPGRADE":
+                if fw_nspe["upgrade"] and True:
                     slot1 = slot
                 else:
-                    toolchain.notify.debug("[PSOC6.sign_image] ERROR: BOOT or UPGRADE sections"
-                                           " can't be found in policy file ")
-                    raise Exception("imgtool finished execution with errors!")
+                    toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
+                                          " be built per policy settings.")
 
     else:
         # check if PSA targets flash map correspond to slots addresses and sizes in policy
@@ -212,28 +216,27 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
             raise Exception("imgtool finished execution with errors!")
 
         # check slots addresses and sizes if upgrade is set to True
-        if fw_spe["upgrade"] and True:
-
-            for slot in fw_spe["resources"]:
-                if slot["type"] == "BOOT":
-                    slot0 = slot
-                elif slot["type"] == "UPGRADE":
+        for slot in fw_spe["resources"]:
+            if slot["type"] == "BOOT":
+                slot0 = slot
+            if slot["type"] == "UPGRADE":
+                if fw_spe["upgrade"] and True:
                     slot1 = slot
                 else:
-                    toolchain.notify.debug("[PSOC6.sign_image] ERROR:"
-                                           " BOOT or UPGRADE sections can't be found in policy file ")
-                    raise Exception("imgtool finished execution with errors!")
+                    toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
+                                          " be produced per policy settings.")
 
-    # bigger or equal to 0x18000000 hex
-    if slot1["address"] >= SMIF_MEM_MAP_START:
-        toolchain.notify.info("[PSOC6.sign_image] INFO: UPGRADE slot will be resided in external flash")
+    if slot1 is not None:
+        # bigger or equal to 0x18000000 hex
+        if slot1["address"] >= SMIF_MEM_MAP_START:
+            toolchain.notify.info("[PSOC6.sign_image] INFO: UPGRADE slot will be resided in external flash")
 
-    # TODO: implement slots do not overlap check?
+        if slot0["size"] != slot1["size"]:
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT and UPGRADE slots sizes are not equal")
 
-    if slot0["size"] != slot1["size"]:
-        toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT and UPGRADE slots sizes are not equal")
-
-    return [slot0, slot1, img_id]
+        return [slot0, slot1, img_id]
+    else:
+        return [slot0, None, img_id]
 
 
 # Resolve Secure Boot policy sections considering target
@@ -276,7 +279,7 @@ def process_target(toolchain, target):
     priv_key_path = sdk_path / Path(sb_config["priv_key_file"])
 
     if not os.path.isfile(str(priv_key_path)):
-        toolchain.notify.debug("[PSOC6.sign_image] ERROR: Private key file not found in " + priv_key_path)
+        toolchain.notify.debug("[PSOC6.sign_image] ERROR: Private key file not found in " + str(priv_key_path))
         raise Exception("imgtool finished execution with errors!")
 
     if "_PSA" in target:
@@ -315,9 +318,11 @@ def process_target(toolchain, target):
                                       fw_nspe=firmware_nspe_cm4, target_data=processing_target)
 
     target_sig_data = [{"img_data": sb_config["boot0"], "slot_data": slots[0],
-                        "key_file": sb_config["priv_key_file"], "sdk_path": sdk_path, "id": slots[2]},
-                       {"img_data": sb_config["boot1"], "slot_data": slots[1],
                         "key_file": sb_config["priv_key_file"], "sdk_path": sdk_path, "id": slots[2]}]
+
+    if slots[1] is not None:
+        target_sig_data.append({"img_data": sb_config["boot1"], "slot_data": slots[1],
+                                "key_file": sb_config["priv_key_file"], "sdk_path": sdk_path, "id": slots[2]})
 
     return target_sig_data
 
@@ -326,6 +331,8 @@ def process_target(toolchain, target):
 def sign_image(toolchain, elf0, binf, hexf1=None):
 
     target_sig_data = None
+    # reserve name for separate NSPE image
+    out_cm4_hex = binf[:-4] + "_cm4.hex"
 
     # preserve original hex file from mbed-os build
     mbed_hex = binf[:-4] + "_unsigned.hex"
@@ -344,9 +351,8 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
 
         if slot["slot_data"]["type"] == "UPGRADE":
             out_hex_name = binf[:-4] + "_upgrade.hex"
-            out_bin_name = out_hex_name[:-4] + "_signed_upgrade.bin"
+            out_bin_name = out_hex_name[:-4] + "_signed.bin"
         else:
-            out_cm4_hex = binf[:-4] + "_cm4.hex"
             out_hex_name = binf
             out_bin_name = out_hex_name[:-4] + "_signed.bin"
 
