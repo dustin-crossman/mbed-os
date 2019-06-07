@@ -155,6 +155,12 @@ public:
      */
     virtual void set_memory_manager(EMACMemoryManager &mem_mngr);
 
+    /** Set callback to receive EMAC activity events
+     *
+     * @param activity_cb The callback for activity events
+     */
+    virtual void set_activity_cb(mbed::Callback<void(bool is_tx_activity)> activity_cb);
+
     emac_link_input_cb_t emac_link_input_cb = NULL; /**< Callback for incoming data */
     emac_link_state_change_cb_t emac_link_state_cb = NULL;
     EMACMemoryManager *memory_manager;
@@ -168,6 +174,7 @@ public:
     whd_buffer_funcs_t *buffer_ops = NULL;
     whd_netif_funcs_t *netif_ops = NULL;
     whd_init_config_t *whd_init_config = NULL;
+    mbed::Callback<void(bool)> activity_cb;
 
 };
 
