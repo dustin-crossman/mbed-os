@@ -214,6 +214,7 @@ typedef void *nsapi_socket_t;
 typedef enum nsapi_protocol {
     NSAPI_TCP, /*!< Socket is of TCP type */
     NSAPI_UDP, /*!< Socket is of UDP type */
+    NSAPI_RAW, /*!< Socket is of RAW type */
 } nsapi_protocol_t;
 
 /** Enum of standardized stack option levels
@@ -266,6 +267,7 @@ typedef enum nsapi_socket_option {
     NSAPI_ADD_MEMBERSHIP,    /*!< Add membership to multicast address */
     NSAPI_DROP_MEMBERSHIP,   /*!< Drop membership to multicast address */
     NSAPI_BIND_TO_DEVICE,        /*!< Bind socket network interface name*/
+    NSAPI_IP_TOS,            /*!< IP TOS */
 } nsapi_socket_option_t;
 
 /** Supported IP protocol versions of IP stack
