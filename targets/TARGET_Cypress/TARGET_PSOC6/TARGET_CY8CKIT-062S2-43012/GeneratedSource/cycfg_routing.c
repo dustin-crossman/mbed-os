@@ -1,8 +1,8 @@
 /*******************************************************************************
-* File Name: cycfg_platform.h
+* File Name: cycfg_routing.c
 *
 * Description:
-* Platform configuration
+* Establishes all necessary connections between hardware elements.
 * This file was automatically generated and should not be modified.
 * 
 ********************************************************************************
@@ -22,32 +22,8 @@
 * limitations under the License.
 ********************************************************************************/
 
-#if !defined(CYCFG_PLATFORM_H)
-#define CYCFG_PLATFORM_H
+#include "cycfg_routing.h"
 
-#include "cycfg_notices.h"
-#include "cy_sysclk.h"
-#include "cy_ble_clk.h"
-#include "cy_gpio.h"
-#include "cy_syspm.h"
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-#define CY_CFG_SYSCLK_CLKLF_FREQ_HZ 32768
-#define CY_CFG_PWR_VDDA_MV 3300
-#define CY_CFG_PWR_VDDD_MV 3300
-#define CY_CFG_PWR_VBACKUP_MV 3300
-#define CY_CFG_PWR_VDD_NS_MV 3300
-#define CY_CFG_PWR_VDDIO0_MV 3300
-#define CY_CFG_PWR_VDDIO1_MV 3300
-
-void init_cycfg_platform(void);
-
-#if defined(__cplusplus)
+void init_cycfg_routing(void)
+{
 }
-#endif
-
-
-#endif /* CYCFG_PLATFORM_H */

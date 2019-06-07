@@ -51,6 +51,7 @@ typedef enum
     CYHAL_RSC_ADC,       /*!< Analog to digital converter */
     CYHAL_RSC_BLESS,     /*!< Bluetooth communications block */
     CYHAL_RSC_CAN,       /*!< CAN communication block */
+    CYHAL_RSC_CLKPATH,   /*!< System clock clock path, used to drive hfclks */
     CYHAL_RSC_CLOCK,     /*!< Clock divider */
     CYHAL_RSC_CRC,       /*!< CRC hardware accelerator */
     CYHAL_RSC_DAC,       /*!< Digital to analog converter */
