@@ -86,3 +86,17 @@ void mbed_sdk_init(void)
 #endif
 }
 
+/*******************************************************************************
+* Function Name: mbed_main
+****************************************************************************//**
+*
+* Mbed's post-memory-initialization function.
+* Used here to initialize common parts of the Cypress libraries.
+*
+*******************************************************************************/
+void mbed_main(void)
+{
+#if defined(TARGET_WHD)
+    cybsp_wifi_init();
+#endif
+}
