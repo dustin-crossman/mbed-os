@@ -163,6 +163,7 @@ void Cy_SystemInit(void)
     }
 }
 #endif
+
 static void turn_on_cm4(void)
 {
     uint32_t regValue;

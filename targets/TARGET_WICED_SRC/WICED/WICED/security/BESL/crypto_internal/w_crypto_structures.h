@@ -38,6 +38,9 @@
 #include "aes.h"
 #include "sha256.h"
 #include "sha512.h"
+#ifdef MBEDTLS_SHA1_ALT
+#include "sha1_alt.h"
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -409,14 +412,16 @@ typedef struct
 
 /**
  * \brief          SHA-1 context structure
+ * Used when MBEDTLS_SHA1_ALT is disabled
  */
+#ifndef MBEDTLS_SHA1_ALT
 typedef struct
 {
     uint32_t total[2];          /*!< number of bytes processed  */
     uint32_t state[5];          /*!< intermediate digest state  */
     unsigned char buffer[64];   /*!< data block being processed */
 } mbedtls_sha1_context;
-
+#endif
 
 typedef struct
 {
