@@ -8260,6 +8260,7 @@
         "components_add": ["SPM_MAILBOX", "FLASHIAP"],
         "device_has_remove": ["TRNG", "CRC"],
         "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
+        "macros_remove": ["MBEDTLS_CONFIG_HW_SUPPORT"],
         "hex_filename": "psa_release_1.0.hex",
         "overrides": {
             "secure-rom-start": "0x10000000",
@@ -8342,6 +8343,7 @@
         "components_add": ["SPM_MAILBOX", "FLASHIAP"],
         "device_has_remove": ["TRNG", "CRC"],
         "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
+        "macros_remove": ["MBEDTLS_CONFIG_HW_SUPPORT"],
         "hex_filename": "psa_release_1.0.hex",
         "post_binary_hook": {
             "function": "PSOC6Code.sign_complete"
@@ -8422,7 +8424,7 @@
     "AUGUST_CYW43012": {
         "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
-        "extra_labels_add": ["PSOC6_01", "WICED_SRC", "CYW43XXX", "CYW43012", "CORDIO"],
+        "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW43012", "CORDIO"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1", "MBED_TICKLESS"],
         "detect_code": ["190D"],
         "forced_reset_timeout": 30,
@@ -8476,6 +8478,7 @@
         "components_add": ["SPM_MAILBOX", "FLASHIAP"],
         "device_has_remove": ["TRNG", "CRC"],
         "macros_add": ["MBEDTLS_PSA_CRYPTO_C"],
+        "macros_remove": ["MBEDTLS_CONFIG_HW_SUPPORT"],
         "hex_filename": "psa_release_1.0.hex",
         "post_binary_hook": {
             "function": "PSOC6Code.sign_complete"
