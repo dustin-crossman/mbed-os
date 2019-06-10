@@ -129,8 +129,8 @@
                     },
                     {
                         "type": "UPGRADE",
-                        "address": 268632064,
-                        "size": 1024
+                        "address": 402653184,
+                        "size": 196608
                     }
                 ]
             }
