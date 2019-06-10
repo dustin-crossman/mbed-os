@@ -11,9 +11,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <cycfg_qspi_memslot.h>
+#include <cycfg_peripherals.h>
+
 #include "cy_pdl.h"
 #include "cycfg.h"
-#include "cycfg_qspi_memslot.h"
 #include "flash_smif.h"
 
 /***************************************************************************
@@ -21,30 +23,16 @@
 ***************************************************************************/
 
 #define SMIF_PRIORITY       (1u)      /* SMIF interrupt priority */
-#define TIMEOUT_1_MS        (1000ul)  /* 1 ms timeout for all blocking functions */
+#define SMIF_TIMEOUT_1_MS   (1000ul)  /* 1 ms timeout for all blocking functions */
 #define PACKET_SIZE         (64u)    /* The memory Read/Write packet */
 #define ADDRESS_SIZE        (3u)      /* Memory address size */
 #define SUCCESS             (0u)
+#define SMIF_NVIC_IRQN      (NvicMux7_IRQn)
 /***************************************************************************
 * Global variables
 ***************************************************************************/
 cy_stc_scb_uart_context_t UART_context;
 cy_stc_smif_context_t SMIF_context;
-
-/*******************************************************************************
-* Function Name: handle_error
-********************************************************************************
-*
-* This function processes unrecoverable errors
-*
-*******************************************************************************/
-void handle_error(void)
-{
-     /* Disable all interrupts */
-    __disable_irq();
-    while(1u) {}
-}
-
 
 /*******************************************************************************
 * Function Name: SMIF_Interrupt_User
@@ -54,99 +42,89 @@ void handle_error(void)
 * memory are processed inside the SMIF ISR.
 *
 *******************************************************************************/
-void SMIF_Interrupt_User(void)
+void Flash_SMIF_Interrupt_User(void)
 {
-//    Cy_SMIF_Interrupt(SMIF_HW, &SMIF_context);
+    Cy_SMIF_Interrupt(SMIF0, &QSPIContext);
 }
-
-
-/*******************************************************************************
-* Function Name: InitBuffers
-****************************************************************************//**
-*
-* This function initializes the transfer buffers.
-*
-* \param txBuffer - The buffer for Write data.
-*
-* \param rxBuffer - The buffer for Read data.
-*
-*******************************************************************************/
-void InitBuffers(uint8_t txBuffer[],uint8_t rxBuffer[], uint32_t bufferSize)
-{
-    for(uint32_t index=0; index<bufferSize; index++)
-    {
-        txBuffer[index] = (uint8_t) (index & 0xFF);
-        rxBuffer[index] = 0;
-    }
-}
-
-
-/*******************************************************************************
-* Function Name: PrintArray
-****************************************************************************//**
-*
-* This function prints the content of the RX buffer to the UART console.
-*
-* \param msg - message print before array output
-*
-* \param  rxBuffer - The buffer to the console output.
-*
-* \param  size - The size of the buffer to the console output.
-*
-*******************************************************************************/
-void PrintArray(char * msg, uint8_t * buff, uint32_t size)
-{
-    printf("%s", msg);
-    for(uint32_t index=0; index<size; index++)
-    {
-        printf("0x%02X ", (unsigned int) buff[index]);
-    }
-    printf("\r\n=======================\r\n");
-}
-
-/*******************************************************************************
-* Function Name: CheckStatus
-****************************************************************************//**
-*
-* Check if status is SUCCES and call handle error function
-*
-*******************************************************************************/
-void CheckStatus(char * msg, uint32_t status)
-{
-    if(SUCCESS != status)
-    {
-        printf("%s", msg);
-        handle_error();
-    }
-}
-
 cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
 {
     cy_en_smif_status_t qspiStatus = CY_SMIF_BAD_PARAM;
 
-    qspiStatus = Cy_SMIF_Init(SMIF0, &QSPI_config, TIMEOUT_1_MS, &QSPIContext);
+    /* Configure SMIF interrupt */
+    cy_stc_sysint_t smifIntConfig =
+    {
+#if (CY_CPU_CORTEX_M0P)
+        .intrSrc = SMIF_NVIC_IRQN,
+        .cm0pSrc = smif_interrupt_IRQn,
+#else
+        .intrSrc = smif_interrupt_IRQn, /* SMIF interrupt number (non M0 core)*/
+#endif
+        .intrPriority = SMIF_PRIORITY
+    };
+
+    /* enable interrupts */
+    __enable_irq();
+
+    /* SMIF interrupt initialization status */
+    cy_en_sysint_status_t intr_init_status;
+    intr_init_status = Cy_SysInt_Init(&smifIntConfig, Flash_SMIF_Interrupt_User);
+
+    if(0 != intr_init_status)
+    {
+         BOOT_LOG_ERR("SMIF Interrupt initialization failed with error code %i", intr_init_status);
+    }
+
+    /*
+     * cy_en_smif_status_t Cy_SMIF_Init(SMIF_Type *base,
+                                    cy_stc_smif_config_t const *config,
+                                    uint32_t timeout,
+                                    cy_stc_smif_context_t *context)
+    */
+    qspiStatus = Cy_SMIF_Init(SMIF0, &QSPI_config, SMIF_TIMEOUT_1_MS, &QSPIContext);
 
     if(qspiStatus == CY_SMIF_SUCCESS)
     {
         Cy_SMIF_SetDataSelect(SMIF0, CY_SMIF_SLAVE_SELECT_0, CY_SMIF_DATA_SEL0);
         Cy_SMIF_Enable(SMIF0, &QSPIContext);
         BOOT_LOG_INF("SMIF Block Enabled\r\n");
-//    }
-//
-//    if(qspiStatus == CY_SMIF_SUCCESS)
-//    {
+
         /* Map memory device to memory map */
         qspiStatus = Cy_SMIF_Memslot_Init(SMIF0, &smifBlockConfig, &QSPIContext);
     }
 
     if(qspiStatus == CY_SMIF_SUCCESS)
     {
-        /* Put the device in XIP mode */
-        BOOT_LOG_INF("\r\nEntering XIP Mode\r\n");
-        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
+        BOOT_LOG_INF("SMIF Normal Mode");
+        /* Need to start from CommandMode as we will switch FlashMemory to Quad first */
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
     }
-
+#if (CY_CPU_CORTEX_M0P)
+	NVIC_EnableIRQ(SMIF_NVIC_IRQN);
+#else
+	NVIC_EnableIRQ(smif_interrupt_IRQn);
+#endif
     return qspiStatus;
+}
+
+void Flash_SMIF_GetAddrBuff(uint32_t address, uint8_t * addrBuf)
+{
+    uint32_t numAddrBytes = smifMemConfigs[0]->deviceCfg->numOfAddrBytes;
+
+    if(3u == numAddrBytes)
+    {
+        addrBuf[3] = 0x00;
+        addrBuf[2] = CY_LO8(CY_LO16(address));
+        addrBuf[1] = CY_HI8(CY_LO16(address));
+        addrBuf[0] = CY_LO8(CY_HI16(address));
+    }
+    else
+    if(4u == numAddrBytes)
+    {
+        addrBuf[3] = CY_LO8(CY_LO16(address));
+        addrBuf[2] = CY_HI8(CY_LO16(address));
+        addrBuf[1] = CY_LO8(CY_HI16(address));
+        addrBuf[0] = CY_HI8(CY_HI16(address));
+    }
 }
 
 /*******************************************************************************
@@ -168,51 +146,34 @@ cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
 void Flash_SMIF_EnableQuadMode(SMIF_Type *baseaddr, cy_stc_smif_mem_config_t *memConfig,
                     cy_stc_smif_context_t const *smifContext)
 {
-//    cy_en_smif_status_t status;
-//    uint8_t readStatus = 0;
-//    uint32_t statusCmd = memConfig->deviceCfg->readStsRegQeCmd->command;
-//    uint8_t maskQE = (uint8_t) memConfig->deviceCfg->stsRegQuadEnableMask;
-//
-//    status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, memConfig, &readStatus, statusCmd,
-//                                        smifContext);
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_QuadEnable failed\r\n", status);
-//
-//    if(maskQE != (readStatus & maskQE))
-//    {
-//        /* Check user confirmation to do QE*/
-//        printf("\r\nQuad is NOT enabled. Pleas press button to continue\r\n");
-//        bool btnPressed = false;
-//        while (!btnPressed)
-//        {   /* 50 ms delay for button press check*/
-//            Cy_SysLib_Delay(50u);
-//            if (Cy_GPIO_Read(PIN_SW2_PORT, PIN_SW2_PIN) == 0u)
-//            {
-//                /* 50 ms delay for button debounce on button press */
-//                Cy_SysLib_Delay(50u);
-//                if (Cy_GPIO_Read(PIN_SW2_PORT, PIN_SW2_PIN) == 0u)
-//                {
-//                    while (Cy_GPIO_Read(PIN_SW2_PORT, PIN_SW2_PIN) == 0u)
-//                    {   /* 50 ms delay for button debounce on button release */
-//                        Cy_SysLib_Delay(50u);
-//                    }
-//                    btnPressed = true;
-//                }
-//
-//            }
-//        }
-//
-//        status = Cy_SMIF_Memslot_QuadEnable(baseaddr, memConfig, smifContext);
-//        CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_QuadEnable failed\r\n", status);
-//
-//        while(Cy_SMIF_Memslot_IsBusy(baseaddr, memConfig, smifContext))
-//        {
-//            /* Wait until the QE operation is completed */
-//        }
-//    }
-//    else
-//    {
-//        printf("\r\nQuad is enabled. Enabling operation skipped\r\n");
-//    }
+    cy_en_smif_status_t status;
+    uint8_t readStatus = 0;
+    uint32_t statusCmd = memConfig->deviceCfg->readStsRegQeCmd->command;
+    uint8_t maskQE = (uint8_t) memConfig->deviceCfg->stsRegQuadEnableMask;
+
+    status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, memConfig, &readStatus, statusCmd, smifContext);
+    if(CY_SMIF_SUCCESS != status)
+    {
+        BOOT_LOG_ERR("Memory Module Read Status failed with error code %i", status);
+    }
+    else
+    {
+        if(maskQE != (readStatus & maskQE))
+        {
+            status = Cy_SMIF_Memslot_QuadEnable(baseaddr, memConfig, smifContext);
+            if(CY_SMIF_SUCCESS == status)
+            {
+                while(Cy_SMIF_Memslot_IsBusy(baseaddr, memConfig, smifContext))
+                {
+                    /* Wait until the QE operation is completed */
+                }
+            }
+            else
+            {
+                BOOT_LOG_ERR("Memory Module QuadEnable failed with error code %i", status);
+            }
+        }
+    }
 }
 
 
@@ -252,24 +213,17 @@ int Flash_SMIF_ReadMemory(SMIF_Type *baseaddr,
 
     /* Read data from the external memory configuration register */
     status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, smifMemConfigs[0], &rxBuffer_reg, (uint8_t)cmdreadStsRegQe->command , smifContext);
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdReadSts failed\r\n", status);
-//
-//    printf("Received Data: 0x%X\r\n", (unsigned int) rxBuffer_reg);
-//    printf("\r\nQuad I/O Read (QIOR 0x%0X) \r\n", 0x38);
-
     if(CY_SMIF_SUCCESS == status)
     {
-        /* The 4 Page program command */
         status = Cy_SMIF_Memslot_CmdRead(baseaddr, smifMemConfigs[0], address, rxBuffer, rxSize, NULL, smifContext);
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdRead failed\r\n",status);
-
-        while(Cy_SMIF_BusyCheck(baseaddr))
+        if(CY_SMIF_SUCCESS == status)
         {
-            /* Wait until the SMIF IP operation is completed. */
+            while(Cy_SMIF_BusyCheck(baseaddr))
+            {
+                /* Wait until the SMIF IP operation is completed. */
+            }
         }
     }
-    /* Send received data to the console */
-//    PrintArray("Received Data: ",rxBuffer, rxSize);
     return (int)status;
 }
 
@@ -314,39 +268,24 @@ int Flash_SMIF_WriteMemory(SMIF_Type *baseaddr,
 
     if(CY_SMIF_SUCCESS == status)
     {
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdReadSts failed\r\n", status);
-
-//    printf("Received Data: 0x%X\r\n", (unsigned int) rxBuffer_reg);
-
-    /* Send Write Enable to external memory */
+        /* Send Write Enable to external memory */
         status = Cy_SMIF_Memslot_CmdWriteEnable(baseaddr, smifMemConfigs[0], smifContext);
     }
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdWriteEnable failed\r\n", status);
-
-//    printf("\r\nQuad Page Program (QPP 0x%0X) \r\n", 0x38);
-
     if(CY_SMIF_SUCCESS == status)
     {
         /* Quad Page Program command */
         status = Cy_SMIF_Memslot_CmdProgram(baseaddr, smifMemConfigs[0], address, txBuffer, txSize, NULL, smifContext);
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdProgram failed\r\n", status);
-//
-//    PrintArray("Written Data: ", txBuffer, txSize);
     }
-
     if(CY_SMIF_SUCCESS == status)
     {
         while(Cy_SMIF_Memslot_IsBusy(baseaddr, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], smifContext))
         {
-            /* Wait until the Erase operation is completed */
+            /* Wait until the operation is completed */
         }
         /* Read data from the external memory status register */
         status = Cy_SMIF_Memslot_CmdReadSts(baseaddr, smifMemConfigs[0], &rxBuffer_reg,
                                  (uint8_t)cmdreadStsRegWip->command , smifContext);
     }
-//    CheckStatus("\r\n\r\nSMIF ReadStatusReg failed\r\n", status);
-//
-//    printf("Received Data: 0x%X\r\n", (unsigned int) rxBuffer_reg);
     return (int)status;
 }
 
@@ -378,11 +317,7 @@ int Flash_SMIF_EraseMemory(SMIF_Type *baseaddr, cy_stc_smif_mem_config_t *memCon
     status = Cy_SMIF_Memslot_CmdWriteEnable(baseaddr, memConfig, smifContext);
     if(CY_SMIF_SUCCESS == status)
     {
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdWriteEnable failed\r\n", status);
         status = Cy_SMIF_Memslot_CmdSectorErase(baseaddr, memConfig, address, smifContext);
-
-//    CheckStatus("\r\n\r\nSMIF Cy_SMIF_Memslot_CmdSectorErase failed\r\n", status);
-
         /* Wait until the memory is erased */
         while(Cy_SMIF_Memslot_IsBusy(baseaddr, memConfig, smifContext))
         {
