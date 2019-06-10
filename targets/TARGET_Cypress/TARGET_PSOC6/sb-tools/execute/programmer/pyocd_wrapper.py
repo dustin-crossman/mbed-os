@@ -32,7 +32,7 @@ class Pyocd(ProgrammerBase):
                 }
             else:
                 options = {}
-            self.session = ConnectHelper.session_with_chosen_probe(blocking=True, options=options, board_id=probe_id)
+            self.session = ConnectHelper.session_with_chosen_probe(blocking=True, options=options, board_id=probe_id, unique_id=probe_id)
             if self.session is None:
                 return False
             self.board = self.session.board

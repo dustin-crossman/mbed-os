@@ -6,8 +6,7 @@ from intelhex import IntelHex
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(os.path.dirname('../execute'))
 from test_utility import *
-#from execute.programmer.programmer import ProgrammingTool
-from programmer_override import ProgrammingTool
+from execute.programmer.programmer import ProgrammingTool
 from execute.programmer.exceptions import ExtendedTransferFaultError
 
 TOOL = 'pyocd'
@@ -227,8 +226,6 @@ class TestControlAPIs(unittest.TestCase):
     def setUpClass(cls):
         cls.tool = ProgrammingTool.create(TOOL)
         cls.tool.connect(TARGET, probe_id=PROBE_ID)
-        print('Erasing flash...')
-        cls.tool.erase(MAIN_ADDR, 0x000e0000)
 
     @classmethod
     def tearDownClass(cls):
