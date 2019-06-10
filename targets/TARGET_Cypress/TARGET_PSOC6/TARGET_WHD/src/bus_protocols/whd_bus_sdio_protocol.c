@@ -1365,12 +1365,14 @@ void whd_bus_sdio_irq_handler(void *handler_arg, cyhal_sdio_irq_event_t event)
 
 whd_result_t whd_bus_sdio_irq_register(whd_driver_t whd_driver)
 {
-    return cyhal_sdio_register_irq(whd_driver->bus_priv->sdio_obj, whd_bus_sdio_irq_handler, whd_driver);
+    cyhal_sdio_register_irq(whd_driver->bus_priv->sdio_obj, whd_bus_sdio_irq_handler, whd_driver);
+    return WHD_SUCCESS;
 }
 
 whd_result_t whd_bus_sdio_irq_enable(whd_driver_t whd_driver, whd_bool_t enable)
 {
-    return cyhal_sdio_irq_enable(whd_driver->bus_priv->sdio_obj, CYHAL_SDIO_CARD_INTERRUPT, enable);
+    cyhal_sdio_irq_enable(whd_driver->bus_priv->sdio_obj, CYHAL_SDIO_CARD_INTERRUPT, enable);
+    return WHD_SUCCESS;
 }
 
 void whd_bus_sdio_oob_intr_asserted(whd_driver_t whd_driver)

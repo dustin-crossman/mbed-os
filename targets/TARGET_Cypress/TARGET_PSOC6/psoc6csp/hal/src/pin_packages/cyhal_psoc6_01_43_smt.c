@@ -26,9 +26,9 @@
 *******************************************************************************/
 
 #include "cy_device_headers.h"
-#include "cyhal_hw_types.h"
 
 #if defined(_GPIO_PSOC6_01_43_SMT_H_)
+#include "cyhal_hw_types.h"
 #include "pin_packages/cyhal_psoc6_01_43_smt.h"
 
 /* Hardware Blocks */

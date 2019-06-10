@@ -91,12 +91,8 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
     i2c->cfg.address = 0;
     i2c->cfg.frequencyhal_hz = 400;
     i2c->async_handler = NULL;
-    if (CY_RSLT_SUCCESS != cyhal_i2c_register_irq(&(i2c->hal_i2c), &cy_i2c_event_handler, obj)) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_register_irq");
-    }
-    if (CY_RSLT_SUCCESS != cyhal_i2c_irq_enable(&(i2c->hal_i2c), CYHAL_I2C_SLAVE_READ_EVENT | CYHAL_I2C_SLAVE_WRITE_EVENT | CYHAL_I2C_SLAVE_ERR_EVENT | CYHAL_I2C_SLAVE_RD_CMPLT_EVENT | CYHAL_I2C_SLAVE_WR_CMPLT_EVENT | CYHAL_I2C_MASTER_ERR_EVENT | CYHAL_I2C_MASTER_RD_CMPLT_EVENT | CYHAL_I2C_MASTER_WR_CMPLT_EVENT, true)) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_irq_enable");
-    }
+    cyhal_i2c_register_irq(&(i2c->hal_i2c), &cy_i2c_event_handler, obj);
+    cyhal_i2c_irq_enable(&(i2c->hal_i2c), CYHAL_I2C_SLAVE_READ_EVENT | CYHAL_I2C_SLAVE_WRITE_EVENT | CYHAL_I2C_SLAVE_ERR_EVENT | CYHAL_I2C_SLAVE_RD_CMPLT_EVENT | CYHAL_I2C_SLAVE_WR_CMPLT_EVENT | CYHAL_I2C_MASTER_ERR_EVENT | CYHAL_I2C_MASTER_RD_CMPLT_EVENT | CYHAL_I2C_MASTER_WR_CMPLT_EVENT, true);
 }
 
 void i2c_frequency(i2c_t *obj, int hz)

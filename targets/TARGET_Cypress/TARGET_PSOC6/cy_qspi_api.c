@@ -32,7 +32,8 @@ qspi_status_t qspi_init(qspi_t *obj, PinName io0, PinName io1, PinName io2, PinN
 
 qspi_status_t qspi_free(qspi_t *obj)
 {
-    return CY_RSLT_SUCCESS == cyhal_qspi_free(&(obj->hal_qspi)) ? QSPI_STATUS_OK : QSPI_STATUS_ERROR;
+    cyhal_qspi_free(&(obj->hal_qspi));
+    return QSPI_STATUS_OK;
 }
 
 qspi_status_t qspi_frequency(qspi_t *obj, int hz)

@@ -78,17 +78,13 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
     if (CY_RSLT_SUCCESS != cyhal_spi_init(&(spi->hal_spi), mosi, miso, sclk, ssel, NULL, spi->cfg.data_bits, spi->cfg.mode, spi->cfg.is_slave)) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_spi_init");
     }
-    if (CY_RSLT_SUCCESS != cyhal_spi_register_irq(&(spi->hal_spi), &cy_spi_irq_handler_internal, obj)) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_spi_register_irq");
-    }
+    cyhal_spi_register_irq(&(spi->hal_spi), &cy_spi_irq_handler_internal, obj);
 }
 
 void spi_free(spi_t *obj)
 {
     struct spi_s *spi = cy_get_spi(obj);
-    if (CY_RSLT_SUCCESS != cyhal_spi_free(&(spi->hal_spi))) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_spi_free");
-    }
+    cyhal_spi_free(&(spi->hal_spi));
 }
 
 void spi_format(spi_t *obj, int bits, int mode, int slave)
@@ -96,9 +92,7 @@ void spi_format(spi_t *obj, int bits, int mode, int slave)
     struct spi_s *spi = cy_get_spi(obj);
     cyhal_gpio_t mosi = spi->mosi, miso = spi->miso, sclk = spi->sclk, ssel = spi->ssel;
     int hz = spi->hz;
-    if (CY_RSLT_SUCCESS != cyhal_spi_free(&(spi->hal_spi))) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_spi_free");
-    }
+    cyhal_spi_free(&(spi->hal_spi));
     cyhal_spi_mode_t hal_mode;
     switch (mode) {
         default: // fallthrough
@@ -173,14 +167,10 @@ void spi_slave_write(spi_t *obj, int value)
     }
 }
 
-int  spi_busy(spi_t *obj)
+int spi_busy(spi_t *obj)
 {
-    bool busy;
     struct spi_s *spi = cy_get_spi(obj);
-    if (CY_RSLT_SUCCESS != cyhal_spi_is_busy(&(spi->hal_spi), &busy)) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_spi_is_busy");
-    }
-    return busy;
+    return cyhal_spi_is_busy(&(spi->hal_spi));
 }
 
 uint8_t spi_get_module(spi_t *obj)
