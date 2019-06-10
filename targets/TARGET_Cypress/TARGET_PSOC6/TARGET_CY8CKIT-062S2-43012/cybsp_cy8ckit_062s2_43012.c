@@ -75,7 +75,7 @@ cy_rslt_t cybsp_retarget_init()
 
 	if ((uart_cts_pin != NC) && (uart_rts_pin != NC))
 	{
-		result = cyhal_uart_set_flow_control(&cybsp_debug_uart, uart_cts_pin, uart_cts_pin);
+		result = cyhal_uart_set_flow_control(&cybsp_debug_uart, uart_cts_pin, uart_rts_pin);
 	}
 
 	return result;
