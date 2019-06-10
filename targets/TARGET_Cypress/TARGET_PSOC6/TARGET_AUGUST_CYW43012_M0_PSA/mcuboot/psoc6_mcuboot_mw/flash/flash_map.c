@@ -59,10 +59,8 @@
 * so agrees to indemnify Cypress against all liability.
 *
 ********************************************************************************/
-#include "flash.h"
 #include <stdbool.h>
 
-#include "cy_flash.h"
 #include <flash_map/flash_map.h>
 #include <hal/hal_flash.h>
 #include <sysflash/sysflash.h>
@@ -72,7 +70,11 @@
 
 #include "bootutil/bootutil_log.h"
 
+#include "flash.h"
 #include "flash_psoc6.h"
+#include "flash_smif.h"
+#include "cy_flash.h"
+#include "cy_pdl.h"
 /* The following 4 macros are taken from zephyr project, util.h file. */
 
 /*
@@ -116,6 +118,7 @@ extern struct device *boot_flash_device;
 #define FLASH_DEVICE_ID 	111
 #define FLASH_MAP_ENTRY_MAGIC 0xd00dbeef
 
+#define SMIF_ZERO_BUFF_SIZE (256)
 /*
  * The flash area describes essentially the partition table of the
  * flash.  In this case, it starts with FLASH_AREA_IMAGE_0.
@@ -225,28 +228,117 @@ void zephyr_flash_area_warn_on_open(void)
 int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
             uint32_t len)
 {
-    BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);    
-    return psoc6_flash_read(area->fa_off + off, dst, len);
+    int rc = 0;
+    uint32_t addr = area->fa_off + off;
+    BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
+    /* Expecting command mode READ will only be used in non-XIP mode per user settings */
+#if (defined(MCUBOOT_USE_SMIF_STAGE) && !defined(MCUBOOT_USE_SMIF_XIP))
+    uint8_t addrBuf[4];
+    if(IS_FLASH_SMIF(addr))
+    {
+        addr = addr - smifMemConfigs[0]->baseAddress + FLASH_DEVICE_BASE;
+        Flash_SMIF_GetAddrBuff(addr, addrBuf)
+        rc = Flash_SMIF_ReadMemory(SMIF0             /* SMIF_Type *baseaddr*/,
+                                    &QSPIContext   /* cy_stc_smif_context_t *smifContext*/,
+                                    dst             /* uint8_t rxBuffer[]*/,
+                                    len             /* uint32_t rxSize*/,
+                                    addrBuf           /* uint8_t *address */);
+    }
+    else
+#endif
+    {
+#if (defined(MCUBOOT_USE_SMIF_STAGE) && defined(MCUBOOT_USE_SMIF_XIP))
+        /* Preferable READ mode is Memory/XIP. */
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
+#endif
+        rc = psoc6_flash_read(addr, dst, len);
+    }
+    return rc;
 }
 
 int flash_area_write(const struct flash_area *area, uint32_t off, const void *src,
              uint32_t len)
 {
     int rc = 0;
-
+    uint32_t addr = area->fa_off + off;
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
-    rc = psoc6_flash_write(area->fa_off + off, src, len);
-
+#ifdef MCUBOOT_USE_SMIF_STAGE
+    uint8_t addrBuf[4];
+    if(IS_FLASH_SMIF(addr))
+    {
+#ifdef MCUBOOT_USE_SMIF_XIP
+        /* Memory/XIP Read is Done. Switching back to Normal/CMD */
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
+#endif
+        addr = addr - smifMemConfigs[0]->baseAddress+FLASH_DEVICE_BASE;
+        Flash_SMIF_GetAddrBuff(addr, addrBuf);
+        rc = Flash_SMIF_WriteMemory(SMIF0    /* SMIF_Type *baseaddr */,
+                                    &QSPIContext       /* cy_stc_smif_context_t *smifContext */,
+                                    src     /* uint8_t txBuffer[] */,
+                                    len     /* uint32_t txSize */,
+                                    addrBuf   /* uint8_t *address */);
+    }
+    else
+#endif
+    {
+        rc = psoc6_flash_write(area->fa_off + off, src, len);
+    }
     return rc;
 }
 
 int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
 {
-    int rc;
-
+    int rc = 0;
+    uint32_t addr = area->fa_off + off;
     BOOT_LOG_DBG("area=%d, off=%x, len=%x", area->fa_id, off, len);
-    rc = psoc6_flash_erase(area->fa_off + off, len);
+#ifdef MCUBOOT_USE_SMIF_STAGE
+    uint8_t addrBuf[4];
+    if(IS_FLASH_SMIF(addr))
+    {
+#ifdef MCUBOOT_USE_SMIF_XIP
+        /* Memory/XIP Read is Done. Switching back to Normal/CMD */
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
+#endif
+        uint8_t zero_buff[SMIF_ZERO_BUFF_SIZE];
+        uint32_t buff_num, rem_num, cur_addr;
+        /* Zeroise data on external Flash instead of Erasing */
+        memset(zero_buff, 0x00, sizeof(zero_buff));
 
+        /* We do not know how big piece of data needs
+         * to be Erased, so splitting it into 256-bytes
+         * chunks to save zero-buffer RAM */
+        buff_num = len/SMIF_ZERO_BUFF_SIZE;
+        rem_num  = len%SMIF_ZERO_BUFF_SIZE;
+        cur_addr = addr-smifMemConfigs[0]->baseAddress+FLASH_DEVICE_BASE;
+
+        for(;((buff_num>0)&&(0 == rc)); buff_num--)
+        {
+            Flash_SMIF_GetAddrBuff(cur_addr, addrBuf);
+
+            rc = Flash_SMIF_WriteMemory(SMIF0       /* SMIF_Type *baseaddr */,
+                                        &QSPIContext/* cy_stc_smif_context_t *smifContext */,
+                                        zero_buff   /* uint8_t txBuffer[] */,
+                                        SMIF_ZERO_BUFF_SIZE     /* uint32_t txSize */,
+                                        addrBuf   /* uint8_t *address */);
+
+            cur_addr += SMIF_ZERO_BUFF_SIZE;
+        }
+
+        if((0 != rem_num)&&(0 == rc))
+        {
+            Flash_SMIF_GetAddrBuff(cur_addr, addrBuf);
+            rc = Flash_SMIF_WriteMemory(SMIF0       /* SMIF_Type *baseaddr */,
+                                        &QSPIContext/* cy_stc_smif_context_t *smifContext */,
+                                        zero_buff   /* uint8_t txBuffer[] */,
+                                        rem_num     /* uint32_t txSize */,
+                                        addrBuf   /* uint8_t *address */);
+        }
+    }
+    else
+#endif
+    {
+        rc = psoc6_flash_erase(addr, len);
+    }
     return rc;
 }
 
@@ -280,12 +372,12 @@ int flash_area_get_bounds(int idx, uint32_t *off, uint32_t *len)
 
     switch (idx) {
     case FLASH_AREA_IMAGE_0:
-        *off = FLASH_AREA_IMAGE_0_OFFSET;
-        *len = FLASH_AREA_IMAGE_0_SIZE;
+        *off = part_map[0].area.fa_off;
+        *len = part_map[0].area.fa_size;
         break;
     case FLASH_AREA_IMAGE_1:
-        *off = FLASH_AREA_IMAGE_1_OFFSET;
-        *len = FLASH_AREA_IMAGE_1_SIZE;
+        *off = part_map[1].area.fa_off;
+        *len = part_map[1].area.fa_size;
         break;
     case FLASH_AREA_IMAGE_SCRATCH:
         *off = FLASH_AREA_IMAGE_SCRATCH_OFFSET;

@@ -28,13 +28,15 @@
 #include "spm_internal.h"
 #include "cy_device.h"
 
+#include "flash_smif.h"
+
 #ifdef PU_ENABLE
 #include "cyprotection_config.h"
-#endif // PU_ENABLE
+#endif /* PU_ENABLE */
 
 #ifdef TARGET_MCUBOOT
 
-#include "cy_policy.h"
+#include "mcuboot/cy_policy.h"
 /* mcuboot Headers */
 #include "cy_device_headers.h"
 #include "cycfg_peripherals.h"
@@ -143,9 +145,15 @@ void cy_assert(int expr)
 
 /********************************************
  * NOTE:
- * SPE CM0p Acquire Target is enabled by default.
+ * SPE CM0p Debug is disabled by default.
+ *
+ * Please, add ENABLE_CM0P_DEBUG symbol
+ * into targets.json into "macros_add"
+ * section of CY8CPROTO_064_SB_M0_PSA
+ * target if debugging is required.
  *
  * ******************************************/
+#if defined(ENABLE_CM0P_DEBUG)
 void Cy_SystemInit(void)
 {
     if((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL)
@@ -154,6 +162,7 @@ void Cy_SystemInit(void)
 		while((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL);
     }
 }
+#endif
 
 static void turn_on_cm4(void)
 {
@@ -223,10 +232,28 @@ void spm_hal_start_nspe(void)
     /* MCUBoot integration starts here */
     struct boot_rsp rsp;
     int rc = 0;
-   
+
+#ifdef MCUBOOT_USE_SMIF_STAGE
+    cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
+
+    qspi_status = Flash_SMIF_QSPI_Start();
+    if(0 != qspi_status)
+    {
+         BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
+    }
+    /* Set QE */
+    Flash_SMIF_EnableQuadMode(SMIF0, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
+#ifdef MCUBOOT_USE_SMIF_XIP
+    if(qspi_status == CY_SMIF_SUCCESS)
+    {
+        BOOT_LOG_INF("SMIF Memory/XIP Mode");
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
+    }
+#endif
+#endif
     boot_flash_device = (struct device*)&psoc6_flash_device;
 
-#if(MCUBOOT_POLICY == MCUBOOT_POLICY_JWT)
+#if(MCUBOOT_POLICY == 1)
     /* Processing of policy in JWT format */
     uint32_t jwtLen;
     char *jwt;
@@ -248,17 +275,6 @@ void spm_hal_start_nspe(void)
     if(0 != rc)
     {
          BOOT_LOG_ERR("2: Policy parsing failed with code %i", rc);
-
-         part_map[0].area.fa_off     = MCUBOOT_POLICY_FLASH_AREA_0_START-FLASH_DEVICE_BASE;
-         part_map[0].area.fa_size    = MCUBOOT_POLICY_FLASH_AREA_SIZE;
-
-         part_map[1].area.fa_off     = MCUBOOT_POLICY_FLASH_AREA_1_START-FLASH_DEVICE_BASE;
-         part_map[1].area.fa_size    = MCUBOOT_POLICY_FLASH_AREA_SIZE;
-
-         bnu_policy.bnu_img_policy.boot_auth[0]      = MCUBOOT_POLICY_BOOT_AUTH;
-         bnu_policy.bnu_img_policy.upgrade_auth[0]   = MCUBOOT_POLICY_UPGRADE_AUTH;
-         bnu_policy.bnu_img_policy.id                = MCUBOOT_POLICY_IMG_ID;
-         bnu_policy.bnu_img_policy.upgrade           = MCUBOOT_POLICY_UPGRADE;
     }
     else
     {
@@ -330,7 +346,7 @@ void spm_hal_memory_protection_init(void)
    status = ppu_prog_protect((cy_ppu_prog_cfg_t *)prog_spm_ppu_config, sizeof(prog_spm_ppu_config) / sizeof(prog_spm_ppu_config[0]));
    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
 #endif /* INITIAL_PROTECTION_AVAILABLE */
-/* TODO: Temporary commented, because it is configured by FlashBoot to fix some silicon issues,
+/* TODO: Temporary commented, because it is configured by FlashBoot to fix some silicon issues*/
    /* fixed group ppu */
 /*#ifndef INITIAL_PROTECTION_AVAILABLE
    status = ppu_fixed_gr_protect((cy_ppu_fixed_gr_cfg_t *)fixed_gr_spm_ppu_config, sizeof(fixed_gr_spm_ppu_config) / sizeof(fixed_gr_spm_ppu_config[0]));
