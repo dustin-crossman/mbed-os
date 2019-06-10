@@ -71,11 +71,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <hal/hal_flash.h>
-#include <os/os_malloc.h>
 #include "bootutil/bootutil.h"
 #include "bootutil/image.h"
 #include "bootutil_priv.h"
 #include "bootutil/bootutil_log.h"
+#include "flash_map/flash_map.h"
 
 #include "mcuboot_config/mcuboot_config.h"
 #include "psa/crypto.h"
@@ -410,8 +410,9 @@ boot_slots_compatible(void)
     size_t num_sectors_1 = boot_img_num_sectors(&boot_data, 1);
     size_t size_0, size_1;
     size_t i;
+    size_t bootMaxImgSect = Cy_BootMaxImgSectors();
 
-    if (num_sectors_0 > BOOT_MAX_IMG_SECTORS || num_sectors_1 > BOOT_MAX_IMG_SECTORS) {
+    if (num_sectors_0 > bootMaxImgSect || num_sectors_1 > bootMaxImgSect) {
         BOOT_LOG_WRN("Cannot upgrade: more sectors than allowed");
         return 0;
     }
@@ -2026,8 +2027,11 @@ boot_go(struct boot_rsp *rsp)
      * necessary because the gcc option "-fdata-sections" doesn't seem to have
      * any effect in older gcc versions (e.g., 4.8.4).
      */
-    static boot_sector_t slot0_sectors[BOOT_MAX_IMG_SECTORS];
-    static boot_sector_t slot1_sectors[BOOT_MAX_IMG_SECTORS];
+    size_t bootMaxImgSect = Cy_BootMaxImgSectors();
+
+    boot_sector_t *slot0_sectors = malloc(sizeof(boot_sector_t)*bootMaxImgSect);
+    boot_sector_t *slot1_sectors = malloc(sizeof(boot_sector_t)*bootMaxImgSect);
+
     boot_data.imgs[0].sectors = slot0_sectors;
     boot_data.imgs[1].sectors = slot1_sectors;
 
@@ -2045,7 +2049,7 @@ boot_go(struct boot_rsp *rsp)
     rc = boot_read_sectors();
     if (rc != 0) {
         BOOT_LOG_WRN("Failed reading sectors; BOOT_MAX_IMG_SECTORS=%d - too small?",
-                BOOT_MAX_IMG_SECTORS);
+                Cy_BootMaxImgSectors());
         goto out;
     }
 
@@ -2173,6 +2177,8 @@ boot_go(struct boot_rsp *rsp)
     rsp->br_hdr = boot_img_hdr(&boot_data, slot);
 
  out:
+    free(slot0_sectors);
+    free(slot1_sectors);
     flash_area_close(BOOT_SCRATCH_AREA(&boot_data));
     for (slot = 0; slot < BOOT_NUM_SLOTS; slot++) {
         flash_area_close(BOOT_IMG_AREA(&boot_data, BOOT_NUM_SLOTS - 1 - slot));
@@ -2189,12 +2195,12 @@ split_go(int loader_slot, int split_slot, void **entry)
     int split_flash_id;
     int rc;
 
-    sectors = malloc(BOOT_MAX_IMG_SECTORS * 2 * sizeof *sectors);
+    sectors = malloc(Cy_BootMaxImgSectors() * 2 * sizeof *sectors);
     if (sectors == NULL) {
         return SPLIT_GO_ERR;
     }
     boot_data.imgs[loader_slot].sectors = sectors + 0;
-    boot_data.imgs[split_slot].sectors = sectors + BOOT_MAX_IMG_SECTORS;
+    boot_data.imgs[split_slot].sectors = sectors + Cy_BootMaxImgSectors();
 
     loader_flash_id = flash_area_id_from_image_slot(loader_slot);
     rc = flash_area_open(loader_flash_id,

@@ -50,6 +50,9 @@ int Flash_SMIF_WriteMemory(SMIF_Type *baseaddr,
                             uint32_t txSize,
                             uint8_t *address);
 
+void Flash_SMIF_EnableQuadMode(SMIF_Type *baseaddr, cy_stc_smif_mem_config_t *memConfig,
+                    cy_stc_smif_context_t const *smifContext);
+
 #if defined(__cplusplus)
 }
 #endif

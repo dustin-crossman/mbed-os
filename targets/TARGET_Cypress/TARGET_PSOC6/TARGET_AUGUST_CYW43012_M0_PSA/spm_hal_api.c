@@ -28,11 +28,11 @@
 
 #ifdef PU_ENABLE
 #include "cyprotection_config.h"
-#endif // PU_ENABLE
+#endif /* PU_ENABLE */
 
 #ifdef TARGET_MCUBOOT
 
-#include "cy_policy.h"
+#include "mcuboot/cy_policy.h"
 /* mcuboot Headers */
 #include "cy_device_headers.h"
 #include "cycfg_peripherals.h"
@@ -240,11 +240,14 @@ void spm_hal_start_nspe(void)
          BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
     }
     /* Set QE */
-    qspi_status = Flash_SMIF_EnableQuadMode(SMIF0, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
-    if(0 != qspi_status)
+    Flash_SMIF_EnableQuadMode(SMIF0, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
+#ifdef MCUBOOT_USE_SMIF_XIP
+    if(qspi_status == CY_SMIF_SUCCESS)
     {
-         BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
+        BOOT_LOG_INF("SMIF Memory/XIP Mode");
+        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
     }
+#endif
 #endif
 
     boot_flash_device = (struct device*)&psoc6_flash_device;
@@ -359,12 +362,12 @@ void spm_hal_memory_protection_init(void)
    status = ppu_prog_protect((cy_ppu_prog_cfg_t *)prog_spm_ppu_config, sizeof(prog_spm_ppu_config) / sizeof(prog_spm_ppu_config[0]));
    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
 #endif /* INITIAL_PROTECTION_AVAILABLE */
-/* TODO: Temporary commented, because it is configured by FlashBoot to fix some silicon issues,
+/* TODO: Temporary commented, because it is configured by FlashBoot to fix some silicon issues*/
    /* fixed group ppu */
 /*#ifndef INITIAL_PROTECTION_AVAILABLE
    status = ppu_fixed_gr_protect((cy_ppu_fixed_gr_cfg_t *)fixed_gr_spm_ppu_config, sizeof(fixed_gr_spm_ppu_config) / sizeof(fixed_gr_spm_ppu_config[0]));
    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
-#endif /* INITIAL_PROTECTION_AVAILABLE */
+#endif // INITIAL_PROTECTION_AVAILABLE */
 
 #endif /* PU_ENABLE */
 }
