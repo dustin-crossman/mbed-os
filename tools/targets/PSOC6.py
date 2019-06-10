@@ -53,7 +53,8 @@ CY_META_CHECKSUM_ADDR = 0x90500008
 MCUBOOT_HEADER_SIZE = 1024
 SPE_IMAGE_ID = 1
 NSPE_IMAGE_ID = 16
-SMIF_MEM_MAP_START = 402653184
+SMIF_MEM_MAP_START = 0x18000000
+
 
 # Patch Cypress hex file:
 # - update checksum
@@ -167,12 +168,15 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
         for slot in fw_nspe["resources"]:
             if slot["type"] == "BOOT":
                 slot0 = slot
-            if slot["type"] == "UPGRADE":
-                if fw_nspe["upgrade"] and True:
+            if fw_nspe["upgrade"] and True:
+                if slot["type"] == "UPGRADE":
                     slot1 = slot
-                else:
-                    toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
-                                          " be built per policy settings.")
+            else:
+                toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
+                                      " be built per policy settings.")
+        if slot0 is None:
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section not found in policy resources")
+            raise Exception("imgtool finished execution with errors!")
 
     else:
         # check if PSA targets flash map correspond to slots addresses and sizes in policy
@@ -219,15 +223,18 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
         for slot in fw_spe["resources"]:
             if slot["type"] == "BOOT":
                 slot0 = slot
-            if slot["type"] == "UPGRADE":
-                if fw_spe["upgrade"] and True:
+            if fw_spe["upgrade"] and True:
+                if slot["type"] == "UPGRADE":
                     slot1 = slot
-                else:
-                    toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
-                                          " be produced per policy settings.")
+            else:
+                toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
+                                      " be produced per policy settings.")
+    if slot0 is None:
+        toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section not found in policy resources")
+        raise Exception("imgtool finished execution with errors!")
 
     if slot1 is not None:
-        # bigger or equal to 0x18000000 hex
+        # bigger or equal to 0x18000000 in hex is a start of SMIF memory
         if slot1["address"] >= SMIF_MEM_MAP_START:
             toolchain.notify.info("[PSOC6.sign_image] INFO: UPGRADE slot will be resided in external flash")
 
