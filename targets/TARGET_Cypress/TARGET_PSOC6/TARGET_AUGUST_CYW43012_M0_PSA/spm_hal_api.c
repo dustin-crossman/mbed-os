@@ -249,10 +249,9 @@ void spm_hal_start_nspe(void)
     }
 #endif
 #endif
-
     boot_flash_device = (struct device*)&psoc6_flash_device;
 
-#if(MCUBOOT_POLICY == MCUBOOT_POLICY_JWT)
+#if(MCUBOOT_POLICY == 1)
     /* Processing of policy in JWT format */
     uint32_t jwtLen;
     char *jwt;
@@ -274,17 +273,6 @@ void spm_hal_start_nspe(void)
     if(0 != rc)
     {
          BOOT_LOG_ERR("2: Policy parsing failed with code %i", rc);
-
-         part_map[0].area.fa_off     = MCUBOOT_POLICY_FLASH_AREA_0_START-FLASH_DEVICE_BASE;
-         part_map[0].area.fa_size    = MCUBOOT_POLICY_FLASH_AREA_SIZE;
-
-         part_map[1].area.fa_off     = MCUBOOT_POLICY_FLASH_AREA_1_START-FLASH_DEVICE_BASE;
-         part_map[1].area.fa_size    = MCUBOOT_POLICY_FLASH_AREA_SIZE;
-
-         bnu_policy.bnu_img_policy.boot_auth[0]      = MCUBOOT_POLICY_BOOT_AUTH;
-         bnu_policy.bnu_img_policy.upgrade_auth[0]   = MCUBOOT_POLICY_UPGRADE_AUTH;
-         bnu_policy.bnu_img_policy.id                = MCUBOOT_POLICY_IMG_ID;
-         bnu_policy.bnu_img_policy.upgrade           = MCUBOOT_POLICY_UPGRADE;
     }
     else
     {
