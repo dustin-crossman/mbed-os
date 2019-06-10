@@ -11,13 +11,15 @@
 * disclaimers, and limitations in the end user license agreement accompanying 
 * the software package with which this file was provided.
 ********************************************************************************/
+
 #if defined(TARGET_WHD)
 
 #include <stdlib.h>
 #include "cy_network_buffer.h"
 #include "cy_utils.h"
 #include "memp.h"
-cy_rslt_t cy_host_buffer_get(whd_buffer_t *buffer, whd_buffer_dir_t direction, uint16_t size, uint32_t timeout_ms)
+
+whd_result_t cy_host_buffer_get(whd_buffer_t *buffer, whd_buffer_dir_t direction, unsigned short size, unsigned long timeout_ms)
 {
     UNUSED_PARAMETER( direction );
     struct pbuf *p = NULL;
@@ -31,19 +33,19 @@ cy_rslt_t cy_host_buffer_get(whd_buffer_t *buffer, whd_buffer_dir_t direction, u
     }
     if (p != NULL )
     {
-       *buffer = p;
-    	return CY_RSLT_SUCCESS;
+        *buffer = p;
+    	return WHD_SUCCESS;
     }
     else
     {
-       return CY_RSLT_BUFFER_UNAVAILABLE;
+        return WHD_BUFFER_ALLOC_FAIL;
     }
 }
 
 void cy_buffer_release(whd_buffer_t buffer, whd_buffer_dir_t direction)
 {
     UNUSED_PARAMETER( direction );
-   (void) pbuf_free( (struct pbuf *)buffer );
+    (void) pbuf_free( (struct pbuf *)buffer );
 }
 
 uint8_t *cy_buffer_get_current_piece_data_pointer(whd_buffer_t buffer)
@@ -60,14 +62,14 @@ uint16_t cy_buffer_get_current_piece_size(whd_buffer_t buffer)
     return (uint16_t) pbuffer->len;
 }
 
-cy_rslt_t cy_buffer_set_size(whd_buffer_t buffer, uint16_t size)
+whd_result_t cy_buffer_set_size(whd_buffer_t buffer, unsigned short size)
 {
     CY_ASSERT(buffer != NULL);
     struct pbuf * pbuffer = (struct pbuf *) buffer;
 
     if ( size > (unsigned short) WHD_LINK_MTU  + LWIP_MEM_ALIGN_SIZE(LWIP_MEM_ALIGN_SIZE(sizeof(struct pbuf))) + LWIP_MEM_ALIGN_SIZE(size) )
     {
-        return CY_RSLT_BUFFER_UNAVAILABLE;
+        return WHD_PMK_WRONG_LENGTH;
     }
 
     pbuffer->tot_len = size;
@@ -76,17 +78,17 @@ cy_rslt_t cy_buffer_set_size(whd_buffer_t buffer, uint16_t size)
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cy_buffer_add_remove_at_front(whd_buffer_t *buffer, int32_t add_remove_amount)
+whd_result_t cy_buffer_add_remove_at_front(whd_buffer_t *buffer, int32_t add_remove_amount)
 {
     CY_ASSERT(buffer != NULL);
     struct pbuf **pbuffer = (struct pbuf**) buffer;
 
     if ( (u8_t) 0 != pbuf_header( *pbuffer, ( s16_t )( -add_remove_amount ) ) )
     {
-        return CY_RSLT_BUFFER_TOO_SMALL;
+        return WHD_PMK_WRONG_LENGTH;
     }
 
-    return CY_RSLT_SUCCESS;
+    return WHD_SUCCESS;
 }
 
 #endif /* defined(TARGET_WHD) */

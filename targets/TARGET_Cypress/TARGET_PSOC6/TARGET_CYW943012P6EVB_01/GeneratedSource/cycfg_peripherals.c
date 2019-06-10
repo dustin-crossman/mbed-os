@@ -25,7 +25,7 @@
 #include "cycfg_peripherals.h"
 
 #define PWM_INPUT_DISABLED 0x7U
-#define USBUART_INTR_LVL_SEL (CY_USBFS_DEV_DRV_SET_SOF_LVL(0x2U) | \
+#define CYBSP_USBUART_INTR_LVL_SEL (CY_USBFS_DEV_DRV_SET_SOF_LVL(0x2U) | \
                  CY_USBFS_DEV_DRV_SET_BUS_RESET_LVL(0x2U) | \
                  CY_USBFS_DEV_DRV_SET_EP0_LVL(0x2U) | \
                  CY_USBFS_DEV_DRV_SET_LPM_LVL(0x0U) | \
@@ -43,7 +43,31 @@ cy_stc_csd_context_t cy_csd_0_context =
 {
 	.lockKey = CY_CSD_NONE_KEY,
 };
-const cy_stc_scb_uart_config_t BT_UART_config = 
+const cy_stc_scb_spi_config_t CYBSP_SPI_config = 
+{
+	.spiMode = CY_SCB_SPI_MASTER,
+	.subMode = CY_SCB_SPI_MOTOROLA,
+	.sclkMode = CY_SCB_SPI_CPHA0_CPOL0,
+	.oversample = 16,
+	.rxDataWidth = 8UL,
+	.txDataWidth = 8UL,
+	.enableMsbFirst = true,
+	.enableInputFilter = false,
+	.enableFreeRunSclk = false,
+	.enableMisoLateSample = true,
+	.enableTransferSeperation = false,
+	.ssPolarity = ((CY_SCB_SPI_ACTIVE_LOW << CY_SCB_SPI_SLAVE_SELECT0) | \
+                                         (CY_SCB_SPI_ACTIVE_LOW << CY_SCB_SPI_SLAVE_SELECT1) | \
+                                         (CY_SCB_SPI_ACTIVE_LOW << CY_SCB_SPI_SLAVE_SELECT2) | \
+                                         (CY_SCB_SPI_ACTIVE_LOW << CY_SCB_SPI_SLAVE_SELECT3)),
+	.enableWakeFromSleep = false,
+	.rxFifoTriggerLevel = 63UL,
+	.rxFifoIntEnableMask = 0UL,
+	.txFifoTriggerLevel = 63UL,
+	.txFifoIntEnableMask = 0UL,
+	.masterSlaveIntEnableMask = 0UL,
+};
+const cy_stc_scb_uart_config_t CYBSP_BT_UART_config = 
 {
 	.uartMode = CY_SCB_UART_STANDARD,
 	.enableMutliProcessorMode = false,
@@ -71,7 +95,7 @@ const cy_stc_scb_uart_config_t BT_UART_config =
 	.txFifoTriggerLevel = 63UL,
 	.txFifoIntEnableMask = 0UL,
 };
-const cy_stc_scb_ezi2c_config_t CSD_COMM_config = 
+const cy_stc_scb_ezi2c_config_t CYBSP_CSD_COMM_config = 
 {
 	.numberOfAddresses = CY_SCB_EZI2C_ONE_ADDRESS,
 	.slaveAddress1 = 8U,
@@ -79,7 +103,7 @@ const cy_stc_scb_ezi2c_config_t CSD_COMM_config =
 	.subAddressSize = CY_SCB_EZI2C_SUB_ADDR16_BITS,
 	.enableWakeFromSleep = false,
 };
-const cy_stc_scb_uart_config_t KITPROG_UART_config = 
+const cy_stc_scb_uart_config_t CYBSP_WL_UART_config = 
 {
 	.uartMode = CY_SCB_UART_STANDARD,
 	.enableMutliProcessorMode = false,
@@ -107,14 +131,42 @@ const cy_stc_scb_uart_config_t KITPROG_UART_config =
 	.txFifoTriggerLevel = 63UL,
 	.txFifoIntEnableMask = 0UL,
 };
-const cy_stc_smif_config_t QSPI_config = 
+const cy_stc_scb_uart_config_t CYBSP_KITPROG_UART_config = 
+{
+	.uartMode = CY_SCB_UART_STANDARD,
+	.enableMutliProcessorMode = false,
+	.smartCardRetryOnNack = false,
+	.irdaInvertRx = false,
+	.irdaEnableLowPowerReceiver = false,
+	.oversample = 8,
+	.enableMsbFirst = false,
+	.dataWidth = 8UL,
+	.parity = CY_SCB_UART_PARITY_NONE,
+	.stopBits = CY_SCB_UART_STOP_BITS_1,
+	.enableInputFilter = false,
+	.breakWidth = 11UL,
+	.dropOnFrameError = false,
+	.dropOnParityError = false,
+	.receiverAddress = 0x0UL,
+	.receiverAddressMask = 0x0UL,
+	.acceptAddrInFifo = false,
+	.enableCts = false,
+	.ctsPolarity = CY_SCB_UART_ACTIVE_LOW,
+	.rtsRxFifoLevel = 0UL,
+	.rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
+	.rxFifoTriggerLevel = 63UL,
+	.rxFifoIntEnableMask = 0UL,
+	.txFifoTriggerLevel = 63UL,
+	.txFifoIntEnableMask = 0UL,
+};
+const cy_stc_smif_config_t CYBSP_QSPI_config = 
 {
 	.mode = (uint32_t)CY_SMIF_NORMAL,
-	.deselectDelay = QSPI_DESELECT_DELAY,
+	.deselectDelay = CYBSP_QSPI_DESELECT_DELAY,
 	.rxClockSel = (uint32_t)CY_SMIF_SEL_INV_INTERNAL_CLK,
 	.blockEvent = (uint32_t)CY_SMIF_BUS_ERROR,
 };
-const cy_stc_mcwdt_config_t MCWDT0_config = 
+const cy_stc_mcwdt_config_t CYBSP_MCWDT0_config = 
 {
 	.c0Match = 32768U,
 	.c1Match = 32768U,
@@ -127,7 +179,7 @@ const cy_stc_mcwdt_config_t MCWDT0_config =
 	.c0c1Cascade = true,
 	.c1c2Cascade = false,
 };
-const cy_stc_rtc_config_t RTC_config = 
+const cy_stc_rtc_config_t CYBSP_RTC_config = 
 {
 	.sec = 0U,
 	.min = 0U,
@@ -167,7 +219,7 @@ const cy_stc_tcpwm_pwm_config_t PWM_config =
 	.countInputMode = PWM_INPUT_DISABLED & 0x3U,
 	.countInput = CY_TCPWM_INPUT_1,
 };
-const cy_stc_usbfs_dev_drv_config_t USBUART_config = 
+const cy_stc_usbfs_dev_drv_config_t CYBSP_USBUART_config = 
 {
 	.mode = CY_USBFS_DEV_DRV_EP_MANAGEMENT_CPU,
 	.epAccess = CY_USBFS_DEV_DRV_USE_8_BITS_DR,
@@ -182,7 +234,7 @@ const cy_stc_usbfs_dev_drv_config_t USBUART_config =
 	.dmaConfig[6] = NULL,
 	.dmaConfig[7] = NULL,
 	.enableLpm = false,
-	.intrLevelSel = USBUART_INTR_LVL_SEL,
+	.intrLevelSel = CYBSP_USBUART_INTR_LVL_SEL,
 };
 
 
@@ -190,9 +242,13 @@ void init_cycfg_peripherals(void)
 {
 	Cy_SysClk_PeriphAssignDivider(PCLK_CSD_CLOCK, CY_SYSCLK_DIV_8_BIT, 4U);
 
+	Cy_SysClk_PeriphAssignDivider(PCLK_SCB1_CLOCK, CY_SYSCLK_DIV_8_BIT, 5U);
+
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB2_CLOCK, CY_SYSCLK_DIV_8_BIT, 2U);
 
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB3_CLOCK, CY_SYSCLK_DIV_8_BIT, 1U);
+
+	Cy_SysClk_PeriphAssignDivider(PCLK_SCB5_CLOCK, CY_SYSCLK_DIV_8_BIT, 6U);
 
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB6_CLOCK, CY_SYSCLK_DIV_8_BIT, 2U);
 

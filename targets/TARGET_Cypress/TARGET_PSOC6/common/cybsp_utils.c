@@ -27,6 +27,8 @@
 #include "cy_network_buffer.h"
 #include "cmsis_os2.h"
 #include "whd_bus_types.h"
+#include "cyhal.h"
+#include "cyhal_implementation.h"
 
 #if defined(__cplusplus)
 extern "C" {
