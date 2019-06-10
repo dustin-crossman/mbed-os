@@ -98,13 +98,11 @@ cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
         /* Need to start from CommandMode as we will switch FlashMemory to Quad first */
         Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
     }
-
 #if (CY_CPU_CORTEX_M0P)
 	NVIC_EnableIRQ(SMIF_NVIC_IRQN);
 #else
 	NVIC_EnableIRQ(smif_interrupt_IRQn);
 #endif
-
     return qspiStatus;
 }
 
@@ -225,8 +223,6 @@ int Flash_SMIF_ReadMemory(SMIF_Type *baseaddr,
                 /* Wait until the SMIF IP operation is completed. */
             }
         }
-//        /* Wait until receive transaction completed */
-//        while(Cy_SMIF_GetTxfrStatus(SMIF0, &QSPIContext) != CY_SMIF_REC_CMPLT);
     }
     return (int)status;
 }

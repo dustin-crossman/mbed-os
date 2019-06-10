@@ -372,12 +372,12 @@ int flash_area_get_bounds(int idx, uint32_t *off, uint32_t *len)
 
     switch (idx) {
     case FLASH_AREA_IMAGE_0:
-        *off = FLASH_AREA_IMAGE_0_OFFSET;
-        *len = FLASH_AREA_IMAGE_0_SIZE;
+        *off = part_map[0].area.fa_off;
+        *len = part_map[0].area.fa_size;
         break;
     case FLASH_AREA_IMAGE_1:
-        *off = FLASH_AREA_IMAGE_1_OFFSET;
-        *len = FLASH_AREA_IMAGE_1_SIZE;
+        *off = part_map[1].area.fa_off;
+        *len = part_map[1].area.fa_size;
         break;
     case FLASH_AREA_IMAGE_SCRATCH:
         *off = FLASH_AREA_IMAGE_SCRATCH_OFFSET;
