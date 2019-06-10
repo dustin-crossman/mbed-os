@@ -5,6 +5,10 @@
 #ifndef CY_FLASH_MAP_H_
 #define CY_FLASH_MAP_H_
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #define MCUBOOT_POLICY_HDR (0)
 #define MCUBOOT_POLICY_JWT (1)
 
@@ -18,5 +22,8 @@
 #define MCUBOOT_POLICY_IMG_ID          (5)
 #define MCUBOOT_POLICY_UPGRADE         (1)
 
+#if defined(__cplusplus)
+}
+#endif
 
 #endif /* CY_FLASH_MAP_H_ */

@@ -179,10 +179,10 @@ const cy_stc_scb_i2c_config_t I2C_config =
 	.lowPhaseDutyCycle = 0,
 	.highPhaseDutyCycle = 0,
 };
-const cy_stc_smif_config_t SMIF_config = 
+const cy_stc_smif_config_t QSPI_config = 
 {
 	.mode = (uint32_t)CY_SMIF_NORMAL,
-	.deselectDelay = SMIF_DESELECT_DELAY,
+	.deselectDelay = QSPI_DESELECT_DELAY,
 	.rxClockSel = (uint32_t)CY_SMIF_SEL_INV_INTERNAL_CLK,
 	.blockEvent = (uint32_t)CY_SMIF_BUS_ERROR,
 };

@@ -296,11 +296,8 @@ void mbed_sdk_init(void)
 #if defined(COMPONENT_SPM_MAILBOX)
     mailbox_init();
 #endif
-
-#if !defined(COMPONENT_NSPE)
     /* Set up the device based on configurator selections */
     init_cycfg_all();
-#endif
     /* Enable global interrupts */
     __enable_irq();
 }

@@ -16,7 +16,7 @@ pyocd_wrapper:
     - virtualenv venv
     - .\venv\Scripts\activate.ps1
     - echo "[INFO] Getting latest pyocd"
-    - if (-Not(Test-Path pyocd)) { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd; cd pyocd; git checkout tags/AH_SECURITY_RELEASE_2; git branch; cd .. }
+    - if (Test-Path pyocd) { cd pyocd; git pull; cd .. } else { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd }
     - echo "[INFO] Installing recquired python modules"
     - pip install cmsis-pack-manager
     - pip install colorama
@@ -36,7 +36,6 @@ pyocd_wrapper:
     - cd ..
     - echo "[INFO] Start tests"
     - cd .\targets\TARGET_Cypress\TARGET_PSOC6\sb-tools\test\
-    - mbedls -m 1907:CY8CPROTO_064_SB
     - python -m unittest -v test_pyocd_wrapper.py
     - deactivate
   cache:
@@ -56,7 +55,7 @@ test_mbed_062_crypto:
     - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
 
 # Compile TARGET_PSOC6_PSA
-.test_mbed_064_psa:
+test_mbed_064_psa:
   stage: test
   tags:
     - MBED_TEST

@@ -23,6 +23,7 @@
 #include "sysflash/sysflash.h"
 
 #include <flash_map_backend/flash_map_backend.h>
+#include "flash_map/flash_map.h"
 
 #include "bootutil/image.h"
 #include "mcuboot_config/mcuboot_config.h"
@@ -93,8 +94,6 @@ struct boot_swap_state {
     uint8_t image_ok;
 };
 
-#define BOOT_MAX_IMG_SECTORS       MCUBOOT_MAX_IMG_SECTORS
-
 /*
  * The current flashmap API does not check the amount of space allocated when
  * loading sector data from the flash device, allowing for smaller counts here
@@ -102,16 +101,13 @@ struct boot_swap_state {
  *
  * TODO: make flashmap API receive the current sector array size.
  */
-#if BOOT_MAX_IMG_SECTORS < 32
-#error "Too few sectors, please increase BOOT_MAX_IMG_SECTORS to at least 32"
-#endif
 
 /** Number of image slots in flash; currently limited to two. */
 #define BOOT_NUM_SLOTS             2
 
 /** Maximum number of image sectors supported by the bootloader. */
 #define BOOT_STATUS_STATE_COUNT    3
-#define BOOT_STATUS_MAX_ENTRIES    BOOT_MAX_IMG_SECTORS
+#define BOOT_STATUS_MAX_ENTRIES    Cy_BootMaxImgSectors()
 
 #define BOOT_STATUS_SOURCE_NONE    0
 #define BOOT_STATUS_SOURCE_SCRATCH 1
@@ -229,7 +225,7 @@ boot_img_sector_off(struct boot_loader_state *state, size_t slot,
 static inline int
 boot_initialize_area(struct boot_loader_state *state, int flash_area)
 {
-    int num_sectors = BOOT_MAX_IMG_SECTORS;
+    int num_sectors = Cy_BootMaxImgSectors();
     size_t slot;
     int rc;
 
@@ -278,14 +274,14 @@ boot_initialize_area(struct boot_loader_state *state, int flash_area)
     size_t *out_num_sectors;
     int rc;
 
+    num_sectors = Cy_BootMaxImgSectors();
+
     switch (flash_area) {
     case FLASH_AREA_IMAGE_0:
-        num_sectors = BOOT_MAX_IMG_SECTORS;
         out_sectors = state->imgs[0].sectors;
         out_num_sectors = &state->imgs[0].num_sectors;
         break;
     case FLASH_AREA_IMAGE_1:
-        num_sectors = BOOT_MAX_IMG_SECTORS;
         out_sectors = state->imgs[1].sectors;
         out_num_sectors = &state->imgs[1].num_sectors;
         break;
