@@ -1,7 +1,8 @@
 /*
+ * mcuboot_assert.h
+ *
+ * Cypress-specific assert() macro redefinition
  *
  */
-
-void cy_assert(int expr);
-
-#define ASSERT cy_assert
+#define ASSERT CY_ASSERT
+#define assert CY_ASSERT
