@@ -143,15 +143,9 @@ void cy_assert(int expr)
 
 /********************************************
  * NOTE:
- * SPE CM0p Debug is disabled by default.
- *
- * Please, add ENABLE_CM0P_DEBUG symbol
- * into targets.json into "macros_add"
- * section of CY8CPROTO_064_SB_M0_PSA
- * target if debugging is required.
+ * SPE CM0p Acquire Target is enabled by default.
  *
  * ******************************************/
-#if defined(ENABLE_CM0P_DEBUG)
 void Cy_SystemInit(void)
 {
     if((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL)
@@ -160,7 +154,6 @@ void Cy_SystemInit(void)
 		while((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL);
     }
 }
-#endif
 
 static void turn_on_cm4(void)
 {
