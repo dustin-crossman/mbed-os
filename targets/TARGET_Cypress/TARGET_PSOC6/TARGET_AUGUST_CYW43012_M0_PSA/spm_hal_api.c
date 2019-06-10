@@ -350,7 +350,7 @@ void spm_hal_memory_protection_init(void)
 /*#ifndef INITIAL_PROTECTION_AVAILABLE
    status = ppu_fixed_gr_protect((cy_ppu_fixed_gr_cfg_t *)fixed_gr_spm_ppu_config, sizeof(fixed_gr_spm_ppu_config) / sizeof(fixed_gr_spm_ppu_config[0]));
    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
-#endif // INITIAL_PROTECTION_AVAILABLE */
+#endif /* INITIAL_PROTECTION_AVAILABLE */
 
 #endif /* PU_ENABLE */
 }

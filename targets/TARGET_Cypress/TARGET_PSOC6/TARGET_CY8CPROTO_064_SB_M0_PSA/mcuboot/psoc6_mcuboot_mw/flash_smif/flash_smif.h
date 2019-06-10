@@ -26,11 +26,32 @@ extern "C" {
 #define PACKET_SIZE   (64u)     /* The memory Read/Write packet */
 #define TIMEOUT_1_MS  (1000u)
 
+#define IS_FLASH_SMIF(x) ((x)>=(smifMemConfigs[0]->baseAddress-FLASH_DEVICE_BASE))
+
 /* Create context for peripheral operation */
 cy_stc_smif_context_t QSPIContext;
 
+void Flash_SMIF_Interrupt_User(void);
+
+void Flash_SMIF_GetAddrBuff(uint32_t address, uint8_t * addrBuf);
+
 /* QSPI initialization */
-cy_en_smif_status_t QSPI_Start(void);
+cy_en_smif_status_t Flash_SMIF_QSPI_Start(void);
+
+int Flash_SMIF_WriteMemory(SMIF_Type *baseaddr,
+                            cy_stc_smif_context_t *smifContext,
+                            uint8_t txBuffer[],
+                            uint32_t txSize,
+                            uint8_t *address);
+
+int Flash_SMIF_WriteMemory(SMIF_Type *baseaddr,
+                            cy_stc_smif_context_t *smifContext,
+                            uint8_t txBuffer[],
+                            uint32_t txSize,
+                            uint8_t *address);
+
+void Flash_SMIF_EnableQuadMode(SMIF_Type *baseaddr, cy_stc_smif_mem_config_t *memConfig,
+                    cy_stc_smif_context_t const *smifContext);
 
 #if defined(__cplusplus)
 }
