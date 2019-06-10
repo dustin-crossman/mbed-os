@@ -18,7 +18,11 @@
 
 
 /* -------------------------------------- Includes ----------------------------------- */
+#ifdef MCUBOOT_HAVE_ASSERT_H
+#include "mcuboot_config/mcuboot_assert.h"
+#else
 #include <assert.h>
+#endif
 
 #include "cy_sysint.h"
 #include "spm_internal.h"
@@ -209,9 +213,6 @@ static void do_boot(struct boot_rsp *rsp)
     /* It is aligned to 0x400 (256 records in vector table*4bytes each) */
     BOOT_LOG_INF("Cy_SysEnableCM4");
 
-    IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
-    BOOT_LOG_INF("TEST BIT SET !");
-
 #if(MCUBOOT_LOG_LEVEL != 0)
     while(!Cy_SCB_UART_IsTxComplete(SCB5))
     {
@@ -296,12 +297,6 @@ void spm_hal_start_nspe(void)
     bnu_policy.bnu_img_policy.upgrade           = MCUBOOT_POLICY_UPGRADE;
 #endif
 
-    if((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL)
-    {
-        IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
-        BOOT_LOG_INF("TEST MODE");
-        __disable_irq();
-    } 
     BOOT_LOG_INF("Processing available images");
     rc = boot_go(&rsp);
     if (rc != 0)

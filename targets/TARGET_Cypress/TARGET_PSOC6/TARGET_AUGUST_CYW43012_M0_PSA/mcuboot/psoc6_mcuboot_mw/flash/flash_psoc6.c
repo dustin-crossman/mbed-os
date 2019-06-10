@@ -48,7 +48,11 @@
 #include "string.h"
 #include "stdlib.h"
 #include "stdbool.h"
+#ifdef MCUBOOT_HAVE_ASSERT_H
+#include "mcuboot_config/mcuboot_assert.h"
+#else
 #include <assert.h>
+#endif
 
 #include "cy_device_headers.h"
 
