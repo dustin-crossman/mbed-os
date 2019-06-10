@@ -147,6 +147,9 @@ bool WHD_EMAC::link_out(emac_mem_buf_t *buf)
     void *dest = whd_buffer_get_current_piece_data_pointer(drvp, buffer);
     memory_manager->copy_from_buf(dest, size, buf);
 
+    if (activity_cb) {
+        activity_cb(true);
+    }
     whd_network_send_ethernet_data(ifp, buffer);
     memory_manager->free(buf);
     return true;
@@ -155,6 +158,11 @@ bool WHD_EMAC::link_out(emac_mem_buf_t *buf)
 void WHD_EMAC::get_ifname(char *name, uint8_t size) const
 {
     memcpy(name, "whd", size);
+}
+
+void WHD_EMAC::set_activity_cb(mbed::Callback<void(bool)> cb)
+{
+    activity_cb = cb;
 }
 
 extern "C"
@@ -175,6 +183,9 @@ void cy_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer)
 
     if (size > 0) {
            mem_buf = buffer;
+            if (emac.activity_cb) {
+                emac.activity_cb(false);
+            }
            emac.emac_link_input_cb(mem_buf);
     }
 }

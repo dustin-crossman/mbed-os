@@ -114,12 +114,19 @@ static whd_security_t whd_fromsecurity(nsapi_security_t sec) {
     }
 }
 
-WhdSTAInterface::WhdSTAInterface(WHD_EMAC &emac, OnboardNetworkStack &stack)
+MBED_WEAK WhdSTAInterface::OlmInterface &WhdSTAInterface::OlmInterface::get_default_instance()
+{
+    static OlmInterface olm;
+    return olm;
+}
+
+WhdSTAInterface::WhdSTAInterface(WHD_EMAC &emac, OnboardNetworkStack &stack, OlmInterface &olm)
     : EMACInterface(emac, stack),
       _ssid("\0"),
       _pass("\0"),
       _security(NSAPI_SECURITY_NONE),
-      _whd_emac(emac)
+      _whd_emac(emac),
+      _olm(&olm)
 {
 }
 
@@ -181,6 +188,11 @@ nsapi_error_t WhdSTAInterface::connect()
             return err;
         }
         _interface->attach(_connection_status_cb);
+    }
+
+    // Initialize the Offload Manager
+    if(_olm != NULL) {
+        _olm->init_ols(&_emac, this);
     }
 
     if ((_ssid == NULL) ||
@@ -247,6 +259,11 @@ nsapi_error_t WhdSTAInterface::disconnect()
     whd_result_t res = whd_wifi_leave(_whd_emac.ifp);
     if (res != WHD_SUCCESS) {
         return whd_toerror(res);
+    }
+
+    // de-init Offload Manager
+    if(_olm != NULL) {
+        _olm->deinit_ols();
     }
 
     return NSAPI_ERROR_OK;

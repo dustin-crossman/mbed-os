@@ -334,17 +334,8 @@ typedef struct {
 /** Callbacks for Sleep and Deepsleep APIs */
 #define cyhal_system_call_back_t cy_stc_syspm_callback_t
 
-/** Divider for HFCLK. Support values { 1, 2, 4, 8 } */
-typedef enum
-{
-    CYHAL_SYSTEM_CM4_DIVIDER_1 = 1,
-    CYHAL_SYSTEM_CM4_DIVIDER_2 = 2,
-    CYHAL_SYSTEM_CM4_DIVIDER_4 = 4,
-    CYHAL_SYSTEM_CM4_DIVIDER_8 = 8,
-} cyhal_system_cm4_divider_t;
-
 /** Enum for clock type to configure. HFCLKs are configured using different APIs and does not using this enum */
-typedef enum cyhal_system_clock
+typedef enum
 {
     CYHAL_SYSTEM_CLOCK_CM4,
     CYHAL_SYSTEM_CLOCK_CM0,

@@ -23,6 +23,7 @@
 #include "whd_emac.h"
 #include "whd_types_int.h"
 
+struct ol_desc;
 
 /** WhdSTAInterface class
  *  Implementation of the NetworkStack for the WHD
@@ -31,11 +32,26 @@ class WhdSTAInterface : public WiFiInterface, public EMACInterface
 {
 public:
 
+    class OlmInterface
+    {
+    public:
+        /** Get the default OLM interface. */
+        static OlmInterface &get_default_instance();
+
+        OlmInterface(struct ol_desc *list = NULL) {}
+
+        virtual int init_ols(void *whd, void *ip) { return 0; }
+        virtual int sleep() { return 0; }
+        virtual int wake() { return 0; }
+
+        virtual void deinit_ols(void) {}
+    };
+
     WhdSTAInterface(
             WHD_EMAC &emac = WHD_EMAC::get_instance(),
-            OnboardNetworkStack &stack = OnboardNetworkStack::get_default_instance());
+            OnboardNetworkStack &stack = OnboardNetworkStack::get_default_instance(),
+            OlmInterface &olm = OlmInterface::get_default_instance());
 
-    
     static WhdSTAInterface *get_default_instance();
 
     /** Start the interface
@@ -134,12 +150,46 @@ public:
     /* set wifi interface down */
     int wifi_set_down (void );
 
+    /** Set Offload Manager Information
+     *  NOTE: Only allowed while disconnected
+     *
+     * @param  olm      Offload Manager info structure
+     * @return          true if completed successfully
+     *                  false if Interface is connected
+     */
+    int set_olm(OlmInterface *olm) {
+        if (get_connection_status() == NSAPI_STATUS_DISCONNECTED)
+        {
+            _olm = olm;
+            return true;
+        }
+        return false;
+    }
+
+    /** Network stack is suspended
+     *
+     * @return          0 if successful
+     */
+    int net_suspended() {
+        int ret = _olm->sleep();
+        return ret;
+    }
+
+    /** Network stack is resuming
+     *
+     * @return          0 if successful
+     */
+    int net_resuming() {
+        int ret = _olm->wake();
+        return ret;
+    }
 private:
 
     char _ssid[33]; /* The longest possible name (defined in 802.11) +1 for the \0 */
     char _pass[64]; /* The longest allowed passphrase + 1 */
     nsapi_security_t _security;
     WHD_EMAC& _whd_emac;
+    OlmInterface *_olm;
 };
 
 extern int wiced_leave_ap      ( int interface );
