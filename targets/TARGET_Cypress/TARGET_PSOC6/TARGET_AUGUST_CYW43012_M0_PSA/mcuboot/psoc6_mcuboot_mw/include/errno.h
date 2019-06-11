@@ -21,9 +21,10 @@
 extern "C" {
 #endif
 
-
+#if 0 
 extern int *__errno(void);
 #define errno (*__errno())
+#endif /* IAR link error */
 
 /*
  * POSIX Error codes
