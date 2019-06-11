@@ -39,15 +39,13 @@ cy_rslt_t cyhal_adc_init(cyhal_adc_t *obj, cyhal_gpio_t pin)
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_adc_free(cyhal_adc_t *obj)
+void cyhal_adc_free(cyhal_adc_t *obj)
 {
-    return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_adc_read_u16(const cyhal_adc_t *obj, uint16_t *value)
+uint16_t cyhal_adc_read_u16(const cyhal_adc_t *obj)
 {
-    *value = 0;
-    return CY_RSLT_SUCCESS;
+    return 0;
 }
 
 
@@ -57,24 +55,22 @@ cy_rslt_t cyhal_dac_init(cyhal_dac_t *obj, cyhal_gpio_t pin)
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_dac_free(cyhal_dac_t *obj)
+void cyhal_dac_free(cyhal_dac_t *obj)
 {
-    return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_dac_get_max(cyhal_dac_t *obj, uint16_t *millivolts)
+uint16_t cyhal_dac_get_max(cyhal_dac_t *obj)
 {
-    return CY_RSLT_SUCCESS;
+    return 0;
 }
 
-cy_rslt_t cyhal_dac_write(const cyhal_dac_t *obj, uint16_t millivolts)
+void cyhal_dac_write(const cyhal_dac_t *obj, uint16_t millivolts)
 {
-    return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_dac_read(cyhal_dac_t *obj, uint16_t *millivolts)
+uint16_t cyhal_dac_read(cyhal_dac_t *obj)
 {
-    return CY_RSLT_SUCCESS;
+    return 0;
 }
 
 
@@ -84,9 +80,8 @@ cy_rslt_t cyhal_dma_init(cyhal_dma_t *obj, uint8_t priority, cyhal_dma_direction
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_dma_free(cyhal_dma_t *obj)
+void cyhal_dma_free(cyhal_dma_t *obj)
 {
-    return CY_RSLT_SUCCESS;
 }
 
 cy_rslt_t cyhal_dma_setup_transfer(cyhal_dma_t *obj, const cyhal_dma_cfg_t *cfg)
@@ -99,18 +94,15 @@ cy_rslt_t cyhal_dma_start_transfer(cyhal_dma_t *obj)
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_dma_busy(cyhal_dma_t *obj, bool *busy)
+bool cyhal_dma_busy(cyhal_dma_t *obj)
 {
-    *busy = false;
-    return CY_RSLT_SUCCESS;
+    return false;
 }
 
-cy_rslt_t cyhal_dma_register_irq(cyhal_dma_t *obj, cyhal_dma_irq_handler handler, void *handler_arg)
+void cyhal_dma_register_irq(cyhal_dma_t *obj, cyhal_dma_irq_handler handler, void *handler_arg)
 {
-    return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_dma_irq_enable(cyhal_dma_t *obj, cyhal_dma_irq_event_t event, bool enable)
+void cyhal_dma_irq_enable(cyhal_dma_t *obj, cyhal_dma_irq_event_t event, bool enable)
 {
-    return CY_RSLT_SUCCESS;
 }

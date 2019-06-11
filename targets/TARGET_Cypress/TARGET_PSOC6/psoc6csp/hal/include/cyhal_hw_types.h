@@ -121,11 +121,6 @@ typedef struct {
 typedef struct {
 #ifdef CY_IP_M4CPUSS
     cyhal_resource_inst_t       resource;
-    uint32_t                    flashBaseAddr;
-    uint32_t                    flashSize;
-    uint32_t                    sectorSize;
-    uint32_t                    pageSize;
-    uint8_t                     eraseVal;
 #else
     void *empty;
 #endif /* CY_IP_M4CPUSS */
@@ -139,6 +134,7 @@ typedef struct {
     cyhal_gpio_t                        pin_sda;
     cyhal_gpio_t                        pin_scl;
     cyhal_clock_divider_t               clock;
+    bool                                is_shared_clock;
     cy_stc_scb_i2c_context_t            context;
     cy_stc_scb_i2c_master_xfer_config_t rx_config;
     cy_stc_scb_i2c_master_xfer_config_t tx_config;
@@ -201,7 +197,7 @@ typedef struct {
 typedef struct {
 #ifdef CY_IP_MXSMIF
     SMIF_Type*                  base;
-    cyhal_resource_inst_t       resource;   
+    cyhal_resource_inst_t       resource;
     cyhal_gpio_t                pin_io0;
     cyhal_gpio_t                pin_io1;
     cyhal_gpio_t                pin_io2;
@@ -299,10 +295,10 @@ typedef struct {
     cyhal_dma_t                 dma0Ch1;
     cyhal_dma_t                 dma1Ch1;
     cyhal_dma_t                 dma1Ch3;
-    
+
     uint32_t                    frequencyhal_hz;
     uint16_t                    block_size;
-    
+
     stc_sdio_irq_cb_t*          pfuCb;
     uint32_t                    irq_cause;
 #else
@@ -334,6 +330,20 @@ typedef struct {
     void *empty;
 #endif
 } cyhal_spi_t;
+
+/** Callbacks for Sleep and Deepsleep APIs */
+#define cyhal_system_call_back_t cy_stc_syspm_callback_t
+
+/** Enum for clock type to configure. HFCLKs are configured using different APIs and does not using this enum */
+typedef enum
+{
+    CYHAL_SYSTEM_CLOCK_CM4,
+    CYHAL_SYSTEM_CLOCK_CM0,
+    CYHAL_SYSTEM_CLOCK_PERI,
+} cyhal_system_clock_t;
+
+/** Divider for CM4, CM0 and Peri clock. Supports values between [1, 256] */
+typedef uint16_t cyhal_system_divider_t;
 
 /** Timer object */
 typedef struct {

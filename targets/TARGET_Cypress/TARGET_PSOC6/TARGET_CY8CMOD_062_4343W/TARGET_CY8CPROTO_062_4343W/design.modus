@@ -901,6 +901,10 @@
                 </Mux>
             </Netlist>
         </Device>
+        <Device mpn="CYW4343WKUBG">
+            <BlockConfig/>
+            <Netlist/>
+        </Device>
     </Devices>
     <Libraries>
         <Library name="psoc6sw" version="1.2"/>

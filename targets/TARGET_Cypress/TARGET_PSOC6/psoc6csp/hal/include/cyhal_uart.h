@@ -42,7 +42,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "cy_result.h"
-#include "cyhal_implementation.h"
+#include "cyhal_hw_types.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -137,9 +137,8 @@ cy_rslt_t cyhal_uart_init(cyhal_uart_t *obj, cyhal_gpio_t tx, cyhal_gpio_t rx, c
  *  resource management.
  *
  * @param[in,out] obj The uart object
- * @return The status of the free request
  */
-cy_rslt_t cyhal_uart_free(cyhal_uart_t *obj);
+void cyhal_uart_free(cyhal_uart_t *obj);
 
 /** Configure the baud rate
  *
@@ -242,18 +241,16 @@ cy_rslt_t cyhal_uart_rx_asynch(cyhal_uart_t *obj, void *rx, size_t length);
 /** Attempts to determine if the uart peripheral is already in use for TX
  *
  * @param[in]  obj    The uart object
- * @param[out] active Is the TX channel active
- * @return The status of the is_tx_active request
+ * @return Is the TX channel active
  */
-cy_rslt_t cyhal_uart_is_tx_active(cyhal_uart_t *obj, bool *active);
+bool cyhal_uart_is_tx_active(cyhal_uart_t *obj);
 
 /** Attempts to determine if the uart peripheral is already in use for RX
  *
  * @param[in]  obj    The uart object
- * @param[out] active Is the RX channel active
- * @return The status of the is_rx_active request
+ * @return Is the RX channel active
  */
-cy_rslt_t cyhal_uart_is_rx_active(cyhal_uart_t *obj, bool *active);
+bool cyhal_uart_is_rx_active(cyhal_uart_t *obj);
 
 /** Abort the ongoing TX transaction. It disables the enabled interupt for TX and
  *  flushes the TX hardware buffer if TX FIFO is used
@@ -276,18 +273,16 @@ cy_rslt_t cyhal_uart_rx_abort(cyhal_uart_t *obj);
  * @param[in] obj         The uart object
  * @param[in] handler     The callback handler which will be invoked when the interrupt fires
  * @param[in] handler_arg Generic argument that will be provided to the handler when called
- * @return The status of the register_irq request
  */
-cy_rslt_t cyhal_uart_register_irq(cyhal_uart_t *obj, cyhal_uart_irq_handler_t handler, void *handler_arg);
+void cyhal_uart_register_irq(cyhal_uart_t *obj, cyhal_uart_irq_handler_t handler, void *handler_arg);
 
 /** Configure uart interrupt. This function is used for word-approach
  *
  * @param[in] obj      The uart object
  * @param[in] event    The uart IRQ type, this argument supports the bitwise-or of multiple enum flag values
  * @param[in] enable   True to turn on interrupts, False to turn off
- * @return The status of the irq_enable request
  */
-cy_rslt_t cyhal_uart_irq_enable(cyhal_uart_t *obj, cyhal_uart_irq_event_t event, bool enable);
+void cyhal_uart_irq_enable(cyhal_uart_t *obj, cyhal_uart_irq_event_t event, bool enable);
 
 /** \} group_hal_uart_functions */
 

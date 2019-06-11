@@ -2,9 +2,9 @@
 * File Name: cyhal_sdhc.c
 *
 * Description:
-* Provides a high level interface for interacting with the Cypress SDHC. This 
+* Provides a high level interface for interacting with the Cypress SDHC. This
 * is a wrapper around the lower level PDL API.
-* 
+*
 ********************************************************************************
 * \copyright
 * Copyright 2018-2019 Cypress Semiconductor Corporation
@@ -23,26 +23,26 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include <stdlib.h> /* For memcpy */
+#include <string.h> /* For memcpy */
+#include <stdlib.h>
+#include "cy_pdl.h"
+#include "cy_result.h"
 #include "cyhal_sdhc.h"
 #include "cyhal_sdio.h"
-#include "cy_sysint.h"
-#include "cy_sd_host.h"
-#include "cy_gpio.h"
-#include "cy_device.h"
-#include "cy_result.h"
-#include "cyhal_pin_package.h"
+#include "cyhal_gpio.h"
 #include "cyhal_hwmgr.h"
 #include "cyhal_utils.h"
 #include "cyhal_interconnect.h"
+#include "cyhal_implementation.h"
 
 #ifdef CY_IP_MXSDHC
 
+#define CY_HAL_READ_WRITE_RETRY_CYCLES       (100u)    /* Number of cycles for read/write operation complete */
 #define CY_HAL_SDHC_RETRY_TIME               (1000UL)  /* The number loops to make the timeout in msec */
 #define CY_HAL_SDHC_FUJE_TIMEOUT_MS          (1000U)   /* The Fuje timeout for one block */
 #define CY_HAL_SDHC_READ_WRITE_TIMEOUT_MS    (500U)    /* The Read/Write timeout for one block */
 #define CY_HAL_SDHC_OPER_CMPLT_US            (250U)    /* Delay in uS to complete all internal pending operations */
-#define CY_HAL_SDHC_CMD_TIMEOUT_MS           (5U)      /* The Command timeout */
+#define CY_HAL_SDHC_CMD_TIMEOUT_US           (5U)      /* The Command timeout */
 #define CY_HAL_SDHC_TRANSFER_TIMEOUT         (0xCUL)   /* The transfer timeout */
 #define CY_HAL_SDHC_EMMC_TRIM_TIMEOUT        (100U)    /* The EMMC TRIM timeout */
 #ifndef SDIO_ENUMERATION_TIMEOUT_MS
@@ -194,7 +194,7 @@ static cy_en_sd_host_status_t Cy_SD_Host_PollCmdComplete(SDHC_Type *base)
             break;
         }
 
-        Cy_SysLib_DelayUs(CY_HAL_SDHC_CMD_TIMEOUT_MS);
+        Cy_SysLib_DelayUs(CY_HAL_SDHC_CMD_TIMEOUT_US);
         retry--;
     }
 
@@ -219,7 +219,7 @@ static cy_en_sd_host_status_t Cy_SD_Host_PollTransferComplete(SDHC_Type *base);
 static cy_en_sd_host_status_t Cy_SD_Host_PollTransferComplete(SDHC_Type *base)
 {
     cy_en_sd_host_status_t ret = CY_SD_HOST_ERROR_TIMEOUT;
-    uint32_t               retry = CY_HAL_SDHC_RETRY_TIME;
+    uint32_t               retry = CY_HAL_READ_WRITE_RETRY_CYCLES;
     uint32_t               status = 0UL;
 
     while ((CY_SD_HOST_ERROR_TIMEOUT == ret) && (retry-- > 0u))
@@ -240,19 +240,6 @@ static cy_en_sd_host_status_t Cy_SD_Host_PollTransferComplete(SDHC_Type *base)
     }
 
     return ret;
-}
-
-/* Disconnect (interconnect) pin and free it (hwmgr) as resource */
-static cy_rslt_t cyhal_free_pin(cyhal_gpio_t pin)
-{
-    cyhal_resource_inst_t rsc;
-    cy_rslt_t result = cyhal_disconnect_pin(pin);
-    if (CY_RSLT_SUCCESS == result)
-    {
-        rsc = cyhal_utils_get_gpio_resource(pin);
-        result = cyhal_hwmgr_free(&rsc);
-    }
-    return result;
 }
 
 cy_rslt_t cyhal_sdhc_init(cyhal_sdhc_t *obj,
@@ -292,7 +279,7 @@ cy_rslt_t cyhal_sdhc_init(cyhal_sdhc_t *obj,
         pin_rsc = cyhal_utils_get_gpio_resource(cmd);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(cmd, cyhal_pin_map_sdhc_card_cmd);
             result = cyhal_connect_pin(map);
         }
@@ -303,29 +290,29 @@ cy_rslt_t cyhal_sdhc_init(cyhal_sdhc_t *obj,
         pin_rsc = cyhal_utils_get_gpio_resource(clk);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(clk, cyhal_pin_map_sdhc_clk_card);
             result = cyhal_connect_pin(map);
         }
     }
-    
+
     if (result == CY_RSLT_SUCCESS)
     {
         pin_rsc = cyhal_utils_get_gpio_resource(data0);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(data0, cyhal_pin_map_sdhc_card_dat_3to0);
             result = cyhal_connect_pin(map);
         }
     }
-    
+
     if ((NC != data1) && (CY_RSLT_SUCCESS == result))
     {
         pin_rsc = cyhal_utils_get_gpio_resource(data1);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(data1, cyhal_pin_map_sdhc_card_dat_3to0);
             result = cyhal_connect_pin(map);
         }
@@ -336,7 +323,7 @@ cy_rslt_t cyhal_sdhc_init(cyhal_sdhc_t *obj,
         pin_rsc = cyhal_utils_get_gpio_resource(data2);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(data2, cyhal_pin_map_sdhc_card_dat_3to0);
             result = cyhal_connect_pin(map);
         }
@@ -347,7 +334,7 @@ cy_rslt_t cyhal_sdhc_init(cyhal_sdhc_t *obj,
         pin_rsc = cyhal_utils_get_gpio_resource(data3);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(data3, cyhal_pin_map_sdhc_card_dat_3to0);
             result = cyhal_connect_pin(map);
         }
@@ -358,7 +345,7 @@ cy_rslt_t cyhal_sdhc_init(cyhal_sdhc_t *obj,
         pin_rsc = cyhal_utils_get_gpio_resource(data4);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(data4, cyhal_pin_map_sdhc_card_dat_7to4);
             result = cyhal_connect_pin(map);
         }
@@ -369,7 +356,7 @@ cy_rslt_t cyhal_sdhc_init(cyhal_sdhc_t *obj,
         pin_rsc = cyhal_utils_get_gpio_resource(data5);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(data5, cyhal_pin_map_sdhc_card_dat_7to4);
             result = cyhal_connect_pin(map);
         }
@@ -380,7 +367,7 @@ cy_rslt_t cyhal_sdhc_init(cyhal_sdhc_t *obj,
         pin_rsc = cyhal_utils_get_gpio_resource(data6);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(data6, cyhal_pin_map_sdhc_card_dat_7to4);
             result = cyhal_connect_pin(map);
         }
@@ -391,83 +378,83 @@ cy_rslt_t cyhal_sdhc_init(cyhal_sdhc_t *obj,
         pin_rsc = cyhal_utils_get_gpio_resource(data7);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(data7, cyhal_pin_map_sdhc_card_dat_7to4);
             result = cyhal_connect_pin(map);
         }
     }
-    
+
     if ((NC != cardDetect) && (CY_RSLT_SUCCESS == result))
     {
         pin_rsc = cyhal_utils_get_gpio_resource(cardDetect);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(cardDetect, cyhal_pin_map_sdhc_card_detect_n);
             result = cyhal_connect_pin(map);
         }
     }
-    
+
     if ((NC != ioVoltSel) && (CY_RSLT_SUCCESS == result))
     {
         pin_rsc = cyhal_utils_get_gpio_resource(ioVoltSel);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(ioVoltSel, cyhal_pin_map_sdhc_io_volt_sel);
             result = cyhal_connect_pin(map);
         }
     }
-    
+
     if ((NC != cardIfPwrEn) && (CY_RSLT_SUCCESS == result))
     {
         pin_rsc = cyhal_utils_get_gpio_resource(cardIfPwrEn);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(cardIfPwrEn, cyhal_pin_map_sdhc_card_if_pwr_en);
             result = cyhal_connect_pin(map);
         }
     }
-    
+
     if ((NC != cardMechWriteProt) && (CY_RSLT_SUCCESS == result))
     {
         pin_rsc = cyhal_utils_get_gpio_resource(cardMechWriteProt);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(cardMechWriteProt, cyhal_pin_map_sdhc_card_mech_write_prot);
             result = cyhal_connect_pin(map);
         }
     }
-    
+
     if ((NC != ledCtrl) && (CY_RSLT_SUCCESS == result))
     {
         pin_rsc = cyhal_utils_get_gpio_resource(ledCtrl);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(ledCtrl, cyhal_pin_map_sdhc_led_ctrl);
             result = cyhal_connect_pin(map);
         }
     }
-    
+
     if ((NC != cardEmmcReset) && (CY_RSLT_SUCCESS == result))
     {
         pin_rsc = cyhal_utils_get_gpio_resource(cardEmmcReset);
         result = cyhal_hwmgr_reserve(&pin_rsc);
         if (result == CY_RSLT_SUCCESS)
-        {    
+        {
             map = CY_UTILS_GET_RESOURCE(cardEmmcReset, cyhal_pin_map_sdhc_card_emmc_reset_n);
             result = cyhal_connect_pin(map);
         }
     }
-    
+
     if (CY_RSLT_SUCCESS == result)
     {
         /* Enable the SDHC block. */
         Cy_SD_Host_Enable(obj->base);
-    
+
         /* Configure SD Host to operate */
         hostConfig.dmaType = obj->dmaType;
         hostConfig.emmc = obj->emmc;
@@ -477,116 +464,119 @@ cy_rslt_t cyhal_sdhc_init(cyhal_sdhc_t *obj,
     }
 
     if (CY_SD_HOST_SUCCESS != result)
-        {
-            result = CY_RSLT_TYPE_ERROR;
-        }
+    {
+        result = CY_RSLT_TYPE_ERROR;
+    }
     return result;
 }
 
-cy_rslt_t cyhal_sdhc_free(cyhal_sdhc_t *obj)
+void cyhal_sdhc_free(cyhal_sdhc_t *obj)
 {
-    cy_rslt_t result = CY_RSLT_SUCCESS;
-    bool configured = false;
+    Cy_SD_Host_DeInit(obj->base);
+
+    /* Free pins */
+    if (CYHAL_NC_PIN_VALUE != obj->pin_cmd)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_cmd);
+        obj->pin_cmd = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_clk)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_clk);
+        obj->pin_clk = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_data0)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_data0);
+        obj->pin_data0 = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_data1)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_data1);
+        obj->pin_data1 = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_data2)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_data2);
+        obj->pin_data2 = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_data3)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_data3);
+        obj->pin_data3 = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_data4)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_data4);
+        obj->pin_data4 = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_data5)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_data5);
+        obj->pin_data5 = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_data6)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_data6);
+        obj->pin_data6 = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_data7)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_data7);
+        obj->pin_data6 = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_cardDetect)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_cardDetect);
+        obj->pin_cardDetect = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_ioVoltSel)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_ioVoltSel);
+        obj->pin_ioVoltSel = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_cardIfPwrEn)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_cardIfPwrEn);
+        obj->pin_cardIfPwrEn = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_cardMechWriteProt)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_cardMechWriteProt);
+        obj->pin_cardMechWriteProt = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_ledCtrl)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_ledCtrl);
+        obj->pin_ledCtrl = CYHAL_NC_PIN_VALUE;
+    }
+
+    if (CYHAL_NC_PIN_VALUE != obj->pin_cardEmmcReset)
+    {
+        cyhal_utils_disconnect_and_free(obj->pin_cardEmmcReset);
+        obj->pin_cardEmmcReset = CYHAL_NC_PIN_VALUE;
+    }
 
     /* Free SDHC */
     if (CYHAL_RSC_INVALID != obj->resource.type)
     {
-        result = cyhal_hwmgr_free(&obj->resource);
+        cyhal_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
+        cyhal_hwmgr_free(&obj->resource);
     }
-
-    /* Free pins */
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_cmd);
-    }
-
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_clk);
-    }
-
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_data0);
-    }
-
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_data1);
-    }
-
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_data2);
-    }
-
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_data3);
-    }
-
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_data4);
-    }
-
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_data5);
-    }
-    
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_data6);
-    }
-    
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_data7);
-    }
-    
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_cardDetect);
-    }
-    
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_ioVoltSel);
-    }
-    
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_cardIfPwrEn);
-    }
-    
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_cardMechWriteProt);
-    }
-    
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_ledCtrl);
-    }
-    
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_free_pin(obj->pin_cardEmmcReset);
-    }
-
-    Cy_SD_Host_DeInit(obj->base);
-
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_hwmgr_is_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num, &configured);
-        if ((CY_RSLT_SUCCESS == result) && configured)
-        {
-            result = cyhal_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
-        }
-    }
-
-    return result;
 }
 
 cy_rslt_t cyhal_sdhc_configure(cyhal_sdhc_t *obj, const cyhal_sdhc_config_t *config)
@@ -597,11 +587,9 @@ cy_rslt_t cyhal_sdhc_configure(cyhal_sdhc_t *obj, const cyhal_sdhc_config_t *con
     cy_en_sd_host_card_capacity_t cardCapacity;
     uint32_t rca = 0UL;
     cy_en_sd_host_card_type_t cardType = CY_SD_HOST_UNUSABLE;
-    bool configured = false;
 
-    ret = cyhal_hwmgr_is_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num, &configured);
-    
-    if ((CY_RSLT_SUCCESS == ret) && !configured)
+    bool configured = cyhal_hwmgr_is_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
+    if (!configured)
     {
         /** Initialize the SDIO/SD/eMMC card configuration structure */
         stcSdcardCfg.lowVoltageSignaling = config->lowVoltageSignaling;
@@ -612,14 +600,9 @@ cy_rslt_t cyhal_sdhc_configure(cyhal_sdhc_t *obj, const cyhal_sdhc_config_t *con
 
         /** Initialize the card */
         driverRet = Cy_SD_Host_InitCard(obj->base, &stcSdcardCfg, &obj->context);
-        if ((CY_SD_HOST_SUCCESS != driverRet) && (ret == CY_RSLT_SUCCESS))
-        {
-            ret = CY_RSLT_TYPE_ERROR;
-        }
-        else
-        {
-            ret = cyhal_hwmgr_set_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
-        }
+        ret = ((CY_SD_HOST_SUCCESS != driverRet) && (ret == CY_RSLT_SUCCESS))
+            ? CY_RSLT_TYPE_ERROR
+            : cyhal_hwmgr_set_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
     }
     return ret;
 }
@@ -682,7 +665,7 @@ cy_rslt_t cyhal_sdhc_write(const cyhal_sdhc_t *obj, uint32_t address, const uint
     dataConfig.dataTimeout = CY_HAL_SDHC_TRANSFER_TIMEOUT;  /* The timeout value for the transfer. */
     dataConfig.enReliableWrite = false; /* For EMMC cards enable reliable write. */
     dataConfig.enableDma = true;
-    
+
     driverRet = Cy_SD_Host_Write(obj->base, &dataConfig, &obj->context);
 
     if (CY_SD_HOST_SUCCESS != driverRet)
@@ -773,11 +756,9 @@ cy_rslt_t cyhal_sdhc_write_async(const cyhal_sdhc_t *obj, uint32_t address, cons
     return ret;
 }
 
-cy_rslt_t cyhal_sdhc_is_busy(const cyhal_sdhc_t *obj, bool *busy)
+bool cyhal_sdhc_is_busy(const cyhal_sdhc_t *obj)
 {
-    *busy = (CY_SD_HOST_XFER_COMPLETE != (CY_SD_HOST_XFER_COMPLETE & Cy_SD_Host_GetNormalInterruptStatus(obj->base)));
-
-    return CY_RSLT_SUCCESS;
+    return (CY_SD_HOST_XFER_COMPLETE != (CY_SD_HOST_XFER_COMPLETE & Cy_SD_Host_GetNormalInterruptStatus(obj->base)));
 }
 
 cy_rslt_t cyhal_sdhc_abort_async(const cyhal_sdhc_t *obj)
@@ -786,7 +767,7 @@ cy_rslt_t cyhal_sdhc_abort_async(const cyhal_sdhc_t *obj)
     cy_en_sd_host_status_t driverRet;
 
     driverRet = Cy_SD_Host_AbortTransfer(obj->base, &obj->context);
-    
+
     if (CY_SD_HOST_SUCCESS != driverRet)
     {
         ret = CY_RSLT_TYPE_ERROR;
@@ -795,10 +776,11 @@ cy_rslt_t cyhal_sdhc_abort_async(const cyhal_sdhc_t *obj)
     return ret;
 }
 
-cy_rslt_t cyhal_sdhc_register_irq(cyhal_sdhc_t *obj, cyhal_sdhc_irq_handler handler, void *handler_arg)
+void cyhal_sdhc_register_irq(cyhal_sdhc_t *obj, cyhal_sdhc_irq_handler handler, void *handler_arg)
 {
-    cy_rslt_t ret = CY_RSLT_SUCCESS;
-    IRQn_Type irqn = CY_SDHC_IRQ_N[obj->resource.block_num];
+    IRQn_Type irqn = (obj->base == SDHC1)
+        ? sdhc_0_interrupt_general_IRQn
+        : sdhc_1_interrupt_general_IRQn;
 
     /* Only enable if it's not already enabled */
     if (NVIC_GetEnableIRQ(irqn) == 0)
@@ -811,21 +793,18 @@ cy_rslt_t cyhal_sdhc_register_irq(cyhal_sdhc_t *obj, cyhal_sdhc_irq_handler hand
     else
     {
         NVIC_SetPriority(irqn, SDHC_IRQ_PRIORITY);
-    }   
-
-    return ret;
+    }
 }
 
-cy_rslt_t cyhal_sdhc_irq_enable(cyhal_sdhc_t *obj, cyhal_sdhc_irq_event_t event, bool enable)
+void cyhal_sdhc_irq_enable(cyhal_sdhc_t *obj, cyhal_sdhc_irq_event_t event, bool enable)
 {
-    cy_rslt_t ret = CY_RSLT_SUCCESS;
     uint32_t interruptMask;
     uint32_t interruptEnable;
 
     interruptEnable = Cy_SD_Host_GetNormalInterruptEnable(obj->base);
     interruptMask = Cy_SD_Host_GetNormalInterruptMask(obj->base);
 
-    if(enable == true) 
+    if(enable == true)
     {
         /* Enable specific interrupt */
         if(event < CYHAL_SDHC_ERR_INTERRUPT)
@@ -875,8 +854,6 @@ cy_rslt_t cyhal_sdhc_irq_enable(cyhal_sdhc_t *obj, cyhal_sdhc_irq_event_t event,
 
     Cy_SD_Host_SetNormalInterruptMask(obj->base, interruptMask);
     Cy_SD_Host_SetNormalInterruptEnable(obj->base, interruptEnable);
-
-    return ret;
 }
 
 cy_rslt_t cyhal_sdio_init(cyhal_sdio_t *obj, cyhal_gpio_t cmd, cyhal_gpio_t clk, cyhal_gpio_t data0, cyhal_gpio_t data1, cyhal_gpio_t data2, cyhal_gpio_t data3)
@@ -1015,16 +992,7 @@ cy_rslt_t cyhal_sdio_init(cyhal_sdio_t *obj, cyhal_gpio_t cmd, cyhal_gpio_t clk,
         result = cyhal_hwmgr_reserve(&sdhc);
         if (result == CY_RSLT_SUCCESS)
         {
-            bool configured = false;
-
-            if (result == CY_RSLT_SUCCESS)
-            {
-                result = cyhal_hwmgr_is_configured(obj->resource.type,
-                                                   obj->resource.block_num, 
-                                                   obj->resource.channel_num, 
-                                                   &configured);
-            }
-
+            bool configured = cyhal_hwmgr_is_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
             if (result == CY_RSLT_SUCCESS && !configured)
             {
                 /* Set HF CL to 100MHz */
@@ -1097,64 +1065,58 @@ cy_rslt_t cyhal_sdio_init(cyhal_sdio_t *obj, cyhal_gpio_t cmd, cyhal_gpio_t clk,
     return result;
 }
 
-cy_rslt_t cyhal_sdio_free(cyhal_sdio_t *obj)
+void cyhal_sdio_free(cyhal_sdio_t *obj)
 {
-    cy_rslt_t result = CY_RSLT_SUCCESS;
-
-    if (NULL == obj)
-    {
-        return CYHAL_SDIO_RSLT_ERR_BAD_PARAM;
-    }
-
+    cy_rslt_t result;
+    CY_ASSERT(NULL != obj);
     if ((NULL != obj->base) && (obj->resource.type != CYHAL_RSC_INVALID))
     {
         Cy_SD_Host_DeInit(obj->base);
-        result = cyhal_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
-        
-        if (result == CY_RSLT_SUCCESS)
-        {
-            result = cyhal_hwmgr_free(&(obj->resource));
-        }
 
-        if (result == CY_RSLT_SUCCESS)
-        {
-            obj->base = NULL;
-            obj->resource.type = CYHAL_RSC_INVALID;
-        }
+        result = cyhal_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
+        CY_ASSERT(CY_RSLT_SUCCESS == result);
+        
+        cyhal_hwmgr_free(&(obj->resource));
+        obj->base = NULL;
+        obj->resource.type = CYHAL_RSC_INVALID;
     }
 
     /* Free pins */
-    if ((obj->pin_clk != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    if (obj->pin_clk != SDIO_PINS_NC)
     {
-        result = cyhal_free_pin(obj->pin_clk);
+        cyhal_utils_disconnect_and_free(obj->pin_clk);
+        obj->pin_clk = SDIO_PINS_NC;
     }
     
-    if ((obj->pin_cmd != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    if (obj->pin_cmd != SDIO_PINS_NC)
     {
-        result = cyhal_free_pin(obj->pin_cmd);
+        cyhal_utils_disconnect_and_free(obj->pin_cmd);
+        obj->pin_cmd = SDIO_PINS_NC;
     }
 
-    if ((obj->pin_data0 != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    if (obj->pin_data0 != SDIO_PINS_NC)
     {
-        result = cyhal_free_pin(obj->pin_data0);
+        cyhal_utils_disconnect_and_free(obj->pin_data0);
+        obj->pin_data0 = SDIO_PINS_NC;
     }
     
-    if ((obj->pin_data1 != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    if (obj->pin_data1 != SDIO_PINS_NC)
     {
-        result = cyhal_free_pin(obj->pin_data1);
+        cyhal_utils_disconnect_and_free(obj->pin_data1);
+        obj->pin_data1 = SDIO_PINS_NC;
     }
     
-    if ((obj->pin_data2 != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    if (obj->pin_data2 != SDIO_PINS_NC)
     {
-        result = cyhal_free_pin(obj->pin_data2);
+        cyhal_utils_disconnect_and_free(obj->pin_data2);
+        obj->pin_data2 = SDIO_PINS_NC;
     }
 
-    if ((obj->pin_data3 != SDIO_PINS_NC) && (result == CY_RSLT_SUCCESS))
+    if (obj->pin_data3 != SDIO_PINS_NC)
     {
-        result = cyhal_free_pin(obj->pin_data3);
+        cyhal_utils_disconnect_and_free(obj->pin_data3);
+        obj->pin_data3 = SDIO_PINS_NC;
     }
-
-    return result;
 }
 
 
@@ -1529,17 +1491,9 @@ cy_rslt_t cyhal_sdio_transfer_async(cyhal_sdio_t *obj, cyhal_transfer_t directio
     return ret;
 }
 
-
-cy_rslt_t cyhal_sdio_is_busy(const cyhal_sdio_t *obj, bool *busy)
+bool cyhal_sdio_is_busy(const cyhal_sdio_t *obj)
 {
-    if (NULL == obj)
-    {
-        return CYHAL_SDIO_RSLT_ERR_BAD_PARAM;
-    }
-    
-    *busy = isTransferInProcess;
-
-    return CY_RSLT_SUCCESS;
+    return isTransferInProcess;
 }
 
 
@@ -1629,10 +1583,8 @@ static void isr_sdio_1_handler (void)
     isr_sdio_handler(1, SDHC1);
 }
 
-
-cy_rslt_t cyhal_sdio_register_irq(cyhal_sdio_t *obj, cyhal_sdio_irq_handler handler, void *handler_arg)
+void cyhal_sdio_register_irq(cyhal_sdio_t *obj, cyhal_sdio_irq_handler handler, void *handler_arg)
 {
-    cy_rslt_t ret = CY_RSLT_SUCCESS;
     uint8_t index = obj->resource.block_num;
 
     IRQn_Type irqn = CY_SDHC_IRQ_N[index];
@@ -1652,21 +1604,14 @@ cy_rslt_t cyhal_sdio_register_irq(cyhal_sdio_t *obj, cyhal_sdio_irq_handler hand
     {
         NVIC_SetPriority(irqn, SDIO_IRQ_PRIORITY);
     }
-
-    return ret;
 }
 
-
-cy_rslt_t cyhal_sdio_irq_enable(cyhal_sdio_t *obj, cyhal_sdio_irq_event_t event, bool enable)
+void cyhal_sdio_irq_enable(cyhal_sdio_t *obj, cyhal_sdio_irq_event_t event, bool enable)
 {
-    cy_rslt_t ret = CY_RSLT_SUCCESS;
-    uint32_t interruptMask;
-    uint32_t interruptEnable;
+    uint32_t interruptEnable = Cy_SD_Host_GetNormalInterruptEnable(obj->base);
+    uint32_t interruptMask = Cy_SD_Host_GetNormalInterruptMask(obj->base);
 
-    interruptEnable = Cy_SD_Host_GetNormalInterruptEnable(obj->base);
-    interruptMask = Cy_SD_Host_GetNormalInterruptMask(obj->base);
-
-    if(enable)
+    if (enable)
     {
         interruptEnable |= event;
         interruptMask   |= event;
@@ -1683,8 +1628,6 @@ cy_rslt_t cyhal_sdio_irq_enable(cyhal_sdio_t *obj, cyhal_sdio_irq_event_t event,
 
     Cy_SD_Host_SetNormalInterruptMask(obj->base, interruptMask);
     Cy_SD_Host_SetNormalInterruptEnable(obj->base, interruptEnable);
-
-    return ret;
 }
 
 

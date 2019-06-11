@@ -6,6 +6,13 @@ before_script:
   - whoami
   - set
 
+astyle:
+  stage: build
+  tags:
+    - mti-win10
+  script:
+    - bash -ex cy-astyle.sh
+
 ##############################################################################
 # Win10 - ARM, GCC_ARM and IAR
 ##############################################################################

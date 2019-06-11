@@ -25,8 +25,7 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "cyhal_rtc.h"
-#include "cyhal_hwmgr.h"
+#include "cyhal_implementation.h"
 #include "cy_rtc.h"
 
 #if defined(__cplusplus)
@@ -107,15 +106,14 @@ cy_rslt_t cyhal_rtc_init(cyhal_rtc_t *obj)
     return rslt;
 }
 
-cy_rslt_t cyhal_rtc_free(cyhal_rtc_t *obj)
+void cyhal_rtc_free(cyhal_rtc_t *obj)
 {
     Cy_RTC_SetInterruptMask(CY_RTC_INTR_CENTURY);
-    return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_rtc_is_enabled(cyhal_rtc_t *obj)
+bool cyhal_rtc_is_enabled(cyhal_rtc_t *obj)
 {
-    return cyhal_rtc_initialized == CY_RTC_STATE_TIME_SET ? CY_RSLT_SUCCESS : CY_RSLT_RTC_NOT_INITIALIZED;
+    return (cyhal_rtc_initialized == CY_RTC_STATE_TIME_SET);
 }
 
 cy_rslt_t cyhal_rtc_read(cyhal_rtc_t *obj, struct tm *time)
@@ -193,20 +191,18 @@ cy_rslt_t cyhal_rtc_alarm(cyhal_rtc_t *obj, const struct tm *time)
     return (cy_rslt_t)Cy_RTC_SetAlarmDateAndTime(&alarm, CY_RTC_ALARM_1);
 }
 
-cy_rslt_t cyhal_rtc_register_irq(cyhal_rtc_t *obj, cyhal_rtc_irq_handler handler, void *handler_arg)
+void cyhal_rtc_register_irq(cyhal_rtc_t *obj, cyhal_rtc_irq_handler handler, void *handler_arg)
 {
     uint32_t savedIntrStatus = cyhal_system_critical_section_enter();
     cyhal_rtc_handler_arg = handler_arg;
     cyhal_rtc_user_handler = handler;
     cyhal_system_critical_section_exit(savedIntrStatus);
-    return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_rtc_irq_enable(cyhal_rtc_t *obj, cyhal_rtc_irq_event_t event, bool enable)
+void cyhal_rtc_irq_enable(cyhal_rtc_t *obj, cyhal_rtc_irq_event_t event, bool enable)
 {
     Cy_RTC_ClearInterrupt(CY_RTC_INTR_ALARM1 | CY_RTC_INTR_ALARM2);
     Cy_RTC_SetInterruptMask((enable ? CY_RTC_INTR_ALARM1 : 0) | CY_RTC_INTR_CENTURY);
-    return CY_RSLT_SUCCESS;
 }
 
 #if defined(__cplusplus)

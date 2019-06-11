@@ -430,14 +430,9 @@ cy_rslt_t cyhal_usb_dev_init(cyhal_usb_dev_t *obj, cyhal_gpio_t dp, cyhal_gpio_t
         obj->base = CYHAL_USB_DEV_BASE_ADDRESSES[idx];
     }
 
-    bool configured = false;
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cyhal_hwmgr_is_configured(obj->resource.type, 
+    bool configured = cyhal_hwmgr_is_configured(obj->resource.type, 
                                            obj->resource.block_num, 
-                                           obj->resource.channel_num, 
-                                           &configured);
-    }
+                                           obj->resource.channel_num);
 
     if ((CY_RSLT_SUCCESS == result) && !configured)
     {

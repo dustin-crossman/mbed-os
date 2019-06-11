@@ -26,9 +26,9 @@
 *******************************************************************************/
 
 #include "cy_device_headers.h"
-#include "cyhal_hw_types.h"
 
 #if defined(_GPIO_PSOC6_01_80_WLCSP_H_)
+#include "cyhal_hw_types.h"
 #include "pin_packages/cyhal_psoc6_01_80_wlcsp.h"
 
 /* Hardware Blocks */
