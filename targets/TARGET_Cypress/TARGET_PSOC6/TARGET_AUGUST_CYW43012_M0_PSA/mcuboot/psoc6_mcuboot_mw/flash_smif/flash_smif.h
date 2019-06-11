@@ -28,8 +28,7 @@ extern "C" {
 
 #define IS_FLASH_SMIF(x) ((x)>=(smifMemConfigs[0]->baseAddress-FLASH_DEVICE_BASE))
 
-/* Create context for peripheral operation */
-cy_stc_smif_context_t QSPIContext;
+extern cy_stc_smif_context_t QSPIContext;
 
 void Flash_SMIF_Interrupt_User(void);
 
