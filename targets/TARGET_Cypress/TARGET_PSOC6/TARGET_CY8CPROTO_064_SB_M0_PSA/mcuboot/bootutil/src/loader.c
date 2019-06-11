@@ -748,7 +748,7 @@ boot_validate_slot(int slot)
     struct cy_image_header *hdr;
     int rc;
 
-    hdr = boot_img_hdr(&boot_data, slot);
+    hdr = (struct cy_image_header *)boot_img_hdr(&boot_data, slot);
     if (hdr->ih_magic == 0xffffffff || (hdr->ih_flags & IMAGE_F_NON_BOOTABLE)) {
         /* No bootable image in slot; continue booting from slot 0. */
         return CY_BOOTLDR_GENERIC_ERROR;
@@ -771,9 +771,9 @@ boot_validate_slot(int slot)
 #endif
 
 #if defined(MCUBOOT_USE_FLASHBOOT_CRYPTO)
-    if ((hdr->ih_magic != IMAGE_MAGIC || boot_image_check(hdr, fap, slot) != 0)) {
+    if ((hdr->ih_magic != IMAGE_MAGIC || boot_image_check((struct image_header *)hdr, fap, slot) != 0)) {
 #else
-    if ((hdr->ih_magic != IMAGE_MAGIC || boot_image_check(hdr, fap) != 0)) {
+    if ((hdr->ih_magic != IMAGE_MAGIC || boot_image_check((struct image_header *)hdr, fap) != 0)) {
 #endif
         if (slot != 0) {
             flash_area_erase(fap, 0, fap->fa_size);
