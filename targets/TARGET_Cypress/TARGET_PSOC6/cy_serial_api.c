@@ -216,7 +216,7 @@ void serial_pinout_tx(PinName tx)
 void serial_set_flow_control(serial_t *obj, FlowControl type, PinName rxflow, PinName txflow)
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
-    if (CY_RSLT_SUCCESS != cyhal_uart_set_flow_control(&(ser->hal_obj), rxflow, txflow)) {
+    if (CY_RSLT_SUCCESS != cyhal_uart_set_flow_control(&(ser->hal_obj), txflow, rxflow)) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SERIAL, MBED_ERROR_FAILED_OPERATION), "serial_set_flow_control");
     }
     ser->pin_rts = rxflow;
