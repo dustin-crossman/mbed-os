@@ -33,6 +33,8 @@
 ***************************************************************************/
 cy_stc_scb_uart_context_t UART_context;
 cy_stc_smif_context_t SMIF_context;
+/* Create context for peripheral operation */
+cy_stc_smif_context_t QSPIContext;
 
 /*******************************************************************************
 * Function Name: SMIF_Interrupt_User

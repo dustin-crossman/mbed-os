@@ -21,8 +21,7 @@
 extern "C" {
 #endif
 
-
-extern int *__errno(void);
+int *__errno(void);
 #define errno (*__errno())
 
 /*
