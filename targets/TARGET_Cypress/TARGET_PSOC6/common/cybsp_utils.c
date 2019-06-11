@@ -256,8 +256,11 @@ static void cy_enable_oob_intr(whd_driver_t whd_driver, const whd_variant_t intr
     /* assert(CY_SDIO_BUS_USE_OOB_INTR != 0) */
     (void)whd_driver;
     (void)intr;
-    cyhal_gpio_irq_enable(CY_WIFI_HOST_WAKE_GPIO, CY_WIFI_HOST_WAKE_IRQ_EVENT,
-                          (whd_enable == WHD_TRUE) ? true : false);
+    //TODO: This needs to be enabled in the WHD after the rtos is initialized. The current location where this is called
+    //causes a crash in the interrupt handler since it tries to set data on the thread before it is initialized. 
+    //Need to review where this should be called in the WHD.
+    // cyhal_gpio_irq_enable(CY_WIFI_HOST_WAKE_GPIO, CY_WIFI_HOST_WAKE_IRQ_EVENT,
+    //                       (whd_enable == WHD_TRUE) ? true : false);
 }
 
 static void cy_get_intr_config(whd_driver_t whd_driver, const whd_variant_t intr, whd_intr_config_t *config)

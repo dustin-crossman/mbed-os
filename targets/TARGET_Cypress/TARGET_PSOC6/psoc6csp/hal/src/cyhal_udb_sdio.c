@@ -519,8 +519,6 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     }
 
     status = SDIO_SendCommandAndWait(&cmd);
-    Cy_SysLib_DelayUs(30);
-    __DSB();
 
     /* Wait until operation is complete on both sides */
     Cy_SysLib_DelayUs(OPERATION_CMPLT_DELAY_US);
@@ -534,11 +532,6 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     if(retVal == CY_RSLT_SUCCESS && length >= obj->block_size && cmd.bRead)
     {
         memcpy((uint8_t *)data, tempBuffer, (size_t)length);
-    }
-    
-    if (tempBuffer != NULL)
-    {
-        free(tempBuffer);
     }
 
     if (response != NULL)
