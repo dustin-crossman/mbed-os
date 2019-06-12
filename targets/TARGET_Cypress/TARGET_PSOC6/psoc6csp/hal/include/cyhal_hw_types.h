@@ -72,10 +72,17 @@ typedef struct {
 #ifdef CY_IP_MXS40PASS_SAR
     SAR_Type*                   base;
     cyhal_resource_inst_t       resource;
-    cyhal_gpio_t                pin;
     cyhal_clock_divider_t       clock;
 #endif
 } cyhal_adc_t;
+
+/** ADC channel object */
+typedef struct {
+#ifdef CY_IP_MXS40PASS_SAR
+    cyhal_adc_t*                adc;
+    cyhal_gpio_t                pin;
+#endif
+} cyhal_adc_channel_t;
 
 /** Comparator object */
 typedef struct {

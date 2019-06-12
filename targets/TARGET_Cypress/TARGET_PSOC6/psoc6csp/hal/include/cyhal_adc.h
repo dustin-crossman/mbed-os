@@ -32,7 +32,8 @@
 * High level interface for interacting with the Cypress ADC.
 *
 * \defgroup group_hal_adc_macros Macros
-* \defgroup group_hal_adc_functions Functions
+* \defgroup group_hal_adc_functions ADC Functions
+* \defgroup group_hal_adc_channel_functions ADC Channel Functions
 * \defgroup group_hal_adc_data_structures Data Structures
 * \defgroup group_hal_adc_enums Enumerated Types
 */
@@ -54,7 +55,7 @@ extern "C" {
 */
 
 /** Maximum value that the ADC can return */
-#define CY_ADC_MAX_VALUE 0x0FFF
+#define CYHAL_ADC_MAX_VALUE 0x0FFF
 
 /** \} group_hal_adc_macros */
 
@@ -64,14 +65,14 @@ extern "C" {
 * \{
 */
 
-/** Initialize the adc peripheral
+/** Initialize adc peripheral
  *
- * Configures the pin used by adc.
  * @param[out] obj The adc object to initialize
  * @param[in]  pin The adc pin name
+ * @param[in]  clk The clock to use can be shared, if not provided a new clock will be allocated
  * @return The status of the init request
  */
-cy_rslt_t cyhal_adc_init(cyhal_adc_t *obj, cyhal_gpio_t pin);
+cy_rslt_t cyhal_adc_init(cyhal_adc_t *obj, cyhal_gpio_t pin, const cyhal_clock_divider_t *clk);
 
 /** Uninitialize the adc peripheral and cyhal_adc_t object
  *
@@ -79,14 +80,37 @@ cy_rslt_t cyhal_adc_init(cyhal_adc_t *obj, cyhal_gpio_t pin);
  */
 void cyhal_adc_free(cyhal_adc_t *obj);
 
-/** Read the value from adc pin, represented as an unsigned 16bit value
+/** \} group_hal_adc_functions */
+
+/**
+* \addtogroup group_hal_adc_channel_functions
+* \{
+*/
+
+/** Initialize a single-ended adc channel. 
+ *
+ * Configures the pin used by adc.
+ * @param[out] obj The adc channel object to initialize
+ * @param[in]  adc The adc for which the channel should be initialized
+ * @param[in]  pin The adc pin name
+ * @return The status of the init request
+ */
+cy_rslt_t cyhal_adc_channel_init(cyhal_adc_channel_t *obj, cyhal_adc_t* adc, cyhal_gpio_t pin);
+
+/** Uninitialize the adc channel and cyhal_adc_channel_t object
+ *
+ * @param[in,out] obj The adc channel object
+ */
+void cyhal_adc_channel_free(cyhal_adc_channel_t *obj);
+
+/** Read the value from adc pin, represented as an unsigned 16bit value.
  *
  * @param[in] obj The adc object
  * @return An unsigned 16bit value representing the current input voltage
  */
-uint16_t cyhal_adc_read_u16(const cyhal_adc_t *obj);
+uint16_t cyhal_adc_read_u16(const cyhal_adc_channel_t *obj);
 
-/** \} group_hal_adc_functions */
+/** \} group_hal_adc_channel_functions */
 
 #if defined(__cplusplus)
 }
