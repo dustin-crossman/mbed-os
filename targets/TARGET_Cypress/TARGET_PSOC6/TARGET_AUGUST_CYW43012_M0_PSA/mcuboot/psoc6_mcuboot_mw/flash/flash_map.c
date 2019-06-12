@@ -66,7 +66,7 @@
 #include <sysflash/sysflash.h>
 
 #include <stddef.h>	/* offsetof() */
-#include <errno.h>	/* EINVAL */
+#include <mcuboot_errno.h>	/* EINVAL */
 
 #include "bootutil/bootutil_log.h"
 
