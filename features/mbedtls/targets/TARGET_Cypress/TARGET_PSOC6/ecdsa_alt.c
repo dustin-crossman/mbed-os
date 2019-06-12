@@ -17,6 +17,12 @@
  *  limitations under the License.
  */
 
+/*
+ * \file     ecdsa_alt.c
+ * \version  1.0
+ *
+ */
+
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
 #else

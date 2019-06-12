@@ -19,6 +19,7 @@
 
 /**
  * \file     sha1_alt.c
+ * \version  1.0
  *
  * \brief    Source file - wrapper for mbedtls SHA1 HW acceleration
  *
@@ -38,10 +39,17 @@
 
 #include <string.h>
 
+/* Parameter validation macros based on platform_util.h */
+#define SHA1_VALIDATE_RET(cond)                             \
+    MBEDTLS_INTERNAL_VALIDATE_RET( cond, MBEDTLS_ERR_SHA1_BAD_INPUT_DATA )
+#define SHA1_VALIDATE(cond)  MBEDTLS_INTERNAL_VALIDATE( cond )
+
 #if defined(MBEDTLS_SHA1_ALT)
 
 void mbedtls_sha1_init( mbedtls_sha1_context *ctx )
 {
+    SHA1_VALIDATE( ctx == NULL );
+
     cy_hw_sha_init(ctx, sizeof( mbedtls_sha1_context ));
 }
 
@@ -57,6 +65,9 @@ void mbedtls_sha1_free( mbedtls_sha1_context *ctx )
 
 void mbedtls_sha1_clone( mbedtls_sha1_context *dst, const mbedtls_sha1_context *src )
 {
+    SHA1_VALIDATE( dst != NULL );
+    SHA1_VALIDATE( src != NULL );
+
     cy_hw_sha_clone(dst, src, sizeof(mbedtls_sha1_context), &dst->hashState, &dst->shaBuffers);
 }
 
@@ -65,6 +76,8 @@ void mbedtls_sha1_clone( mbedtls_sha1_context *dst, const mbedtls_sha1_context *
  */
 int mbedtls_sha1_starts_ret( mbedtls_sha1_context *ctx )
 {
+    SHA1_VALIDATE_RET( ctx != NULL );
+
     return cy_hw_sha_start(&ctx->hashState, CY_CRYPTO_MODE_SHA1, &ctx->shaBuffers);
 }
 
@@ -75,6 +88,9 @@ int mbedtls_sha1_update_ret( mbedtls_sha1_context *ctx,
                              const unsigned char *input,
                              size_t ilen )
 {
+    SHA1_VALIDATE_RET( ctx != NULL );
+    SHA1_VALIDATE_RET( ilen == 0 || input != NULL );
+
     return cy_hw_sha_update(&ctx->hashState, input, ilen);
 }
 
@@ -83,11 +99,17 @@ int mbedtls_sha1_update_ret( mbedtls_sha1_context *ctx,
  */
 int mbedtls_sha1_finish_ret( mbedtls_sha1_context *ctx, unsigned char output[20])
 {
-     return cy_hw_sha_finish(&ctx->hashState, output);
+    SHA1_VALIDATE_RET( ctx != NULL );
+    SHA1_VALIDATE_RET( (unsigned char *)output != NULL );
+
+    return cy_hw_sha_finish(&ctx->hashState, output);
 }
 
 int mbedtls_internal_sha1_process( mbedtls_sha1_context *ctx, const unsigned char data[64] )
 {
+    SHA1_VALIDATE_RET( ctx != NULL );
+    SHA1_VALIDATE_RET( (const unsigned char *)data != NULL );
+
     return cy_hw_sha_process(&ctx->hashState, data);
 }
 
