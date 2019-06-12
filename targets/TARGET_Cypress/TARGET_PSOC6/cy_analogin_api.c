@@ -18,6 +18,7 @@
 #include "analogin_api.h"
 #include "mbed_error.h"
 #include "cyhal_adc.h"
+#include "cyhal_utils.h"
 
 #if DEVICE_ANALOGIN
 
@@ -27,19 +28,23 @@ extern "C" {
 
 void analogin_init(analogin_t *obj, PinName pin)
 {
-    if (CY_RSLT_SUCCESS != cyhal_adc_init(&(obj->hal_adc), pin)) {
+    if (CY_RSLT_SUCCESS != cyhal_adc_init(&(obj->hal_adc), pin, NULL)) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_ANALOG, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_adc_init");
+    }
+
+    if (CY_RSLT_SUCCESS != cyhal_adc_channel_init(&(obj->hal_adc_channel), &(obj->hal_adc), pin)) {
+        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_ANALOG, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_adc_channel_init");
     }
 }
 
 float analogin_read(analogin_t *obj)
 {
-    return analogin_read_u16(obj) * (1.0f / (1.0f + CY_ADC_MAX_VALUE));
+    return analogin_read_u16(obj) * (1.0f / (1.0f + CYHAL_ADC_MAX_VALUE));
 }
 
 uint16_t analogin_read_u16(analogin_t *obj)
 {
-    return cyhal_adc_read_u16(&(obj->hal_adc));
+    return cyhal_adc_read_u16(&(obj->hal_adc_channel));
 }
 
 const PinMap *analogin_pinmap(void)
