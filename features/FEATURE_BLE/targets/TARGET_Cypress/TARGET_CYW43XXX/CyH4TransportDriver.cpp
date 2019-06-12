@@ -56,12 +56,10 @@ void CyH4TransportDriver::initialize()
         SerialBase::RxIrq
     );
 
-#if (defined(MBED_TICKLESS) && DEVICE_SLEEP && DEVICE_LPTICKER)
     //Register IRQ for Host WAKE
     host_wake_pin = new InterruptIn(bt_host_wake_name);
     host_wake_pin->fall(callback(this, &CyH4TransportDriver::bt_host_wake_irq_handler));
 
-#endif
     bt_device_wake = 0;
     sleep_manager_unlock_deep_sleep();
 }
