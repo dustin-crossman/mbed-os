@@ -319,6 +319,7 @@ typedef struct {
     cy_en_scb_spi_mode_t        ms_mode;
     cy_en_scb_spi_sclk_mode_t   clk_mode;
     uint8_t                     data_bits;
+    bool                        is_slave;
     cy_stc_scb_spi_context_t    context;
     uint32_t                    irq_cause;
     uint16_t                    pending;
@@ -326,6 +327,7 @@ typedef struct {
     uint32_t                    rx_buffer_size;
     void                        *tx_buffer;
     uint32_t                    tx_buffer_size;
+    bool                        is_async;
 #else
     void *empty;
 #endif
