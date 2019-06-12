@@ -75,11 +75,6 @@
                         "type": "SRAM_SPM_PRIV",
                         "address": 134348800,
                         "size": 65536
-                    },
-                    {
-                        "type": "SRAM_DAP",
-                        "address": 134397952,
-                        "size": 16384
                     }
                 ]
             },
@@ -125,12 +120,12 @@
                     {
                         "type": "BOOT",
                         "address": 268435456,
-                        "size": 196608
+                        "size": 524288
                     },
                     {
                         "type": "UPGRADE",
-                        "address": 268632064,
-                        "size": 1024
+                        "address": 402653184,
+                        "size": 524288
                     }
                 ]
             }
