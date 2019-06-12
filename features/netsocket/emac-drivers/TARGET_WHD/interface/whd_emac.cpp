@@ -223,7 +223,7 @@ void cy_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer)
 {
     emac_mem_buf_t *mem_buf = NULL;
 
-    WHD_EMAC &emac = WHD_EMAC::get_instance();
+    WHD_EMAC &emac = WHD_EMAC::get_instance(ifp->role);
 
     if (!emac.powered_up && !emac.emac_link_input_cb) {
         // ignore any trailing packets

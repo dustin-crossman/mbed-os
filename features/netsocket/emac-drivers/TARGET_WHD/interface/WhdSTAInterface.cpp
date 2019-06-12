@@ -51,7 +51,7 @@ static whd_scan_result_t *result_ptr = &internal_scan_result;
 extern "C" void whd_emac_wifi_link_state_changed(bool state_up, whd_interface_t ifp);
 
 
-static int whd_toerror(whd_result_t res) {
+int whd_toerror(whd_result_t res) {
     switch (res) {
         case WHD_SUCCESS:                       return NSAPI_ERROR_OK;
         case WHD_UNSUPPORTED:
@@ -103,7 +103,7 @@ static nsapi_security_t whd_tosecurity(whd_security_t sec) {
     }
 }
 
-static whd_security_t whd_fromsecurity(nsapi_security_t sec) {
+whd_security_t whd_fromsecurity(nsapi_security_t sec) {
     switch (sec) {
         case NSAPI_SECURITY_NONE:       return WHD_SECURITY_OPEN;
         case NSAPI_SECURITY_WEP:        return WHD_SECURITY_WEP_PSK;
