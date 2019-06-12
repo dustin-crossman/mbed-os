@@ -5,7 +5,7 @@
 * PSoC6_02 device GPIO HAL header for 124-BGA package
 *
 * \note
-* Generator version: 1.4.7093.26167
+* Generator version: 1.4.7097.19784
 *
 ********************************************************************************
 * \copyright
@@ -181,13 +181,20 @@ extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_dsi_comp0[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_dsi_comp1[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_i2c_scl[21];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_i2c_sda[21];
-extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_clk[16];
-extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_miso[17];
-extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_mosi[17];
-extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_select0[16];
-extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_select1[13];
-extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_select2[13];
-extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_select3[10];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_m_clk[16];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_m_miso[17];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_m_mosi[17];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_m_select0[16];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_m_select1[13];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_m_select2[13];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_m_select3[10];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_s_clk[16];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_s_miso[17];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_s_mosi[17];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_s_select0[16];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_s_select1[13];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_s_select2[13];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_s_select3[10];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_uart_cts[18];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_uart_rts[18];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_uart_rx[19];
