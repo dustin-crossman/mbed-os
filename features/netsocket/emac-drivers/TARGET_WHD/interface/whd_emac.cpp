@@ -27,6 +27,13 @@
 #include "whd_wlioctl.h"
 #include "whd_buffer_api.h"
 #include "cybsp_api_wifi.h"
+#include "emac_eapol.h"
+
+
+extern "C"
+{
+    eapol_packet_handler_t emac_eapol_packet_handler = NULL;
+} // extern "C"
 
 WHD_EMAC::WHD_EMAC(whd_interface_role_t role)
     : interface_type(role)
@@ -167,6 +174,40 @@ void WHD_EMAC::set_activity_cb(mbed::Callback<void(bool)> cb)
 
 extern "C"
 {
+
+static void emac_receive_eapol_packet(whd_interface_t interface, whd_buffer_t buffer)
+{
+    if ( buffer != NULL )
+    {
+        if ( emac_eapol_packet_handler != NULL )
+        {
+
+            emac_eapol_packet_handler( interface, buffer );
+        }
+        else
+        {
+            whd_buffer_release( interface->whd_driver,buffer, WHD_NETWORK_RX );
+        }
+    }
+}
+
+whd_result_t emac_register_eapol_packet_handler( eapol_packet_handler_t eapol_packet_handler )
+{
+
+    if ( emac_eapol_packet_handler == NULL )
+    {
+        emac_eapol_packet_handler = eapol_packet_handler;
+        return WHD_SUCCESS;
+    }
+
+    return WHD_HANDLER_ALREADY_REGISTERED;
+}
+
+void emac_unregister_eapol_packet_handler( void )
+{
+    emac_eapol_packet_handler = NULL;
+}
+
 void cy_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer)
 {
 	emac_mem_buf_t *mem_buf = NULL;
@@ -179,14 +220,34 @@ void cy_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer)
         return;
     }
 
+    uint8_t *data = whd_buffer_get_current_piece_data_pointer(emac.drvp, buffer);
+
     uint16_t size = whd_buffer_get_current_piece_size(emac.drvp, buffer);
 
-    if (size > 0) {
-           mem_buf = buffer;
-            if (emac.activity_cb) {
-                emac.activity_cb(false);
+
+    if (size > WHD_ETHERNET_SIZE ) {
+
+        uint16_t ethertype;
+
+        ethertype = (uint16_t) (data[12] << 8 | data[13]);
+
+        if (ethertype == EAPOL_PACKET_TYPE) {
+
+            /* pass it to the EAP layer, but do not release the packet */
+            emac_receive_eapol_packet(ifp,buffer);
+
+        } else {
+            /* Allocate a memory buffer chain from buffer pool */
+            mem_buf = emac.memory_manager->alloc_heap(size, 0);
+            if (mem_buf != NULL) {
+                memcpy(
+                        static_cast<uint8_t *>(emac.memory_manager->get_ptr(
+                                mem_buf)), static_cast<uint8_t *>(data), size);
+                emac.emac_link_input_cb(mem_buf);
+                whd_buffer_release(emac.drvp, buffer, WHD_NETWORK_RX);
+
             }
-           emac.emac_link_input_cb(mem_buf);
+        }
     }
 }
 
