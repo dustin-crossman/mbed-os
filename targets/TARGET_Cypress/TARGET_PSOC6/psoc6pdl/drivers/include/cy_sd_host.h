@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_sd_host.h
-* \version 1.10
+* \version 1.20
 *
 *  This file provides constants and parameter values for 
 *  the SD Host Controller driver.
@@ -245,11 +245,44 @@
 * a detailed description of the registers.
 *
 * \section group_sd_host_MISRA MISRA-C Compliance
-* The SD Host driver does not have any driver-specific deviations.
+* <table class="doxtable">
+*   <tr>
+*     <th>MISRA Rule</th>
+*     <th>Rule Class (Required/Advisory)</th>
+*     <th>Rule Description</th>
+*     <th>Description of Deviation(s)</th>
+*   </tr>
+*   <tr>
+*     <td>11.4</td>
+*     <td>A</td>
+*     <td>A cast should not be performed between a pointer to object type and
+*         a different pointer to object type.</td>
+*     <td>
+*         The function \ref Cy_SD_Host_DeepSleepCallback is the callback of
+*         the \ref cy_en_syspm_status_t type. The cast operation safety in these
+*         functions becomes the user's responsibility because pointers are
+*         initialized when the callback is registered in the SysPm driver.</td>
+*   </tr>
+*   <tr>
+*     <td>20.3</td>
+*     <td>R</td>
+*     <td>The validity of values passed to library functions shall be checked.</td>
+*     <td>This violation is not caused by code changes, i.e. is not a regression.</td>
+*   </tr>
+* </table>
 *
 * \section group_sd_host_Changelog Changelog
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td rowspan="2"> 1.20</td>
+*     <td>Documentation of the MISRA rule violation.</td>
+*     <td>MISRA compliance.</td>
+*   </tr>
+*   <tr>
+*     <td>Added the Cy_SD_Host_DeepSleepCallback() function.</td>
+*     <td>Driver maintenance.</td>
+*   </tr>
 *   <tr>
 *     <td>1.10</td>
 *     <td>The PLL and CLK disable sequence in \ref Cy_SD_Host_DisableSdClk()
@@ -333,6 +366,7 @@
 #include "cy_device.h"
 #include "cy_device_headers.h"
 #include "cy_syslib.h"
+#include "cy_syspm.h"
 
 #if defined(CY_IP_MXSDHC)
 
@@ -355,7 +389,7 @@ extern "C"
 #define CY_SD_HOST_DRV_VERSION_MAJOR       1
 
 /** Driver minor version */
-#define CY_SD_HOST_DRV_VERSION_MINOR       10
+#define CY_SD_HOST_DRV_VERSION_MINOR       20
 
 /******************************************************************************
 * API Constants
@@ -1477,6 +1511,8 @@ cy_en_sd_host_status_t Cy_SD_Host_GetScr(SDHC_Type *base,
 uint32_t Cy_SD_Host_GetPresentState(SDHC_Type const *base);
 bool Cy_SD_Host_IsCardConnected(SDHC_Type const *base);
 void Cy_SD_Host_SoftwareReset(SDHC_Type *base, cy_en_sd_host_reset_t reset);
+cy_en_syspm_status_t Cy_SD_Host_DeepSleepCallback(cy_stc_syspm_callback_params_t *callbackParams, 
+                                                  cy_en_syspm_callback_mode_t mode);
 
 /** \} group_sd_host_low_level_functions */
 

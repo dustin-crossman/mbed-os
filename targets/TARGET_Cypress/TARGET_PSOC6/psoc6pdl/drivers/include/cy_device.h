@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_device.h
-* \version 1.10
+* \version 2.0
 *
 * This file specifies the structure for core and peripheral block HW base
 * addresses, versions, and parameters.
@@ -30,6 +30,14 @@
 *     <th>Rule Class (Required/Advisory)</th>
 *     <th>Rule Description</th>
 *     <th>Description of Deviation(s)</th>
+*   </tr>
+*   <tr>
+*     <td>10.1</td>
+*     <td>R</td>
+*     <td>The value of an expression of integer type shall not be implicitly converted to a different underlying type
+*         under some circumstances.</td>
+*     <td>An operand of essentially enum type is being converted to unsigned type as a result of an arithmetic or
+*         conditional operation. The conversion does not have any unintended effect.</td>
 *   </tr>
 *   <tr>
 *     <td>20.6</td>

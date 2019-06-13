@@ -181,7 +181,7 @@ __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetArbReadAddr (USBFS_Type const *base
 * \addtogroup group_usbfs_drv_drv_reg_arbiter_data 
 * \{
 */
-/* Access data endpoints data registers. Used to get/put data into endpoint buffer. */
+/* Access data endpoints data registers. Used to get/put data into endpoint buffer */
 __STATIC_INLINE void     Cy_USBFS_Dev_Drv_WriteData  (USBFS_Type *base, uint32_t endpoint, uint8_t  byte);
 __STATIC_INLINE void     Cy_USBFS_Dev_Drv_WriteData16(USBFS_Type *base, uint32_t endpoint, uint16_t halfword);
 __STATIC_INLINE uint8_t  Cy_USBFS_Dev_Drv_ReadData   (USBFS_Type const *base, uint32_t endpoint);
@@ -449,40 +449,40 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_SetSieInterrupt(USBFS_Type *base, uint32_t
 * Function Name: Cy_USBFS_Dev_Drv_WriteEp0Mode
 ****************************************************************************//**
 *
-* Sets mode in the CR0 register of the endpoint 0 (clears all other bits in the
+* Sets a mode in the CR0 register of endpoint 0 (clears all other bits in the
 * register).
 *
 * \param base
 * The pointer to the USBFS instance.
 *
 * \param mode
-* SIE mode defines data endpoint 0 response to host request.
+* SIE mode defines the data endpoint 0 response to a host request.
 * See \ref group_usbfs_dev_drv_reg_macros_sie_mode for the set of constants.
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_USBFS_Dev_Drv_WriteEp0Mode(USBFS_Type *base, uint32_t mode)
 {
     USBFS_DEV_EP0_CR(base) = mode;
-    USBFS_DEV_EP0_CR(base);
+    (void) USBFS_DEV_EP0_CR(base);
 }
 
 /*******************************************************************************
 * Function Name: Cy_USBFS_Dev_Drv_ReadEp0Mode
 ****************************************************************************//**
 *
-* Returns mode in the CR0 register of the endpoint 0.
+* Returns a mode in the CR0 register of endpoint 0.
 *
 * \param base
 * The pointer to the USBFS instance.
 *
 * \return
-* SIE mode (defines endpoint 0 response to host request).
+* SIE mode (defines the endpoint 0 response to a host request).
 * See \ref group_usbfs_dev_drv_reg_macros_sie_mode for the set of constants.
 *
 *******************************************************************************/
 __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_ReadEp0Mode(USBFS_Type const *base)
 {
-	return USBFS_DEV_EP0_CR(base);
+    return USBFS_DEV_EP0_CR(base);
 }
 
 
@@ -490,14 +490,14 @@ __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_ReadEp0Mode(USBFS_Type const *base)
 * Function Name: Cy_USBFS_Dev_Drv_SetSieEpCount
 ****************************************************************************//**
 *
-* Configures number of bytes and toggle bit to return on the host read request
-* to the endpoint 0.
+* Configures the number of bytes and toggle bit to return to a host read request
+* to endpoint 0.
 *
 * \param base
 * The pointer to the USBFS instance.
 *
 * \param count
-* The number of bytes to return on the host read request.
+* The number of bytes to return to a host read request.
 *
 * \param toggle
 * The data toggle bit.
@@ -506,8 +506,8 @@ __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_ReadEp0Mode(USBFS_Type const *base)
 *******************************************************************************/
 __STATIC_INLINE void Cy_USBFS_Dev_Drv_SetEp0Count(USBFS_Type *base, uint32_t count, uint32_t toggle)
 {
-	count = _VAL2FLD(USBFS_USBDEV_EP0_CNT_BYTE_COUNT, count);
-	USBFS_DEV_EP0_CNT(base) = CY_USBFS_DEV_DRV_WRITE_ODD(count | toggle);
+    count = _VAL2FLD(USBFS_USBDEV_EP0_CNT_BYTE_COUNT, count);
+    USBFS_DEV_EP0_CNT(base) = CY_USBFS_DEV_DRV_WRITE_ODD(count | toggle);
 }
 
 
@@ -515,20 +515,20 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_SetEp0Count(USBFS_Type *base, uint32_t cou
 * Function Name: Cy_USBFS_Dev_Drv_GetEp0Count
 ****************************************************************************//**
 *
-* Returns the number of data bytes written into the endpoint 0 by the host.
+* Returns the number of data bytes written into endpoint 0 by the host.
 *
 * \param base
 * The pointer to the USBFS instance.
 *
 * \return
-* Number of bytes written by the host into the endpoint.
+* The number of bytes written by the host into the endpoint.
 *
 *******************************************************************************/
 __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetEp0Count(USBFS_Type const *base)
 {
     uint32_t ep0Cnt = CY_USBFS_DEV_READ_ODD(USBFS_DEV_EP0_CNT(base));
 
-    /* Exclude CRC size */
+    /* Excludes the CRC size */
     return (_FLD2VAL(USBFS_USBDEV_EP0_CNT_BYTE_COUNT, ep0Cnt) - CY_USBFS_DEV_DRV_EP_CRC_SIZE);
 }
 
@@ -537,30 +537,30 @@ __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetEp0Count(USBFS_Type const *base)
 * Function Name: Cy_USBFS_Dev_Drv_WriteEp0Data
 ****************************************************************************//**
 *
-* Writes a byte (8-bit) into the endpoint 0 hardware buffer.
+* Writes an 8-bit byte into the endpoint 0 hardware buffer.
 *
 * \param base
 * The pointer to the USBFS instance.
 *
 * \param idx
-* Index of endpoint 0 hardware buffer entry.
+* The index of the endpoint 0 hardware buffer entry.
 * Valid range: 0 - ( \ref CY_USBFS_DEV_DRV_EP0_BUFFER_SIZE - 1 ).
 *
 * \param value
-* Value to be written into the endpoint 0 hardware buffer.
+* The value to be written into the endpoint 0 hardware buffer.
 *
 *******************************************************************************/
 __STATIC_INLINE void Cy_USBFS_Dev_Drv_WriteEp0Data(USBFS_Type *base, uint32_t idx, uint32_t value)
 {
-	if (0U == (idx & 0x1U))
-	{
-		USBFS_DEV_EP0_DR(base, idx) = value;
-	}
-	else
-	{
-		/* Apply special write for odd offset registers */
-		USBFS_DEV_EP0_DR(base, idx) = CY_USBFS_DEV_DRV_WRITE_ODD(value);
-	}
+    if (0U == (idx & 0x1U))
+    {
+        USBFS_DEV_EP0_DR(base, idx) = value;
+    }
+    else
+    {
+        /* Applies a special write for odd offset registers */
+        USBFS_DEV_EP0_DR(base, idx) = CY_USBFS_DEV_DRV_WRITE_ODD(value);
+    }
 }
 
 
@@ -568,34 +568,34 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_WriteEp0Data(USBFS_Type *base, uint32_t id
 * Function Name: Cy_USBFS_Dev_Drv_ReadEp0Data
 ****************************************************************************//**
 *
-* Reads a byte (8-bit) from the endpoint 0 hardware buffer.
+* Reads an 8-bit byte from the endpoint 0 hardware buffer.
 *
 * \param base
 * The pointer to the USBFS instance.
 *
 * \param idx
-* Index of endpoint 0 hardware buffer entry.
+* The index of the endpoint 0 hardware buffer entry.
 * Valid range: 0 - ( \ref CY_USBFS_DEV_DRV_EP0_BUFFER_SIZE - 1 ).
 *
 * \return
-* The byte of data to be read from the hardware buffer.
+* The byte of data to read from the hardware buffer.
 *
 *******************************************************************************/
 __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_ReadEp0Data(USBFS_Type const *base, uint32_t idx)
 {
-	uint32_t value;
+    uint32_t value;
 
-	if (0U == (idx & 0x1U))
-	{
-		value = USBFS_DEV_EP0_DR(base, idx);
-	}
-	else
-	{
-		/* Apply special write for odd offset registers */
-		value = CY_USBFS_DEV_READ_ODD(USBFS_DEV_EP0_DR(base, idx));
-	}
+    if (0U == (idx & 0x1U))
+    {
+        value = USBFS_DEV_EP0_DR(base, idx);
+    }
+    else
+    {
+        /* Applies a special write for odd offset registers */
+        value = CY_USBFS_DEV_READ_ODD(USBFS_DEV_EP0_DR(base, idx));
+    }
 
-	return (value);
+    return (value);
 }
 /** \} group_usbfs_drv_drv_reg_ep0_access */
 
@@ -1507,7 +1507,7 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_SetEpType(USBFS_Type *base, bool inDirecti
 * Function Name: Cy_USBFS_Dev_Drv_GetSofNubmer
 ****************************************************************************//**
 *
-* Returns SOF frame number.
+* Returns the SOF frame number.
 *
 * \param base
 * The pointer to the USBFS instance.

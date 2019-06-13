@@ -5,7 +5,7 @@
 * Common header file to be included by the drivers.
 *
 * \note
-* Generator version: 1.4.0.1268
+* Generator version: 1.5.0.1274
 *
 ********************************************************************************
 * \copyright
