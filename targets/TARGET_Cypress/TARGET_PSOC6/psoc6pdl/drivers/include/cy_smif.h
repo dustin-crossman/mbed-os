@@ -211,18 +211,18 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
-*     <td>1.30.1</td>
-*     <td>Added conditional check for presence of the SMIF hardware IP.</td>
-*     <td>Driver maintenance.</td>
-*   </tr>
-*   <tr>
-*     <td rowspan="3">1.30</td>
+*     <td rowspan="5">1.30</td>
 *     <td>The CY_SMIF_CMD_FIFO_WR_RX_COUNT_Msk value is changed to 0x0000FFFFUL.</td>
-*     <td>Driver maintenance.</td>
+*     <td rowspan="4">Driver maintenance.</td>
 *   </tr>
 *   <tr>
 *     <td>Added the check of the size parameter in the Cy_SMIF_TransmitData() function.</td>
-*     <td>Driver maintenance.</td>
+*   </tr>
+*   <tr>
+*     <td>Added conditional check for presence of the SMIF hardware IP.</td>
+*   </tr>
+*   <tr>
+*     <td>Fixed the wrong erase command in the SFDP protocol for devices with Erase Type 3.</td>
 *   </tr>
 *   <tr>
 *     <td>Updated the General Description section with minor changes.

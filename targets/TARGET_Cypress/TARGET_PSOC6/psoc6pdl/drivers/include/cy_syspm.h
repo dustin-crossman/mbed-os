@@ -63,6 +63,7 @@
 *     - \ref group_syspm_cb_structures
 *     - \ref group_syspm_cb_function_implementation
 *     - \ref group_syspm_cb_flow
+*     - \ref group_syspm_cb_registering
 *     - \ref group_syspm_cb_unregistering
 * * \ref group_syspm_definitions
 *
@@ -381,16 +382,15 @@
 * execute when exiting the low power mode.
 *
 * The callback structures after registration:
-* \image html syspm_2_10_after_registration.png
+* \image html syspm_register_eq.png
 *
 * Your application must register each callback, so that SysPm can execute it. 
 * Upon registration, the linked list is built by the SysPm driver. Notice 
 * the &myDeepSleep1 address in the myDeepSleep1 
-* \ref cy_stc_syspm_callback_t structure. This is filled in by the SysPm driver 
-* when you register myDeepSleep1. The order in which the callbacks are 
-* registered in the application defines the order of their execution by the 
-* SysPm driver. Call \ref Cy_SysPm_RegisterCallback() to register each 
-* callback function. 
+* \ref cy_stc_syspm_callback_t structure. This is filled in by the SysPm driver,
+* when you register myDeepSleep1. The cy_stc_syspm_callback_t.order element 
+* defines the order of their execution by the SysPm driver.
+* Call \ref Cy_SysPm_RegisterCallback() to register each callback function. 
 * 
 * A callback function is typically associated with a particular driver that 
 * handles the peripheral. So the callback mechanism enables a peripheral to 
@@ -471,7 +471,7 @@
 * 
 * The callback structures are now defined and allocated in the user's 
 * memory space:
-* \image html syspm_2_10_before_registration.png
+* \image html syspm_before_registration.png
 *
 * Now we implement the callback functions. See 
 * \ref group_syspm_cb_function_implementation in 
@@ -532,8 +532,11 @@
 * \subsubsection group_syspm_cb_structures Callback Function Structure
 * For each callback, provide a \ref cy_stc_syspm_callback_t structure. Some 
 * fields in this structure are maintained by the driver. Use NULL for 
-* <b>prevItm</b> and <b>nextItm</b>. The driver uses these fields to build a 
-* linked list of callback functions.
+* cy_stc_syspm_callback_t.prevItm and cy_stc_syspm_callback_t.nextItm. 
+* Driver uses these fields to build a linked list of callback functions.
+* The value of cy_stc_syspm_callback_t.order element is used to define the order
+* how the callbacks are put into linked list, and sequentially, how the 
+* callbacks are executed. See \ref group_syspm_cb_registering section.
 *
 * \warning The Cy_SysPm_RegisterCallback() function stores a pointer to the 
 * cy_stc_syspm_callback_t structure. Do not modify elements of the 
@@ -618,6 +621,39 @@
 * step before entering the low power mode, and restore those resources first, 
 * as the system returns from low power mode.
 *
+* \subsubsection group_syspm_cb_registering Callback Registering
+* While registration the callback is put into the linked list. The 
+* place where the callback structure is put into the linked list is based on 
+* cy_stc_syspm_callback_t.order. The callback with the lowest 
+* cy_stc_syspm_callback_t.order value will be placed at the beginning of linked 
+* list. The callback with the highest cy_stc_syspm_callback_t.order value will 
+* be placed at the end of the linked list.
+* If there is already a callback structure in the linked list with the same
+* cy_stc_syspm_callback_t.order value as you attend to register, then your 
+* callback will be placed right after such a callback.
+*
+* Such a registration order defines how the callbacks are executed: 
+* * Callbacks with the lower cy_stc_syspm_callback_t.order are executed first 
+* when entering into low power and last when exiting from low power.
+* * Callbacks with the higher cy_stc_syspm_callback_t.order are executed last 
+* when entering into low power and first when exiting from low power.
+*
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_RegisterCallback
+*
+* Callbacks with equal cy_stc_syspm_callback_t.order values are
+* registered in the same order as they are registered:
+* \image html syspm_register_eq.png
+
+* Callbacks with a different cy_stc_syspm_callback_t.order value will be 
+* stored based on the cy_stc_syspm_callback_t.order value, with no matter when 
+* they when registered:
+*
+* \image html syspm_register_dif.png
+*
+* This can be useful to ensure that system resources (clock dividers, etc) are 
+* changed right before entering low power mode and immediately after exiting 
+* from low power.
+*
 * \subsubsection group_syspm_cb_unregistering Callback Unregistering
 *
 * Unregistering the callback might be useful when you need to dynamically manage
@@ -625,7 +661,7 @@
 *
 * \snippet syspm/snippet/main.c snippet_Cy_SysPm_UnregisterCallback
 * The callback structures after myDeepSleep2 callback is unregistered:
-* \image html syspm_2_10_unregistration.png
+* \image html syspm_unregistration.png
 *
 * \section group_syspm_definitions Definitions
 *
@@ -688,9 +724,24 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
-*     <td>4.20</td>
-*     <td>TBD</td>
-*     <td>TBD</td>
+*     <td rowspan="3">4.20</td>
+*     <td>Updated the \ref Cy_SysPm_RegisterCallback() function.
+*         Added a new element to callback structure - 
+*         cy_stc_syspm_callback_t.order</td>
+*     <td>Enhanced the mechanism of callbacks registration and execution. Now 
+*         callbacks can be ordered during registration. This means the
+*         execution flow now is based on cy_stc_syspm_callback_t.order.
+*         For more details, see the \ref group_syspm_cb_registering section. </td>
+*   </tr>
+*   <tr>
+*     <td>Updated \ref group_syspm_cb section. 
+*         Added \ref group_syspm_cb_registering section</td>
+*     <td>Added explanations how to use updated callbacks registration 
+*         mechanism. </td>
+*   </tr>
+*   <tr>
+*     <td>Added new function  \ref Cy_SysPm_GetFailedCallback()</td>
+*     <td>Added new functionality to support callback debugging</td>
 *   </tr>
 *   <tr>
 *     <td>4.10.1</td>
@@ -1601,13 +1652,11 @@ typedef struct cy_stc_syspm_callback
                                                             link this structure to the previous registered structure.
                                                             It will be updated during callback registration. Do not 
                                                             modify this element at run-time. */
-    uint8_t priority;                                  /**< Holds the callback priority value. Range: 1-255. The lower
-                                                            the value, the higher the priority. 1 is the highest priority.
-                                                            0 is reserved for backward compatibility with the previous
-                                                            driver versions. While entering low power mode, callbacks
-                                                            with higher priorities are executed first. While exiting low
-                                                            power mode, the callbacks are executed in the opposite order.
-                                                            Callbacks with the same priority are executed in the
+    uint8_t order;                                     /**< Holds the callback execution order value. Range: 0-255. 
+                                                            While entering low power mode, callbacks with lower order values
+                                                            are executed first. While exiting low power mode, 
+                                                            the callbacks are executed in the opposite order.
+                                                            Callbacks with the same order value are executed in the
                                                             order they are registered in the application. */
 } cy_stc_syspm_callback_t;
 
@@ -1754,8 +1803,8 @@ bool Cy_SysPm_BuckIsOutputEnabled(cy_en_syspm_buck_out_t output);
 bool Cy_SysPm_RegisterCallback(cy_stc_syspm_callback_t *handler);
 bool Cy_SysPm_UnregisterCallback(cy_stc_syspm_callback_t const *handler);
 cy_en_syspm_status_t Cy_SysPm_ExecuteCallback(cy_en_syspm_callback_type_t type, cy_en_syspm_callback_mode_t mode);
+cy_stc_syspm_callback_t* Cy_SysPm_GetFailedCallback(cy_en_syspm_callback_type_t type);
 /** \} group_syspm_functions_callback */
-
 
 /**
 * \addtogroup group_syspm_functions_power_status

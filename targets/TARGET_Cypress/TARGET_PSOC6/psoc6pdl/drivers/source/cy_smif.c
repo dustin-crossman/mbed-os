@@ -432,7 +432,7 @@ cy_en_smif_status_t  Cy_SMIF_TransmitData(SMIF_Type *base,
         SMIF_TX_CMD_FIFO_WR(base) =
             _VAL2FLD(CY_SMIF_CMD_FIFO_WR_MODE, CY_SMIF_CMD_FIFO_TX_COUNT_MODE) |
             _VAL2FLD(CY_SMIF_CMD_FIFO_WR_WIDTH, (uint32_t)transferWidth)    |
-            _VAL2FLD(CY_SMIF_CMD_FIFO_WR_TX_COUNT, ((uint32_t)(size - 1U)));
+            _VAL2FLD(CY_SMIF_CMD_FIFO_WR_TX_COUNT, (size - 1UL));
 
         if (NULL != txBuffer)
         {
@@ -520,7 +520,7 @@ cy_en_smif_status_t  Cy_SMIF_TransmitDataBlocking(SMIF_Type *base,
             SMIF_TX_CMD_FIFO_WR(base) =
                 _VAL2FLD(CY_SMIF_CMD_FIFO_WR_MODE, CY_SMIF_CMD_FIFO_TX_COUNT_MODE) |
                 _VAL2FLD(CY_SMIF_CMD_FIFO_WR_WIDTH, (uint32_t)transferWidth)    |
-                _VAL2FLD(CY_SMIF_CMD_FIFO_WR_TX_COUNT, ((uint32_t)(size - 1U)));
+                _VAL2FLD(CY_SMIF_CMD_FIFO_WR_TX_COUNT, (size - 1UL));
 
             result = CY_SMIF_SUCCESS;
 
@@ -630,7 +630,7 @@ cy_en_smif_status_t  Cy_SMIF_ReceiveData(SMIF_Type *base,
             SMIF_TX_CMD_FIFO_WR(base) =
                 _VAL2FLD(CY_SMIF_CMD_FIFO_WR_MODE, CY_SMIF_CMD_FIFO_RX_COUNT_MODE) |
                 _VAL2FLD(CY_SMIF_CMD_FIFO_WR_WIDTH, (uint32_t)transferWidth)    |
-                _VAL2FLD(CY_SMIF_CMD_FIFO_WR_RX_COUNT, ((uint32_t)(size - 1U)));
+                _VAL2FLD(CY_SMIF_CMD_FIFO_WR_RX_COUNT, (size - 1UL));
 
             if (NULL != rxBuffer)
             {
@@ -723,7 +723,7 @@ cy_en_smif_status_t  Cy_SMIF_ReceiveDataBlocking(SMIF_Type *base,
             SMIF_TX_CMD_FIFO_WR(base) =
                 _VAL2FLD(CY_SMIF_CMD_FIFO_WR_MODE, CY_SMIF_CMD_FIFO_RX_COUNT_MODE) |
                 _VAL2FLD(CY_SMIF_CMD_FIFO_WR_WIDTH, (uint32_t)transferWidth)    |
-                _VAL2FLD(CY_SMIF_CMD_FIFO_WR_RX_COUNT, ((uint32_t)(size - 1U)));
+                _VAL2FLD(CY_SMIF_CMD_FIFO_WR_RX_COUNT, (size - 1UL));
             result = CY_SMIF_SUCCESS;
 
             if (NULL != rxBuffer)
@@ -786,7 +786,7 @@ cy_en_smif_status_t  Cy_SMIF_SendDummyCycles(SMIF_Type *base,
             /* Send the dummy bytes */
             SMIF_TX_CMD_FIFO_WR(base) =
                 _VAL2FLD(CY_SMIF_CMD_FIFO_WR_MODE, CY_SMIF_CMD_FIFO_DUMMY_COUNT_MODE) |
-                _VAL2FLD(CY_SMIF_CMD_FIFO_WR_DUMMY, ((uint32_t)(cycles-1U)));
+                _VAL2FLD(CY_SMIF_CMD_FIFO_WR_DUMMY, (cycles-1UL));
 
             result = CY_SMIF_SUCCESS;
         }

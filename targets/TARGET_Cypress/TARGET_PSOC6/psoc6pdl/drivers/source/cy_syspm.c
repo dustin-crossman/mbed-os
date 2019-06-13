@@ -275,6 +275,9 @@ typedef void (*cy_cb_syspm_deep_sleep_t)(cy_en_syspm_waitfor_t waitFor, bool *wa
 /* Array of the callback roots */
 static cy_stc_syspm_callback_t* pmCallbackRoot[CALLBACK_ROOT_NR] = {NULL, NULL, NULL, NULL, NULL};
 
+/* The array of the pointers to failed callback */
+static cy_stc_syspm_callback_t* failedCallback[CALLBACK_ROOT_NR] = {NULL, NULL, NULL, NULL, NULL};
+
 /* Structure for registers that should retain while Deep Sleep mode */
 static cy_stc_syspm_backup_regs_t bkpRegs;
 
@@ -2374,10 +2377,10 @@ bool Cy_SysPm_RegisterCallback(cy_stc_syspm_callback_t* handler)
             while ((NULL != curCallback->nextItm) && (curCallback != handler))
             {
                 curCallback = curCallback->nextItm;
-                /* Callbacks with the same priority are stored in the order
+                /* Callbacks with the same order value are stored in the order
                  * they are registered.
                  */
-                if (curCallback->priority <= handler->priority)
+                if (curCallback->order <= handler->order)
                 {
                     insertPos = curCallback;
                 }
@@ -2386,7 +2389,7 @@ bool Cy_SysPm_RegisterCallback(cy_stc_syspm_callback_t* handler)
             if (curCallback != handler)
             {
                 /* If the callback is to be inserted at the beginning of the list. */
-                if ((insertPos->prevItm == NULL) && (handler->priority < insertPos->priority))
+                if ((insertPos->prevItm == NULL) && (handler->order < insertPos->order))
                 {
                     handler->nextItm = insertPos;
                     handler->prevItm = NULL;
@@ -2578,6 +2581,23 @@ cy_en_syspm_status_t Cy_SysPm_ExecuteCallback(cy_en_syspm_callback_type_t type, 
             }
             curCallback = curCallback->nextItm;
         }
+
+        if (mode == CY_SYSPM_CHECK_READY)
+        {
+            /* Update the pointer to  the failed callback with the result of the callback execution.
+            *  If the callback fails, the value of the pointer will be updated
+            *  with the address of the callback which returned CY_SYSPM_FAIL, else,
+            *  it will be updated with NULL.
+            */
+            if(retVal == CY_SYSPM_FAIL)
+            {
+                failedCallback[(uint32_t) type] = lastExecutedCallback;	
+            }
+            else
+            {
+                failedCallback[(uint32_t) type] = NULL;
+            }
+        }
     }
     else
     {
@@ -2624,6 +2644,37 @@ cy_en_syspm_status_t Cy_SysPm_ExecuteCallback(cy_en_syspm_callback_type_t type, 
     }
 
     return retVal;
+}
+
+
+/*******************************************************************************
+* Function Name: Cy_SysPm_GetFailedCallback
+****************************************************************************//**
+* 
+* Reads the result of the callback execution after the power mode functions
+* execution.
+*
+* This function reads the value of the pointer that stores the result of callback
+* execution. It takes power mode as the parameter and returns the address of the
+* callback configuration structure in the case of failure or NULL in the case of
+* success. This address of the failed callback allows finding the callback that
+* blocks entering power mode.
+*
+* \param type
+* Power mode for which a callback execution result is required.
+*
+* \return
+* - The address of the callback configuration structure if the callback handler
+* function failed.
+* - NULL if the callback skipped or executed successfully.
+*
+* \funcusage
+* \snippet syspm/snippet/main.c snippet_Cy_SysPm_GetFailedCallback
+*
+*******************************************************************************/
+cy_stc_syspm_callback_t* Cy_SysPm_GetFailedCallback(cy_en_syspm_callback_type_t type)
+{
+    return failedCallback[(uint32_t) type];
 }
 
 

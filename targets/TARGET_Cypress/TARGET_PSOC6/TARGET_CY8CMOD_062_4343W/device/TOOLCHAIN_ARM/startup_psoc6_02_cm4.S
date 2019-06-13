@@ -735,7 +735,15 @@ sdhc_1_interrupt_general_IRQHandler
 
                 ELSE
 
-                IMPORT __use_two_region_memory
+                EXPORT  __user_initial_stackheap
+
+__user_initial_stackheap PROC
+                LDR     R0, =Heap_Mem
+                LDR     R1, =(Stack_Mem + Stack_Size)
+                LDR     R2, =(Heap_Mem +  Heap_Size)
+                LDR     R3, =Stack_Mem
+                BX      LR
+                ENDP
 
                 ALIGN
 
