@@ -107,6 +107,8 @@
 #define FLASH_START             MBED_APP_START
 #define FLASH_SIZE              MBED_APP_SIZE
 
+#define Stack_Size              0x00001000
+
 ; The following defines describe a 32K flash region used for EEPROM emulation. 
 ; This region can also be used as the general purpose flash.
 ; You can assign sections to this memory region for only one of the cores.
@@ -182,15 +184,13 @@ LR_IROM1 FLASH_START (FLASH_SIZE - 0x8000)
     }
 
     ; Application heap area (HEAP)
-    ARM_LIB_HEAP  +0
-    { 
-        * (HEAP) 
+    ARM_LIB_HEAP  +0 EMPTY ((RAM_START+RAM_SIZE)-AlignExpr(ImageLimit(RW_IRAM1), 8)-Stack_Size)
+    {
     }
     
     ; Stack region growing down
-    ARM_LIB_STACK RAM_START+RAM_SIZE -Stack_Size
+    ARM_LIB_STACK (RAM_START+RAM_SIZE) EMPTY -Stack_Size
     {
-        * (STACK)
     }
 
     RW_IRAM2 PUBLIC_RAM_START UNINIT
