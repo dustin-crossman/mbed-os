@@ -24,7 +24,7 @@ from execute.gen_data_from_json import ENTRANCE_EXAM_FW_STATUS_REG, ENTRANCE_EXA
 from execute.p6_reg import CYREG_CPUSS_PROTECTION, NVSTORE_AREA_1_ADDRESS
 
 
-def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
+def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, protection_state=ProtectionState.secure):
     """
     Programs Cypress Bootloader and calls system calls for device provisioning.
     :param tool: Programming/debugging tool used for communication with device.
@@ -33,6 +33,7 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
            all data necessary for provisioning, including policy, authorization
            packets and keys).
     :param cy_bootloader_hex: Path to Cypress Bootloader program file.
+    :param protection_state: Expected target protection state.
     :return: True if provisioning passed, otherwise False.
     """
     tool.set_frequency(200)
@@ -50,7 +51,7 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
 
     # Check the device life-cycle stage
     print('Check device protection state')
-    if not check_mode(tool, ProtectionState.secure):
+    if not check_mode(tool, protection_state):
         return False
 
     print(os.linesep + 'Erase main flash and TOC3:')
@@ -75,7 +76,8 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
 
     if is_exam_pass:
         print(os.linesep + 'Run provisioning syscall')
-        blow_secure_fuse = 1  # indicates whether to convert device to SECURE CLAIMED mode
+        # Set a value indicating whether to convert device to SECURE CLAIMED mode
+        blow_secure_fuse = 1 if protection_state == ProtectionState.secure else 0
         is_exam_pass = provision_keys_and_policies(tool, blow_secure_fuse, os.path.join(prov_cmd_jwt))
         print(hex(NVSTORE_AREA_1_ADDRESS) + ': ', sep=' ', end='', flush=True)
         if is_exam_pass:

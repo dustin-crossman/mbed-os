@@ -6,6 +6,76 @@ before_script:
     - curl.exe --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip
     - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
 
+# Run device provisioning tests
+test_provisioning:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - python -V
+    - virtualenv venv
+    - .\venv\Scripts\activate.ps1
+    - echo "[INFO] Getting latest pyocd"
+    - if (-Not(Test-Path pyocd)) { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd; cd pyocd; git checkout tags/AH_SECURITY_RELEASE_2; git branch; cd .. }
+    - echo "[INFO] Installing recquired python modules"
+    - pip install cmsis-pack-manager
+    - pip install colorama
+    - pip install intelhex
+    - pip install intervaltree
+    - pip install prettytable
+    - pip install pyelftools
+    - pip install pyusb
+    - pip install pywinusb
+    - pip install pyyaml
+    - pip install six
+    - pip install setuptools_scm_git_archive
+    - pip install setuptools_scm
+    - echo "[INFO] Installing pyocd"
+    - cd pyocd
+    - python setup.py install
+    - cd ..
+    - echo "[INFO] Start tests"
+    - cd .\targets\TARGET_Cypress\TARGET_PSOC6\sb-tools\test\
+    - mbedls -m 1907:CY8CPROTO_064_SB
+
+    - echo [INFO] Test provisioning using single stage policy (CM4), CyBootloader Release
+    - copy "test_data\erase.act" "D:\"
+    - Remove-Item -LiteralPath "packet" -Force -Recurse
+    - python prepare\provisioning_packet.py --policy policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
+    - cd test
+    - python -m unittest test_provisioning.TestProvisioning.test_provision_device_release
+    - cd ..
+
+    - echo [INFO] Test provisioning using dual stage policy (CM0, CM4), CyBootloader Release
+    - copy "test_data\erase.act" "D:\"
+    - Remove-Item -LiteralPath "packet" -Force -Recurse
+    - python prepare\provisioning_packet.py --policy policy_dual_stage_CM0p_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
+    - cd test
+    - python -m unittest test_provisioning.TestProvisioning.test_provision_device_release
+    - cd ..
+    - deactivate
+
+    - echo [INFO] Test provisioning using single stage policy (CM4), CyBootloader WithLogs
+    - copy "test_data\erase.act" "D:\"
+    - Remove-Item -LiteralPath "packet" -Force -Recurse
+    - python prepare\provisioning_packet.py --policy policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
+    - cd test
+    - python -m unittest test_provisioning.TestProvisioning.test_provision_device_with_logs
+    - cd ..
+    
+    - echo [INFO] Test provisioning using dual stage policy (CM0, CM4), CyBootloader WithLogs
+    - copy "test_data\erase.act" "D:\"
+    - Remove-Item -LiteralPath "packet" -Force -Recurse
+    - python prepare\provisioning_packet.py --policy policy_dual_stage_CM0p_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
+    - cd test
+    - python -m unittest test_provisioning.TestProvisioning.test_provision_device_with_logs
+    - cd ..
+    - deactivate
+  cache:
+    paths:
+      - venv
+      - pyocd
+
 # Run pyocd wrapper functional tests
 pyocd_wrapper:
   stage: test
