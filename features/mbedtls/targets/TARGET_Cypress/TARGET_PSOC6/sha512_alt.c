@@ -19,6 +19,7 @@
 
 /**
  * \file     sha512_alt.c
+ * \version  1.0
  *
  * \brief    Source file - wrapper for mbedtls SHA512 HW acceleration
  *
@@ -37,10 +38,17 @@
 
 #include <string.h>
 
+/* Parameter validation macros based on platform_util.h */
+#define SHA512_VALIDATE_RET(cond)                           \
+    MBEDTLS_INTERNAL_VALIDATE_RET( cond, MBEDTLS_ERR_SHA512_BAD_INPUT_DATA )
+#define SHA512_VALIDATE(cond)  MBEDTLS_INTERNAL_VALIDATE( cond )
+
 #if defined(MBEDTLS_SHA512_ALT)
 
 void mbedtls_sha512_init( mbedtls_sha512_context *ctx )
 {
+    SHA512_VALIDATE( ctx != NULL );
+
     cy_hw_sha_init(ctx, sizeof( mbedtls_sha512_context ));
 }
 
@@ -56,6 +64,9 @@ void mbedtls_sha512_free( mbedtls_sha512_context *ctx )
 
 void mbedtls_sha512_clone( mbedtls_sha512_context *dst, const mbedtls_sha512_context *src )
 {
+    SHA512_VALIDATE( dst != NULL );
+    SHA512_VALIDATE( src != NULL );
+
     cy_hw_sha_clone(dst, src, sizeof(mbedtls_sha512_context), &dst->hashState, &dst->shaBuffers);
 }
 
@@ -64,6 +75,9 @@ void mbedtls_sha512_clone( mbedtls_sha512_context *dst, const mbedtls_sha512_con
  */
 int mbedtls_sha512_starts_ret( mbedtls_sha512_context *ctx, int is384)
 {
+    SHA512_VALIDATE_RET( ctx != NULL );
+    SHA512_VALIDATE_RET( is384 == 0 || is384 == 1 );
+
     return cy_hw_sha_start(&ctx->hashState,
                            ( is384 == 0 ) ? CY_CRYPTO_MODE_SHA512 : CY_CRYPTO_MODE_SHA384,
                            &ctx->shaBuffers);
@@ -74,6 +88,9 @@ int mbedtls_sha512_starts_ret( mbedtls_sha512_context *ctx, int is384)
  */
 int mbedtls_sha512_update_ret( mbedtls_sha512_context *ctx, const unsigned char *input, size_t ilen )
 {
+    SHA512_VALIDATE_RET( ctx != NULL );
+    SHA512_VALIDATE_RET( ilen == 0 || input != NULL );
+
     return cy_hw_sha_update(&ctx->hashState, input, ilen);
 }
 
@@ -82,11 +99,17 @@ int mbedtls_sha512_update_ret( mbedtls_sha512_context *ctx, const unsigned char 
  */
 int mbedtls_sha512_finish_ret( mbedtls_sha512_context *ctx, unsigned char output[64] )
 {
-     return cy_hw_sha_finish(&ctx->hashState, output);
+    SHA512_VALIDATE_RET( ctx != NULL );
+    SHA512_VALIDATE_RET( (unsigned char *)output != NULL );
+
+    return cy_hw_sha_finish(&ctx->hashState, output);
 }
 
 int mbedtls_internal_sha512_process( mbedtls_sha512_context *ctx, const unsigned char data[128] )
 {
+    SHA512_VALIDATE_RET( ctx != NULL );
+    SHA512_VALIDATE_RET( (const unsigned char *)data != NULL );
+
     return cy_hw_sha_process(&ctx->hashState, data);
 }
 
