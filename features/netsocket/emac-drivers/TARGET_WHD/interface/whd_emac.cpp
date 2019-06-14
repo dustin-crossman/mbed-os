@@ -248,19 +248,14 @@ void cy_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer)
             emac_receive_eapol_packet(ifp,buffer);
 
         } else {
-            /* Allocate a memory buffer chain from buffer pool */
-            mem_buf = emac.memory_manager->alloc_heap(size, 0);
-            if (mem_buf != NULL) {
-                memcpy(
-                        static_cast<uint8_t *>(emac.memory_manager->get_ptr(
-                                mem_buf)), static_cast<uint8_t *>(data), size);
-                emac.emac_link_input_cb(mem_buf);
-                whd_buffer_release(emac.drvp, buffer, WHD_NETWORK_RX);
-
+            mem_buf = buffer;
+            if (emac.activity_cb) {
+                emac.activity_cb(false);
             }
+            emac.emac_link_input_cb(mem_buf);
+        }
         }
     }
-}
 
 void whd_emac_wifi_link_state_changed(bool state_up, whd_interface_t ifp)
 {
