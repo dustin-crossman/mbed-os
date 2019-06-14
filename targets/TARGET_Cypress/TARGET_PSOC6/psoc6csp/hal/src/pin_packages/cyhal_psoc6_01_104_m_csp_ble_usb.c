@@ -5,7 +5,7 @@
 * PSoC6_01 device GPIO HAL header for 104-M-CSP-BLE-USB package
 *
 * \note
-* Generator version: 1.4.7097.19784
+* Generator version: 1.4.7104.26717
 *
 ********************************************************************************
 * \copyright
@@ -37,6 +37,7 @@ static const cyhal_resource_inst_t CYHAL_PDM_0 = { CYHAL_RSC_PDM, 0, 0 };
 static const cyhal_resource_inst_t CYHAL_BLESS_0 = { CYHAL_RSC_BLESS, 0, 0 };
 static const cyhal_resource_inst_t CYHAL_LPCOMP_0_0 = { CYHAL_RSC_LPCOMP, 0, 0 };
 static const cyhal_resource_inst_t CYHAL_OPAMP_0 = { CYHAL_RSC_OPAMP, 0, 0 };
+static const cyhal_resource_inst_t CYHAL_ADC_0 = { CYHAL_RSC_ADC, 0, 0 };
 static const cyhal_resource_inst_t CYHAL_SCB_0 = { CYHAL_RSC_SCB, 0, 0 };
 static const cyhal_resource_inst_t CYHAL_SCB_1 = { CYHAL_RSC_SCB, 1, 0 };
 static const cyhal_resource_inst_t CYHAL_SCB_2 = { CYHAL_RSC_SCB, 2, 0 };
@@ -153,6 +154,44 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_dsi_comp1[1] = {
     {P8_3, &CYHAL_LPCOMP_0_0, CYHAL_PIN_OUT_FUNCTION(P8_3_LPCOMP_DSI_COMP1)},
 };
 
+/* Connections for: lpcomp_inn_comp0 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inn_comp0[1] = {
+    {P5_7, &CYHAL_LPCOMP_0_0, CYHAL_PIN_ANALOG_FUNCTION(P5_7_LPCOMP_INN_COMP0)},
+};
+
+/* Connections for: lpcomp_inn_comp1 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inn_comp1[1] = {
+    {P6_3, &CYHAL_LPCOMP_0_0, CYHAL_PIN_ANALOG_FUNCTION(P6_3_LPCOMP_INN_COMP1)},
+};
+
+/* Connections for: lpcomp_inp_comp0 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inp_comp0[1] = {
+    {P5_6, &CYHAL_LPCOMP_0_0, CYHAL_PIN_ANALOG_FUNCTION(P5_6_LPCOMP_INP_COMP0)},
+};
+
+/* Connections for: lpcomp_inp_comp1 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inp_comp1[1] = {
+    {P6_2, &CYHAL_LPCOMP_0_0, CYHAL_PIN_ANALOG_FUNCTION(P6_2_LPCOMP_INP_COMP1)},
+};
+
+/* Connections for: pass_ctb_oa0_out_10x */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_oa0_out_10x[1] = {
+    {P9_2, &CYHAL_OPAMP_0, CYHAL_PIN_ANALOG_FUNCTION(P9_2_PASS_CTB_OA0_OUT_10X)},
+};
+
+/* Connections for: pass_ctb_oa1_out_10x */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_oa1_out_10x[1] = {
+    {P9_3, &CYHAL_OPAMP_0, CYHAL_PIN_ANALOG_FUNCTION(P9_3_PASS_CTB_OA1_OUT_10X)},
+};
+
+/* Connections for: pass_ctb_pads */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_pads[4] = {
+    {P9_0, &CYHAL_OPAMP_0, CYHAL_PIN_ANALOG_FUNCTION(P9_0_PASS_CTB_PADS0)},
+    {P9_1, &CYHAL_OPAMP_0, CYHAL_PIN_ANALOG_FUNCTION(P9_1_PASS_CTB_PADS1)},
+    {P9_2, &CYHAL_OPAMP_0, CYHAL_PIN_ANALOG_FUNCTION(P9_2_PASS_CTB_PADS2)},
+    {P9_3, &CYHAL_OPAMP_0, CYHAL_PIN_ANALOG_FUNCTION(P9_3_PASS_CTB_PADS3)},
+};
+
 /* Connections for: pass_dsi_ctb_cmp0 */
 const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_dsi_ctb_cmp0[1] = {
     {P9_2, &CYHAL_OPAMP_0, CYHAL_PIN_OUT_FUNCTION(P9_2_PASS_DSI_CTB_CMP0)},
@@ -161,6 +200,18 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_dsi_ctb_cmp0[1] = {
 /* Connections for: pass_dsi_ctb_cmp1 */
 const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_dsi_ctb_cmp1[1] = {
     {P9_3, &CYHAL_OPAMP_0, CYHAL_PIN_OUT_FUNCTION(P9_3_PASS_DSI_CTB_CMP1)},
+};
+
+/* Connections for: pass_sarmux_pads */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_sarmux_pads[8] = {
+    {P10_0, &CYHAL_ADC_0, CYHAL_PIN_ANALOG_FUNCTION(P10_0_PASS_SARMUX_PADS0)},
+    {P10_1, &CYHAL_ADC_0, CYHAL_PIN_ANALOG_FUNCTION(P10_1_PASS_SARMUX_PADS1)},
+    {P10_2, &CYHAL_ADC_0, CYHAL_PIN_ANALOG_FUNCTION(P10_2_PASS_SARMUX_PADS2)},
+    {P10_3, &CYHAL_ADC_0, CYHAL_PIN_ANALOG_FUNCTION(P10_3_PASS_SARMUX_PADS3)},
+    {P10_4, &CYHAL_ADC_0, CYHAL_PIN_ANALOG_FUNCTION(P10_4_PASS_SARMUX_PADS4)},
+    {P10_5, &CYHAL_ADC_0, CYHAL_PIN_ANALOG_FUNCTION(P10_5_PASS_SARMUX_PADS5)},
+    {P10_6, &CYHAL_ADC_0, CYHAL_PIN_ANALOG_FUNCTION(P10_6_PASS_SARMUX_PADS6)},
+    {P10_7, &CYHAL_ADC_0, CYHAL_PIN_ANALOG_FUNCTION(P10_7_PASS_SARMUX_PADS7)},
 };
 
 /* Connections for: scb_i2c_scl */

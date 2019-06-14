@@ -1,5 +1,5 @@
 /***************************************************************************//**
-* \file cyw943012p6evb_01.c
+* \file cybsp_cyw943012p6evb_01.c
 *
 * Description:
 * Provides APIs for interacting with the hardware contained on the Cypress

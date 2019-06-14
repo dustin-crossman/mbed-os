@@ -1,5 +1,5 @@
 /***************************************************************************//**
-* \file cy_bsp_cyw943012p6evb_01.h
+* \file cybsp_cyw943012p6evb_01.h
 *
 * Description:
 * Provides APIs for interacting with the hardware contained on the Cypress
@@ -42,13 +42,12 @@
 * <div class="category">Kit Contents:</div>
 * <ul>
 * <li>CYW943012P6EVB-01 evaluation board</li>
-* <li>TFT display shield with a 2.4" TFT display, light sensor, 6-axis motion sensor, and digital microphone</li>
 * <li>USB cable</li>
 * </ul>
 *
-* \defgroup group_bsp_cy8kit_062_wifi_bt_macros Macros
-* \defgroup group_bsp_cy8kit_062_wifi_bt_functions Functions
-* \defgroup group_bsp_cy8kit_062_wifi_bt_enums Enumerated Types
+* \defgroup group_bsp_cyw943012p6evb_01_macros Macros
+* \defgroup group_bsp_cyw943012p6evb_01_functions Functions
+* \defgroup group_bsp_cyw943012p6evb_01_enums Enumerated Types
 */
 
 #pragma once
@@ -70,4 +69,4 @@ extern "C" {
 }
 #endif
 
-/** \} group_bsp_cy8kit_062_wifi_bt */
+/** \} group_bsp_cyw943012p6evb_01 */

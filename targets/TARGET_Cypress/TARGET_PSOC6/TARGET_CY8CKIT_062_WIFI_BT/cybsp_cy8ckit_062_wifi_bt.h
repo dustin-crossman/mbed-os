@@ -24,7 +24,7 @@
 *******************************************************************************/
 
 /**
-* \addtogroup group_bsp_cy8kit_062_wifi_bt CY8CKIT-062-WIFI-BT
+* \addtogroup group_bsp_cy8ckit_062_wifi_bt CY8CKIT-062-WIFI-BT
 * \ingroup group_bsp
 * \{
 * The PSoC 6 WiFi-BT Pioneer Kit is a low-cost hardware platform
@@ -46,9 +46,9 @@
 * <li>USB cable</li>
 * </ul>
 *
-* \defgroup group_bsp_cy8kit_062_wifi_bt_macros Macros
-* \defgroup group_bsp_cy8kit_062_wifi_bt_functions Functions
-* \defgroup group_bsp_cy8kit_062_wifi_bt_enums Enumerated Types
+* \defgroup group_bsp_cy8ckit_062_wifi_bt_macros Macros
+* \defgroup group_bsp_cy8ckit_062_wifi_bt_functions Functions
+* \defgroup group_bsp_cy8ckit_062_wifi_bt_enums Enumerated Types
 */
 
 #pragma once
@@ -78,4 +78,4 @@ extern cyhal_rtc_t cybsp_rtc;
 }
 #endif
 
-/** \} group_bsp_cy8kit_062_wifi_bt */
+/** \} group_bsp_cy8ckit_062_wifi_bt */

@@ -73,6 +73,8 @@ typedef struct {
     SAR_Type*                   base;
     cyhal_resource_inst_t       resource;
     cyhal_clock_divider_t       clock;
+#else
+    void *empty;
 #endif
 } cyhal_adc_t;
 
@@ -81,6 +83,8 @@ typedef struct {
 #ifdef CY_IP_MXS40PASS_SAR
     cyhal_adc_t*                adc;
     cyhal_gpio_t                pin;
+#else
+    void *empty;
 #endif
 } cyhal_adc_channel_t;
 
@@ -287,7 +291,7 @@ typedef struct {
     uint16_t                    block_size;
     uint32_t                    irq_cause;
 
-#elif defined(CY8C6247BZI_D54) /* TODO: BSP-525 */
+#elif defined(CY8C6247BZI_D54)
     cyhal_resource_inst_t       resource;
     cyhal_gpio_t                pin_clk;
     cyhal_gpio_t                pin_cmd;

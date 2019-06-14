@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include "cyhal_implementation.h"
 
+#ifdef CY_IP_MXSCB
+
 #define UART_OVERSAMPLE                 12
 
 /* Default UART configuration */
@@ -500,10 +502,17 @@ static cy_en_scb_uart_stop_bits_t convert_stopbits(uint8_t stopbits)
 
 cy_rslt_t cyhal_uart_init(cyhal_uart_t *obj, cyhal_gpio_t tx, cyhal_gpio_t rx, const cyhal_clock_divider_t *clk, const cyhal_uart_cfg_t *cfg)
 {
-    cy_rslt_t result = CY_RSLT_SUCCESS;
-    // If something go wrong, any resource not marked as invalid will be freed.
+    CY_ASSERT(NULL != obj);
+
     // Explicitly marked not allocated resources as invalid to prevent freeing them.
-    memset(obj, 0, sizeof(cyhal_uart_t));
+    obj->resource.type = CYHAL_RSC_INVALID;
+    obj->is_user_clock = true;
+    obj->pin_rx = CYHAL_NC_PIN_VALUE;
+    obj->pin_tx = CYHAL_NC_PIN_VALUE;
+    obj->pin_cts = CYHAL_NC_PIN_VALUE;
+    obj->pin_rts = CYHAL_NC_PIN_VALUE;
+
+    cy_rslt_t result = CY_RSLT_SUCCESS;
     cyhal_resource_inst_t pin_rsc;
 
     // Reserve the UART
@@ -514,11 +523,11 @@ cy_rslt_t cyhal_uart_init(cyhal_uart_t *obj, cyhal_gpio_t tx, cyhal_gpio_t rx, c
         return CYHAL_UART_RSLT_ERR_INVALID_PIN;
     }
 
-    obj->resource = *rx_map->inst;
-    
-
-    if (CY_RSLT_SUCCESS != (result = cyhal_hwmgr_reserve(&obj->resource)))
+    cyhal_resource_inst_t rsc = *rx_map->inst;
+    if (CY_RSLT_SUCCESS != (result = cyhal_hwmgr_reserve(&rsc)))
         return result;
+
+    obj->resource = rsc;
 
     // reserve the TX pin
     pin_rsc = cyhal_utils_get_gpio_resource(tx);
@@ -539,9 +548,6 @@ cy_rslt_t cyhal_uart_init(cyhal_uart_t *obj, cyhal_gpio_t tx, cyhal_gpio_t rx, c
         }
     }
     
-    obj->pin_cts = NC;
-    obj->pin_rts = NC;
-
     obj->base = CY_SCB_BASE_ADDRESSES[obj->resource.block_num];
 
     if (result == CY_RSLT_SUCCESS)
@@ -626,6 +632,8 @@ cy_rslt_t cyhal_uart_init(cyhal_uart_t *obj, cyhal_gpio_t tx, cyhal_gpio_t rx, c
 
 void cyhal_uart_free(cyhal_uart_t *obj)
 {
+    CY_ASSERT(NULL != obj);
+
     if (obj->resource.type != CYHAL_RSC_INVALID)
     {
         cyhal_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
@@ -945,3 +953,5 @@ void cyhal_uart_irq_enable(cyhal_uart_t *obj, cyhal_uart_irq_event_t event, bool
         obj->irq_cause &= ~event;
     }
 }
+
+#endif /* CY_IP_MXSCB */
