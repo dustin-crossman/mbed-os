@@ -32,7 +32,7 @@ extern "C" {
 
 #if DEVICE_ANALOGIN
 struct analogin_s {
-    cyhal_adc_t hal_adc;
+    cyhal_adc_t *hal_adc;
     cyhal_adc_channel_t hal_adc_channel;
 };
 #endif
