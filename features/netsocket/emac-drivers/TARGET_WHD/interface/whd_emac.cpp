@@ -28,7 +28,7 @@
 #include "whd_buffer_api.h"
 #include "cybsp_api_wifi.h"
 #include "emac_eapol.h"
-
+#include "cy_result.h"
 
 extern "C"
 {
@@ -83,18 +83,29 @@ void WHD_EMAC::set_all_multicast(bool all)
 
 void WHD_EMAC::power_down()
 {
-    powered_up = false;
-    whd_wifi_off(ifp);
-    whd_deinit(ifp);
+    if(powered_up)
+    {
+        powered_up = false;
+        whd_wifi_off(ifp);
+        whd_deinit(ifp);
+    }
 }
 
 bool WHD_EMAC::power_up()
 {
-	drvp = *(cybsp_get_wifi_driver());
-	whd_wifi_on(drvp, &ifp /* OUT */);
-    powered_up = true;
-    if (link_state && emac_link_state_cb ) {
-        emac_link_state_cb(link_state);
+    if(!powered_up)
+    {
+        if(CY_RSLT_SUCCESS != cybsp_wifi_init()){
+            return false;
+        }
+        drvp = *(cybsp_get_wifi_driver());
+        if(WHD_SUCCESS != whd_wifi_on(drvp, &ifp /* OUT */)){
+            return false;
+        }
+        powered_up = true;
+        if (link_state && emac_link_state_cb ) {
+            emac_link_state_cb(link_state);
+        }
     }
     return true;
 }
@@ -144,8 +155,8 @@ bool WHD_EMAC::link_out(emac_mem_buf_t *buf)
     whd_result_t res = whd_host_buffer_get(drvp, &buffer, WHD_NETWORK_TX, size+offset, WHD_TRUE);
     if ( res != WHD_SUCCESS)
     {
-    	memory_manager->free(buf);
-    	return true;
+        memory_manager->free(buf);
+        return true;
     }
     MBED_ASSERT(res == WHD_SUCCESS);
 
@@ -210,7 +221,7 @@ void emac_unregister_eapol_packet_handler( void )
 
 void cy_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer)
 {
-	emac_mem_buf_t *mem_buf = NULL;
+    emac_mem_buf_t *mem_buf = NULL;
 
     WHD_EMAC &emac = WHD_EMAC::get_instance();
 
