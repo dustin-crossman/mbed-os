@@ -19,6 +19,7 @@
 
 /**
  * \file ecp.h
+ * \version 1.0
  *
  * \brief This file provides an API for Elliptic Curves over GF(P) (ECP).
  *
