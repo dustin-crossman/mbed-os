@@ -963,8 +963,7 @@ void SDIO_DisableSdClk(void)
 void SDIO_SetSdClkFrequency(uint32_t u32SdClkFreqHz)
 {
     uint16_t u16Div;
-    //TODO: Need a non-hardcoded value here
-    u16Div = 100000000 / (2*u32SdClkFreqHz);
+    u16Div = Cy_SysClk_ClkPeriGetFrequency() / u32SdClkFreqHz;
     Cy_SysClk_PeriphSetDivider(SDIO_HOST_Internal_Clock_DIV_TYPE, SDIO_HOST_Internal_Clock_DIV_NUM, (u16Div-1));
 }
 

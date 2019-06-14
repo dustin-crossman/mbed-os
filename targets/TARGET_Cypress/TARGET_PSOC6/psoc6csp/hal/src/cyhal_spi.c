@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include "cyhal_implementation.h"
 
+#ifdef CY_IP_MXSCB
+
 #define SPI_DEFAULT_SPEED               100000
 #define NUM_SPI_PORTS                   8
 #define SPI_DEFAULT_IRQ_PRIORITY        7
@@ -604,15 +606,17 @@ static bool is_cyhal_mode_msb(cyhal_spi_mode_t mode)
 cy_rslt_t cyhal_spi_init(cyhal_spi_t *obj, cyhal_gpio_t mosi, cyhal_gpio_t miso, cyhal_gpio_t sclk, cyhal_gpio_t ssel, const cyhal_clock_divider_t *clk,
                         uint8_t bits, cyhal_spi_mode_t mode, bool is_slave)
 {
+    CY_ASSERT(NULL != obj);
+
     cy_rslt_t result = CY_RSLT_SUCCESS;
     cyhal_resource_inst_t pin_rsc;
 
-    if (NULL == obj)
-        return CYHAL_SPI_RSLT_BAD_ARGUMENT;
-
-    // If something go wrong, any resource not marked as invalid will be freed.
     // Explicitly marked not allocated resources as invalid to prevent freeing them.
-    memset(obj, 0, sizeof(cyhal_spi_t));
+    obj->resource.type = CYHAL_RSC_INVALID;
+    obj->pin_miso = CYHAL_NC_PIN_VALUE;
+    obj->pin_mosi = CYHAL_NC_PIN_VALUE;
+    obj->pin_sclk = CYHAL_NC_PIN_VALUE;
+    obj->pin_ssel = CYHAL_NC_PIN_VALUE;
     
     const cyhal_resource_pin_mapping_t *mosi_map;
     const cyhal_resource_pin_mapping_t *miso_map;
@@ -1101,3 +1105,5 @@ void cyhal_spi_irq_enable(cyhal_spi_t *obj, cyhal_spi_irq_event_t event, bool en
         obj->irq_cause &= ~event;
     }
 }
+
+#endif /* CY_IP_MXSCB */

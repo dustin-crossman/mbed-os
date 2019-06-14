@@ -61,6 +61,11 @@ extern "C" {
 /** Pin: WIFI Host Wakeup */
 #define CYBSP_WIFI_HOST_WAKE   P1_4
 
+/** Host-wake GPIO drive mode */
+#define CYBSP_WIFI_HOST_WAKE_GPIO_DM CYHAL_GPIO_DRIVE_ANALOG
+/** Host-wake IRQ event */
+#define CYBSP_WIFI_HOST_WAKE_IRQ_EVENT CYHAL_GPIO_IRQ_RISE
+
 /** \} group_bsp_cy8cproto_062_4343w_macros */
 
 /**
@@ -100,11 +105,6 @@ typedef enum
 } cybsp_btn_t;
 
 /** \} group_bsp_cy8cproto_062_4343w_enums */
-
-/** Host-wake GPIO drive mode */
-#define CYBSP_WIFI_HOST_WAKE_GPIO_DM CYHAL_GPIO_DRIVE_ANALOG
-/** Host-wake IRQ event */
-#define CYBSP_WIFI_HOST_WAKE_IRQ_EVENT CYHAL_GPIO_IRQ_RISE
 
 #if defined(__cplusplus)
 }

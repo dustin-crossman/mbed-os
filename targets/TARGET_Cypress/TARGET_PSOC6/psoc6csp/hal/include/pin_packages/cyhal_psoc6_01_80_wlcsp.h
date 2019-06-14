@@ -5,7 +5,7 @@
 * PSoC6_01 device GPIO HAL header for 80-WLCSP package
 *
 * \note
-* Generator version: 1.4.7097.19784
+* Generator version: 1.4.7104.26717
 *
 ********************************************************************************
 * \copyright
@@ -137,8 +137,16 @@ extern const cyhal_resource_pin_mapping_t cyhal_pin_map_audioss_tx_sdo[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_audioss_tx_ws[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_dsi_comp0[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_dsi_comp1[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inn_comp0[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inn_comp1[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inp_comp0[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inp_comp1[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_oa0_out_10x[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_oa1_out_10x[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_pads[6];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_dsi_ctb_cmp0[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_dsi_ctb_cmp1[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_sarmux_pads[4];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_i2c_scl[13];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_i2c_sda[13];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_m_clk[11];

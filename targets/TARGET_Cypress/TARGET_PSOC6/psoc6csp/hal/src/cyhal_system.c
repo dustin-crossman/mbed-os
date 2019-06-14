@@ -27,6 +27,8 @@
 
 #include "cyhal_system.h"
 
+#ifdef CY_IP_MXS40SRSS
+
 #define HZ_PER_MHZ 1000000
 
 cy_rslt_t cyhal_system_register_callback(cyhal_system_call_back_t *handler)
@@ -261,3 +263,5 @@ cy_rslt_t cyhal_system_clock_divider(cyhal_system_clock_t clock, cyhal_system_di
     SystemCoreClockUpdate();
     return CY_RSLT_SUCCESS;
 }
+
+#endif /* CY_IP_MXS40SRSS */

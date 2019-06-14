@@ -5,7 +5,7 @@
 * PSoC6_03 device GPIO HAL header for 100-TQFP package
 *
 * \note
-* Generator version: 1.4.7097.19784
+* Generator version: 1.4.7104.26717
 *
 ********************************************************************************
 * \copyright
@@ -133,6 +133,11 @@ extern const cyhal_resource_pin_mapping_t cyhal_pin_map_canfd_ttcan_rx[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_canfd_ttcan_tx[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_dsi_comp0[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_dsi_comp1[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inn_comp0[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inn_comp1[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inp_comp0[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inp_comp1[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_sarmux_pads[8];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_i2c_scl[12];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_i2c_sda[12];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_m_clk[9];
