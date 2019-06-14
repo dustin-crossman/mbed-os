@@ -114,6 +114,12 @@ whd_result_t whd_cdc_bdc_info_init(whd_driver_t whd_driver)
         whd_rtos_deinit_semaphore(&cdc_bdc_info->ioctl_mutex);
         return WHD_SEMAPHORE_ERROR;
     }
+    if(whd_rtos_get_semaphore(&cdc_bdc_info->ioctl_sleep, NEVER_TIMEOUT, WHD_FALSE) != WHD_SUCCESS)
+    {
+        whd_rtos_deinit_semaphore(&cdc_bdc_info->ioctl_sleep);
+		whd_rtos_deinit_semaphore(&cdc_bdc_info->ioctl_mutex);
+		return WHD_SEMAPHORE_ERROR;
+    }
 
     /* Create semaphore to protect event list management */
     if (whd_rtos_init_semaphore(&cdc_bdc_info->event_list_mutex) != WHD_SUCCESS)
