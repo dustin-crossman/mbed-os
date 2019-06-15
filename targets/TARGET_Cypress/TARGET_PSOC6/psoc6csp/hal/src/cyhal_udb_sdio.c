@@ -52,6 +52,9 @@
 /* The 1 byte transition mode define */
 #define CY_HAL_SDIO_1B        (1u)
 
+
+static uint8_t tempBuffer[2048];
+
 /*******************************************************************************
 *       (Internal) Configuration structures for SDIO pins
 *******************************************************************************/
@@ -470,7 +473,7 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     en_sdio_result_t status;
     uint32_t cmdResponse;
     cy_rslt_t retVal = CY_RSLT_SUCCESS;
-    uint8_t* tempBuffer = NULL;
+   // uint8_t* tempBuffer = NULL;
     if (response != NULL)
     {
         *response = 0;
@@ -485,10 +488,10 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     cmd.bRead = (direction != CYHAL_READ) ? false : true;
 
     /* Cypress ID BSP-542 */
-    if (cmd.bRead)
-    {
-        tempBuffer = (uint8_t*)malloc(length + obj->block_size - 1);
-    }
+  //  if (cmd.bRead)
+  //  {
+  //      tempBuffer = (uint8_t*)malloc(length + obj->block_size - 1);
+   // }
 
     if (length >= obj->block_size)
     {
@@ -514,9 +517,10 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
         retVal = CYHAL_SDIO_RSLT_ERR_FUNC_RET(status);
     }
 
+
     if(retVal == CY_RSLT_SUCCESS && length >= obj->block_size && cmd.bRead)
     {
-        memcpy((uint8_t *)data, tempBuffer, (size_t)length);
+      memcpy((uint8_t *)data, tempBuffer, (size_t)length);
     }
 
     if (response != NULL)
@@ -524,10 +528,10 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
         *response = cmdResponse;
     }
 
-    if (tempBuffer != NULL)
-    {
-        free(tempBuffer);
-    }
+  //  if (tempBuffer != NULL)
+  //  {
+  //      free(tempBuffer);
+  //  }
 
     return retVal;
 }
