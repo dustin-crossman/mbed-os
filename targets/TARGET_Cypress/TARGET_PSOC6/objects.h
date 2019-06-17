@@ -40,7 +40,6 @@ struct analogin_s {
 #if DEVICE_ANALOGOUT
 struct dac_s {
     cyhal_dac_t hal_dac;
-    uint16_t max;
 };
 #endif
 
