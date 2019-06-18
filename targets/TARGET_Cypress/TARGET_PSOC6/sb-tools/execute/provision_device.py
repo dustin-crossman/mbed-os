@@ -72,7 +72,6 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, pro
     if is_exam_pass:
         print(os.linesep + 'PROGRAMMING APP HEX:')
         tool.program(cy_bootloader_hex)
-        reset_device(tool)
 
     if is_exam_pass:
         print(os.linesep + 'Run provisioning syscall')
