@@ -20,22 +20,7 @@
 extern "C" {
 #endif
 #define SEMAPHORE
-#define NEVER_TIMEOUT ( (uint32_t)0xffffffffUL )
-typedef osSemaphoreId_t cy_rtos_semaphore_type_t;
-/**
- * Boolean values
- */
-typedef enum
-{
-    CYRSLT_FALSE = 0,
-    CYRSLT_TRUE = 1
-} cy_bool_t;
 
-en_sdio_result_t cy_rtos_init_semaphore(/*@out@*/ cy_rtos_semaphore_type_t *semaphore);
-en_sdio_result_t cy_rtos_get_semaphore(cy_rtos_semaphore_type_t *semaphore, uint32_t timeout_ms,
-                                          cy_bool_t will_set_in_isr);
-en_sdio_result_t cy_rtos_set_semaphore(cy_rtos_semaphore_type_t *semaphore, cy_bool_t called_from_ISR);
-en_sdio_result_t cy_rtos_deinit_semaphore(cy_rtos_semaphore_type_t *semaphore);
 
 /*Globals Needed for DMA */
 /*DMA channel structures*/
@@ -64,7 +49,13 @@ static uint32_t yCounts;
 
 /* declare a semaphore*/
 #ifdef SEMAPHORE
-static cy_rtos_semaphore_type_t        sdio_transfer_finished_semaphore;
+#define NEVER_TIMEOUT ( (uint32_t)0xffffffffUL )
+typedef osSemaphoreId_t cy_semaphore_t;
+en_sdio_result_t cy_rtos_init_semaphore(/*@out@*/ cy_semaphore_t *semaphore);
+en_sdio_result_t cy_rtos_get_semaphore(cy_semaphore_t *semaphore, uint32_t timeout_ms);
+en_sdio_result_t cy_rtos_set_semaphore(cy_semaphore_t *semaphore );
+en_sdio_result_t cy_rtos_deinit_semaphore(cy_semaphore_t *semaphore);
+static cy_semaphore_t   sdio_transfer_finished_semaphore;
 #endif
 
 static uint32_t udb_initialized = 0;
@@ -85,11 +76,6 @@ static uint32_t udb_initialized = 0;
 *******************************************************************************/
 void SDIO_Init(stc_sdio_irq_cb_t* pfuCb)
 {
-
-#ifdef SEMAPHORE
-	en_sdio_result_t result;
-#endif
-
     if ( !udb_initialized )
     {
         udb_initialized = 1;
@@ -144,15 +130,9 @@ void SDIO_Init(stc_sdio_irq_cb_t* pfuCb)
     SDIO_EnableIntClock();
     SDIO_EnableSdClk();
 
-
      /*Initalize the semaphore*/
 #ifdef SEMAPHORE
-    result = cy_rtos_init_semaphore( &sdio_transfer_finished_semaphore );
-    if(result != Ok)
-    {
-    	printf("cy_rtos_init_semaphore failed\n");
-        while(1);
-    }
+   cy_rtos_init_semaphore( &sdio_transfer_finished_semaphore );
 #endif
 }
 
@@ -740,7 +720,7 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                         if(u32Timeout == SDIO_DAT_TIMEOUT)
 
             #else
-                         result = cy_rtos_get_semaphore( &sdio_transfer_finished_semaphore, 10, CYRSLT_TRUE );
+                         result = cy_rtos_get_semaphore( &sdio_transfer_finished_semaphore, 10 );
                          enRetTmp = SDIO_CheckForEvent(SdCmdEventTransferDone);
                       /*if it was a read it is possible there is still extra data hanging out, trigger the
                            DMA again. This can result in extra data being transfered so the read buffer should be
@@ -1223,7 +1203,7 @@ void SDIO_IRQ(void)
         }
         /*set the done flag*/
 #ifdef SEMAPHORE
-        cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore, CYRSLT_TRUE );
+        cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore );
 #else
         gstcInternalData.stcEvents.u8TransComplete++;
 #endif
@@ -1243,7 +1223,7 @@ void SDIO_IRQ(void)
         }
         /*Okay we're done so set the done flag*/
 #ifdef SEMAPHORE
-        cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore, CYRSLT_TRUE );
+        cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore );
 #else
         gstcInternalData.stcEvents.u8TransComplete++;
 #endif
@@ -1383,9 +1363,9 @@ void SDIO_WRITE_DMA_IRQ(void)
  *
  * @param semaphore         : pointer to variable which will receive handle of created semaphore
  *
- * @returns WHD_SUCCESS on success, error otherwise
+ * @returns Ok on success, Error otherwise
  */
-en_sdio_result_t cy_rtos_init_semaphore(/*@out@*/ cy_rtos_semaphore_type_t *semaphore)   /*@modifies *semaphore@*/
+en_sdio_result_t cy_rtos_init_semaphore(/*@out@*/ cy_semaphore_t *semaphore)   /*@modifies *semaphore@*/
 {
     *semaphore = osSemaphoreNew(1, 1, NULL);
     if (*semaphore == NULL)
@@ -1404,18 +1384,13 @@ en_sdio_result_t cy_rtos_init_semaphore(/*@out@*/ cy_rtos_semaphore_type_t *sema
  *
  * Must not be called from interrupt context, since it could block, and since an interrupt is not a
  * normal thread, so could cause RTOS problems if it tries to suspend it.
- * If called from interrupt context time out value should be 0.
  *
  * @param semaphore   : Pointer to variable which will receive handle of created semaphore
  * @param timeout_ms  : Maximum period to block for. Can be passed NEVER_TIMEOUT to request no timeout
- * @param will_set_in_isr : True if the semaphore will be set in an ISR. Currently only used for NoOS/NoNS
- *
  */
-en_sdio_result_t cy_rtos_get_semaphore(cy_rtos_semaphore_type_t *semaphore, uint32_t timeout_ms,
-                                          cy_bool_t will_set_in_isr)
+en_sdio_result_t cy_rtos_get_semaphore(cy_semaphore_t *semaphore, uint32_t timeout_ms)
 {
     osStatus_t result;
- //   UNUSED_PARAMETER(will_set_in_isr);
 
     if (*semaphore == NULL)
     {
@@ -1425,7 +1400,7 @@ en_sdio_result_t cy_rtos_get_semaphore(cy_rtos_semaphore_type_t *semaphore, uint
     if (timeout_ms == NEVER_TIMEOUT)
         result = osSemaphoreAcquire(*semaphore, osWaitForever);
     else
-        result = osSemaphoreAcquire(*semaphore, timeout_ms * 1000 / 1000);
+        result = osSemaphoreAcquire(*semaphore, timeout_ms );
 
     if (result == osOK)
     {
@@ -1452,17 +1427,13 @@ en_sdio_result_t cy_rtos_get_semaphore(cy_rtos_semaphore_type_t *semaphore, uint
  * threads from interrupt context.
  *
  * @param semaphore       : Pointer to variable which will receive handle of created semaphore
- * @param called_from_ISR : Value of WHD_TRUE indicates calling from interrupt context
- *                          Value of WHD_FALSE indicates calling from normal thread context
- *
- * @return whd_result_t : WHD_SUCCESS if semaphore was successfully set
- *                        : error if an error occurred
+ * @return en_sdio_result_t :Ok if semaphore was successfully set
+ *                          : Error if an error occurred
  *
  */
-en_sdio_result_t cy_rtos_set_semaphore(cy_rtos_semaphore_type_t *semaphore, cy_bool_t called_from_ISR)
+en_sdio_result_t cy_rtos_set_semaphore(cy_semaphore_t *semaphore )
 {
     osStatus_t result;
-   // UNUSED_PARAMETER(called_from_ISR);
 
     if (*semaphore == NULL)
     {
@@ -1486,15 +1457,15 @@ en_sdio_result_t cy_rtos_set_semaphore(cy_rtos_semaphore_type_t *semaphore, cy_b
 /**
  * Deletes a semaphore
  *
- * WHD uses this function to delete a semaphore.
+ * function to delete a semaphore.
  *
  * @param semaphore         : Pointer to the semaphore handle
  *
- * @return whd_result_t : WHD_SUCCESS if semaphore was successfully deleted
- *                        : error if an error occurred
+ * @return en_sdio_result_t : Ok if semaphore was successfully deleted
+ *                        : Error if an error occurred
  *
  */
-en_sdio_result_t cy_rtos_deinit_semaphore(cy_rtos_semaphore_type_t *semaphore)
+en_sdio_result_t cy_rtos_deinit_semaphore(cy_semaphore_t *semaphore)
 {
     osStatus_t result;
     if (*semaphore == NULL)
