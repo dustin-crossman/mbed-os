@@ -34,49 +34,38 @@ extern "C" {
 
 cy_rslt_t cybsp_init(void)
 {
-    init_cycfg_all();
-    return CY_RSLT_SUCCESS;
-}
+	init_cycfg_system();
 
-cy_rslt_t cybsp_led_init(cybsp_led_t which)
-{
-    return cyhal_gpio_init((cyhal_gpio_t)which, CYHAL_GPIO_DIR_OUTPUT, CYHAL_GPIO_DRIVE_STRONG, CYBSP_LED_STATE_OFF);
-}
+    cy_rslt_t result = CY_RSLT_SUCCESS;
+    /* Initialize User LEDs */
+    result |= cybsp_led_init(CYBSP_LED_RGB_RED);
+    result |= cybsp_led_init(CYBSP_LED_RGB_BLUE);
+    result |= cybsp_led_init(CYBSP_LED_RGB_GREEN);
+    /* Initialize User Buttons */
+    result |= cybsp_btn_init(CYBSP_USER_BTN0);
 
-void cybsp_led_set_state(cybsp_led_t which, bool on)
-{
-    cyhal_gpio_write((cyhal_gpio_t)which, on);
-}
+    CY_ASSERT(CY_RSLT_SUCCESS == result);
 
-void cybsp_led_toggle(cybsp_led_t which)
-{
-    cyhal_gpio_toggle((cyhal_gpio_t)which);
-}
-
-cy_rslt_t cybsp_btn_init(cybsp_btn_t which)
-{
-    return cyhal_gpio_init((cyhal_gpio_t)which, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
-}
-
-bool cybsp_btn_get_state(cybsp_btn_t which)
-{
-    return cyhal_gpio_read((cyhal_gpio_t)which);
-}
-
-static void (*btn_interrupt_call_back) (void);
-static void gpio_call_back_wrapper(void *handler_arg, cyhal_gpio_irq_event_t event)
-{
-    if (btn_interrupt_call_back != NULL)
+#if defined(CYBSP_WIFI_CAPABLE)
+    /* Initialize UDB SDIO interface. This must be done before any other HAL API attempts to allocate clocks or DMA
+       instances. The UDB SDIO interface uses specific instances which are reserved as part of this call.
+       NOTE: The full WiFi interface still needs to be initialized via cybsp_wifi_init(). This is typically done
+       when starting up WiFi. */
+    if (CY_RSLT_SUCCESS == result)
     {
-        btn_interrupt_call_back();
+        result = cybsp_sdio_init();
     }
-}
+#endif
 
-void cybsp_btn_set_interrupt(cybsp_btn_t which, cyhal_gpio_irq_event_t type, void (*callback)(void))
-{
-    btn_interrupt_call_back = callback;
-    cyhal_gpio_register_irq((cyhal_gpio_t)which, 7, &gpio_call_back_wrapper, NULL);
-    cyhal_gpio_irq_enable((cyhal_gpio_t)which, type, 1);
+#if defined(CYBSP_RETARGET_ENABLED)
+    /* Initialize retargetting stdio to 'DEBUG_UART' peripheral */
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cybsp_retarget_init();
+    }
+#endif
+
+    return result;
 }
 
 #if defined(__cplusplus)

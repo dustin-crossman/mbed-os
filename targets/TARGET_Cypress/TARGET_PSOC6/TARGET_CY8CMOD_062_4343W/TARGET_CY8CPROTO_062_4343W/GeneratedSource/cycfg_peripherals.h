@@ -78,12 +78,12 @@ extern "C" {
 #define CYBSP_BT_UART_ENABLED 1U
 #define CYBSP_BT_UART_HW SCB2
 #define CYBSP_BT_UART_IRQ scb_2_interrupt_IRQn
-#define CYBSP_I2C_ENABLED 1U
-#define CYBSP_I2C_HW SCB3
-#define CYBSP_I2C_IRQ scb_3_interrupt_IRQn
-#define CYBSP_UART_ENABLED 1U
-#define CYBSP_UART_HW SCB5
-#define CYBSP_UART_IRQ scb_5_interrupt_IRQn
+#define CYBSP_CSD_COMM_ENABLED 1U
+#define CYBSP_CSD_COMM_HW SCB3
+#define CYBSP_CSD_COMM_IRQ scb_3_interrupt_IRQn
+#define CYBSP_DEBUG_UART_ENABLED 1U
+#define CYBSP_DEBUG_UART_HW SCB5
+#define CYBSP_DEBUG_UART_IRQ scb_5_interrupt_IRQn
 #define CYBSP_RADIO_ENABLED 1U
 #define CYBSP_RADIO_HW SDHC0
 #define CYBSP_RADIO_IRQ sdhc_0_interrupt_general_IRQn
@@ -119,8 +119,8 @@ extern "C" {
 
 extern cy_stc_csd_context_t cy_csd_0_context;
 extern const cy_stc_scb_uart_config_t CYBSP_BT_UART_config;
-extern const cy_stc_scb_ezi2c_config_t CYBSP_I2C_config;
-extern const cy_stc_scb_uart_config_t CYBSP_UART_config;
+extern const cy_stc_scb_ezi2c_config_t CYBSP_CSD_COMM_config;
+extern const cy_stc_scb_uart_config_t CYBSP_DEBUG_UART_config;
 extern cy_en_sd_host_card_capacity_t CYBSP_RADIO_cardCapacity;
 extern cy_en_sd_host_card_type_t CYBSP_RADIO_cardType;
 extern uint32_t CYBSP_RADIO_rca;

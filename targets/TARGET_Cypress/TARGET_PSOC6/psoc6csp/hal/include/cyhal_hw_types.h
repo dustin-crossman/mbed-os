@@ -413,9 +413,11 @@ typedef struct {
     USBFS_Type*                     base;
     cy_stc_usbfs_dev_drv_context_t  context;
     cyhal_resource_inst_t           resource;
-    cyhal_gpio_t                    pin_dp;
-    cyhal_gpio_t                    pin_dm;
+    cyhal_resource_inst_t           pll_resource;
     cyhal_clock_divider_t           clock;
+    bool                            shared_clock;
+    cyhal_gpio_t                    pin_dp;
+    cyhal_gpio_t                    pin_dm;    
     uint8_t *rd_data[CY_USBFS_DEV_DRV_NUM_EPS_MAX];
     uint32_t rd_size[CY_USBFS_DEV_DRV_NUM_EPS_MAX];
 #else

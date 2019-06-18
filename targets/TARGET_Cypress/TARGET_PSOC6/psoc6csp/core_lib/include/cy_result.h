@@ -108,7 +108,8 @@ extern "C" {
 /** Base identifier for board support modules */
 #define CY_RSLT_MODULE_ABSTRACTION_ENV            (0x0184U)
 
-/**** Middleware Module codes: 0x0100 - 0x01FF ****/
+/**** Middleware Module codes: 0x0200 - 0x02FF ****/
+#define CY_RSLT_MODULE_MIDDLEWARE_BASE            (0x0200U)
 
 
 

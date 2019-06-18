@@ -28,7 +28,7 @@
 #include "cy_crypto_core_crc.h"
 #include "cyhal_trng_impl.h"
 
-#if defined(CY_IP_MXCRYPTO_INSTANCES) || defined(CPUSS_CRYPTO_PRESENT)
+#if defined(CY_IP_MXCRYPTO)
 
 /*******************************************************************************
 *       Functions
@@ -52,4 +52,4 @@ void cyhal_trng_free(cyhal_trng_t *obj)
     }
 }
 
-#endif /* defined(CY_IP_MXCRYPTO_INSTANCES) || defined(CPUSS_CRYPTO_PRESENT) */
+#endif /* defined(CY_IP_MXCRYPTO) */

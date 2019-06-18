@@ -26,6 +26,8 @@
 
 #include "cyhal_trng.h"
 
+#if defined(CY_IP_MXCRYPTO)
+
 #if defined(__cplusplus)
 extern "C" {
 #endif /* __cplusplus */
@@ -53,3 +55,5 @@ static inline uint32_t cyhal_trng_generate_internal(const cyhal_trng_t *obj)
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */
+
+#endif /* defined(CY_IP_MXCRYPTO) */

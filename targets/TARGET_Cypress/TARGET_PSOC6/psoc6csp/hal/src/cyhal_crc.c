@@ -28,7 +28,7 @@
 #include "cyhal_crc_impl.h"
 #include "cyhal_hwmgr.h"
 
-#if defined(CY_IP_MXCRYPTO_INSTANCES) || defined(CPUSS_CRYPTO_PRESENT)
+#if defined(CY_IP_MXCRYPTO)
 
 /*******************************************************************************
 *       Functions
@@ -52,4 +52,4 @@ void cyhal_crc_free(cyhal_crc_t *obj)
     }
 }
 
-#endif /* defined(CY_IP_MXCRYPTO_INSTANCES) || defined(CPUSS_CRYPTO_PRESENT) */
+#endif /* defined(CY_IP_MXCRYPTO) */
