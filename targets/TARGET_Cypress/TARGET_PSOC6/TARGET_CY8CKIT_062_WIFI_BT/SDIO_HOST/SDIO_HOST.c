@@ -132,7 +132,7 @@ void SDIO_Init(stc_sdio_irq_cb_t* pfuCb)
 
      /*Initalize the semaphore*/
 #ifdef SEMAPHORE
-   cy_rtos_init_semaphore( &sdio_transfer_finished_semaphore );
+    cy_rtos_init_semaphore( &sdio_transfer_finished_semaphore );
 #endif
 }
 
@@ -699,7 +699,7 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                             SDIO_CONTROL_REG |= SDIO_CTRL_ENABLE_WRITE;
                         }
 
-            #ifndef SEMAPHORE
+#ifndef SEMAPHORE
                          /*Wait for the transfer to finish*/
                         do
                         {
@@ -707,7 +707,7 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                             u32Timeout++;
                             enRetTmp = SDIO_CheckForEvent(SdCmdEventTransferDone);
 
-                        }while (!((enRetTmp == Ok) || (enRetTmp == DataCrcError) || (u32Timeout >= SDIO_DAT_TIMEOUT)));
+                        } while (!((enRetTmp == Ok) || (enRetTmp == DataCrcError) || (u32Timeout >= SDIO_DAT_TIMEOUT)));
 
                         /*if it was a read it is possible there is still extra data hanging out, trigger the
                           DMA again. This can result in extra data being transfered so the read buffer should be
@@ -719,10 +719,11 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
 
                         if(u32Timeout == SDIO_DAT_TIMEOUT)
 
-            #else
+#else
                          result = cy_rtos_get_semaphore( &sdio_transfer_finished_semaphore, 10 );
                          enRetTmp = SDIO_CheckForEvent(SdCmdEventTransferDone);
-                      /*if it was a read it is possible there is still extra data hanging out, trigger the
+
+                         /* if it was a read it is possible there is still extra data hanging out, trigger the
                            DMA again. This can result in extra data being transfered so the read buffer should be
                            3 bytes bigger than needed*/
                         if(pstcCmd->bRead == true)
@@ -730,9 +731,8 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                             Cy_TrigMux_SwTrigger((uint32_t)SDIO_HOST_Read_DMA_DW__TR_IN, 2);
                         }
 
-
                         if(result != Ok)
-            #endif
+#endif
                         {
                             enRet |= DataTimeout;
                         }
@@ -749,7 +749,7 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
 
 
 #ifndef SEMAPHORE
-            u32Timeout = 0;
+    u32Timeout = 0;
 #endif
 
     /*If there were no errors then indicate transfer was okay*/
@@ -1410,10 +1410,7 @@ en_sdio_result_t cy_rtos_get_semaphore(cy_semaphore_t *semaphore, uint32_t timeo
     {
         return DataTimeout;
     }
-    else if (result == osErrorResource)
-    {
-        return Error;
-    }
+
     return Error;
 }
 
@@ -1447,10 +1444,6 @@ en_sdio_result_t cy_rtos_set_semaphore(cy_semaphore_t *semaphore )
         return Ok;
     }
 
-    else if (result == osErrorParameter)
-    {
-        return Error;
-    }
     return Error;
 }
 
