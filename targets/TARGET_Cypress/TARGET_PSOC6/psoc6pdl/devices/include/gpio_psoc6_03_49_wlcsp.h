@@ -5,7 +5,7 @@
 * PSoC6_03 device GPIO header for 49-WLCSP package
 *
 * \note
-* Generator version: 1.4.0.1268
+* Generator version: 1.5.0.1274
 *
 ********************************************************************************
 * \copyright

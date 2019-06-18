@@ -26,57 +26,209 @@
 /**
 * \addtogroup group_seglcd
 * \{
-* The Segment LCD driver provides an API to configure and access the MXLCD hardware.
-*
-* The Segment LCD solution (driver + HW) can directly drive a variety of LCD glass
+* The Segment LCD Driver provides an API to configure and operate the MXLCD hardware block.
+* The MXLCD block can be flexibly configured to drive a variety of LCD glass
 * at different voltage levels with multiplex ratios.
-* The driver provides an easy method of configuring the MXLCD block to drive your
-* custom or standard glass.
 *
 * Features:
-* * Digital Correlation and PWM at 1/2, 1/3, 1/4 and at 1/5 bias modes supported
-* * Drive STN/TN LCD glass with up to eight COMs (device specific)
-* * Four priority levels for each channel
+* * Digital Correlation and PWM at 1/2, 1/3, 1/4 and at 1/5 bias modes are supported
+* * Drives STN/TN LCD-glass with up to eight COMs (device specific)
 * * 30 to 150 Hz refresh rate
-* * Supports both type A (standard) and type B (low power) waveforms
-* * Pixel state of the display may be inverted for a negative image
-* * Operation in Deep Sleep Mode from the ILO
+* * Supports both type A (standard) and type B (low-power) waveforms
+* * The display pixel state can be inverted for a negative image
+* * Operation in Deep Sleep Mode from ILO/MFO
 * * All-digital contrast control using "Dead Period" digital modulation
-* * Set of basic standard displays and fonts.
-* * Customizable display and font structure.
+* * A set of basic standard displays and fonts
+* * The customizable display and font structures.
+*
+* \section group_seglcd_glossary Glossary
+* * LCD - Liquid Crystal Display
+* * Glass - An LCD glass that may contain a few displays
+*   (e.g. one 7-segment display and one bar-graph display).
+* * TN - A twisted nematic LCD glass.
+* * STN - A super-twisted nematic LCD glass.
+* * Display - A block of homogeneous symbols on an LCD glass
+*   intended to indicate a multi-digital number or string.
+*   A few displays are possible whithin a single LCD glass.
+* * Pixel - A unity LCD displaying item with a binary state (on/off).
+*   It can be a segment of e.g. the 7-segment symbol (therefore may be called "segment"),
+*   a pixel of the matrix display, or a standalone arbitrarily-shaped display element.
+*   Each pixel has a unique set of common and segment lines in scope of the LCD glass.
+*   The API offers pixel identifiers - the 32-bit items of the display pixel map 
+*   (to use in the display structure definition, see \ref cy_stc_seglcd_disp_t),
+*   created by the \ref CY_SEGLCD_PIXEL macro.
+* * Common line (Com/COM for short) - A common wire/signal from the PSoC chip to the LCD glass.
+*   The API offers common line identifiers - the 32-bit items of the commons array
+*   (to use in \ref Cy_SegLCD_ClrFrame and \ref Cy_SegLCD_InvFrame),
+*   created by the \ref CY_SEGLCD_COMMON macro.
+* * Segment line (Seg/SEG for short) - A segment wire/signal from the PSoC chip to the LCD glass.
+* * Octet - A bunch of subsequent eight MXLCD terminals. Octets may not match GPIO ports.
+* * Frame buffer - An array of registers to control the MXLCD signal generation for all the MXLCD terminals.
+*
+* \section group_seglcd_solution SegLCD Solution
+* The Segment LCD Driver can be used either as a standalone library
+* to manage the MXLCD hardware or as a part of the more complex software solution
+* delivered within ModusToolbox: 
+* the Device Configurator SegLCD personality and the SegLCD Configurator tools.
+*
+* The SegLCD solution provides an easy method to configure
+* an MXLCD block to drive your standard or custom LCD glass:
+* \image html seglcd_solution.png
+* The SegLCD solution includes:
+* * The SegLCD Configurator tool, which is a display configuration wizard to create and 
+*   configure displays and generate commons array and display structures \ref cy_stc_seglcd_disp_t.
+* * The ModusToolbox Device Configurator contains a SegLCD personality, which is an MXLCD block 
+*   configuration wizard. It helps to easily tune all the timing settings, operation modes,
+*   provides a flexible GPIO pin assignment capability and generates the \ref cy_stc_seglcd_config_t
+*   structure and the rest of accompanying definitions.
+* * The SegLCD Driver API itself, which uses all the mentioned above generated code.
 *
 * \section group_seglcd_configuration Configuration Considerations
-*
-* To start working with an LCD first initialize an MXLCD block, then initialize
-* a frame buffer and then enable the block:
+* To start working with an LCD, first initialize the MXLCD block, then initialize
+* the frame buffer, and then enable the block:
 * \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_Config
+* \note If you use ModusToolbox Device Configurator, a SegLCD configuration structure
+* is generated automatically into the GeneratedSource/cycfg_peripherals.h/.c files.
+* All you need is just to call \ref Cy_SegLCD_Init with a pointer to the structure.
+*
 * \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_Init
 *
-* Now the display structure is needed:
-* \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_Display
+* Contrast vs. Frame Rate (\ref cy_stc_seglcd_config_t.contrast vs. \ref cy_stc_seglcd_config_t.frRate)\n
+* Some combinations of a frame rate and input frequency can restrict the valid contrast range
+* because of the limited dividers size (for Low Speed mode - 8 bit, and for High Speed mode - 16 bit). 
+* For small values of contrast at small frame rates, the required divider values 
+* may be beyond permissible limits of the dividers size. 
+* For large High Speed clock frequencies, certain ratios between the contrast and frame
+* rate cannot be achieved due to the limited divider size. The \ref Cy_SegLCD_Init function
+* automatically restricts such incorrect combinations (returns \ref CY_SEGLCD_BAD_PARAM).
 *
-* And now you can write characters, multi-digit numbers and strings onto the display:
-* \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_Char
+* Speed Mode Switching (\ref cy_stc_seglcd_config_t.speed)\n
+* The High Speed and Low Speed generators mostly duplicate each other,
+* except that for MXLCD_ver1, the High Speed version has larger frequency dividers to generate
+* the frame and sub-frame periods. This is because the clock of the High Speed block 
+* typically has a frequency 30-100 times bigger than the 32 KHz clock fed to the Low Speed block. 
+* For MXLCD_ver2, both High Speed and Low Speed generators have similar 16-bit dividers,
+* because a possibility exists to source a Low Speed generator with a Medium Frequency clock
+* (see \ref group_sysclk_mf_funcs) that may be much higher than 32 KHz ILO.
+* Switching between High Speed and Low Speed modes via the \ref Cy_SegLCD_Init function
+* causes the dividers to reconfigure.
+* Under possible restrictions related to certain ratios between contrast and frame rates 
+* (see Contrast vs. Frame Rate section above), switching between High Speed and the Low Speed modes
+* via the \ref Cy_SegLCD_Init function may set new dividers values that don’t give the same contrast value.
+*
+* Driving Modes (\ref cy_stc_seglcd_config_t.drive)\n
+* SegLCD supports the following operating modes:
+* * Digital Correlation - preferred for low clock speeds, low common lines count and low supply voltages.
+* * PWM at 1/2, 1/3, 1/4 or 1/5 Bias - preferred for high clock speeds (e.g. over 1MHz), many common lines (e.g. over 4), and high voltages (e.g. 3.3V or higher).
+* More precise preferences depend on a certain set of an LCD glass, power modes, the number of terminals, desired contrast/frame rate settings, etc.
+*
+* Conventional Waveforms (\ref cy_stc_seglcd_config_t.wave)\n
+* Conventional LCD drivers apply waveforms to COM and SEG electrodes generated by switching 
+* between multiple different voltages. The following terms are used to define these waveforms:
+* * Duty:  A driver operates in the 1/M-th duty when it drives M COM electrodes. Each COM electrode is effectively driven for the 1/M of the frame time.
+* * Bias:  A driver uses the 1/B-th bias when its waveforms use the voltage steps of (1/B)*VDRV.
+* * Frame: A frame is the time length to address all segments.
+*   During a frame, the driver cycles through the commons in sequence.
+*   All segments receive 0V DC when measured over the length of an entire frame.
+* * Type-A Waveform:  The driver structures the frame into M sub-frames. COMi is addressed in sub-frame i.
+* * Type-B Waveform:  The driver structures the frame into 2M sub-frames. COMi is addressed in sub-frames i and M+i.
+*   The two sub-frames are inverse of each other.  Typically, type-B waveforms are slightly more power-efficient because they contain fewer transitions.
+*
+* The following figures show the conventional waveforms for COM and SEG electrodes for the 1/3rd bias and 1/4th duty. Only COM0/COM1 and SEG0/SEG1 are drawn.
+* Conventional Type-A Waveform Example:
+* \image html seglcd_waveA.png
+* Conventional Type-B Waveform Example:
+* \image html seglcd_waveB.png
+* The generalized waveforms for individual sub-frames for any duty and bias are illustrated in the following figure.
+* Note that these use 6 different voltages at most(including VSS and VDRV).
+* Conventional Waveforms - Generalized:
+* \image html seglcd_waveGen.png
+* The effective RMS voltage for on and off segments can be calculated using these waveforms:
+* \image html seglcd_Voff.png
+* \image html seglcd_Von.png
+* The resulting Discrimination Ratio (D) for various bias and duty combinations is illustrated in the following table.
+* The bias choice (B) for each duty (M) with the highest possible value for D is colored green:
+* \image html seglcd_descr.png
+*
+* Digital Correlation (\ref CY_SEGLCD_CORRELATION)\n
+* The principles of operation are illustrated by the example waveforms shown in the following figures.
+* Digital Correlation Example – Type-A:
+* \image html seglcd_DCA.png
+* Digital Correlation Example – Type-B:
+* \image html seglcd_DCB.png
+* As illustrated, instead of generating bias voltages between the rails, this approach takes advantage of the LCD displays characteristic:
+* the LCD segments' on-ness and off-ness degree is determined by the RMS voltage across the segments. In this approach, the correlation
+* coefficient between any given pair of COM and SEG signals determines whether the corresponding LCD segment is On or Off.
+* Thus, by doubling the base drive frequency of the COM signals in their inactive sub-frame intervals, the phase relationship of the COM and SEG
+* drive signals can be varied to turn segments on and off – rather than varying the DC levels of the signals as is used in the conventional approaches.
+*
+* PWM Drive (\ref CY_SEGLCD_PWM)\n
+* This approach duplicates the multi-voltage drive signals of the conventional method with bias B using a PWM output signal together
+* with the intrinsic resistance and capacitance of the LCD display to create a simple PWM DAC.
+* This is illustrated in the following figure:
+* \image html seglcd_PWM.png
+* To drive a low-capacitance display with an acceptable ripple and rise/fall time, using a 32-kHz PWM an additional external
+* series resistance of 100 k - 1 M ohm is required. External Resistors are not required for PWM frequencies of greater than ~1 MHz.
+* The exact frequency depends on the display capacitance, the internal ITO resistance of the ITO routing traces,
+* and the drive impedance of the I/O pins.
+* The PWM method works for any bias value (B). NOTE As B gets higher, a higher PWM step frequency is required to maintain the
+* same PWM output frequency (the RC response of the LCD depends on the PWM output frequency, NOT the step frequency).
+* The PWM approach may also be used to drive a 1/2-bias display. This has the advantage that PWM is only required on the COM signals,
+* as SEG signals of a 1/2-bias display use only logic levels. Therefore, PWM 1/2-bias can be supported at 32 kHz using just
+* four external resistors.
+* The power consumption of the approach (even for 1/2 bias) is substantially higher than that of other methods. Therefore, it is recommended
+* power-sensitive customers use Digital Correlation drive in Deep Sleep mode, and change to PWM mode to gain the advantage of
+* better contrast/viewing angle on TN displays in Active or Sleep mode.
+*
+* PWM1/2 LCD drive waveform:
+* \image html seglcd_PWM2.png
+* PWM1/3 LCD drive waveform:
+* \image html seglcd_PWM3.png
+*
+* Digital Contrast Control\n
+* In all modes, digital contrast control is available using the duty cycle/dead time method illustrated in the following figure:
+* \image html seglcd_contrast.png
+* This illustration shows the principle for 1/3 bias and 1/4 duty implementation, but the general approach of reducing contrast
+* by reducing the percentage of time the glass is driven can be generalized and applied to any drive method.
+* In all cases, during the dead time, all COM and SEG signals are set to a logic "1" state.
+*
+* When the block is configured, for further work with display, a display structure is needed:
+* \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_Display
+* \note Using the SegLCD Configurator, display structures and the commons array are generated automatically into the 
+* GeneratedSource/cycfg_seglcd.h/.c files. All you need is just to include cycfg_seglcd.h into your application code.
+*
+* And now you can write multi-digit decimal and hexadecimal numbers and strings onto the initiated 7-segment display:
 * \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_DecNum
+* after which the next image on the glass appears:
+* \image html seglcd_12.png
 * \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_HexNum
-* \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_String
+* \image html seglcd_oooc.png
 *
 * Or even manage separate LCD pixels:
 * \snippet seglcd/snippet/SegLCD_Snpt.h snippet_Cy_SegLCD_DefPixel
-* \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_ActPixel
 * \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_SetPixel
+* after which the next image on the glass appears:
+* \image html seglcd_heart.png
 * \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_ClrPixel
 * \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_InvPixel
+* \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_ActPixel
 *
-* You can also customize basic fonts, for example:
+* Also, you can customize basic fonts, for example:
 * \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_CustomAsciiFont7seg
+* And now you can write characters and strings on a standard 7-segment display:
+* \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_Char
+* after which the next image on the glass appears:
+* \image html seglcd_char.png
+* \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_String
+* \image html seglcd_font.png
 *
-* You can also customize or create your own displays, for example:
+* Also, you can customize or create your own displays, for example:
 * \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_Custom3x5
-*
 * And also different fonts for them:
 * \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_CustomFont3x5
-*
+* And now use all that together:
+* \snippet seglcd/snippet/SegLCD_Snpt.c snippet_Cy_SegLCD_Custom3x5_WriteNumber
+* \image html seglcd_3x5.png
 *
 * \section group_seglcd_more_information More Information
 * Refer to the technical reference manual (TRM) and the device datasheet.
@@ -102,13 +254,13 @@
 *     <td>A</td>
 *     <td>A cast should not be performed between a pointer to object type and
 *         a different pointer to object type.</td>
-*     <td>This is a fix for GCC compiler warning.</td>
+*     <td>This is a fix for the GCC compiler warning.</td>
 *   </tr>
 *   <tr>
 *     <td>14.1</td>
 *     <td>R</td>
 *     <td>There shall be no unreachable code.</td>
-*     <td>This is HOBTO parameter reading for future features support.</td>
+*     <td>This is the HOBTO parameter reading for future features support.</td>
 *   </tr>
 * </table>
 *
@@ -158,7 +310,7 @@ extern "C" {
 /** SegLCD driver ID */
 #define CY_SEGLCD_ID                        (CY_PDL_DRV_ID(0x40u))
 
-/** Specifies the pixel in the display array which is not connected */
+/** Specifies the pixel in the display pixel map array which is not connected */
 #define CY_SEGLCD_NOT_CON                   (0xFFFFFFFFUL)
 
 /** \cond internal */
@@ -173,18 +325,30 @@ extern "C" {
 #define CY_SEGLCD_ITEM(trmNum, comLine)     (_VAL2FLD(CY_SEGLCD_COM, (comLine))                  | \
                                              _VAL2FLD(CY_SEGLCD_OCT, (trmNum) / CY_SEGLCD_OCTET) | \
                                              _VAL2FLD(CY_SEGLCD_NBL, (trmNum) % CY_SEGLCD_OCTET))
+
+/* Extract the LCD common line number from the pixel value */
+#define CY_SEGLCD_EXTR_COM(pixel)           (_FLD2VAL(CY_SEGLCD_COM, (pixel)))
+/* Extract the LCD terminal octet number from the pixel value */
+#define CY_SEGLCD_EXTR_OCT(pixel)           (_FLD2VAL(CY_SEGLCD_OCT, (pixel)))
+/* Extract the LCD terminal nibble number from the pixel value */
+#define CY_SEGLCD_EXTR_NBL(pixel)           (_FLD2VAL(CY_SEGLCD_NBL, (pixel)))
+/* Extract the LCD terminal number from the pixel value */
+#define CY_SEGLCD_EXTR_TRM(pixel)           ((CY_SEGLCD_EXTR_OCT(pixel) * CY_SEGLCD_OCTET) + \
+                                              CY_SEGLCD_EXTR_NBL(pixel))
+/* Convert the locComNum from the machine range (0-14) into the natural range (2-16). */
+#define CY_SEGLCD_COM_NUM(base)             (_FLD2VAL(LCD_CONTROL_COM_NUM, LCD_CONTROL(base)) + 2UL)
 /** \endcond */
 
 
 /**
-* Makes the pixel value from the LCD segment terminal number and the user defined common line number.
-* It should be used to display pixMap array definitions for \ref cy_stc_seglcd_disp_t.
+* Makes the pixel identifier from the LCD segment terminal number and the user defined common line number.
+* It should be used to display pixel map (pixMap) array definitions for \ref cy_stc_seglcd_disp_t.
 */
 #define CY_SEGLCD_PIXEL(segNum, comLine)    (CY_SEGLCD_ITEM(segNum, comLine))
 
 /**
-* Makes the common line value from the LCD common terminal number and the user defined common line number.
-* It should be used for common lines array definitions for \ref Cy_SegLCD_ClrFrame and \ref Cy_SegLCD_InvFrame.
+* Makes the common line identifier from the LCD common terminal number and the user defined common line number.
+* It should be used for commons array definitions for \ref Cy_SegLCD_ClrFrame and \ref Cy_SegLCD_InvFrame.
 */
 #define CY_SEGLCD_COMMON(comNum, comLine)   (CY_SEGLCD_ITEM(comNum, comLine))
 

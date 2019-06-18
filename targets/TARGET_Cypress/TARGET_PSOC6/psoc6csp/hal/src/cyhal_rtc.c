@@ -28,6 +28,8 @@
 #include "cyhal_implementation.h"
 #include "cy_rtc.h"
 
+#ifdef CY_IP_MXS40SRSS_RTC_INSTANCES
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -208,3 +210,5 @@ void cyhal_rtc_irq_enable(cyhal_rtc_t *obj, cyhal_rtc_irq_event_t event, bool en
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* CY_IP_MXS40SRSS_RTC_INSTANCES */

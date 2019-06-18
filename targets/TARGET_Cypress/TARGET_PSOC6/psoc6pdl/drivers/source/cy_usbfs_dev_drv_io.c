@@ -101,7 +101,7 @@ static void DisableEndpoint(USBFS_Type *base, uint32_t endpoint, cy_stc_usbfs_de
 ****************************************************************************//**
 *
 * Set basic device configuration (clears previous configuration). 
-* This function must be called after endpoints were configured to complete
+* Call this function after endpoints were configured to complete the
 * device configuration.
 *
 * \param base
@@ -131,7 +131,7 @@ void Cy_USBFS_Dev_Drv_ConfigDevice(USBFS_Type *base, cy_stc_usbfs_dev_drv_contex
             /* USBFS_DEV_EP_ACTIVE and USBFS_DEV_EP_TYPE are set when endpoint is added */
         }
 
-        /* Configuration complete: generate rising edge for USBDEV_ARB_CFG.CFG_CMP bit */
+        /* Configuration completes: Generates a rising edge for the USBDEV_ARB_CFG.CFG_CMP bit */
         USBFS_DEV_ARB_CFG(base)  = _VAL2FLD(USBFS_USBDEV_ARB_CFG_DMA_CFG, context->mode) |
                                    autoMemMask;
         USBFS_DEV_ARB_CFG(base) |= USBFS_USBDEV_ARB_CFG_CFG_CMP_Msk;
@@ -145,8 +145,9 @@ void Cy_USBFS_Dev_Drv_ConfigDevice(USBFS_Type *base, cy_stc_usbfs_dev_drv_contex
 ****************************************************************************//**
 *
 * Clear device configuration. 
-* This function must be called before set configuration or configuration failure
-* to set configuration into the default state.
+* Call this function before setting a configuration or a configuration failure
+* to set the configuration into the default state.
+* Alternately, call \ref Cy_USBFS_Dev_Drv_RemoveEndpoint for each active endpoint.
 *
 * \param base
 * The pointer to the USBFS instance.
@@ -162,13 +163,13 @@ void Cy_USBFS_Dev_Drv_UnConfigureDevice(USBFS_Type *base, cy_stc_usbfs_dev_drv_c
 {
     uint32_t endpoint;
 
-    /* Clear buffer pointer */
+    /* Clears the buffer pointer */
     context->curBufAddr = 0U;
     
-    /* Remove all active endpoints */
+    /* Removes all active endpoints */
     context->activeEpMask = 0U;
 
-    /* Disable SIE and Arbiter interrupts */
+    /* Disables the SIE and Arbiter interrupts */
     USBFS_DEV_SIE_EP_INT_EN(base) = 0UL;
     USBFS_DEV_ARB_INT_EN(base)    = 0UL;
 
@@ -290,7 +291,7 @@ void RestoreEndpointHwBuffer(USBFS_Type *base,
     /* Enable SIE interrupt for endpoint */
     Cy_USBFS_Dev_Drv_EnableSieEpInterrupt(base, endpoint);  
 
-    /* Set arbiter configuration */
+    /* Sets an arbiter configuration */
     Cy_USBFS_Dev_Drv_SetArbEpConfig(base, endpoint, (USBFS_USBDEV_ARB_EP1_CFG_CRC_BYPASS_Msk |
                                                      USBFS_USBDEV_ARB_EP1_CFG_RESET_PTR_Msk));  
 
@@ -363,7 +364,7 @@ cy_en_usbfs_dev_drv_status_t AddEndpointHwBuffer(USBFS_Type *base,
         endpointData->sieMode = GetEndpointActiveMode(inDirection, config->attributes);
         endpointData->isPending = false;
 
-        /* Set arbiter configuration (clears DMA requests) */
+        /* Sets an arbiter configuration (clears DMA requests) */
         Cy_USBFS_Dev_Drv_SetArbEpConfig(base, endpoint, (USBFS_USBDEV_ARB_EP1_CFG_CRC_BYPASS_Msk |
                                                          USBFS_USBDEV_ARB_EP1_CFG_RESET_PTR_Msk));
 
@@ -439,7 +440,7 @@ cy_en_usbfs_dev_drv_status_t Cy_USBFS_Dev_Drv_RemoveEndpoint(USBFS_Type *base,
 {
     uint32_t endpoint = EPADDR2EP(endpointAddr);
 
-    /* Check if endpoint is supported by driver */
+    /* Checks if the endpoint is supported by the driver */
     if (false == IS_EP_VALID(endpoint))
     {
         return CY_USBFS_DEV_DRV_BAD_PARAM;
@@ -458,7 +459,7 @@ cy_en_usbfs_dev_drv_status_t Cy_USBFS_Dev_Drv_RemoveEndpoint(USBFS_Type *base,
     Cy_USBFS_Dev_Drv_ClearSieEpInterrupt(base, endpoint);
     Cy_USBFS_Dev_Drv_ClearArbEpInterrupt(base, endpoint, ENDPOINT_ARB_INTR_SOURCES_ALL);
 
-    /* Remove active endpoint */
+    /* Removes the active endpoint */
     context->activeEpMask &= (uint8_t) ~EP2MASK(endpont);
 
     return CY_USBFS_DEV_DRV_SUCCESS;
@@ -503,7 +504,7 @@ void Cy_USBFS_Dev_Drv_EnableOutEndpoint(USBFS_Type *base,
     /* Get pointer to endpoint data */
     cy_stc_usbfs_dev_drv_endpoint_data_t *endpointData = &context->epPool[endpoint];
 
-    /* Endpoint pending: waits for the host write data after exit this function */
+    /* Endpoint pending: Waits for the host write data after exiting this function */
     endpointData->state = CY_USB_DEV_EP_PENDING;
 
     /* Arm endpoint: Host is allowed to write data */
@@ -556,7 +557,7 @@ cy_en_usbfs_dev_drv_status_t LoadInEndpointCpu(USBFS_Type   *base,
         return CY_USBFS_DEV_DRV_BAD_PARAM;
     }
 
-    /* Endpoint pending: waits for the host read data after exit this function */
+    /* Endpoint pending: Waits for the host read data after exiting this function */
     endpointData->state = CY_USB_DEV_EP_PENDING;
 
     /* Set count and data toggle */
@@ -576,13 +577,13 @@ cy_en_usbfs_dev_drv_status_t LoadInEndpointCpu(USBFS_Type   *base,
             /* Get pointer to the buffer */
             uint16_t const *ptr = (uint16_t const *) buffer;
 
-            /* Copy data from the user buffer into the hardware buffer using 16-bit register */
+            /* Copy data from the user buffer into the hardware buffer using a 16-bit register */
             for (idx = 0u; idx < (size / 2U) ; ++idx)
             {
                 Cy_USBFS_Dev_Drv_WriteData16(base, endpoint, ptr[idx]);
             }
 
-            /* Write the last byte */
+            /* Writes the last byte */
             if (0U != (size & 0x1U))
             {
                 Cy_USBFS_Dev_Drv_WriteData16(base, endpoint, (uint16_t) buffer[idx * 2U]);
@@ -678,13 +679,13 @@ cy_en_usbfs_dev_drv_status_t ReadOutEndpointCpu(USBFS_Type *base,
         /* Get pointer to the buffer */
         uint16_t *ptr = (uint16_t *) buffer;
 
-        /* Copy data from the hardware buffer into the user buffer using 16-bit register */
+        /* Copies data from the hardware buffer into the user buffer using a 16-bit register */
         for (idx = 0U; idx < (numToCopy / 2U) ; ++idx)
         {
             ptr[idx] = Cy_USBFS_Dev_Drv_ReadData16(base, endpoint);
         }
 
-        /* Read the last byte */
+        /* Reads the last byte */
         if (0U != (numToCopy & 0x1U))
         {
             buffer[idx * 2U] = (uint8_t) Cy_USBFS_Dev_Drv_ReadData16(base, endpoint);

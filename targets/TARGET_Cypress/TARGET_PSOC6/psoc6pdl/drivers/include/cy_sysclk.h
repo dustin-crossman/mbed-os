@@ -613,7 +613,7 @@
 * \}
 * \defgroup group_sysclk_mf_funcs         Medium Frequency Domain Clock
 * \{
-*   The Medium Frequency Domain Clock is present only in SRSS_V1_3.
+*   The Medium Frequency Domain Clock is present only in SRSS_ver1_3.
 *   Consists of MFO - the Medium Frequency Oscillator,
 *   and CLK_MF - the Medium Frequency Clock divider.
 *   This clock chain is designed to source the LCD block

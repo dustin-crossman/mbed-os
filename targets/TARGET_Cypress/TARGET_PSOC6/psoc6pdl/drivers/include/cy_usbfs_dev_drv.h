@@ -1061,28 +1061,28 @@ typedef struct
 typedef struct cy_stc_usbfs_dev_drv_context
 {
     /** \cond INTERNAL */
-    /** Stores Endpoint 0 buffer to put read operation results */
+    /** Stores the Endpoint 0 buffer to put read operation results */
     uint8_t *ep0Buffer;
 
-    /** Stores Endpoint 0 buffer size */
+    /** Stores the Endpoint 0 buffer size */
     uint8_t ep0BufferSize;
 
-   	/** Endpoint 0 data toggle bit: 0 or USBFS_USBDEV_EP0_CNT_DATA_TOGGLE_Msk */
+    /** Endpoint 0 data toggle bit: 0 or USBFS_USBDEV_EP0_CNT_DATA_TOGGLE_Msk */
     uint8_t  ep0DataToggle;
 
     /** Active endpoint mask */
     uint8_t activeEpMask;
 
-    /** Device address to set */
+    /** The device address to set */
     uint8_t address;
 
     /** Endpoints management mode */
     cy_en_usbfs_dev_drv_ep_management_mode_t mode;
 
-    /** Stores state of the control transfer */
+    /** Stores the control transfer state */
     cy_en_usbfs_dev_drv_ep0_ctrl_state_t ep0CtrlState;
 
-    /* Status to set or not device address after status state of the control transfer */
+    /* Status to set or not the device address after the status state of the control transfer */
     bool    setAddress;
 
     /** Defines which endpoint registers to use: 8-bits or 16-bits */
@@ -1474,15 +1474,15 @@ __STATIC_INLINE cy_en_usbfs_dev_drv_lpm_req_t Cy_USBFS_Dev_Drv_Lpm_GetResponse(U
 * Function Name: Cy_USBFS_Dev_Drv_SetAddress
 ****************************************************************************//**
 *
-* Posts request to set the device address after completion status stage of 
-* the control transfer. This function must be used if higher level requests 
-* to set address before status stage of the control transfer.
+* Posts a request to set the device address after the completion status stage of 
+* the control transfer. This function must be used if a higher level requests 
+* to set an address before the status stage of the control transfer.
 *
 * \param base
 * The pointer to the USBFS instance.
 *
 * \param address
-* Device address.
+* The device address.
 *
 * \param context
 * The pointer to the context structure \ref cy_stc_usbfs_dev_drv_context_t
@@ -1494,7 +1494,7 @@ __STATIC_INLINE cy_en_usbfs_dev_drv_lpm_req_t Cy_USBFS_Dev_Drv_Lpm_GetResponse(U
 __STATIC_INLINE void Cy_USBFS_Dev_Drv_SetAddress(USBFS_Type *base, uint8_t address, 
                                                  cy_stc_usbfs_dev_drv_context_t *context)
 {
-    /* Store address to be set later and setup request */
+    /* Stores the address to set later after status stage of setup request completed */
     context->address    = address;
     context->setAddress = true;
 }
@@ -1504,7 +1504,7 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_SetAddress(USBFS_Type *base, uint8_t addre
 * Function Name: Cy_USBFS_Dev_Drv_SetDeviceAddress
 ****************************************************************************//**
 *
-* Sets the device address (writes address directly into the register).
+* Sets the device address (writes the address directly into the register).
 *
 * \param base
 * The pointer to the USBFS instance.
@@ -1523,7 +1523,7 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_SetDeviceAddress(USBFS_Type *base, uint8_t
 * Function Name: Cy_USBFS_Dev_Drv_GetDeviceAddress
 ****************************************************************************//**
 *
-* Returns the device address (reads address directly from the register).
+* Returns the device address (reads the address directly from the register).
 *
 * \param base
 * The pointer to the USBFS instance.
@@ -2076,7 +2076,7 @@ __STATIC_INLINE cy_en_usbfs_dev_drv_status_t Cy_USBFS_Dev_Drv_AddEndpoint(USBFS_
 
     uint32_t endpoint = CY_USBFS_DEV_DRV_EPADDR2EP(config->endpointAddr);
 
-    /* Check if endpoint is supported by driver */
+    /* Checks if the endpoint is supported by the driver */
     if (CY_USBFS_DEV_DRV_IS_EP_VALID(endpoint))
     {
         retStatus = context->addEndpoint(base, config, context);
@@ -2339,7 +2339,7 @@ __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetEndpointCount(USBFS_Type const *bas
 *******************************************************************************/
 __STATIC_INLINE void Cy_USBFS_Dev_Drv_Ep0Stall(USBFS_Type *base)
 {
-    /* Update CR registers to STALL the request (CNT register does not care). */
+    /* Updates the CR registers to STALL a request (CNT register does not care) */
     Cy_USBFS_Dev_Drv_WriteEp0Mode(base, CY_USBFS_DEV_DRV_EP_CR_STALL_INOUT);
 }
 
@@ -2348,14 +2348,14 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_Ep0Stall(USBFS_Type *base)
 * Function Name: Cy_USBFS_Dev_Drv_GetEp0MaxPacket
 ****************************************************************************//**
 *
-* Return endpoint 0 maximum packet size that can be for read or write from
+* Returns the endpoint 0 maximum packet size that can be for read or write from
 * the endpoint 0 buffer.
 *
 * \param base
 * The pointer to the USBFS instance.
 *
 * \return
-* Endpoint 0 maximum packet size (the endpoint 0 has dedicated hardware buffer).
+* The endpoint 0 maximum packet size (endpoint 0 has a dedicated hardware buffer).
 *
 *******************************************************************************/
 __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetEp0MaxPacket(USBFS_Type *base)

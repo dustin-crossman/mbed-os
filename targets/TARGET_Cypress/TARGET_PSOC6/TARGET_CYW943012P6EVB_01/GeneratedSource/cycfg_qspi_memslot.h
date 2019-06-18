@@ -26,8 +26,21 @@
 #define CYCFG_QSPI_MEMSLOT_H
 #include "cy_smif_memslot.h"
 
-#define CY_SMIF_DEVICE_NUM 0
+#define CY_SMIF_DEVICE_NUM 1
 
+extern cy_stc_smif_mem_cmd_t S25FL512S_SlaveSlot_0_readCmd;
+extern cy_stc_smif_mem_cmd_t S25FL512S_SlaveSlot_0_writeEnCmd;
+extern cy_stc_smif_mem_cmd_t S25FL512S_SlaveSlot_0_writeDisCmd;
+extern cy_stc_smif_mem_cmd_t S25FL512S_SlaveSlot_0_eraseCmd;
+extern cy_stc_smif_mem_cmd_t S25FL512S_SlaveSlot_0_chipEraseCmd;
+extern cy_stc_smif_mem_cmd_t S25FL512S_SlaveSlot_0_programCmd;
+extern cy_stc_smif_mem_cmd_t S25FL512S_SlaveSlot_0_readStsRegQeCmd;
+extern cy_stc_smif_mem_cmd_t S25FL512S_SlaveSlot_0_readStsRegWipCmd;
+extern cy_stc_smif_mem_cmd_t S25FL512S_SlaveSlot_0_writeStsRegQeCmd;
+
+extern cy_stc_smif_mem_device_cfg_t deviceCfg_S25FL512S_SlaveSlot_0;
+
+extern const cy_stc_smif_mem_config_t S25FL512S_SlaveSlot_0;
 extern const cy_stc_smif_mem_config_t* smifMemConfigs[CY_SMIF_DEVICE_NUM];
 
 extern const cy_stc_smif_block_config_t smifBlockConfig;

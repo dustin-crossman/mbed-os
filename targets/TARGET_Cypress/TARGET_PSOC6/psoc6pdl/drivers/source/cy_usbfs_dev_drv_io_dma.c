@@ -786,7 +786,7 @@ void RestoreEndpointRamBuffer(USBFS_Type *base,
         Cy_DMA_Channel_Enable(endpointData->base, endpointData->chNum);
     }
 
-    /* Set arbiter configuration */
+    /* Sets an arbiter configuration */
     Cy_USBFS_Dev_Drv_SetArbEpConfig(base, endpoint, (USBFS_USBDEV_ARB_EP1_CFG_CRC_BYPASS_Msk |
                                                      USBFS_USBDEV_ARB_EP1_CFG_RESET_PTR_Msk));
 
@@ -847,7 +847,7 @@ cy_en_usbfs_dev_drv_status_t LoadInEndpointDma(USBFS_Type    *base,
 
     if (0U == size)
     {
-        /* Endpoint pending: waits for the host read data after exit this function */
+        /* Endpoint pending: Waits for the host read data after exiting this function */
         endpointData->state = CY_USB_DEV_EP_PENDING;
 
         /* Arm endpoint: Host is allowed to read data */
@@ -876,7 +876,7 @@ cy_en_usbfs_dev_drv_status_t LoadInEndpointDma(USBFS_Type    *base,
         */
         Cy_USBFS_Dev_Drv_TriggerArbCfgEpDmaReq(base, endpoint);
 
-        /* Wait until DMA complete write operation. Current endpoint state is 
+        /* Waits until DMA completes the write operation. The current endpoint state is 
         * idle or completed and DMA completion interrupt changes state to pending 
         * (endpoint waits for the host read data).
         */
@@ -976,7 +976,7 @@ cy_en_usbfs_dev_drv_status_t ReadOutEndpointDma(USBFS_Type *base,
     /* Enable DMA channel: configuration complete */
     Cy_DMA_Channel_Enable(endpointData->base, endpointData->chNum);
 
-    /* Current endpoint state is completed, change state to pending to
+    /* The current endpoint state is completed, changes the state to pending to
     * track DMA read completion.
     */
     endpointData->state = CY_USB_DEV_EP_PENDING;
@@ -984,13 +984,13 @@ cy_en_usbfs_dev_drv_status_t ReadOutEndpointDma(USBFS_Type *base,
     /* Generate DMA request to read data from hardware buffer */
     Cy_USBFS_Dev_Drv_TriggerArbCfgEpDmaReq(base, endpoint);
 
-	/* Wait until DMA complete read operation */
-	while ((CY_USB_DEV_EP_COMPLETED != endpointData->state) &&
-		   (timeout > 0U))
-	{
-		Cy_SysLib_DelayUs(DMA_READ_REQUEST_ONE_TICK);
-		--timeout;
-	}
+    /* Waits until DMA completes the read operation */
+    while ((CY_USB_DEV_EP_COMPLETED != endpointData->state) &&
+           (timeout > 0U))
+    {
+        Cy_SysLib_DelayUs(DMA_READ_REQUEST_ONE_TICK);
+        --timeout;
+    }
 
     /* Check timeout */
     if (timeout > 0U)
@@ -1049,7 +1049,7 @@ cy_en_usbfs_dev_drv_status_t LoadInEndpointDmaAuto(USBFS_Type    *base,
         return CY_USBFS_DEV_DRV_BAD_PARAM;
     }
 
-    /* Endpoint pending: waits for the host read data after exit this function */
+    /* Endpoint pending: Waits for the host read data after exiting this function */
     endpointData->state = CY_USB_DEV_EP_PENDING;
     
     /* Set count and data toggle */

@@ -23,15 +23,17 @@
 * limitations under the License.
 *******************************************************************************/
 
-#if defined(__cplusplus)
-extern "C" {
-#endif /* __cplusplus */
-
 #include "cyhal_hwmgr.h"
 #include "cyhal_hw_types.h"
 #include "cyhal_flash.h"
 #include "cyhal_flash.h"
 #include <string.h>
+
+#ifdef CY_IP_MXS40SRSS
+
+#if defined(__cplusplus)
+extern "C" {
+#endif /* __cplusplus */
 
 cy_rslt_t cyhal_flash_init(cyhal_flash_t *obj)
 {
@@ -206,3 +208,5 @@ bool cyhal_flash_is_operation_complete(cyhal_flash_t *obj)
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */
+
+#endif /* CY_IP_MXS40SRSS */

@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include "cyhal_implementation.h"
 
+#ifdef CY_IP_MXSCB
+
 #define PENDING_NONE                    0
 #define PENDING_RX                      1
 #define PENDING_TX                      2
@@ -414,11 +416,13 @@ static uint32_t cyhal_divider_value(uint32_t frequency, uint32_t frac_bits)
 
 cy_rslt_t cyhal_i2c_init(cyhal_i2c_t *obj, cyhal_gpio_t sda, cyhal_gpio_t scl, const cyhal_clock_divider_t *clk)
 {
-    /* If something go wrong, any resource not marked as invalid will be freed. */
-    /* Explicitly marked not allocated resources as invalid to prevent freeing them. */
-    memset(obj, 0, sizeof(cyhal_i2c_t));
-    cyhal_resource_inst_t pin_rsc;
+    CY_ASSERT(NULL != obj);
 
+    /* Explicitly marked not allocated resources as invalid to prevent freeing them. */
+    obj->resource.type = CYHAL_RSC_INVALID;
+    obj->pin_scl = CYHAL_NC_PIN_VALUE;
+    obj->pin_sda = CYHAL_NC_PIN_VALUE;
+    obj->is_shared_clock = true;
 
     /* Reserve the I2C */
     const cyhal_resource_pin_mapping_t *sda_map = CY_UTILS_GET_RESOURCE(sda, cyhal_pin_map_scb_i2c_sda);
@@ -436,7 +440,7 @@ cy_rslt_t cyhal_i2c_init(cyhal_i2c_t *obj, cyhal_gpio_t sda, cyhal_gpio_t scl, c
     obj->resource = *rsc;
 
     /* Reserve the SDA pin */
-    pin_rsc = cyhal_utils_get_gpio_resource(sda);
+    cyhal_resource_inst_t pin_rsc = cyhal_utils_get_gpio_resource(sda);
     result = cyhal_hwmgr_reserve(&pin_rsc);
     if (result == CY_RSLT_SUCCESS)
     {
@@ -514,6 +518,8 @@ cy_rslt_t cyhal_i2c_init(cyhal_i2c_t *obj, cyhal_gpio_t sda, cyhal_gpio_t scl, c
 
 void cyhal_i2c_free(cyhal_i2c_t *obj)
 {
+    CY_ASSERT(NULL != obj);
+
     if (CYHAL_RSC_INVALID != obj->resource.type)
     {
         cyhal_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
@@ -549,6 +555,12 @@ cy_rslt_t cyhal_i2c_set_config(cyhal_i2c_t *obj, const cyhal_i2c_cfg_t *cfg)
         : CY_SCB_I2C_MASTER;
 
     config_structure.slaveAddress  = cfg->address;
+
+    /* Set slave address mask if I2C is operate in slave mode */
+    if (cfg->is_slave)
+    {
+    	config_structure.slaveAddressMask = 0xFEU;
+    }
 
     /* Set data rate */
     if (!cfg->is_slave) 
@@ -679,12 +691,19 @@ cy_rslt_t cyhal_i2c_mem_write(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_a
     {
         status = Cy_SCB_I2C_MasterSendStart(obj->base, address, CY_SCB_I2C_WRITE_XFER, timeout, &obj->context);
     }
+
+    /* Check if mem_addr_size is in valid range */
+    if (mem_addr_size == 0 || mem_addr_size > 2)
+    {
+    	return CYHAL_I2C_RSLT_ERR_INVALID_ADDRESS_SIZE;
+    }
+
     /* Send mem_addr - start address in slave memory */
-    if (status == CY_SCB_I2C_SUCCESS)
+    if ((status == CY_SCB_I2C_SUCCESS) && mem_addr_size > 1)
     {
         status = Cy_SCB_I2C_MasterWriteByte(obj->base, (uint8_t)((mem_addr & 0xFF00) >> 8), timeout, &obj->context);
     }
-    if (status == CY_SCB_I2C_SUCCESS)
+    if ((status == CY_SCB_I2C_SUCCESS) && mem_addr_size > 0)
     {
         status = Cy_SCB_I2C_MasterWriteByte(obj->base, (uint8_t)(mem_addr & 0x00FF), timeout, &obj->context);
     }
@@ -719,17 +738,30 @@ cy_rslt_t cyhal_i2c_mem_read(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_ad
     /* Start transaction, send address */
     if (obj->context.state == CY_SCB_I2C_IDLE)
     {
-        status = Cy_SCB_I2C_MasterSendStart(obj->base, address, CY_SCB_I2C_READ_XFER, timeout, &obj->context);
+        status = Cy_SCB_I2C_MasterSendStart(obj->base, address, CY_SCB_I2C_WRITE_XFER, timeout, &obj->context);
     }
-     /* Send mem_addr - start address in slave memory */
-    if (status == CY_SCB_I2C_SUCCESS)
+
+    /* Check if mem_addr_size is in valid range */
+    if (mem_addr_size == 0 || mem_addr_size > 2)
+    {
+    	return CYHAL_I2C_RSLT_ERR_INVALID_ADDRESS_SIZE;
+    }
+
+    /* Send mem_addr - start address in slave memory */
+    if ((status == CY_SCB_I2C_SUCCESS) && mem_addr_size > 1)
     {
         status = Cy_SCB_I2C_MasterWriteByte(obj->base, (uint8_t)((mem_addr & 0xFF00) >> 8), timeout, &obj->context);
     }
-    if (status == CY_SCB_I2C_SUCCESS)
+    if ((status == CY_SCB_I2C_SUCCESS) && mem_addr_size > 0)
     {
         status = Cy_SCB_I2C_MasterWriteByte(obj->base, (uint8_t)(mem_addr & 0x00FF), timeout, &obj->context);
     }
+    
+    if (status == CY_SCB_I2C_SUCCESS)
+    {
+        status = Cy_SCB_I2C_MasterSendReStart(obj->base, address, CY_SCB_I2C_READ_XFER, timeout, &obj->context);
+    }
+
     if (status == CY_SCB_I2C_SUCCESS)
     {
         while (size > 0)
@@ -935,3 +967,4 @@ void cyhal_i2c_irq_enable(cyhal_i2c_t *obj, cyhal_i2c_irq_event_t event, bool en
     }
 }
 
+#endif /* CY_IP_MXSCB */

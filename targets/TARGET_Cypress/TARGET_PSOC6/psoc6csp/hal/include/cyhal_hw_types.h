@@ -72,10 +72,21 @@ typedef struct {
 #ifdef CY_IP_MXS40PASS_SAR
     SAR_Type*                   base;
     cyhal_resource_inst_t       resource;
-    cyhal_gpio_t                pin;
     cyhal_clock_divider_t       clock;
+#else
+    void *empty;
 #endif
 } cyhal_adc_t;
+
+/** ADC channel object */
+typedef struct {
+#ifdef CY_IP_MXS40PASS_SAR
+    cyhal_adc_t*                adc;
+    cyhal_gpio_t                pin;
+#else
+    void *empty;
+#endif
+} cyhal_adc_channel_t;
 
 /** Comparator object */
 typedef struct {
@@ -280,7 +291,7 @@ typedef struct {
     uint16_t                    block_size;
     uint32_t                    irq_cause;
 
-#elif defined(CY8C6247BZI_D54) /* TODO: BSP-525 */
+#elif defined(CY8C6247BZI_D54)
     cyhal_resource_inst_t       resource;
     cyhal_gpio_t                pin_clk;
     cyhal_gpio_t                pin_cmd;
@@ -319,6 +330,7 @@ typedef struct {
     cy_en_scb_spi_mode_t        ms_mode;
     cy_en_scb_spi_sclk_mode_t   clk_mode;
     uint8_t                     data_bits;
+    bool                        is_slave;
     cy_stc_scb_spi_context_t    context;
     uint32_t                    irq_cause;
     uint16_t                    pending;
@@ -326,6 +338,7 @@ typedef struct {
     uint32_t                    rx_buffer_size;
     void                        *tx_buffer;
     uint32_t                    tx_buffer_size;
+    bool                        is_async;
 #else
     void *empty;
 #endif

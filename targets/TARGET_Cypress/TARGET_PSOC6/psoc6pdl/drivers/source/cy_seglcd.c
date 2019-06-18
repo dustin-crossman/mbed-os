@@ -39,19 +39,6 @@
 #define CY_SEGLCD_SYM_BYTE_IDX_Pos          (3U)
 #define CY_SEGLCD_SYM_BYTE_IDX_Msk          ((uint32_t) 0x00001FFFUL << CY_SEGLCD_SYM_BYTE_IDX_Pos)
 
-/* Convert the locComNum from the machine range (0-14) into the natural range (2-16). */
-#define CY_SEGLCD_COM_NUM(base)             (_FLD2VAL(LCD_CONTROL_COM_NUM, LCD_CONTROL(base)) + 2UL)
-
-/* Extract the LCD common line number from the pixel value */
-#define CY_SEGLCD_EXTR_COM(pixel)           (_FLD2VAL(CY_SEGLCD_COM, (pixel)))
-/* Extract the LCD terminal octet number from the pixel value */
-#define CY_SEGLCD_EXTR_OCT(pixel)           (_FLD2VAL(CY_SEGLCD_OCT, (pixel)))
-/* Extract the LCD terminal nibble number from the pixel value */
-#define CY_SEGLCD_EXTR_NBL(pixel)           (_FLD2VAL(CY_SEGLCD_NBL, (pixel)))
-/* Extract the LCD terminal number from the pixel value */
-#define CY_SEGLCD_EXTR_TRM(pixel)           ((CY_SEGLCD_EXTR_OCT(pixel) * CY_SEGLCD_OCTET) + \
-                                              CY_SEGLCD_EXTR_NBL(pixel))
-
 #define CY_SEGLCD_PIX_Pos(pixel)            ((CY_SEGLCD_EXTR_NBL(pixel) * CY_SEGLCD_NIBBLE) + \
                                              (CY_SEGLCD_EXTR_COM(pixel) % CY_SEGLCD_NIBBLE))
 #define CY_SEGLCD_PIX_Msk(pixel)            ((uint32_t)(1UL << CY_SEGLCD_PIX_Pos(pixel)))

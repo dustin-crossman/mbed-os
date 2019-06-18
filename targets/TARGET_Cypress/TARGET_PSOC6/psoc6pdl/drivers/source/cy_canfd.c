@@ -42,7 +42,6 @@ extern "C" {
 #define CY_CANFD_INTERRUPT_ENABLE_DEFAULT       (CANFD_CH_M_TTCAN_IE_DRXE_Msk |  /* Message stored to Rx Buffer */\
                                                  CANFD_CH_M_TTCAN_IE_RF1NE_Msk | /* Rx FIFO 1 New Message */\
                                                  CANFD_CH_M_TTCAN_IE_RF0NE_Msk)  /* Rx FIFO 0 New Message */ 
-#define CY_CANFD_BYTES_IN_UINT32                (4U)
 #define CY_CANFD_EXT_IDENTIFIER_LENGTH          (18U)
 
 /* The configurable start addresses are 32-bit word addresses i.e. only bits 15 
@@ -637,7 +636,15 @@ cy_en_canfd_status_t Cy_CANFD_DeInit(CANFD_Type *base, uint32_t chan, cy_stc_can
 * Function Name: Cy_CANFD_GetLastError
 ****************************************************************************//**
 *
-*  Returns the type of the last error to occur on the CAN bus.
+*  Returns the value of Protocol Status Register (PSR). \n
+*  Use the \ref group_canfd_last_state_masks to extract necessary fields from 
+*  the register. \n
+*  Use the \ref cy_en_canfd_LEC_t enumeration to interpret LEC and DLEC fields. \n
+*  Use the \ref cy_en_canfd_PSR_ACT_t enumeration to interpret the  ACT field.
+*
+* \note Protocol Status Register has reset on read fields. Reading the register
+*  will clear the bits PXE, RFDF, RBRS and RESI, and set DLEC[2:0] and LEC[2:0].
+*  
 *
 * \param *base
 * The pointer to a CAN FD instance.
@@ -645,46 +652,13 @@ cy_en_canfd_status_t Cy_CANFD_DeInit(CANFD_Type *base, uint32_t chan, cy_stc_can
 * \param chan
 *  The CAN FD channel number.
 *
+* \return 
+*  Content of the Protocol Status Register (PSR).
+*
 *******************************************************************************/
-cy_en_canfd_status_t Cy_CANFD_GetLastError(CANFD_Type *base, uint32_t chan)
+uint32_t Cy_CANFD_GetLastError(CANFD_Type *base, uint32_t chan)
 {
-    cy_en_canfd_status_t ret;
-    uint32_t lastErrorCode;
-
-    lastErrorCode = _FLD2VAL(CANFD_CH_M_TTCAN_PSR_LEC, CANFD_PSR(base, chan));
-    
-    switch (lastErrorCode)
-    {
-        case 0UL:
-            ret = CY_CANFD_SUCCESS;   /* No error occurred */
-            break;
-        case 1UL:
-            ret = CY_CANFD_STUFF_ERROR;
-            break;
-        case 2UL:
-            ret = CY_CANFD_FORM_ERROR;
-            break;
-        case 3UL:
-            ret = CY_CANFD_ACK_ERROR;
-            break;
-        case 4UL:
-            ret = CY_CANFD_BIT1_ERROR;
-            break;
-        case 5UL:
-            ret = CY_CANFD_BIT0_ERROR;
-            break;
-        case 6UL:
-            ret = CY_CANFD_CRC_ERROR;
-            break;
-        case 7UL:
-            ret = CY_CANFD_SUCCESS;   /* CY_CANFD_NO_CHANGE */
-            break;
-        default:
-            ret = CY_CANFD_BAD_PARAM;
-            break;
-    }
-
-    return ret;
+    return CANFD_PSR(base, chan);
 }
 
 
@@ -733,10 +707,10 @@ uint32_t  Cy_CANFD_CalcRxBufAdrs(CANFD_Type *base, uint32_t chan,
         /* Sets the message buffer address to the return value if the index is available  */ 
         address = context->messageRAMaddress;    
         address += (_FLD2VAL(CANFD_CH_M_TTCAN_RXBC_RBSA, CANFD_RXBC(base, chan)) 
-                     * CY_CANFD_BYTES_IN_UINT32);  /* Convert the word to the byte offset */ 
+                     * sizeof(uint32_t));  /* Convert the word to the byte offset */ 
         address += index * (CY_CANFD_R0_R1_SIZE + 
                             dataBufferSizeInWord[_FLD2VAL(CANFD_CH_M_TTCAN_RXESC_RBDS, CANFD_RXESC(base, chan))])*
-                            CY_CANFD_BYTES_IN_UINT32;   /* Convert the word to the byte offset */
+                            sizeof(uint32_t);   /* Convert the word to the byte offset */
     }
     return address;
 }
@@ -762,8 +736,6 @@ uint32_t  Cy_CANFD_CalcRxBufAdrs(CANFD_Type *base, uint32_t chan,
 * by the user. The structure is used during the CAN FD operation for internal
 * configuration and data retention. The user must not modify anything
 * in this structure.
-* If only the CAN FD functions which do not require context will be used, pass NULL
-* as the pointer to the context.
 *
 * \return 
 * The Message buffer address corresponding to the index.
@@ -777,13 +749,13 @@ static uint32_t Cy_CANFD_CalcTxBufAdrs(CANFD_Type *base, uint32_t chan, uint32_t
     /* Set the message buffer address to the return value if the index is available */
     address = context->messageRAMaddress;
     address += (_FLD2VAL(CANFD_CH_M_TTCAN_TXBC_TBSA, CANFD_TXBC(base, chan))  /* Tx 32-bit Start Address */
-                * CY_CANFD_BYTES_IN_UINT32);  /* Convert the word to the byte offset */ 
+                * sizeof(uint32_t));  /* Convert the word to the byte offset */ 
 
     if (index < (CY_CANFD_MESSAGE_TX_BUFFERS_MAX_CNT))
     {
         address += index * (CY_CANFD_T0_T1_SIZE + 
                             dataBufferSizeInWord[_FLD2VAL(CANFD_CH_M_TTCAN_TXESC_TBDS, CANFD_TXESC(base, chan))]) *
-                            CY_CANFD_BYTES_IN_UINT32;   /* Converts the word to the byte offset */ 
+                            sizeof(uint32_t);   /* Converts the word to the byte offset */ 
     }
     else
     {
@@ -812,6 +784,12 @@ static uint32_t Cy_CANFD_CalcTxBufAdrs(CANFD_Type *base, uint32_t chan, uint32_t
 * \param index
 * The Message buffer index for the reception (0-63).
 *
+* \param context
+* The pointer to the context structure \ref cy_stc_canfd_context_t allocated
+* by the user. The structure is used during the CAN FD operation for internal
+* configuration and data retention. The user must not modify anything
+* in this structure.
+*
 * \return 
 * The Message buffer address corresponding to the index.
 * Can be 0 if the index is invalid.
@@ -834,12 +812,12 @@ uint32_t Cy_CANFD_CalcRxFifoAdrs(CANFD_Type *base, uint32_t chan,
         address += (((CY_CANFD_RX_FIFO0 == fifoNumber) ? 
                      _FLD2VAL(CANFD_CH_M_TTCAN_RXF0C_F0SA, CANFD_RXF0C(base, chan)) :  /* Rx FIFO 0 32-bit Start Address */
                      _FLD2VAL(CANFD_CH_M_TTCAN_RXF1C_F1SA, CANFD_RXF1C(base, chan)))   /* Rx FIFO 1 32-bit Start Address */
-                     * CY_CANFD_BYTES_IN_UINT32);  /* Convert the word to the byte offset */ 
+                     * sizeof(uint32_t));  /* Convert the word to the byte offset */ 
         address += index * (CY_CANFD_R0_R1_SIZE + 
                             dataBufferSizeInWord[(CY_CANFD_RX_FIFO0 == fifoNumber) ? 
                                                  _FLD2VAL(CANFD_CH_M_TTCAN_RXESC_F0DS, CANFD_RXESC(base, chan)) : 
                                                  _FLD2VAL(CANFD_CH_M_TTCAN_RXESC_F1DS, CANFD_RXESC(base, chan))]) * 
-                           CY_CANFD_BYTES_IN_UINT32;   /* Converts the word to the byte offset */ 
+                           sizeof(uint32_t);   /* Converts the word to the byte offset */ 
     }
 
     return address;
@@ -1445,8 +1423,6 @@ void Cy_CANFD_AckRxFifo(CANFD_Type *base, uint32_t chan, uint32_t FIFOnumber)
 * by the user. The structure is used during the CAN FD operation for internal
 * configuration and data retention. The user must not modify anything
 * in this structure.
-* If only the CAN FD functions that do not require context are used, pass NULL
-* as the pointer to the context.
 *
 *******************************************************************************/
 void Cy_CANFD_IrqHandler(CANFD_Type *base, uint32_t chan, cy_stc_canfd_context_t *context)
@@ -1809,7 +1785,7 @@ cy_en_canfd_status_t Cy_CANFD_TransmitTxBuffer(CANFD_Type *base, uint32_t chan,
     {
         CANFD_TXBAR(base, chan) = 1UL << index; /* Transmits the buffer add request */
             
-        ret = Cy_CANFD_GetLastError(base, chan);
+        ret = CY_CANFD_SUCCESS;
     }
     return ret;
 }
@@ -1917,6 +1893,10 @@ cy_en_canfd_tx_buffer_status_t Cy_CANFD_GetTxBufferStatus(CANFD_Type *base, uint
     else if(0UL != (CANFD_TXBCF(base, chan) & (1UL << index))) /* Cancellation finished */
     {
         enTxBufferStatus = CY_CANFD_TX_BUFFER_CANCEL_FINISHED;
+    }
+    else
+    {
+        /* Closing if-else-if sequence */
     }
     
     return enTxBufferStatus;
