@@ -8313,7 +8313,6 @@
             "PU_ENABLE",
             "MCUBOOT_POLICY=1",
             "MCUBOOT_LOG_LEVEL=0",
-            "CONFIG_FLASH_PAGE_LAYOUT",
             "MCUBOOT_HAVE_ASSERT_H"
         ],
         "deliver_to_target": "CY8CPROTO_064_SB_PSA",

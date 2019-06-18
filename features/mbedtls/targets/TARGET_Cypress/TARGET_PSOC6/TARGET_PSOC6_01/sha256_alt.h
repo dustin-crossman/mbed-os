@@ -19,6 +19,7 @@
 
 /**
  * \file     sha256_alt.h
+ * \version  1.0
  *
  * \brief    header file - wrapper for mbedtls SHA256 HW acceleration
  *
