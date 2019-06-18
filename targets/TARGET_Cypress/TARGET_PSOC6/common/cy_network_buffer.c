@@ -50,7 +50,7 @@ void cy_buffer_release(whd_buffer_t buffer, whd_buffer_dir_t direction)
 
 uint8_t *cy_buffer_get_current_piece_data_pointer(whd_buffer_t buffer)
 {
-  //  CY_ASSERT(buffer != NULL);
+    CY_ASSERT(buffer != NULL);
     struct pbuf *pbuffer= (struct pbuf*) buffer;
     return (uint8_t*) pbuffer->payload;
 }
