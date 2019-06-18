@@ -53,10 +53,9 @@
 
 #pragma once
 
+#include "cybsp_api_core.h"
 #ifdef MBED
 #include "cybsp_api_wifi.h"
-#else
-#include "cybsp_api_core.h"
 #endif /* MBED */
 
 #if defined(__cplusplus)
@@ -68,7 +67,7 @@ extern "C" {
 // HAL HW configuration data
 extern cyhal_qspi_t cybsp_qspi;
 extern cyhal_uart_t cybsp_bt_uart;
-extern cyhal_uart_t cybsp_uart;
+extern cyhal_uart_t cybsp_debug_uart;
 extern cyhal_i2c_t cybsp_i2c;
 extern cyhal_rtc_t cybsp_rtc;
 

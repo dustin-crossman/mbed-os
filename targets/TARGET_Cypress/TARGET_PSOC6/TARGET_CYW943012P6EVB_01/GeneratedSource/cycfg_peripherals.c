@@ -24,7 +24,6 @@
 
 #include "cycfg_peripherals.h"
 
-#define PWM_INPUT_DISABLED 0x7U
 #define CYBSP_USBUART_INTR_LVL_SEL (CY_USBFS_DEV_DRV_SET_SOF_LVL(0x2U) | \
                  CY_USBFS_DEV_DRV_SET_BUS_RESET_LVL(0x2U) | \
                  CY_USBFS_DEV_DRV_SET_EP0_LVL(0x2U) | \
@@ -131,7 +130,7 @@ const cy_stc_scb_uart_config_t CYBSP_WL_UART_config =
 	.txFifoTriggerLevel = 63UL,
 	.txFifoIntEnableMask = 0UL,
 };
-const cy_stc_scb_uart_config_t CYBSP_KITPROG_UART_config = 
+const cy_stc_scb_uart_config_t CYBSP_DEBUG_UART_config = 
 {
 	.uartMode = CY_SCB_UART_STANDARD,
 	.enableMutliProcessorMode = false,
@@ -191,34 +190,6 @@ const cy_stc_rtc_config_t CYBSP_RTC_config =
 	.month = CY_RTC_JANUARY,
 	.year = 0U,
 };
-const cy_stc_tcpwm_pwm_config_t PWM_config = 
-{
-	.pwmMode = CY_TCPWM_PWM_MODE_PWM,
-	.clockPrescaler = CY_TCPWM_PWM_PRESCALER_DIVBY_1,
-	.pwmAlignment = CY_TCPWM_PWM_LEFT_ALIGN,
-	.deadTimeClocks = 0,
-	.runMode = CY_TCPWM_PWM_CONTINUOUS,
-	.period0 = 32000,
-	.period1 = 32768,
-	.enablePeriodSwap = false,
-	.compare0 = 16384,
-	.compare1 = 16384,
-	.enableCompareSwap = false,
-	.interruptSources = CY_TCPWM_INT_NONE,
-	.invertPWMOut = CY_TCPWM_PWM_INVERT_DISABLE,
-	.invertPWMOutN = CY_TCPWM_PWM_INVERT_DISABLE,
-	.killMode = CY_TCPWM_PWM_STOP_ON_KILL,
-	.swapInputMode = PWM_INPUT_DISABLED & 0x3U,
-	.swapInput = CY_TCPWM_INPUT_0,
-	.reloadInputMode = PWM_INPUT_DISABLED & 0x3U,
-	.reloadInput = CY_TCPWM_INPUT_0,
-	.startInputMode = PWM_INPUT_DISABLED & 0x3U,
-	.startInput = CY_TCPWM_INPUT_0,
-	.killInputMode = PWM_INPUT_DISABLED & 0x3U,
-	.killInput = CY_TCPWM_INPUT_0,
-	.countInputMode = PWM_INPUT_DISABLED & 0x3U,
-	.countInput = CY_TCPWM_INPUT_1,
-};
 const cy_stc_usbfs_dev_drv_config_t CYBSP_USBUART_config = 
 {
 	.mode = CY_USBFS_DEV_DRV_EP_MANAGEMENT_CPU,
@@ -251,8 +222,6 @@ void init_cycfg_peripherals(void)
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB5_CLOCK, CY_SYSCLK_DIV_8_BIT, 6U);
 
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB6_CLOCK, CY_SYSCLK_DIV_8_BIT, 2U);
-
-	Cy_SysClk_PeriphAssignDivider(PCLK_TCPWM1_CLOCKS1, CY_SYSCLK_DIV_8_BIT, 3U);
 
 	Cy_SysClk_PeriphAssignDivider(PCLK_UDB_CLOCKS0, CY_SYSCLK_DIV_8_BIT, 0u);
 

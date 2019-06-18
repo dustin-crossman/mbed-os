@@ -68,23 +68,23 @@ cy_rslt_t cyhal_dac_init(cyhal_dac_t *obj, cyhal_gpio_t pin);
  */
 void cyhal_dac_free(cyhal_dac_t *obj);
 
-/** Read the current voltage value on the pin, as a normalized unsigned 16bit value
+/** Get the maximum voltage that the DAC can output
  *
- * @param[in]  obj        The analogin object
+ * @param[in]  obj        The dac object
  * @return The maximum output voltage in terms of the number of milivolts
  */
 uint16_t cyhal_dac_get_max(cyhal_dac_t *obj);
 
 /** Set the output voltage, specified as unsigned 16-bit millivolts
  *
- * @param[in] obj        The analogin object
+ * @param[in] obj        The dac object
  * @param[in] millivolts The unsigned 16-bit output voltage to be set
  */
 void cyhal_dac_write(const cyhal_dac_t *obj, uint16_t millivolts);
 
-/** Read the current voltage value on the pin, as a normalized unsigned 16bit value
+/** Read the current voltage value on the pin, specified as unsigned 16-bit millivolts
  *
- * @param[in]  obj        The analogin object
+ * @param[in]  obj        The dac object
  * @return The output voltage in terms of the number of milivolts
  */
 uint16_t cyhal_dac_read(cyhal_dac_t *obj);

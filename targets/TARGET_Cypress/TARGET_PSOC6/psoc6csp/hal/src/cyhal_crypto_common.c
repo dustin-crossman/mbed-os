@@ -27,7 +27,7 @@
 #include "cy_crypto_core_crc.h"
 #include "cyhal_crypto_common.h"
 
-#if defined(CY_IP_MXCRYPTO_INSTANCES) || defined(CPUSS_CRYPTO_PRESENT)
+#if defined(CY_IP_MXCRYPTO)
 
 CRYPTO_Type* CYHAL_CRYPTO_BASE_ADDRESSES[CYHAL_CRYPTO_INST_COUNT] =
 {
@@ -71,4 +71,4 @@ void cyhal_crypto_free(CRYPTO_Type* base, const cyhal_resource_inst_t *resource)
     cyhal_hwmgr_free(resource);
 }
 
-#endif /* defined(CY_IP_MXCRYPTO_INSTANCES) || defined(CPUSS_CRYPTO_PRESENT) */
+#endif /* defined(CY_IP_MXCRYPTO) */

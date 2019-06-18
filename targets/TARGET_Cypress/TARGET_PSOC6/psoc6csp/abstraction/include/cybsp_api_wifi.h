@@ -49,6 +49,9 @@ extern "C" {
 * \{
 */
 
+/** Indicates that the wifi driver is available and can be used. */
+#define CYBSP_WIFI_CAPABLE 1
+
 /** Initialization of the wifi driver failed. */
 #define CYBSP_RSLT_WIFI_INIT_FAILED (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_BSP, 4))
 /** SDIO enumeration failed. */
@@ -64,20 +67,20 @@ extern "C" {
 /** Initializes the SDIO interface on the board. This only needs to be called if the
  * SDIO interface needs to be initialized before the general wifi interface. If not
  * called directly, it will automatically be called by cybsp_wifi_init().
- * 
+ *
  * @return CY_RSLT_SUCCESS for successful initialization or error if initialization failed.
  */
 cy_rslt_t cybsp_sdio_init(void);
 
 /** Initializes the wifi chip on the board.
- * 
+ *
  * @return CY_RSLT_SUCCESS for successful initialization or error if initialization failed.
  */
 cy_rslt_t cybsp_wifi_init(void);
 
 /** Gets the wifi driver instance initialized by the driver. This should only be called
  * after the interface is initialized by cybsp_wifi_init().
- * 
+ *
  * @return Wifi driver instance pointer.
  */
 whd_driver_t* cybsp_get_wifi_driver(void);

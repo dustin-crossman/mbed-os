@@ -61,6 +61,11 @@ extern "C" {
 /** Pin: WIFI Host Wakeup */
 #define CYBSP_WIFI_HOST_WAKE   P1_4
 
+/** Pin: UART RX */
+#define CYBSP_DEBUG_UART_RX    P5_0
+/** Pin: UART TX */
+#define CYBSP_DEBUG_UART_TX    P5_1
+
 /** Host-wake GPIO drive mode */
 #define CYBSP_WIFI_HOST_WAKE_GPIO_DM CYHAL_GPIO_DRIVE_ANALOG
 /** Host-wake IRQ event */
@@ -90,11 +95,8 @@ typedef enum
 /** Enum defining the different LED pins on the board. */
 typedef enum
 {
-    CYBSP_LED_RGB_RED = P0_3,
-    CYBSP_LED_RGB_BLUE = P11_1,
-    CYBSP_LED_RGB_GREEN = P1_1,
-
-    CYBSP_USER_LED = CYBSP_LED_RGB_RED,    
+    CYBSP_LED_RED = P13_7,
+    CYBSP_USER_LED = CYBSP_LED_RED,
 } cybsp_led_t;
 
 /** Enum defining the different button pins on the board. */
