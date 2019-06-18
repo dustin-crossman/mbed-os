@@ -53,8 +53,6 @@
 #define CY_HAL_SDIO_1B        (1u)
 
 
-static uint8_t tempBuffer[2048];
-
 /*******************************************************************************
 *       (Internal) Configuration structures for SDIO pins
 *******************************************************************************/
@@ -491,11 +489,6 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     {
         cmd.u16BlockCnt = (uint16_t) ((length + obj->block_size - 1)/obj->block_size);
         cmd.u16BlockSize = obj->block_size;
-
-        if (cmd.bRead)
-        {
-            cmd.pu8Data = tempBuffer;
-        }
     }
     else
     {
@@ -509,12 +502,6 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     if (Ok != status)
     {
         retVal = CYHAL_SDIO_RSLT_ERR_FUNC_RET(status);
-    }
-
-
-    if(retVal == CY_RSLT_SUCCESS && length >= obj->block_size && cmd.bRead)
-    {
-      memcpy((uint8_t *)data, tempBuffer, (size_t)length);
     }
 
     if (response != NULL)

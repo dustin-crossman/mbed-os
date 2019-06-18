@@ -18,6 +18,7 @@
 #include "cy_network_buffer.h"
 #include "cy_utils.h"
 #include "memp.h"
+#define  SDIO_BLOCK_SIZE (64U)
 
 whd_result_t cy_host_buffer_get(whd_buffer_t *buffer, whd_buffer_dir_t direction, unsigned short size, unsigned long timeout_ms)
 {
@@ -29,7 +30,7 @@ whd_result_t cy_host_buffer_get(whd_buffer_t *buffer, whd_buffer_dir_t direction
     }
     else
     {
-    	p = pbuf_alloc(PBUF_RAW, size, PBUF_RAM);
+    	p = pbuf_alloc(PBUF_RAW, size+SDIO_BLOCK_SIZE, PBUF_RAM);
     }
     if (p != NULL )
     {
