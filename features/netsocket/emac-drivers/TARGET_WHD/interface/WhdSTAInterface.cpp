@@ -226,9 +226,6 @@ nsapi_error_t WhdSTAInterface::connect()
         return whd_toerror(res);
     }
 
-    /* Use DHCP to get IP address? */
-    set_dhcp( (_ip_address[0] ? false : true) );
-
     if(whd_wifi_is_ready_to_transceive(_whd_emac.ifp) == WHD_SUCCESS)
     {
          whd_emac_wifi_link_state_changed(true, _whd_emac.ifp);
@@ -250,7 +247,7 @@ nsapi_error_t WhdSTAInterface::disconnect()
     }
 
     // bring down
-    int err = EMACInterface::disconnect();
+    int err = _interface->bringdown();
     if (err) {
         return err;
     }
