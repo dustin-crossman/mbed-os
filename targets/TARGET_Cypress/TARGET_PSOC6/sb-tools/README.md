@@ -20,7 +20,13 @@ Execute from ./prepare folder:
 * To create packet for CY8CPROTO_064_SB_M0_PSA and CY8CPROTO_064_SB_PSA targets using dual-stage policy (CM0 and CM4):
     
         python.exe provisioning_packet.py --policy policy_dual_stage_CM0p_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
+        
+* To use external memory (via SMIF) as staging(upgrade) area (slot_1) of NSPE (CM4) image use policy file with corresponding name:
 
+        python.exe provisioning_packet.py --policy policy_dual_stage_CM0p_CM4_smif.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
+        
+* To enable SMIF make sure targets.json has following names defined: SMIF MCUBOOT_USE_SMIF_STAGE, MCUBOOT_USE_SMIF_XIP. This applies for AUGUST_CYW43012_M0_PSA and CY8CPROTO_064_SB_M0_PSA targets.
+        
 Prebuild folder contains CyBootloader_WithLogs and CyBootloader_Release with corresponding hex and jwt files.
   * WithLogs enables logs print to terminal.
   * Release does not print to terminal and boots up silently.
