@@ -85,7 +85,7 @@
                 "id": 1,
                 "launch": 16,
                 "monotonic": 0,
-                "upgrade": true,
+                "upgrade": false,
                 "encrypt": false,
                 "encrypt_key_id": 1,
                 "upgrade_auth": [
@@ -111,7 +111,7 @@
                 ],
                 "id": 16,
                 "monotonic": 0,
-                "upgrade": true,
+                "upgrade": false,
                 "upgrade_auth": [
                     8
                 ],
