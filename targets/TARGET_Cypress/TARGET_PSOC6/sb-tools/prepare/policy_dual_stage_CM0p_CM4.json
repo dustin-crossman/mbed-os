@@ -114,6 +114,7 @@
                 "id": 16,
                 "monotonic": 0,
                 "smif_id": 0,
+                "upgrade": false,
                 "upgrade_auth": [
                     8
                 ],
