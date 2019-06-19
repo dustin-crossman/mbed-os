@@ -13,7 +13,7 @@ from execute.gen_data_from_json import ENTRANCE_EXAM_SRAM_ADDR
 from execute.p6_reg import CYREG_CPUSS_PROTECTION
 from execute.p6_reg import CYREG_IPC2_STRUCT_NOTIFY, CYREG_IPC2_STRUCT_LOCK_STATUS
 
-PROBE_ID = '19071301dd0b211502dd0b2100000000000000002e127069'  # DAP-Link
+PROBE_ID = '19071301d90e140c00d90e1400000000000000002e127069'  # DAP-Link
 
 
 class TestProvisioning(unittest.TestCase):
