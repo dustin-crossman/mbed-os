@@ -4,6 +4,7 @@ import os.path
 import unittest
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(os.path.dirname('../execute/programmer'))
+sys.path.append(os.path.dirname('../'))
 import provision_device_runner
 from execute.enums import ProtectionState
 from execute.helper import get_target_name
