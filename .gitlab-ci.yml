@@ -30,6 +30,7 @@ test_provisioning:
     - pip install six
     - pip install setuptools_scm_git_archive
     - pip install setuptools_scm
+    - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
     - echo "[INFO] Installing pyocd"
     - cd pyocd
     - python setup.py install
