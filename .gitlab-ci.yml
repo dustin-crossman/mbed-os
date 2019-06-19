@@ -10,7 +10,7 @@ before_script:
 astyle:
   stage: build
   tags:
-    - mti-win10
+    - devops-linux
   script:
     - bash -ex cy-astyle.sh
 
@@ -48,8 +48,6 @@ ubuntu18-ARM:
     - gitlab_runner-001
   script:
     - bash -ex cy-build.sh ubuntu ARM
-  # Ignore linkage failure due to undefined symbols
-  allow_failure: true
 
 ubuntu18-GCC_ARM:
   stage: build
