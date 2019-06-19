@@ -66,7 +66,7 @@ void USBPhyHw::init(USBPhyEvents *events)
     instance->events = events;
     
     // Initialize USB Device (CYHAL find required resources).
-    if (CY_RSLT_SUCCESS != cyhal_usb_dev_init(hal_obj, USBDP, USBDM, NULL, NULL, NULL))
+    if (CY_RSLT_SUCCESS != cyhal_usb_dev_init(hal_obj, USBDP, USBDM, NULL))
     {
         // The CYHAL USB Device initialization failed
         MBED_ASSERT(0);
@@ -89,9 +89,11 @@ void USBPhyHw::init(USBPhyEvents *events)
     (void) cyhal_usb_dev_endpoint_add(hal_obj, true, false, 4U, USB_DEV_EP_NON_ISOC_MAX_PACKET, CYHAL_USB_DEV_EP_TYPE_BULK);
     (void) cyhal_usb_dev_endpoint_add(hal_obj, true, false, 5U, USB_DEV_EP_ISOC_MAX_PACKET,     CYHAL_USB_DEV_EP_TYPE_ISO);
     (void) cyhal_usb_dev_endpoint_add(hal_obj, true, false, 6U, USB_DEV_EP_ISOC_MAX_PACKET,     CYHAL_USB_DEV_EP_TYPE_ISO);
+    
     // Clear IN and OUT data endpoint event masks 
     in_event_mask  = 0;
     out_event_mask = 0;
+    
     // Clear abort mask
     ep_abort_mask = 0;
     
