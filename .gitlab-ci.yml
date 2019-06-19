@@ -47,6 +47,7 @@ test_provisioning:
     - python -m unittest test_provisioning.TestProvisioning.test_provision_device_release
     - cd ..
 
+    - sleep 10
     - echo "[INFO] Test provisioning using dual stage policy (CM0, CM4), CyBootloader Release"
     - if ((Test-Path packet)) { Remove-Item -LiteralPath "packet" -Force -Recurse }
     - cd prepare
@@ -56,6 +57,7 @@ test_provisioning:
     - cd ..
     - deactivate
 
+    - sleep 10
     - echo "[INFO] Test provisioning using single stage policy (CM4), CyBootloader WithLogs"
     - if ((Test-Path packet)) { Remove-Item -LiteralPath "packet" -Force -Recurse }
     - cd prepare
@@ -64,6 +66,7 @@ test_provisioning:
     - python -m unittest test_provisioning.TestProvisioning.test_provision_device_with_logs
     - cd ..
     
+    - sleep 10
     - echo "[INFO] Test provisioning using dual stage policy (CM0, CM4), CyBootloader WithLogs"
     - if ((Test-Path packet)) { Remove-Item -LiteralPath "packet" -Force -Recurse }
     - cd prepare
