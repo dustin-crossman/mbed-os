@@ -60,6 +60,7 @@
                 "id": 0,
                 "launch": 4,
                 "monotonic": 0,
+                "smif_id": 0,
                 "upgrade": false,
                 "upgrade_auth": [
                     3
@@ -84,6 +85,7 @@
                 ],
                 "id": 4,
                 "monotonic": 0,
+                "smif_id": 0,
                 "upgrade": true,
                 "upgrade_auth": [
                     8
