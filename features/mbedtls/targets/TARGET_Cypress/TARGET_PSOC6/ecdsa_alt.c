@@ -21,6 +21,8 @@
  * \file     ecdsa_alt.c
  * \version  1.0
  *
+ * \brief This file provides an API for Elliptic Curves sign and verifications.
+ *
  */
 
 #if !defined(MBEDTLS_CONFIG_FILE)
@@ -35,45 +37,20 @@
 #include "mbedtls/asn1write.h"
 #include "mbedtls/platform_util.h"
 
-#include <string.h>
-#include <stdlib.h>
+#if defined(MBEDTLS_ECDSA_SIGN_ALT)
 
 #include "cy_crypto_core_ecc.h"
 #include "cy_crypto_core_vu.h"
-
 #include "psoc6_utils.h"
 
-#if defined(MBEDTLS_ECDSA_SIGN_ALT)
+#include <string.h>
+#include <stdlib.h>
 
-#define ciL                 (sizeof(mbedtls_mpi_uint))       /* chars in limb  */
-#define biL                 (ciL << 3)                       /* bits  in limb  */
-#define BITS_TO_LIMBS(i)    ((i) / biL + ((i) % biL != 0))
-
-/*
- * Derive a suitable integer for group grp from a buffer of length len
- * SEC1 4.1.3 step 5 aka SEC1 4.1.4 step 3
- */
-static int derive_mpi( const mbedtls_ecp_group *grp, mbedtls_mpi *x,
-                       const unsigned char *buf, size_t blen )
-{
-    int ret;
-    size_t n_size = ( grp->nbits + 7 ) / 8;
-    size_t use_size = blen > n_size ? n_size : blen;
-
-    MBEDTLS_MPI_CHK( mbedtls_mpi_read_binary( x, buf, use_size ) );
-
-    if( use_size * 8 > grp->nbits ) {
-        MBEDTLS_MPI_CHK( mbedtls_mpi_shift_r( x, use_size * 8 - grp->nbits ) );
-    }
-
-    /* While at it, reduce modulo N */
-    if( mbedtls_mpi_cmp_mpi( x, &grp->N ) >= 0 ) {
-        MBEDTLS_MPI_CHK( mbedtls_mpi_sub_mpi( x, x, &grp->N ) );
-    }
-
-cleanup:
-    return( ret );
-}
+/* Parameter validation macros based on platform_util.h */
+#define ECDSA_VALIDATE_RET( cond )    \
+    MBEDTLS_INTERNAL_VALIDATE_RET( cond, MBEDTLS_ERR_ECP_BAD_INPUT_DATA )
+#define ECDSA_VALIDATE( cond )        \
+    MBEDTLS_INTERNAL_VALIDATE( cond )
 
 /**
  * \brief           This function computes the ECDSA signature of a
@@ -107,41 +84,36 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
                 int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
 {
     int ret;
-    mbedtls_mpi e, t;
-    cy_stc_crypto_ecc_key key;
-    cy_stc_crypto_ecc_dp_type *dp;
 	size_t bytesize;
     uint8_t *sig = NULL;
-	uint8_t *tmp_b = NULL;
-	uint8_t  tmp_k[CY_CRYPTO_ECC_MAX_BYTE_SIZE];
-    cy_en_crypto_status_t ecdsa_sig_status;
+    uint8_t *tmp_k = NULL;
+    cy_stc_crypto_ecc_key key;
+    cy_stc_crypto_ecc_dp_type *dp;
+    cy_en_crypto_status_t ecdsa_status;
+
+    ECDSA_VALIDATE_RET( grp   != NULL );
+    ECDSA_VALIDATE_RET( r     != NULL );
+    ECDSA_VALIDATE_RET( s     != NULL );
+    ECDSA_VALIDATE_RET( d     != NULL );
+    ECDSA_VALIDATE_RET( f_rng != NULL );
+    ECDSA_VALIDATE_RET( buf   != NULL || blen == 0 );
 
     /* Fail cleanly on curves such as Curve25519 that can't be used for ECDSA */
-    if ( grp->N.p == NULL )
-        return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
-
-    /* Make sure d is in range 1..n-1 */
-    if ( mbedtls_mpi_cmp_int( d, 1 ) < 0 || mbedtls_mpi_cmp_mpi( d, &grp->N ) >= 0 )
-        return( MBEDTLS_ERR_ECP_INVALID_KEY );
-
-    if (f_rng == NULL)
-       return(MBEDTLS_ERR_ECP_BAD_INPUT_DATA);
-
-    if (buf == NULL)
-       return(MBEDTLS_ERR_ECP_BAD_INPUT_DATA);
+    ECDSA_VALIDATE_RET( grp->N.p != NULL );
 
     key.curveID = cy_get_dp_idx(grp->id);
+    ECDSA_VALIDATE_RET( key.curveID != CY_CRYPTO_ECC_ECP_NONE);
 
-    if (key.curveID == CY_CRYPTO_ECC_ECP_NONE)
-        return(MBEDTLS_ERR_ECP_BAD_INPUT_DATA);
+    /* Make sure d is in range 1..n-1 */
+    if( mbedtls_mpi_cmp_int( d, 1 ) < 0 || mbedtls_mpi_cmp_mpi( d, &grp->N ) >= 0 )
+        return( MBEDTLS_ERR_ECP_INVALID_KEY );
 
-    mbedtls_mpi_init( &e ); mbedtls_mpi_init( &t );
-
+    /* Reserve the crypto hardware for the operation */
     cy_reserve_crypto(CY_CRYPTO_VU_HW);
 
 	dp = Cy_Crypto_Core_ECC_GetCurveParams(key.curveID);
 
-	bytesize   = CY_CRYPTO_BYTE_SIZE_OF_BITS(dp->size);
+	bytesize = CY_CRYPTO_BYTE_SIZE_OF_BITS(dp->size);
 
 	key.k = malloc(bytesize);
     MBEDTLS_MPI_CHK((key.k == NULL) ? MBEDTLS_ERR_ECP_ALLOC_FAILED : 0);
@@ -152,42 +124,25 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
     sig = malloc(2 * bytesize);
     MBEDTLS_MPI_CHK((sig == NULL) ? MBEDTLS_ERR_ECP_ALLOC_FAILED : 0);
 
-    tmp_b = malloc(CY_CRYPTO_MAX(blen, bytesize) + 1);
-    MBEDTLS_MPI_CHK((tmp_b == NULL) ? MBEDTLS_ERR_ECP_ALLOC_FAILED : 0);
+    tmp_k = malloc(bytesize);
+    MBEDTLS_MPI_CHK((tmp_k == NULL) ? MBEDTLS_ERR_ECP_ALLOC_FAILED : 0);
 
-    /*
-     * Step 5: derive MPI from hashed message
-     */
-    MBEDTLS_MPI_CHK( derive_mpi( grp, &e, buf, blen ) );
+    ecdsa_status = Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO, key.curveID, tmp_k, f_rng, p_rng);
+    MBEDTLS_MPI_CHK((ecdsa_status == CY_CRYPTO_SUCCESS) ? 0 : MBEDTLS_ERR_ECP_HW_ACCEL_FAILED);
 
-    MBEDTLS_MPI_CHK( mbedtls_mpi_write_binary( &e, tmp_b, bytesize ) );
-    Cy_Crypto_Core_InvertEndianness(tmp_b, bytesize);
-    /* ----------------- */
+    ecdsa_status = Cy_Crypto_Core_ECC_SignHash(CRYPTO, buf, blen, sig, &key, tmp_k);
+    MBEDTLS_MPI_CHK((ecdsa_status == CY_CRYPTO_SUCCESS) ? 0 : MBEDTLS_ERR_ECP_HW_ACCEL_FAILED);
 
-    /* make a PMSN value -> get_priv_key() */
-    MBEDTLS_MPI_CHK( mbedtls_mpi_fill_random( &t, bytesize, f_rng, p_rng ) );
-
-    if( bytesize * 8 > grp->nbits ) {
-        MBEDTLS_MPI_CHK( mbedtls_mpi_shift_r( &t, 8 * bytesize - grp->nbits ) );
-    }
-
-    MBEDTLS_MPI_CHK( mbedtls_mpi_write_binary( &t, tmp_k, bytesize ) );
-    Cy_Crypto_Core_InvertEndianness(tmp_k, bytesize);
-    /* ----------------- */
-
-    ecdsa_sig_status = Cy_Crypto_Core_ECC_SignHash(CRYPTO, tmp_b, bytesize, sig, &key, tmp_k);
-
-    MBEDTLS_MPI_CHK((ecdsa_sig_status == CY_CRYPTO_SUCCESS) ? 0 : MBEDTLS_ERR_ECP_HW_ACCEL_FAILED);
-
+    /* Prepare a signature to load into an mpi format */
     Cy_Crypto_Core_InvertEndianness(sig, bytesize);
     Cy_Crypto_Core_InvertEndianness(sig + bytesize, bytesize);
+
     MBEDTLS_MPI_CHK( mbedtls_mpi_read_binary( r, sig, bytesize ) );
     MBEDTLS_MPI_CHK( mbedtls_mpi_read_binary( s, sig + bytesize, bytesize ) );
 
 cleanup:
+    /* Realease the crypto hardware */
     cy_free_crypto(CY_CRYPTO_VU_HW);
-
-    mbedtls_mpi_free( &e ); mbedtls_mpi_free( &t );
 
     if (key.k != NULL)
     {
@@ -199,10 +154,10 @@ cleanup:
         mbedtls_platform_zeroize(sig, 2 * bytesize);
     	free(sig);
     }
-    if (tmp_b != NULL)
+    if (tmp_k != NULL)
     {
-        mbedtls_platform_zeroize(tmp_b, CY_CRYPTO_MAX(blen, bytesize) + 1);
-        free(tmp_b);
+        mbedtls_platform_zeroize(tmp_k, bytesize);
+        free(tmp_k);
     }
 
     return( ret );
@@ -220,28 +175,28 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
 {
     int ret;
 	uint8_t stat;
-    mbedtls_mpi e;
-    cy_stc_crypto_ecc_key key;
-    cy_stc_crypto_ecc_dp_type *dp;
     size_t bytesize;
 	size_t olen;
     uint8_t *sig = NULL;
-	uint8_t *tmp_b = NULL;
     uint8_t *point_arr = NULL;
+    cy_stc_crypto_ecc_key key;
+    cy_stc_crypto_ecc_dp_type *dp;
     cy_en_crypto_status_t ecdsa_ver_status;
 
-    if (buf == NULL)
-       return(MBEDTLS_ERR_ECP_BAD_INPUT_DATA);
+    ECDSA_VALIDATE_RET( grp != NULL );
+    ECDSA_VALIDATE_RET( Q   != NULL );
+    ECDSA_VALIDATE_RET( r   != NULL );
+    ECDSA_VALIDATE_RET( s   != NULL );
+    ECDSA_VALIDATE_RET( buf != NULL || blen == 0 );
 
     key.curveID = cy_get_dp_idx(grp->id);
-
     MBEDTLS_MPI_CHK( (key.curveID == CY_CRYPTO_ECC_ECP_NONE) ? MBEDTLS_ERR_ECP_BAD_INPUT_DATA : 0);
 
-    mbedtls_mpi_init( &e );
-
+    /* Reserve the crypto hardware for the operation */
     cy_reserve_crypto(CY_CRYPTO_VU_HW);
 
 	dp = Cy_Crypto_Core_ECC_GetCurveParams(key.curveID);
+
 	bytesize   = CY_CRYPTO_BYTE_SIZE_OF_BITS(dp->size);
 
     point_arr = malloc(2 * bytesize + 1u);
@@ -258,32 +213,19 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
     MBEDTLS_MPI_CHK( mbedtls_mpi_write_binary( s, sig + bytesize, bytesize ) );
     Cy_Crypto_Core_InvertEndianness(sig + bytesize, bytesize);
 
+    /* Export a signature from an mpi format to verify */
     MBEDTLS_MPI_CHK( mbedtls_ecp_point_write_binary( grp, Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &olen, point_arr, 2 * bytesize + 1) );
     Cy_Crypto_Core_InvertEndianness(key.pubkey.x, bytesize);
     Cy_Crypto_Core_InvertEndianness(key.pubkey.y, bytesize);
 
-    tmp_b = malloc(CY_CRYPTO_MAX(blen, bytesize) + 1);
-    MBEDTLS_MPI_CHK((tmp_b == NULL) ? MBEDTLS_ERR_ECP_ALLOC_FAILED : 0);
-
-    /*
-     * Step 5: derive MPI from hashed message
-     */
-    MBEDTLS_MPI_CHK( derive_mpi( grp, &e, buf, blen ) );
-
-    MBEDTLS_MPI_CHK( mbedtls_mpi_write_binary( &e, tmp_b, bytesize ) );
-    Cy_Crypto_Core_InvertEndianness(tmp_b, bytesize);
-    /* ----------------- */
-
-    ecdsa_ver_status = Cy_Crypto_Core_ECC_VerifyHash(CRYPTO, sig, tmp_b, bytesize, &stat, &key);
-
+    ecdsa_ver_status = Cy_Crypto_Core_ECC_VerifyHash(CRYPTO, sig, buf, blen, &stat, &key);
     MBEDTLS_MPI_CHK((ecdsa_ver_status != CY_CRYPTO_SUCCESS) ? MBEDTLS_ERR_ECP_HW_ACCEL_FAILED : 0);
 
     MBEDTLS_MPI_CHK((stat == 1) ? 0 : MBEDTLS_ERR_ECP_VERIFY_FAILED);
 
 cleanup:
+    /* Realease the crypto hardware */
     cy_free_crypto(CY_CRYPTO_VU_HW);
-
-    mbedtls_mpi_free( &e );
 
     if (point_arr != NULL)
     {
@@ -294,11 +236,6 @@ cleanup:
     {
         mbedtls_platform_zeroize(sig, 2 * bytesize);
     	free(sig);
-    }
-    if (tmp_b != NULL)
-    {
-        mbedtls_platform_zeroize(tmp_b, CY_CRYPTO_MAX(blen, bytesize) + 1u);
-        free(tmp_b);
     }
 
     return( ret );
