@@ -40,30 +40,34 @@ test_provisioning:
 
     - echo "[INFO] Test provisioning using single stage policy (CM4), CyBootloader Release"
     - if ((Test-Path packet)) { Remove-Item -LiteralPath "packet" -Force -Recurse }
-    - python prepare\provisioning_packet.py --policy policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
-    - cd test
+    - cd prepare
+    - python provisioning_packet.py --policy policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
+    - cd ../test
     - python -m unittest test_provisioning.TestProvisioning.test_provision_device_release
     - cd ..
 
     - echo "[INFO] Test provisioning using dual stage policy (CM0, CM4), CyBootloader Release"
     - if ((Test-Path packet)) { Remove-Item -LiteralPath "packet" -Force -Recurse }
-    - python prepare\provisioning_packet.py --policy policy_dual_stage_CM0p_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
-    - cd test
+    - cd prepare
+    - python provisioning_packet.py --policy policy_dual_stage_CM0p_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
+    - cd ../test
     - python -m unittest test_provisioning.TestProvisioning.test_provision_device_release
     - cd ..
     - deactivate
 
     - echo "[INFO] Test provisioning using single stage policy (CM4), CyBootloader WithLogs"
     - if ((Test-Path packet)) { Remove-Item -LiteralPath "packet" -Force -Recurse }
-    - python prepare\provisioning_packet.py --policy policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
-    - cd test
+    - cd prepare
+    - python provisioning_packet.py --policy policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
+    - cd ../test
     - python -m unittest test_provisioning.TestProvisioning.test_provision_device_with_logs
     - cd ..
     
     - echo "[INFO] Test provisioning using dual stage policy (CM0, CM4), CyBootloader WithLogs"
     - if ((Test-Path packet)) { Remove-Item -LiteralPath "packet" -Force -Recurse }
-    - python prepare\provisioning_packet.py --policy policy_dual_stage_CM0p_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
-    - cd test
+    - cd prepare
+    - python provisioning_packet.py --policy policy_dual_stage_CM0p_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
+    - cd ../test
     - python -m unittest test_provisioning.TestProvisioning.test_provision_device_with_logs
     - cd ..
     - deactivate
