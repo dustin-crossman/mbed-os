@@ -106,7 +106,7 @@ branch_name=$(git name-rev --name-only HEAD)
 echo "Working with branch: $branch_name"
 
 # Only execute this in *usbdev* branches
-if [[ $branch_name == *"usbdev"*  || $branch_name == *"halusb"* ]]; then
+if [[ $branch_name == *"usbdev"*  || $branch_name == *"halusb"* || $branch_name == *"topic/HAL-updates-synch"*]]; then
   echo "Working branch contains usbdev. Updating BSP/CSP and PSOC6PDL"
   
   ROOT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
