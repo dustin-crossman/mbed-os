@@ -25,7 +25,7 @@ Execute from ./prepare folder:
 
         python.exe provisioning_packet.py --policy policy_dual_stage_CM0p_CM4_smif.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
         
-* To enable SMIF make sure targets.json has following names defined: SMIF MCUBOOT_USE_SMIF_STAGE, MCUBOOT_USE_SMIF_XIP. This applies for AUGUST_CYW43012_M0_PSA and CY8CPROTO_064_SB_M0_PSA targets.
+* To enable SMIF make sure targets.json has following names defined: SMIF MCUBOOT_USE_SMIF_STAGE, MCUBOOT_USE_SMIF_XIP. This applies for AUGUST_CYW43012_M0_PSA and CY8CPROTO_064_SB_M0_PSA targets. smif_id = 0 if SMIF disabled or N/A; smif_id = 1 for CY8CPROTO_064_SB; smif_id = 2 for AUGUST_CYW43012.
         
 Prebuild folder contains CyBootloader_WithLogs and CyBootloader_Release with corresponding hex and jwt files.
   * WithLogs enables logs print to terminal.
