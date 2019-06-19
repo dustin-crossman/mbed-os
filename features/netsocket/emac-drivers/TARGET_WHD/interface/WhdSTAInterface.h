@@ -54,6 +54,9 @@ public:
 
     static WhdSTAInterface *get_default_instance();
 
+    /* Turn on the wifi device*/
+    void wifi_on();
+
     /** Start the interface
      *
      *  Attempts to connect to a WiFi network. Requires ssid and passphrase to be set.

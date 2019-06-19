@@ -92,8 +92,8 @@ static nsapi_security_t whd_tosecurity(whd_security_t sec) {
         case WHD_SECURITY_WEP_SHARED:       return NSAPI_SECURITY_WEP;
         case WHD_SECURITY_WPA_TKIP_PSK:
         case WHD_SECURITY_WPA_TKIP_ENT:     return NSAPI_SECURITY_WPA;
-        case WHD_SECURITY_WPA2_MIXED_PSK:
-        case WHD_SECURITY_WPA2_MIXED_ENT:   return NSAPI_SECURITY_WPA_WPA2;
+        case WHD_SECURITY_WPA2_MIXED_PSK:   return NSAPI_SECURITY_WPA_WPA2;
+        case WHD_SECURITY_WPA2_MIXED_ENT:   return NSAPI_SECURITY_WPA2_ENT;
         case WHD_SECURITY_WPA2_AES_PSK:
         case WHD_SECURITY_WPA2_AES_ENT:
         case WHD_SECURITY_WPA2_FBT_PSK:
@@ -110,6 +110,7 @@ whd_security_t whd_fromsecurity(nsapi_security_t sec) {
         case NSAPI_SECURITY_WPA:        return WHD_SECURITY_WPA_MIXED_PSK;
         case NSAPI_SECURITY_WPA2:       return WHD_SECURITY_WPA2_AES_PSK;
         case NSAPI_SECURITY_WPA_WPA2:   return WHD_SECURITY_WPA2_MIXED_PSK;
+        case NSAPI_SECURITY_WPA2_ENT:   return WHD_SECURITY_WPA2_MIXED_ENT;
         default:                        return WHD_SECURITY_UNKNOWN;
     }
 }
@@ -152,8 +153,8 @@ nsapi_error_t WhdSTAInterface::set_credentials(const char *ssid, const char *pas
 {
     if ((ssid == NULL) ||
         (strlen(ssid) == 0) ||
-        (pass == NULL && security != NSAPI_SECURITY_NONE) ||
-        (strlen(pass) == 0 && security != NSAPI_SECURITY_NONE) ||
+        (pass == NULL && ( security != NSAPI_SECURITY_NONE && security != NSAPI_SECURITY_WPA2_ENT)) ||
+        (strlen(pass) == 0 && ( security != NSAPI_SECURITY_NONE && security != NSAPI_SECURITY_WPA2_ENT)) ||
         (strlen(pass) > 63 && (security == NSAPI_SECURITY_WPA2 || security == NSAPI_SECURITY_WPA || security == NSAPI_SECURITY_WPA_WPA2))
         )
     {
@@ -242,6 +243,11 @@ nsapi_error_t WhdSTAInterface::connect()
             DEFAULT_STACK);
 }
 
+void WhdSTAInterface::wifi_on()
+{
+    if (!_whd_emac.powered_up)
+        _whd_emac.power_up();
+}
 
 nsapi_error_t WhdSTAInterface::disconnect()
 {
