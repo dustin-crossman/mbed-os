@@ -35,7 +35,7 @@ test_provisioning:
     - python setup.py install
     - cd ..
     - echo "[INFO] Start tests"
-    - cd .\targets\TARGET_Cypress\TARGET_PSOC6\sb-tools\test\
+    - cd .\targets\TARGET_Cypress\TARGET_PSOC6\sb-tools\
     - mbedls -m 1907:CY8CPROTO_064_SB
 
     - echo "[INFO] Test provisioning using single stage policy (CM4), CyBootloader Release"
