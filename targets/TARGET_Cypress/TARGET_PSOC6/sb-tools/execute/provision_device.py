@@ -18,7 +18,8 @@ from time import sleep
 from execute.helper import check_mode
 from execute.enums import ProtectionState
 from execute.sys_call import get_prov_details, provision_keys_and_policies
-from execute.p6_memory_map import FLASH_ADDRESS, FLASH_SIZE
+from execute.p6_memory_map import FLASH_ADDRESS, CY_BOOTLOADER_SIZE, PROVISION_JWT_PACKET_ADDRESS, \
+    PROVISION_JWT_PACKET_SIZE
 from execute.gen_data_from_json import ENTRANCE_EXAM_FW_STATUS_REG, ENTRANCE_EXAM_FW_STATUS_MASK, \
     ENTRANCE_EXAM_FW_STATUS_VAL
 from execute.p6_reg import CYREG_CPUSS_PROTECTION, NVSTORE_AREA_1_ADDRESS
@@ -56,7 +57,9 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, pro
 
     print(os.linesep + 'Erase main flash and TOC3:')
     print('erasing...')
-    tool.erase(FLASH_ADDRESS, FLASH_SIZE)
+    tool.erase(FLASH_ADDRESS, CY_BOOTLOADER_SIZE)
+    if protection_state != ProtectionState.secure:
+        tool.erase(PROVISION_JWT_PACKET_ADDRESS, PROVISION_JWT_PACKET_SIZE)
     reset_device(tool)
 
     print(os.linesep + 'Read FB Firmware status:')
