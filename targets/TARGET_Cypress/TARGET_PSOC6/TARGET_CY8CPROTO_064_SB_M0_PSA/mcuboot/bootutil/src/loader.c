@@ -2158,7 +2158,7 @@ boot_go(struct boot_rsp *rsp)
     	}
 #endif /* MCUBOOT_CYBOOTLOADER_BACKUP */
     }
-    ASSERT(rc == 0);
+    cy_assert(rc == 0);
     if (rc != 0) {
         rc = BOOT_EBADIMAGE;
         goto out;
