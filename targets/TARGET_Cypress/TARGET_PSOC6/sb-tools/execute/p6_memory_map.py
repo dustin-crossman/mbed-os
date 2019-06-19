@@ -14,4 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 FLASH_ADDRESS = 0x10000000
-FLASH_SIZE = 0x000e0000
+CY_BOOTLOADER_SIZE = 0x000e0000
+PROVISION_JWT_PACKET_ADDRESS = 0x100FD800
+PROVISION_JWT_PACKET_SIZE = 0x2800
