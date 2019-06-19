@@ -39,7 +39,6 @@ test_provisioning:
     - mbedls -m 1907:CY8CPROTO_064_SB
 
     - echo "[INFO] Test provisioning using single stage policy (CM4), CyBootloader Release"
-    - copy "test_data\erase.act" "D:\"
     - Remove-Item -LiteralPath "packet" -Force -Recurse
     - python prepare\provisioning_packet.py --policy policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
     - cd test
@@ -47,7 +46,6 @@ test_provisioning:
     - cd ..
 
     - echo "[INFO] Test provisioning using dual stage policy (CM0, CM4), CyBootloader Release"
-    - copy "test_data\erase.act" "D:\"
     - Remove-Item -LiteralPath "packet" -Force -Recurse
     - python prepare\provisioning_packet.py --policy policy_dual_stage_CM0p_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
     - cd test
@@ -56,7 +54,6 @@ test_provisioning:
     - deactivate
 
     - echo "[INFO] Test provisioning using single stage policy (CM4), CyBootloader WithLogs"
-    - copy "test_data\erase.act" "D:\"
     - Remove-Item -LiteralPath "packet" -Force -Recurse
     - python prepare\provisioning_packet.py --policy policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
     - cd test
@@ -64,7 +61,6 @@ test_provisioning:
     - cd ..
     
     - echo "[INFO] Test provisioning using dual stage policy (CM0, CM4), CyBootloader WithLogs"
-    - copy "test_data\erase.act" "D:\"
     - Remove-Item -LiteralPath "packet" -Force -Recurse
     - python prepare\provisioning_packet.py --policy policy_dual_stage_CM0p_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
     - cd test
