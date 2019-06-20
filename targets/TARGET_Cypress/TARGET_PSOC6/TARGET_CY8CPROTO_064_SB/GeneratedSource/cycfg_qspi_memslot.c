@@ -238,7 +238,7 @@ const cy_stc_smif_mem_config_t S25FL128S_SlaveSlot_0 =
     .baseAddress = 0x18000000U,
     /* The size allocated in the PSoC memory map, for the memory slave device.
     The size is allocated from the base address. Valid when the memory mapped mode is enabled. */
-    .memMappedSize = 0x10000U,
+    .memMappedSize = 0x1000000U,
     /* If this memory device is one of the devices in the dual quad SPI configuration.
     Valid when the memory mapped mode is enabled. */
     .dualQuadSlots = 0,
