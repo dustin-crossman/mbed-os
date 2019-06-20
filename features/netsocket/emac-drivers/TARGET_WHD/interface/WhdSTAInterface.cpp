@@ -193,7 +193,7 @@ nsapi_error_t WhdSTAInterface::connect()
 
     // Initialize the Offload Manager
     if(_olm != NULL) {
-        _olm->init_ols(&_emac, this);
+        _olm->init_ols(_whd_emac.ifp, this);
     }
 
     if ((_ssid == NULL) ||
@@ -414,14 +414,19 @@ int WhdSTAInterface::get_bssid(uint8_t *bssid)
 	return res;
 }
 
-int WhdSTAInterface::whd_log ( char *buffer, int buffer_size )
+int WhdSTAInterface::whd_log_print ( void )
 {
-	whd_result_t res = WHD_SUCCESS;
-	if ( buffer != NULL )
-	{
-		res = whd_wifi_print_whd_log( _whd_emac.drvp);
-	}
-	return res;
+    return whd_wifi_print_wlan_log( _whd_emac.drvp );
+}
+
+int WhdSTAInterface::whd_log_read ( char *buffer, int buffer_size )
+{
+    whd_result_t res = WHD_SUCCESS;
+    if ( buffer != NULL )
+    {
+        res = whd_wifi_read_wlan_log( _whd_emac.drvp, buffer, buffer_size);
+    }
+    return res;
 }
 
 nsapi_error_t WhdSTAInterface::wifi_get_ac_params_sta(void *acp )
