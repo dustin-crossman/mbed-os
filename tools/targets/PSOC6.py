@@ -291,7 +291,7 @@ def process_target(toolchain, target):
 
     if "_PSA" in target:
         # assume dual stage bootloading scheme
-        with open(sdk_path / "prepare/policy_dual_stage_CM0p_CM4.json") as p:
+        with open(sdk_path / Path(sb_config["policy_file"])) as p:
             policy_str = p.read()
             policy_file = json.loads(policy_str)
             p.close()
@@ -313,7 +313,7 @@ def process_target(toolchain, target):
                                           target_data=processing_target)
     else:
         # consider single stage bootloading scheme
-        with open(sdk_path / "prepare/policy_single_stage_CM4.json") as p:
+        with open(sdk_path / Path(sb_config["policy_file"])) as p:
             policy_str = p.read()
             policy_file = json.loads(policy_str)
             p.close()
