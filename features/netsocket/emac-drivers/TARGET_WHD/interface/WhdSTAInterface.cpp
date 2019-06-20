@@ -416,7 +416,7 @@ int WhdSTAInterface::get_bssid(uint8_t *bssid)
 
 int WhdSTAInterface::whd_log_print ( void )
 {
-    return whd_wifi_print_wlan_log( _whd_emac.drvp );
+    return whd_wifi_print_whd_log( _whd_emac.drvp );
 }
 
 int WhdSTAInterface::whd_log_read ( char *buffer, int buffer_size )
