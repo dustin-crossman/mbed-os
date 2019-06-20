@@ -1335,6 +1335,15 @@ int Cy_JWT_BnUPolicyParse(cJSON *bnu_json, bnu_policy_t *bnu_policy, uint32_t ma
                     }
                 }
             }
+            item = Cy_JWT_FindJsonItemByKey("smif_id", policy);
+            if(NULL != item)
+            {
+                bnu_policy->bnu_img_policy.smif_id = item->valueint;
+            }
+            else
+            {
+                bnu_policy->bnu_img_policy.smif_id = 0;
+            }
         }
     }
 

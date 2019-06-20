@@ -23,7 +23,7 @@
 
 #include "cycfg_qspi_memslot.h"
 
-const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_readCmd =
+const cy_stc_smif_mem_cmd_t  S25FL128S_SlaveSlot_0_readCmd =
 {
     /* The 8-bit command. 1 x I/O read command. */
     .command = 0xEBU,
@@ -41,7 +41,7 @@ const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_readCmd =
     .dataWidth = CY_SMIF_WIDTH_QUAD
 };
 
-const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_writeEnCmd =
+const cy_stc_smif_mem_cmd_t  S25FL128S_SlaveSlot_0_writeEnCmd =
 {
     /* The 8-bit command. 1 x I/O read command. */
     .command = 0x06U,
@@ -59,7 +59,7 @@ const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_writeEnCmd =
     .dataWidth = CY_SMIF_WIDTH_SINGLE
 };
 
-const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_writeDisCmd =
+const cy_stc_smif_mem_cmd_t  S25FL128S_SlaveSlot_0_writeDisCmd =
 {
     /* The 8-bit command. 1 x I/O read command. */
     .command = 0x04U,
@@ -77,7 +77,7 @@ const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_writeDisCmd =
     .dataWidth = CY_SMIF_WIDTH_SINGLE
 };
 
-const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_eraseCmd =
+const cy_stc_smif_mem_cmd_t  S25FL128S_SlaveSlot_0_eraseCmd =
 {
     /* The 8-bit command. 1 x I/O read command. */
     .command = 0x20U,
@@ -95,7 +95,7 @@ const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_eraseCmd =
     .dataWidth = CY_SMIF_WIDTH_SINGLE
 };
 
-const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_chipEraseCmd =
+const cy_stc_smif_mem_cmd_t  S25FL128S_SlaveSlot_0_chipEraseCmd =
 {
     /* The 8-bit command. 1 x I/O read command. */
     .command = 0x60U,
@@ -113,25 +113,25 @@ const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_chipEraseCmd =
     .dataWidth = CY_SMIF_WIDTH_SINGLE
 };
 
-const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_programCmd =
+const cy_stc_smif_mem_cmd_t  S25FL128S_SlaveSlot_0_programCmd =
 {
     /* The 8-bit command. 1 x I/O read command. */
-    .command = 0x02U,
+    .command = 0x38U,
     /* The width of the command transfer. */
     .cmdWidth = CY_SMIF_WIDTH_SINGLE,
     /* The width of the address transfer. */
-    .addrWidth = CY_SMIF_WIDTH_SINGLE,
+    .addrWidth = CY_SMIF_WIDTH_QUAD,
     /* The 8-bit mode byte. This value is 0xFFFFFFFF when there is no mode present. */
     .mode = 0xFFFFFFFFU,
     /* The width of the mode command transfer. */
-    .modeWidth = CY_SMIF_WIDTH_SINGLE,
+    .modeWidth = CY_SMIF_WIDTH_QUAD,
     /* The number of dummy cycles. A zero value suggests no dummy cycles. */
     .dummyCycles = 0U,
     /* The width of the data transfer. */
-    .dataWidth = CY_SMIF_WIDTH_SINGLE
+    .dataWidth = CY_SMIF_WIDTH_QUAD
 };
 
-const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_readStsRegQeCmd =
+const cy_stc_smif_mem_cmd_t  S25FL128S_SlaveSlot_0_readStsRegQeCmd =
 {
     /* The 8-bit command. 1 x I/O read command. */
     .command = 0x35U,
@@ -149,7 +149,7 @@ const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_readStsRegQeCmd =
     .dataWidth = CY_SMIF_WIDTH_SINGLE
 };
 
-const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_readStsRegWipCmd =
+const cy_stc_smif_mem_cmd_t  S25FL128S_SlaveSlot_0_readStsRegWipCmd =
 {
     /* The 8-bit command. 1 x I/O read command. */
     .command = 0x05U,
@@ -167,7 +167,7 @@ const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_readStsRegWipCmd =
     .dataWidth = CY_SMIF_WIDTH_SINGLE
 };
 
-const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_writeStsRegQeCmd =
+const cy_stc_smif_mem_cmd_t  S25FL128S_SlaveSlot_0_writeStsRegQeCmd =
 {
     /* The 8-bit command. 1 x I/O read command. */
     .command = 0x01U,
@@ -192,37 +192,37 @@ const cy_stc_smif_mem_device_cfg_t deviceCfg_S25FL128S_SlaveSlot_0 =
     /* The size of the memory. */
     .memSize = 0x1000000U,
     /* Specifies the Read command. */
-    .readCmd = (cy_stc_smif_mem_cmd_t*)&S25FL128S_SlaveSlot_0_readCmd,
+    .readCmd = (cy_stc_smif_mem_cmd_t *)&S25FL128S_SlaveSlot_0_readCmd,
     /* Specifies the Write Enable command. */
-    .writeEnCmd = (cy_stc_smif_mem_cmd_t*)&S25FL128S_SlaveSlot_0_writeEnCmd,
+    .writeEnCmd = (cy_stc_smif_mem_cmd_t *)&S25FL128S_SlaveSlot_0_writeEnCmd,
     /* Specifies the Write Disable command. */
-    .writeDisCmd = (cy_stc_smif_mem_cmd_t*)&S25FL128S_SlaveSlot_0_writeDisCmd,
+    .writeDisCmd = (cy_stc_smif_mem_cmd_t *)&S25FL128S_SlaveSlot_0_writeDisCmd,
     /* Specifies the Erase command. */
-    .eraseCmd = (cy_stc_smif_mem_cmd_t*)&S25FL128S_SlaveSlot_0_eraseCmd,
+    .eraseCmd = (cy_stc_smif_mem_cmd_t *)&S25FL128S_SlaveSlot_0_eraseCmd,
     /* Specifies the sector size of each erase. */
     .eraseSize = 0x0001000U,
     /* Specifies the Chip Erase command. */
-    .chipEraseCmd = (cy_stc_smif_mem_cmd_t*)&S25FL128S_SlaveSlot_0_chipEraseCmd,
+    .chipEraseCmd = (cy_stc_smif_mem_cmd_t *)&S25FL128S_SlaveSlot_0_chipEraseCmd,
     /* Specifies the Program command. */
-    .programCmd = (cy_stc_smif_mem_cmd_t*)&S25FL128S_SlaveSlot_0_programCmd,
+    .programCmd = (cy_stc_smif_mem_cmd_t *)&S25FL128S_SlaveSlot_0_programCmd,
     /* Specifies the page size for programming. */
     .programSize = 0x0000100U,
     /* Specifies the command to read the QE-containing status register. */
-    .readStsRegQeCmd = (cy_stc_smif_mem_cmd_t*)&S25FL128S_SlaveSlot_0_readStsRegQeCmd,
+    .readStsRegQeCmd = (cy_stc_smif_mem_cmd_t *)&S25FL128S_SlaveSlot_0_readStsRegQeCmd,
     /* Specifies the command to read the WIP-containing status register. */
-    .readStsRegWipCmd = (cy_stc_smif_mem_cmd_t*)&S25FL128S_SlaveSlot_0_readStsRegWipCmd,
+    .readStsRegWipCmd = (cy_stc_smif_mem_cmd_t *)&S25FL128S_SlaveSlot_0_readStsRegWipCmd,
     /* Specifies the command to write into the QE-containing status register. */
-    .writeStsRegQeCmd = (cy_stc_smif_mem_cmd_t*)&S25FL128S_SlaveSlot_0_writeStsRegQeCmd,
+    .writeStsRegQeCmd = (cy_stc_smif_mem_cmd_t *)&S25FL128S_SlaveSlot_0_writeStsRegQeCmd,
     /* The mask for the status register. */
     .stsRegBusyMask = 0x01U,
     /* The mask for the status register. */
     .stsRegQuadEnableMask = 0x02U,
     /* The max time for the erase type-1 cycle-time in ms. */
-    .eraseTime = 150U,
+    .eraseTime = 140U,
     /* The max time for the chip-erase cycle-time in ms. */
-    .chipEraseTime = 180000U,
+    .chipEraseTime = 40000U,
     /* The max time for the page-program cycle-time in us. */
-    .programTime = 350U
+    .programTime = 250U
 };
 
 const cy_stc_smif_mem_config_t S25FL128S_SlaveSlot_0 =
@@ -243,17 +243,244 @@ const cy_stc_smif_mem_config_t S25FL128S_SlaveSlot_0 =
     Valid when the memory mapped mode is enabled. */
     .dualQuadSlots = 0,
     /* The configuration of the device. */
-    .deviceCfg = (cy_stc_smif_mem_device_cfg_t*)&deviceCfg_S25FL128S_SlaveSlot_0
+    .deviceCfg = (cy_stc_smif_mem_device_cfg_t *)&deviceCfg_S25FL128S_SlaveSlot_0
 };
 
-const cy_stc_smif_mem_config_t* const smifMemConfigs[] = {
-   &S25FL128S_SlaveSlot_0
+const cy_stc_smif_mem_cmd_t  S25FL064L_SlaveSlot_0_readCmd =
+{
+   /* The 8-bit command. 1 x I/O read command. */
+   .command = 0xEBU,
+   /* The width of the command transfer. */
+   .cmdWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The width of the address transfer. */
+   .addrWidth = CY_SMIF_WIDTH_QUAD,
+   /* The 8-bit mode byte. This value is 0xFFFFFFFF when there is no mode present. */
+   .mode = 0x01U,
+   /* The width of the mode command transfer. */
+   .modeWidth = CY_SMIF_WIDTH_QUAD,
+   /* The number of dummy cycles. A zero value suggests no dummy cycles. */
+   .dummyCycles = 8U,
+   /* The width of the data transfer. */
+   .dataWidth = CY_SMIF_WIDTH_QUAD
 };
 
-cy_stc_smif_block_config_t smifBlockConfig =
+const cy_stc_smif_mem_cmd_t  S25FL064L_SlaveSlot_0_writeEnCmd =
+{
+   /* The 8-bit command. 1 x I/O read command. */
+   .command = 0x06U,
+   /* The width of the command transfer. */
+   .cmdWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The width of the address transfer. */
+   .addrWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The 8-bit mode byte. This value is 0xFFFFFFFF when there is no mode present. */
+   .mode = 0xFFFFFFFFU,
+   /* The width of the mode command transfer. */
+   .modeWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The number of dummy cycles. A zero value suggests no dummy cycles. */
+   .dummyCycles = 0U,
+   /* The width of the data transfer. */
+   .dataWidth = CY_SMIF_WIDTH_SINGLE
+};
+
+const cy_stc_smif_mem_cmd_t  S25FL064L_SlaveSlot_0_writeDisCmd =
+{
+   /* The 8-bit command. 1 x I/O read command. */
+   .command = 0x04U,
+   /* The width of the command transfer. */
+   .cmdWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The width of the address transfer. */
+   .addrWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The 8-bit mode byte. This value is 0xFFFFFFFF when there is no mode present. */
+   .mode = 0xFFFFFFFFU,
+   /* The width of the mode command transfer. */
+   .modeWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The number of dummy cycles. A zero value suggests no dummy cycles. */
+   .dummyCycles = 0U,
+   /* The width of the data transfer. */
+   .dataWidth = CY_SMIF_WIDTH_SINGLE
+};
+
+const cy_stc_smif_mem_cmd_t  S25FL064L_SlaveSlot_0_eraseCmd =
+{
+   /* The 8-bit command. 1 x I/O read command. */
+   .command = 0x20U,
+   /* The width of the command transfer. */
+   .cmdWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The width of the address transfer. */
+   .addrWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The 8-bit mode byte. This value is 0xFFFFFFFF when there is no mode present. */
+   .mode = 0xFFFFFFFFU,
+   /* The width of the mode command transfer. */
+   .modeWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The number of dummy cycles. A zero value suggests no dummy cycles. */
+   .dummyCycles = 0U,
+   /* The width of the data transfer. */
+   .dataWidth = CY_SMIF_WIDTH_SINGLE
+};
+
+const cy_stc_smif_mem_cmd_t  S25FL064L_SlaveSlot_0_chipEraseCmd =
+{
+   /* The 8-bit command. 1 x I/O read command. */
+   .command = 0x60U,
+   /* The width of the command transfer. */
+   .cmdWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The width of the address transfer. */
+   .addrWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The 8-bit mode byte. This value is 0xFFFFFFFF when there is no mode present. */
+   .mode = 0xFFFFFFFFU,
+   /* The width of the mode command transfer. */
+   .modeWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The number of dummy cycles. A zero value suggests no dummy cycles. */
+   .dummyCycles = 0U,
+   /* The width of the data transfer. */
+   .dataWidth = CY_SMIF_WIDTH_SINGLE
+};
+
+const cy_stc_smif_mem_cmd_t  S25FL064L_SlaveSlot_0_programCmd =
+{
+   /* The 8-bit command. 1 x I/O read command. */
+   .command = 0x02U,
+   /* The width of the command transfer. */
+   .cmdWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The width of the address transfer. */
+   .addrWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The 8-bit mode byte. This value is 0xFFFFFFFF when there is no mode present. */
+   .mode = 0xFFFFFFFFU,
+   /* The width of the mode command transfer. */
+   .modeWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The number of dummy cycles. A zero value suggests no dummy cycles. */
+   .dummyCycles = 0U,
+   /* The width of the data transfer. */
+   .dataWidth = CY_SMIF_WIDTH_SINGLE
+};
+
+const cy_stc_smif_mem_cmd_t  S25FL064L_SlaveSlot_0_readStsRegQeCmd =
+{
+   /* The 8-bit command. 1 x I/O read command. */
+   .command = 0x35U,
+   /* The width of the command transfer. */
+   .cmdWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The width of the address transfer. */
+   .addrWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The 8-bit mode byte. This value is 0xFFFFFFFF when there is no mode present. */
+   .mode = 0xFFFFFFFFU,
+   /* The width of the mode command transfer. */
+   .modeWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The number of dummy cycles. A zero value suggests no dummy cycles. */
+   .dummyCycles = 0U,
+   /* The width of the data transfer. */
+   .dataWidth = CY_SMIF_WIDTH_SINGLE
+};
+
+const cy_stc_smif_mem_cmd_t  S25FL064L_SlaveSlot_0_readStsRegWipCmd =
+{
+   /* The 8-bit command. 1 x I/O read command. */
+   .command = 0x05U,
+   /* The width of the command transfer. */
+   .cmdWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The width of the address transfer. */
+   .addrWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The 8-bit mode byte. This value is 0xFFFFFFFF when there is no mode present. */
+   .mode = 0xFFFFFFFFU,
+   /* The width of the mode command transfer. */
+   .modeWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The number of dummy cycles. A zero value suggests no dummy cycles. */
+   .dummyCycles = 0U,
+   /* The width of the data transfer. */
+   .dataWidth = CY_SMIF_WIDTH_SINGLE
+};
+
+const cy_stc_smif_mem_cmd_t  S25FL064L_SlaveSlot_0_writeStsRegQeCmd =
+{
+   /* The 8-bit command. 1 x I/O read command. */
+   .command = 0x01U,
+   /* The width of the command transfer. */
+   .cmdWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The width of the address transfer. */
+   .addrWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The 8-bit mode byte. This value is 0xFFFFFFFF when there is no mode present. */
+   .mode = 0xFFFFFFFFU,
+   /* The width of the mode command transfer. */
+   .modeWidth = CY_SMIF_WIDTH_SINGLE,
+   /* The number of dummy cycles. A zero value suggests no dummy cycles. */
+   .dummyCycles = 0U,
+   /* The width of the data transfer. */
+   .dataWidth = CY_SMIF_WIDTH_SINGLE
+};
+
+const cy_stc_smif_mem_device_cfg_t deviceCfg_S25FL064L_SlaveSlot_0 =
+{
+   /* Specifies the number of address bytes used by the memory slave device. */
+   .numOfAddrBytes = 0x03U,
+   /* The size of the memory. */
+   .memSize = 0x800000U,
+   /* Specifies the Read command. */
+   .readCmd = (cy_stc_smif_mem_cmd_t *)&S25FL064L_SlaveSlot_0_readCmd,
+   /* Specifies the Write Enable command. */
+   .writeEnCmd = (cy_stc_smif_mem_cmd_t*)&S25FL064L_SlaveSlot_0_writeEnCmd,
+   /* Specifies the Write Disable command. */
+   .writeDisCmd = (cy_stc_smif_mem_cmd_t*)&S25FL064L_SlaveSlot_0_writeDisCmd,
+   /* Specifies the Erase command. */
+   .eraseCmd = (cy_stc_smif_mem_cmd_t*)&S25FL064L_SlaveSlot_0_eraseCmd,
+   /* Specifies the sector size of each erase. */
+   .eraseSize = 0x1000U,
+   /* Specifies the Chip Erase command. */
+   .chipEraseCmd = (cy_stc_smif_mem_cmd_t*)&S25FL064L_SlaveSlot_0_chipEraseCmd,
+   /* Specifies the Program command. */
+   .programCmd = (cy_stc_smif_mem_cmd_t*)&S25FL064L_SlaveSlot_0_programCmd,
+   /* Specifies the page size for programming. */
+   .programSize = 0x100U,
+   /* Specifies the command to read the QE-containing status register. */
+   .readStsRegQeCmd = (cy_stc_smif_mem_cmd_t*)&S25FL064L_SlaveSlot_0_readStsRegQeCmd,
+   /* Specifies the command to read the WIP-containing status register. */
+   .readStsRegWipCmd = (cy_stc_smif_mem_cmd_t*)&S25FL064L_SlaveSlot_0_readStsRegWipCmd,
+   /* Specifies the command to write into the QE-containing status register. */
+   .writeStsRegQeCmd = (cy_stc_smif_mem_cmd_t*)&S25FL064L_SlaveSlot_0_writeStsRegQeCmd,
+   /* The mask for the status register. */
+   .stsRegBusyMask = 0x01U,
+   /* The mask for the status register. */
+   .stsRegQuadEnableMask = 0x02U,
+   /* The max time for the erase type-1 cycle-time in ms. */
+   .eraseTime = 65U,
+   /* The max time for the chip-erase cycle-time in ms. */
+   .chipEraseTime = 55000U,
+   /* The max time for the page-program cycle-time in us. */
+   .programTime = 450U
+};
+
+const cy_stc_smif_mem_config_t S25FL064L_SlaveSlot_0 =
+{
+   /* Determines the slot number where the memory device is placed. */
+   .slaveSelect = CY_SMIF_SLAVE_SELECT_1,
+   /* Flags. */
+   .flags = CY_SMIF_FLAG_MEMORY_MAPPED | CY_SMIF_FLAG_WR_EN,
+   /* The data-line selection options for a slave device. */
+   .dataSelect = CY_SMIF_DATA_SEL0,
+   /* The base address the memory slave is mapped to in the PSoC memory map.
+   Valid when the memory-mapped mode is enabled. */
+   .baseAddress = 0x18000000U,
+   /* The size allocated in the PSoC memory map, for the memory slave device.
+   The size is allocated from the base address. Valid when the memory mapped mode is enabled. */
+   .memMappedSize = 0x800000U,
+   /* If this memory device is one of the devices in the dual quad SPI configuration.
+   Valid when the memory mapped mode is enabled. */
+   .dualQuadSlots = 0,
+   /* The configuration of the device. */
+   .deviceCfg = (cy_stc_smif_mem_device_cfg_t*)&deviceCfg_S25FL064L_SlaveSlot_0
+};
+
+const cy_stc_smif_mem_config_t* multi_smifMemConfigs[] = {
+   /* ID = 0 means no SMIF associated with an image */
+   &S25FL128S_SlaveSlot_0, /* CY8CPROTO_064_SB, ID = 1 */
+   &S25FL064L_SlaveSlot_0  /* AUGUST_CYW43012, ID = 2 */
+};
+
+cy_stc_smif_mem_config_t* smifMemConfigs[] = { 0 };
+
+const cy_stc_smif_block_config_t smifBlockConfig =
 {
     /* The number of SMIF memories defined. */
-    .memCount = CY_SMIF_DEVICE_NUM,
+    .memCount = 1,
     /* The pointer to the array of memory config structures of size memCount. */
     .memConfig = (cy_stc_smif_mem_config_t**)smifMemConfigs,
     /* The version of the SMIF driver. */

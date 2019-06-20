@@ -34,26 +34,26 @@ QSPI_CONFIG_START
             <MemoryMapped>true</MemoryMapped>
             <DualQuad>None</DualQuad>
             <StartAddress>0x18000000</StartAddress>
-            <Size>0x10000</Size>
-            <EndAddress>0x1800FFFF</EndAddress>
+            <Size>0x800000</Size>
+            <EndAddress>0x187FFFFF</EndAddress>
             <WriteEnable>true</WriteEnable>
             <Encrypt>false</Encrypt>
             <DataSelect>QUAD_SPI_DATA_0_3</DataSelect>
-            <MemoryConfigsPath>../../../../secureboot_examples/secureboot_exmp_ws/CypressBootloader_CM0p_mainapp/S25FL128S.cymem</MemoryConfigsPath>
-            <ConfigDataInFlash>true</ConfigDataInFlash>
+            <MemoryConfigsPath>S25FL128S</MemoryConfigsPath>
+            <ConfigDataInFlash>false</ConfigDataInFlash>
         </SlotConfig>
         <SlotConfig>
-            <SlaveSlot>1</SlaveSlot>
-            <PartNumber>Not used</PartNumber>
-            <MemoryMapped>false</MemoryMapped>
+            <SlaveSlot>0</SlaveSlot>
+            <PartNumber>S25FL064L</PartNumber>
+            <MemoryMapped>true</MemoryMapped>
             <DualQuad>None</DualQuad>
-            <StartAddress>0x18010000</StartAddress>
-            <Size>0x10000</Size>
-            <EndAddress>0x1801FFFF</EndAddress>
-            <WriteEnable>false</WriteEnable>
+            <StartAddress>0x18000000</StartAddress>
+            <Size>0x800000</Size>
+            <EndAddress>0x187FFFFF</EndAddress>
+            <WriteEnable>true</WriteEnable>
             <Encrypt>false</Encrypt>
-            <DataSelect>SPI_MOSI_MISO_DATA_0_1</DataSelect>
-            <MemoryConfigsPath>default_memory.xml</MemoryConfigsPath>
+            <DataSelect>QUAD_SPI_DATA_0_3</DataSelect>
+            <MemoryConfigsPath>S25FL064L</MemoryConfigsPath>
             <ConfigDataInFlash>false</ConfigDataInFlash>
         </SlotConfig>
         <SlotConfig>
@@ -95,7 +95,7 @@ QSPI_CONFIG_END
 #define CYCFG_QSPI_MEMSLOT_H
 #include "cy_smif_memslot.h"
 
-#define CY_SMIF_DEVICE_NUM 1
+#define CY_SMIF_DEVICE_NUM 2
 
 extern const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_readCmd;
 extern const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_writeEnCmd;
@@ -107,12 +107,25 @@ extern const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_readStsRegQeCmd;
 extern const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_readStsRegWipCmd;
 extern const cy_stc_smif_mem_cmd_t S25FL128S_SlaveSlot_0_writeStsRegQeCmd;
 
+extern const cy_stc_smif_mem_cmd_t S25FL064L_SlaveSlot_0_readCmd;
+extern const cy_stc_smif_mem_cmd_t S25FL064L_SlaveSlot_0_writeEnCmd;
+extern const cy_stc_smif_mem_cmd_t S25FL064L_SlaveSlot_0_writeDisCmd;
+extern const cy_stc_smif_mem_cmd_t S25FL064L_SlaveSlot_0_eraseCmd;
+extern const cy_stc_smif_mem_cmd_t S25FL064L_SlaveSlot_0_chipEraseCmd;
+extern const cy_stc_smif_mem_cmd_t S25FL064L_SlaveSlot_0_programCmd;
+extern const cy_stc_smif_mem_cmd_t S25FL064L_SlaveSlot_0_readStsRegQeCmd;
+extern const cy_stc_smif_mem_cmd_t S25FL064L_SlaveSlot_0_readStsRegWipCmd;
+extern const cy_stc_smif_mem_cmd_t S25FL064L_SlaveSlot_0_writeStsRegQeCmd;
+
 extern const cy_stc_smif_mem_device_cfg_t deviceCfg_S25FL128S_SlaveSlot_0;
+extern const cy_stc_smif_mem_device_cfg_t deviceCfg_S25FL064L_SlaveSlot_0;
 
 extern const cy_stc_smif_mem_config_t S25FL128S_SlaveSlot_0;
-extern const cy_stc_smif_mem_config_t* const smifMemConfigs[CY_SMIF_DEVICE_NUM];
+extern const cy_stc_smif_mem_config_t S25FL064L_SlaveSlot_0;
 
-extern cy_stc_smif_block_config_t smifBlockConfig;
+extern cy_stc_smif_mem_config_t* smifMemConfigs[1];
+extern const cy_stc_smif_mem_config_t* multi_smifMemConfigs[CY_SMIF_DEVICE_NUM];
 
+extern const cy_stc_smif_block_config_t smifBlockConfig;
 
 #endif /*CY_SMIF_MEMCONFIG_H*/
