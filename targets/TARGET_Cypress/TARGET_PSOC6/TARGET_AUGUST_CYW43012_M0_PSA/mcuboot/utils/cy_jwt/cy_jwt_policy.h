@@ -146,6 +146,7 @@ typedef struct
 {
     uint8_t id;
     bool upgrade;
+    int8_t smif_id;
     bool encrypt;
     uint8_t encrypt_key_id;
     uint32_t monotonic;

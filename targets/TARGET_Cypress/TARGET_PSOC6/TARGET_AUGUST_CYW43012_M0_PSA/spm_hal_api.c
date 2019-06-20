@@ -163,6 +163,7 @@ void Cy_SystemInit(void)
     }
 }
 #endif
+
 static void turn_on_cm4(void)
 {
     uint32_t regValue;
@@ -232,24 +233,6 @@ void spm_hal_start_nspe(void)
     struct boot_rsp rsp;
     int rc = 0;
 
-#ifdef MCUBOOT_USE_SMIF_STAGE
-    cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
-
-    qspi_status = Flash_SMIF_QSPI_Start();
-    if(0 != qspi_status)
-    {
-         BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
-    }
-    /* Set QE */
-    Flash_SMIF_EnableQuadMode(SMIF0, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
-#ifdef MCUBOOT_USE_SMIF_XIP
-    if(qspi_status == CY_SMIF_SUCCESS)
-    {
-        BOOT_LOG_INF("SMIF Memory/XIP Mode");
-        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
-    }
-#endif
-#endif
     boot_flash_device = (struct device*)&psoc6_flash_device;
 
 #if(MCUBOOT_POLICY == 1)
@@ -295,6 +278,32 @@ void spm_hal_start_nspe(void)
     bnu_policy.bnu_img_policy.upgrade_auth[0]   = MCUBOOT_POLICY_UPGRADE_AUTH;
     bnu_policy.bnu_img_policy.id                = MCUBOOT_POLICY_IMG_ID;
     bnu_policy.bnu_img_policy.upgrade           = MCUBOOT_POLICY_UPGRADE;
+#endif
+
+#ifdef MCUBOOT_USE_SMIF_STAGE
+    /* read smif_id from policy */
+    int32_t smif_id = bnu_policy.bnu_img_policy.smif_id;
+    if(smif_id != 0)
+    {
+        /* reload one will be used with exact external memory module */
+        smifMemConfigs[0] = multi_smifMemConfigs[smif_id-1];
+        cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
+
+        qspi_status = Flash_SMIF_QSPI_Start();
+        if(0 != qspi_status)
+        {
+             BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
+        }
+        /* Set QE */
+        Flash_SMIF_EnableQuadMode(QSPI_HW, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
+#ifdef MCUBOOT_USE_SMIF_XIP
+        if(qspi_status == CY_SMIF_SUCCESS)
+        {
+            BOOT_LOG_INF("SMIF Memory/XIP Mode");
+            Cy_SMIF_SetMode(QSPI_HW, CY_SMIF_MEMORY);
+        }
+#endif
+    }
 #endif
 
     BOOT_LOG_INF("Processing available images");
