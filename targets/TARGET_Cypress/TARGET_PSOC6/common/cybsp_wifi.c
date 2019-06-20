@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 #define THREAD_STACK_SIZE   	    5120
-#define THREAD_PRIORITY   	        osPriorityRealtime7
+#define THREAD_PRIORITY   	        osPriorityHigh
 #define COUNTRY                     WHD_COUNTRY_AUSTRALIA
 #define DEFAULT_OOB_PIN		        0
 #define WLAN_INTR_PRIORITY	        1

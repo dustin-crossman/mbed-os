@@ -619,7 +619,7 @@ cy_rslt_t cyhal_uart_init(cyhal_uart_t *obj, cyhal_gpio_t tx, cyhal_gpio_t rx, c
         }
         else
         {
-            result = cyhal_uart_baud(obj, CYHAL_UART_DEFAULT_BAUD);
+            result = cyhal_uart_baud(obj, CYHAL_UART_DEFAULT_BAUD); /* Calls Enable() at the end */
         }
     }
 
@@ -668,7 +668,9 @@ static uint32_t cyhal_divider_value(uint32_t frequency, uint32_t frac_bits)
 {
     CY_ASSERT(frequency != 0);
     /* UARTs use peripheral clock */
-    return ((cy_PeriClkFreqHz * (1 << frac_bits)) + (frequency / 2)) / frequency;
+    uint32_t divider = ((cy_PeriClkFreqHz * (1 << frac_bits)) + (frequency / 2)) / frequency;
+    if(frac_bits == 0) divider = divider - 1;
+    return divider;
 }
 
 cy_rslt_t cyhal_uart_baud(cyhal_uart_t *obj, uint32_t baudrate)

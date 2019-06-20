@@ -154,17 +154,6 @@ extern "C" {
 #endif
 #define CYBSP_CSD_TX_HSIOM ioss_0_port_1_pin_0_HSIOM
 #define CYBSP_CSD_TX_IRQ ioss_interrupts_gpio_1_IRQn
-#define CYBSP_LED_GREEN_ENABLED 1U
-#define CYBSP_LED_GREEN_PORT GPIO_PRT1
-#define CYBSP_LED_GREEN_PIN 1U
-#define CYBSP_LED_GREEN_NUM 1U
-#define CYBSP_LED_GREEN_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
-#define CYBSP_LED_GREEN_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_1_pin_1_HSIOM
-	#define ioss_0_port_1_pin_1_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_LED_GREEN_HSIOM ioss_0_port_1_pin_1_HSIOM
-#define CYBSP_LED_GREEN_IRQ ioss_interrupts_gpio_1_IRQn
 #define CYBSP_WIFI_SDIO_DAT0_ENABLED 1U
 #define CYBSP_WIFI_SDIO_DAT0_PORT GPIO_PRT2
 #define CYBSP_WIFI_SDIO_DAT0_PIN 0U
@@ -308,17 +297,28 @@ extern "C" {
 #endif
 #define CYBSP_BT_DEVICE_WAKE_HSIOM ioss_0_port_4_pin_0_HSIOM
 #define CYBSP_BT_DEVICE_WAKE_IRQ ioss_interrupts_gpio_4_IRQn
-#define CYBSP_UART_TX_ENABLED 1U
-#define CYBSP_UART_TX_PORT GPIO_PRT5
-#define CYBSP_UART_TX_PIN 1U
-#define CYBSP_UART_TX_NUM 1U
-#define CYBSP_UART_TX_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
-#define CYBSP_UART_TX_INIT_DRIVESTATE 1
+#define CYBSP_DEBUG_UART_RX_ENABLED 1U
+#define CYBSP_DEBUG_UART_RX_PORT GPIO_PRT5
+#define CYBSP_DEBUG_UART_RX_PIN 0U
+#define CYBSP_DEBUG_UART_RX_NUM 0U
+#define CYBSP_DEBUG_UART_RX_DRIVEMODE CY_GPIO_DM_HIGHZ
+#define CYBSP_DEBUG_UART_RX_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_5_pin_0_HSIOM
+	#define ioss_0_port_5_pin_0_HSIOM HSIOM_SEL_GPIO
+#endif
+#define CYBSP_DEBUG_UART_RX_HSIOM ioss_0_port_5_pin_0_HSIOM
+#define CYBSP_DEBUG_UART_RX_IRQ ioss_interrupts_gpio_5_IRQn
+#define CYBSP_DEBUG_UART_TX_ENABLED 1U
+#define CYBSP_DEBUG_UART_TX_PORT GPIO_PRT5
+#define CYBSP_DEBUG_UART_TX_PIN 1U
+#define CYBSP_DEBUG_UART_TX_NUM 1U
+#define CYBSP_DEBUG_UART_TX_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
+#define CYBSP_DEBUG_UART_TX_INIT_DRIVESTATE 1
 #ifndef ioss_0_port_5_pin_1_HSIOM
 	#define ioss_0_port_5_pin_1_HSIOM HSIOM_SEL_GPIO
 #endif
-#define CYBSP_UART_TX_HSIOM ioss_0_port_5_pin_1_HSIOM
-#define CYBSP_UART_TX_IRQ ioss_interrupts_gpio_5_IRQn
+#define CYBSP_DEBUG_UART_TX_HSIOM ioss_0_port_5_pin_1_HSIOM
+#define CYBSP_DEBUG_UART_TX_IRQ ioss_interrupts_gpio_5_IRQn
 #define CYBSP_EZI2C_SCL_ENABLED 1U
 #define CYBSP_EZI2C_SCL_PORT GPIO_PRT6
 #define CYBSP_EZI2C_SCL_PIN 0U
@@ -496,7 +496,6 @@ extern const cy_stc_gpio_pin_config_t CYBSP_QSPI_DATA0_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_QSPI_SCK_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_LED_RED_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_CSD_TX_config;
-extern const cy_stc_gpio_pin_config_t CYBSP_LED_GREEN_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_DAT0_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_DAT1_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_DAT2_config;
@@ -510,7 +509,8 @@ extern const cy_stc_gpio_pin_config_t CYBSP_BT_UART_CTS_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_BT_POWER_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_BT_HOST_WAKE_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_BT_DEVICE_WAKE_config;
-extern const cy_stc_gpio_pin_config_t CYBSP_UART_TX_config;
+extern const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_RX_config;
+extern const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_TX_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_EZI2C_SCL_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_EZI2C_SDA_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_SWO_config;

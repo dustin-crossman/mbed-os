@@ -51,7 +51,7 @@ static whd_scan_result_t *result_ptr = &internal_scan_result;
 extern "C" void whd_emac_wifi_link_state_changed(bool state_up, whd_interface_t ifp);
 
 
-static int whd_toerror(whd_result_t res) {
+int whd_toerror(whd_result_t res) {
     switch (res) {
         case WHD_SUCCESS:                       return NSAPI_ERROR_OK;
         case WHD_UNSUPPORTED:
@@ -92,8 +92,8 @@ static nsapi_security_t whd_tosecurity(whd_security_t sec) {
         case WHD_SECURITY_WEP_SHARED:       return NSAPI_SECURITY_WEP;
         case WHD_SECURITY_WPA_TKIP_PSK:
         case WHD_SECURITY_WPA_TKIP_ENT:     return NSAPI_SECURITY_WPA;
-        case WHD_SECURITY_WPA2_MIXED_PSK:
-        case WHD_SECURITY_WPA2_MIXED_ENT:   return NSAPI_SECURITY_WPA_WPA2;
+        case WHD_SECURITY_WPA2_MIXED_PSK:   return NSAPI_SECURITY_WPA_WPA2;
+        case WHD_SECURITY_WPA2_MIXED_ENT:   return NSAPI_SECURITY_WPA2_ENT;
         case WHD_SECURITY_WPA2_AES_PSK:
         case WHD_SECURITY_WPA2_AES_ENT:
         case WHD_SECURITY_WPA2_FBT_PSK:
@@ -103,13 +103,14 @@ static nsapi_security_t whd_tosecurity(whd_security_t sec) {
     }
 }
 
-static whd_security_t whd_fromsecurity(nsapi_security_t sec) {
+whd_security_t whd_fromsecurity(nsapi_security_t sec) {
     switch (sec) {
         case NSAPI_SECURITY_NONE:       return WHD_SECURITY_OPEN;
         case NSAPI_SECURITY_WEP:        return WHD_SECURITY_WEP_PSK;
         case NSAPI_SECURITY_WPA:        return WHD_SECURITY_WPA_MIXED_PSK;
         case NSAPI_SECURITY_WPA2:       return WHD_SECURITY_WPA2_AES_PSK;
         case NSAPI_SECURITY_WPA_WPA2:   return WHD_SECURITY_WPA2_MIXED_PSK;
+        case NSAPI_SECURITY_WPA2_ENT:   return WHD_SECURITY_WPA2_MIXED_ENT;
         default:                        return WHD_SECURITY_UNKNOWN;
     }
 }
@@ -152,8 +153,8 @@ nsapi_error_t WhdSTAInterface::set_credentials(const char *ssid, const char *pas
 {
     if ((ssid == NULL) ||
         (strlen(ssid) == 0) ||
-        (pass == NULL && security != NSAPI_SECURITY_NONE) ||
-        (strlen(pass) == 0 && security != NSAPI_SECURITY_NONE) ||
+        (pass == NULL && ( security != NSAPI_SECURITY_NONE && security != NSAPI_SECURITY_WPA2_ENT)) ||
+        (strlen(pass) == 0 && ( security != NSAPI_SECURITY_NONE && security != NSAPI_SECURITY_WPA2_ENT)) ||
         (strlen(pass) > 63 && (security == NSAPI_SECURITY_WPA2 || security == NSAPI_SECURITY_WPA || security == NSAPI_SECURITY_WPA_WPA2))
         )
     {
@@ -226,9 +227,6 @@ nsapi_error_t WhdSTAInterface::connect()
         return whd_toerror(res);
     }
 
-    /* Use DHCP to get IP address? */
-    set_dhcp( (_ip_address[0] ? false : true) );
-
     if(whd_wifi_is_ready_to_transceive(_whd_emac.ifp) == WHD_SUCCESS)
     {
          whd_emac_wifi_link_state_changed(true, _whd_emac.ifp);
@@ -242,6 +240,11 @@ nsapi_error_t WhdSTAInterface::connect()
             DEFAULT_STACK);
 }
 
+void WhdSTAInterface::wifi_on()
+{
+    if (!_whd_emac.powered_up)
+        _whd_emac.power_up();
+}
 
 nsapi_error_t WhdSTAInterface::disconnect()
 {
@@ -250,7 +253,7 @@ nsapi_error_t WhdSTAInterface::disconnect()
     }
 
     // bring down
-    int err = EMACInterface::disconnect();
+    int err = _interface->bringdown();
     if (err) {
         return err;
     }

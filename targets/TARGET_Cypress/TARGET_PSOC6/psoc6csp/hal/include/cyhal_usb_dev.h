@@ -57,6 +57,12 @@ extern "C" {
 /** The usb error */
 #define CYHAL_USB_DEV_RSLT_ERR (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_USB, 0))
 
+/** The driver configuration is not supported by the HAL */
+#define CYHAL_USB_DEV_RSLT_ERR_BAD_DRV_CFG (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_USB, 1))
+ 
+/** The configuration of USB clock failed */
+#define CYHAL_USB_DEV_RSLT_ERR_CLK_CFG   (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_USB, 2))
+
 /** Returns true if endpoint direction is IN */
 #define CYHAL_USB_DEV_IS_IN_EP(endpoint)        (0U != (0x80U & (uint32_t) (endpoint)))
 
@@ -92,21 +98,6 @@ typedef enum
     CYHAL_USB_DEV_EVENT_EP0_OUT,    /**< Callback hooked to endpoint 0 OUT packet interrupt */
 } cyhal_usb_dev_event_t;
 
-/** Service Callback Events */
-typedef enum
-{
-    CYHAL_USB_DEV_MODE1_16_BIT,  /**< Endpoint management mode 1 using 16-bit registers to access endpoint data */
-    
-    /* CYHAL for USB Device v1.0 release supports only MODE 1 and 16-bit access!!!
-    * The other enum value provided for understanding how future extension can be handled.
-    */
-    //CYHAL_USB_DEV_MODE2_16_BIT,  /**< Endpoint management mode 2 using 16-bit registers to access endpoint data */
-    //CYHAL_USB_DEV_MODE3_16_BIT,  /**< Endpoint management mode 3 using 16-bit registers to access endpoint data */
-    //CYHAL_USB_DEV_MODE1_16_BIT,  /**< Endpoint management mode 1 using 8-bit registers to access endpoint data */
-    //CYHAL_USB_DEV_MODE2_16_BIT,  /**< Endpoint management mode 2 using 8-bit registers to access endpoint data */
-    //CYHAL_USB_DEV_MODE3_16_BIT,  /**< Endpoint management mode 3 using 8-bit registers to access endpoint data */
-} cyhal_usb_dev_mode_t;
-
 /** \} group_hal_usb_dev_enums */
 
 
@@ -117,23 +108,6 @@ typedef enum
 
 /** USB endpoint address (it consists from endpoint number and direction) */
 typedef uint8_t cyhal_usb_dev_ep_t;
-
-/** Configuration Structure */
-typedef struct
-{
-    /** Endpoints management mode */
-    cyhal_usb_dev_mode_t mode;
-    
-    /** The pointer to the buffer allocated for the USB Device endpoints. 
-    * Reserved for future use.
-    */
-    uint8_t  *ep_buffer;
-    
-    /** The size of the buffer for the USB Device endpoints. 
-    * Reserved for future use.
-    */
-    uint16_t  ep_buffer_size;
-} cyhal_usb_dev_cfg_t;
 
 /** Handler for USB Device interrupt  */
 typedef void (*cyhal_usb_dev_irq_handler_t)(void);
@@ -161,15 +135,11 @@ typedef void (*cyhal_usb_dev_sof_handler_t)(uint32_t frame_number);
  * @param[in,out] obj The usb device object
  * @param[in] dp      The D+ pin to initialize
  * @param[in] dm      The D- pin to initialize
- * @param[in] clkPll  The PLL clock to use can be shared, if not provided a new clock will be allocated
- * @param[in] clkDiv  The clock to use can be shared, if not provided a new clock will be allocated
- * @param[in]  cfg    The usb device configuration data, if not provided, default configuration is applied.
+ * @param[in] clk     The clock to use can be shared, if not provided a new clock will be allocated
  *
  * @return The status of the initialization request
  */
- cy_rslt_t cyhal_usb_dev_init(cyhal_usb_dev_t *obj, cyhal_gpio_t dp, cyhal_gpio_t dm,
-                              const cyhal_clock_divider_t *clkPll, cyhal_clock_divider_t *clkDiv,
-                              const cyhal_usb_dev_cfg_t *cfg);
+ cy_rslt_t cyhal_usb_dev_init(cyhal_usb_dev_t *obj, cyhal_gpio_t dp, cyhal_gpio_t dm, const cyhal_clock_divider_t *clk);
 
 
 /**

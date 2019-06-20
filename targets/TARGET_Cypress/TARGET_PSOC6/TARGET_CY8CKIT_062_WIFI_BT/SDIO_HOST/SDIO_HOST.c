@@ -13,12 +13,14 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 #include "SDIO_HOST.h"
-
+#include "cmsis_os2.h"
 #if defined(CY8C6247BZI_D54) /* Cypress ticket: BSP-525 */
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
+#define SEMAPHORE
+
 
 /*Globals Needed for DMA */
 /*DMA channel structures*/
@@ -44,6 +46,17 @@ static uint8_t crcTable[256];
 /*Global values used for DMA interrupt*/
 static uint32_t yCountRemainder;
 static uint32_t yCounts;
+
+/* declare a semaphore*/
+#ifdef SEMAPHORE
+#define NEVER_TIMEOUT ( (uint32_t)0xffffffffUL )
+typedef osSemaphoreId_t cy_semaphore_t;
+en_sdio_result_t cy_rtos_init_semaphore(/*@out@*/ cy_semaphore_t *semaphore);
+en_sdio_result_t cy_rtos_get_semaphore(cy_semaphore_t *semaphore, uint32_t timeout_ms);
+en_sdio_result_t cy_rtos_set_semaphore(cy_semaphore_t *semaphore );
+en_sdio_result_t cy_rtos_deinit_semaphore(cy_semaphore_t *semaphore);
+static cy_semaphore_t   sdio_transfer_finished_semaphore;
+#endif
 
 static uint32_t udb_initialized = 0;
 
@@ -117,6 +130,10 @@ void SDIO_Init(stc_sdio_irq_cb_t* pfuCb)
     SDIO_EnableIntClock();
     SDIO_EnableSdClk();
 
+     /*Initalize the semaphore*/
+#ifdef SEMAPHORE
+    cy_rtos_init_semaphore( &sdio_transfer_finished_semaphore );
+#endif
 }
 
 
@@ -550,14 +567,23 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
     stc_sdio_cmd_config_t   stcCmdConfig;
     stc_sdio_data_config_t  stcDataConfig;
 
+#ifdef SEMAPHORE
+    en_sdio_result_t result;
+#endif
+
     /*variable used for holding timeout value*/
+#ifndef SEMAPHORE
     uint32_t    u32Timeout = 0;
+#endif
+
+#ifndef SEMAPHORE_CMD
     uint32_t u32CmdTimeout = 0;
+#endif
 
     /*Returns from various function calls*/
     en_sdio_result_t enRet = Error;
     en_sdio_result_t enRetTmp = Ok;
-    
+
     /*Hold value of if these checks are needed*/
     uint8_t             bCmdIndexCheck;       
     uint8_t             bCmdCrcCheck; 
@@ -673,6 +699,7 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                             SDIO_CONTROL_REG |= SDIO_CTRL_ENABLE_WRITE;
                         }
 
+#ifndef SEMAPHORE
                          /*Wait for the transfer to finish*/
                         do
                         {
@@ -680,7 +707,7 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                             u32Timeout++;
                             enRetTmp = SDIO_CheckForEvent(SdCmdEventTransferDone);
 
-                        }while (!((enRetTmp == Ok) || (enRetTmp == DataCrcError) || (u32Timeout >= SDIO_DAT_TIMEOUT)));
+                        } while (!((enRetTmp == Ok) || (enRetTmp == DataCrcError) || (u32Timeout >= SDIO_DAT_TIMEOUT)));
 
                         /*if it was a read it is possible there is still extra data hanging out, trigger the
                           DMA again. This can result in extra data being transfered so the read buffer should be
@@ -691,6 +718,21 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                         }
 
                         if(u32Timeout == SDIO_DAT_TIMEOUT)
+
+#else
+                         result = cy_rtos_get_semaphore( &sdio_transfer_finished_semaphore, 10 );
+                         enRetTmp = SDIO_CheckForEvent(SdCmdEventTransferDone);
+
+                         /* if it was a read it is possible there is still extra data hanging out, trigger the
+                           DMA again. This can result in extra data being transfered so the read buffer should be
+                           3 bytes bigger than needed*/
+                        if(pstcCmd->bRead == true)
+                        {
+                            Cy_TrigMux_SwTrigger((uint32_t)SDIO_HOST_Read_DMA_DW__TR_IN, 2);
+                        }
+
+                        if(result != Ok)
+#endif
                         {
                             enRet |= DataTimeout;
                         }
@@ -705,12 +747,16 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
         } /*No Response Required, thus no CMD53*/
     } /*CMD Passed*/
 
+
+#ifndef SEMAPHORE
     u32Timeout = 0;
+#endif
 
     /*If there were no errors then indicate transfer was okay*/
     if(enRet == Error)
     {
         enRet = Ok;
+
     }
 
     /*reset CmdTimeout value*/
@@ -1156,8 +1202,11 @@ void SDIO_IRQ(void)
             gstcInternalData.stcEvents.u8CRCError++;
         }
         /*set the done flag*/
+#ifdef SEMAPHORE
+        cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore );
+#else
         gstcInternalData.stcEvents.u8TransComplete++;
-
+#endif
     }
 
     /*Check if a read is complete*/
@@ -1173,7 +1222,11 @@ void SDIO_IRQ(void)
             gstcInternalData.stcEvents.u8CRCError++;
         }
         /*Okay we're done so set the done flag*/
+#ifdef SEMAPHORE
+        cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore );
+#else
         gstcInternalData.stcEvents.u8TransComplete++;
+#endif
     }
 
     NVIC_ClearPendingIRQ(SDIO_HOST_sdio_int__INTC_NUMBER);
@@ -1302,6 +1355,122 @@ void SDIO_WRITE_DMA_IRQ(void)
     /*Clear the interrupt*/
     Cy_DMA_Channel_ClearInterrupt(SDIO_HOST_Write_DMA_HW,SDIO_HOST_Write_DMA_DW_CHANNEL);
     yCounts--;
+}
+
+
+/**
+ * Creates a semaphore
+ *
+ * @param semaphore         : pointer to variable which will receive handle of created semaphore
+ *
+ * @returns Ok on success, Error otherwise
+ */
+en_sdio_result_t cy_rtos_init_semaphore(/*@out@*/ cy_semaphore_t *semaphore)   /*@modifies *semaphore@*/
+{
+    *semaphore = osSemaphoreNew(1, 1, NULL);
+    if (*semaphore == NULL)
+    {
+        return Error;
+    }
+    return Ok;
+}
+
+/**
+ * Gets a semaphore
+ *
+ * If value of semaphore is larger than zero, then the semaphore is decremented and function returns
+ * Else If value of semaphore is zero, then current thread is suspended until semaphore is set.
+ * Value of semaphore should never be below zero
+ *
+ * Must not be called from interrupt context, since it could block, and since an interrupt is not a
+ * normal thread, so could cause RTOS problems if it tries to suspend it.
+ *
+ * @param semaphore   : Pointer to variable which will receive handle of created semaphore
+ * @param timeout_ms  : Maximum period to block for. Can be passed NEVER_TIMEOUT to request no timeout
+ */
+en_sdio_result_t cy_rtos_get_semaphore(cy_semaphore_t *semaphore, uint32_t timeout_ms)
+{
+    osStatus_t result;
+
+    if (*semaphore == NULL)
+    {
+        return Error;
+    }
+
+    if (timeout_ms == NEVER_TIMEOUT)
+        result = osSemaphoreAcquire(*semaphore, osWaitForever);
+    else
+        result = osSemaphoreAcquire(*semaphore, timeout_ms );
+
+    if (result == osOK)
+    {
+        return Ok;
+    }
+    else if (result == osErrorTimeout)
+    {
+        return DataTimeout;
+    }
+
+    return Error;
+}
+
+/**
+ * Sets a semaphore
+ *
+ * If any threads are waiting on the semaphore, the first thread is resumed
+ * Else increment semaphore.
+ *
+ * Can be called from interrupt context, so must be able to handle resuming other
+ * threads from interrupt context.
+ *
+ * @param semaphore       : Pointer to variable which will receive handle of created semaphore
+ * @return en_sdio_result_t :Ok if semaphore was successfully set
+ *                          : Error if an error occurred
+ *
+ */
+en_sdio_result_t cy_rtos_set_semaphore(cy_semaphore_t *semaphore )
+{
+    osStatus_t result;
+
+    if (*semaphore == NULL)
+    {
+        return Error;
+    }
+
+    result = osSemaphoreRelease(*semaphore);
+
+    if ( (result == osOK) || (result == osErrorResource) )
+    {
+        return Ok;
+    }
+
+    return Error;
+}
+
+/**
+ * Deletes a semaphore
+ *
+ * function to delete a semaphore.
+ *
+ * @param semaphore         : Pointer to the semaphore handle
+ *
+ * @return en_sdio_result_t : Ok if semaphore was successfully deleted
+ *                        : Error if an error occurred
+ *
+ */
+en_sdio_result_t cy_rtos_deinit_semaphore(cy_semaphore_t *semaphore)
+{
+    osStatus_t result;
+    if (*semaphore == NULL)
+    {
+        return Error;
+    }
+    result = osSemaphoreDelete(*semaphore);
+
+    if (result != osOK)
+        return Error;
+
+    return Ok;
 }
 
 #endif /* defined(CY8C6247BZI_D54) */

@@ -16,9 +16,16 @@
  */
 
 #include "WhdSTAInterface.h"
+#include "WhdSoftAPInterface.h"
 
 WiFiInterface *WiFiInterface::get_target_default_instance()
 {
     static WhdSTAInterface wifi;
     return &wifi;
+}
+
+WhdSoftAPInterface *WhdSoftAPInterface::get_default_instance()
+{
+    static WhdSoftAPInterface softap;
+    return &softap;
 }

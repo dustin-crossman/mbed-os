@@ -200,22 +200,6 @@ const cy_stc_gpio_pin_config_t CYBSP_CSD_TX_config =
 	.vrefSel = 0UL,
 	.vohSel = 0UL,
 };
-const cy_stc_gpio_pin_config_t CYBSP_LED_GREEN_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = CYBSP_LED_GREEN_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
 const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_DAT0_config = 
 {
 	.outVal = 1,
@@ -424,11 +408,27 @@ const cy_stc_gpio_pin_config_t CYBSP_BT_DEVICE_WAKE_config =
 	.vrefSel = 0UL,
 	.vohSel = 0UL,
 };
-const cy_stc_gpio_pin_config_t CYBSP_UART_TX_config = 
+const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_RX_config = 
+{
+	.outVal = 1,
+	.driveMode = CY_GPIO_DM_HIGHZ,
+	.hsiom = CYBSP_DEBUG_UART_RX_HSIOM,
+	.intEdge = CY_GPIO_INTR_DISABLE,
+	.intMask = 0UL,
+	.vtrip = CY_GPIO_VTRIP_CMOS,
+	.slewRate = CY_GPIO_SLEW_FAST,
+	.driveSel = CY_GPIO_DRIVE_1_2,
+	.vregEn = 0UL,
+	.ibufMode = 0UL,
+	.vtripSel = 0UL,
+	.vrefSel = 0UL,
+	.vohSel = 0UL,
+};
+const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_TX_config = 
 {
 	.outVal = 1,
 	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = CYBSP_UART_TX_HSIOM,
+	.hsiom = CYBSP_DEBUG_UART_TX_HSIOM,
 	.intEdge = CY_GPIO_INTR_DISABLE,
 	.intMask = 0UL,
 	.vtrip = CY_GPIO_VTRIP_CMOS,
@@ -705,8 +705,6 @@ void init_cycfg_pins(void)
 	Cy_GPIO_Pin_Init(CYBSP_LED_RED_PORT, CYBSP_LED_RED_PIN, &CYBSP_LED_RED_config);
 
 
-	Cy_GPIO_Pin_Init(CYBSP_LED_GREEN_PORT, CYBSP_LED_GREEN_PIN, &CYBSP_LED_GREEN_config);
-
 	Cy_GPIO_Pin_Init(CYBSP_WIFI_SDIO_DAT0_PORT, CYBSP_WIFI_SDIO_DAT0_PIN, &CYBSP_WIFI_SDIO_DAT0_config);
 
 	Cy_GPIO_Pin_Init(CYBSP_WIFI_SDIO_DAT1_PORT, CYBSP_WIFI_SDIO_DAT1_PIN, &CYBSP_WIFI_SDIO_DAT1_config);
@@ -733,7 +731,9 @@ void init_cycfg_pins(void)
 
 	Cy_GPIO_Pin_Init(CYBSP_BT_DEVICE_WAKE_PORT, CYBSP_BT_DEVICE_WAKE_PIN, &CYBSP_BT_DEVICE_WAKE_config);
 
-	Cy_GPIO_Pin_Init(CYBSP_UART_TX_PORT, CYBSP_UART_TX_PIN, &CYBSP_UART_TX_config);
+	Cy_GPIO_Pin_Init(CYBSP_DEBUG_UART_RX_PORT, CYBSP_DEBUG_UART_RX_PIN, &CYBSP_DEBUG_UART_RX_config);
+
+	Cy_GPIO_Pin_Init(CYBSP_DEBUG_UART_TX_PORT, CYBSP_DEBUG_UART_TX_PIN, &CYBSP_DEBUG_UART_TX_config);
 
 	Cy_GPIO_Pin_Init(CYBSP_EZI2C_SCL_PORT, CYBSP_EZI2C_SCL_PIN, &CYBSP_EZI2C_SCL_config);
 

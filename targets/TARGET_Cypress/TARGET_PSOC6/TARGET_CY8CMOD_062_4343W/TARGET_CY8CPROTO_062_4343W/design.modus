@@ -156,16 +156,6 @@
                     <Param id="sioOutputBuffer" value="true"/>
                     <Param id="inFlash" value="true"/>
                 </Block>
-                <Block location="ioss[0].port[1].pin[1]" alias="CYBSP_LED_GREEN" template="mxs40pin" version="1.1">
-                    <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
-                    <Param id="initialState" value="1"/>
-                    <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
-                    <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
-                    <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
-                    <Param id="driveStrength" value="CY_GPIO_DRIVE_1_2"/>
-                    <Param id="sioOutputBuffer" value="true"/>
-                    <Param id="inFlash" value="true"/>
-                </Block>
                 <Block location="ioss[0].port[2].pin[0]" alias="CYBSP_WIFI_SDIO_DAT0" template="mxs40pin" version="1.1">
                     <Param id="DriveModes" value="CY_GPIO_DM_STRONG"/>
                     <Param id="initialState" value="1"/>
@@ -296,7 +286,17 @@
                     <Param id="sioOutputBuffer" value="true"/>
                     <Param id="inFlash" value="true"/>
                 </Block>
-                <Block location="ioss[0].port[5].pin[1]" alias="CYBSP_UART_TX" template="mxs40pin" version="1.1">
+                <Block location="ioss[0].port[5].pin[0]" alias="CYBSP_DEBUG_UART_RX" template="mxs40pin" version="1.1">
+                    <Param id="DriveModes" value="CY_GPIO_DM_HIGHZ"/>
+                    <Param id="initialState" value="1"/>
+                    <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
+                    <Param id="isrTrigger" value="CY_GPIO_INTR_DISABLE"/>
+                    <Param id="slewRate" value="CY_GPIO_SLEW_FAST"/>
+                    <Param id="driveStrength" value="CY_GPIO_DRIVE_1_2"/>
+                    <Param id="sioOutputBuffer" value="true"/>
+                    <Param id="inFlash" value="true"/>
+                </Block>
+                <Block location="ioss[0].port[5].pin[1]" alias="CYBSP_DEBUG_UART_TX" template="mxs40pin" version="1.1">
                     <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
                     <Param id="initialState" value="1"/>
                     <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
@@ -456,17 +456,17 @@
                     <Param id="sioOutputBuffer" value="true"/>
                     <Param id="inFlash" value="true"/>
                 </Block>
-                <Block location="peri[0].div_8[0]" alias="" template="mxs40peripheralclock" version="1.0">
+                <Block location="peri[0].div_8[0]" alias="CYBSP_CSD_CLK_DIV" template="mxs40peripheralclock" version="1.0">
                     <Param id="intDivider" value="256"/>
                     <Param id="fracDivider" value="0"/>
                     <Param id="startOnReset" value="true"/>
                 </Block>
-                <Block location="peri[0].div_8[1]" alias="" template="mxs40peripheralclock" version="1.0">
+                <Block location="peri[0].div_8[1]" alias="CYBSP_CSD_COMM_CLK_DIV" template="mxs40peripheralclock" version="1.0">
                     <Param id="intDivider" value="4"/>
                     <Param id="fracDivider" value="0"/>
                     <Param id="startOnReset" value="true"/>
                 </Block>
-                <Block location="peri[0].div_8[2]" alias="" template="mxs40peripheralclock" version="1.0">
+                <Block location="peri[0].div_8[2]" alias="CYBSP_DEBUG_UART_CLK_DIV" template="mxs40peripheralclock" version="1.0">
                     <Param id="intDivider" value="36"/>
                     <Param id="fracDivider" value="0"/>
                     <Param id="startOnReset" value="true"/>
@@ -516,7 +516,7 @@
                     <Param id="IntrTxUnderflow" value="false"/>
                     <Param id="IntrTxTrigger" value="false"/>
                 </Block>
-                <Block location="scb[3]" alias="CYBSP_I2C" template="mxs40ezi2c" version="1.0">
+                <Block location="scb[3]" alias="CYBSP_CSD_COMM" template="mxs40ezi2c" version="1.0">
                     <Param id="DataRate" value="100"/>
                     <Param id="NumOfAddr" value="CY_SCB_EZI2C_ONE_ADDRESS"/>
                     <Param id="SlaveAddress1" value="8"/>
@@ -525,7 +525,7 @@
                     <Param id="EnableWakeup" value="false"/>
                     <Param id="inFlash" value="true"/>
                 </Block>
-                <Block location="scb[5]" alias="CYBSP_UART" template="mxs40uart" version="1.0">
+                <Block location="scb[5]" alias="CYBSP_DEBUG_UART" template="mxs40uart" version="1.0">
                     <Param id="ComMode" value="CY_SCB_UART_STANDARD"/>
                     <Param id="IrdaLowPower" value="false"/>
                     <Param id="BaudRate" value="115200"/>
@@ -771,6 +771,10 @@
                 <Net>
                     <Port name="ioss[0].port[3].pin[3].digital_in[0]"/>
                     <Port name="scb[2].uart_cts[0]"/>
+                </Net>
+                <Net>
+                    <Port name="ioss[0].port[5].pin[0].digital_inout[0]"/>
+                    <Port name="scb[5].uart_rx[0]"/>
                 </Net>
                 <Net>
                     <Port name="ioss[0].port[5].pin[1].digital_inout[0]"/>
