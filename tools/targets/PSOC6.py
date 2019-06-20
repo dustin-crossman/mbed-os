@@ -386,15 +386,14 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
         # preserve signed binary file
         hex2bin(out_hex_name, out_bin_name)
 
-        # produce hex file for slot1
-        if slot["slot_data"]["type"] == "UPGRADE":
-            bin2hex(out_bin_name, out_hex_name, offset=int(slot["slot_data"]["address"]))
-
         # preserve separate hex for cm4
         # 16 is image ID for NSPE image
         if slot["id"] == NSPE_IMAGE_ID:
             copy2(out_hex_name, out_cm4_hex)
 
+        # produce hex file for slot1
+        if slot["slot_data"]["type"] == "UPGRADE":
+            bin2hex(out_bin_name, out_hex_name, offset=int(slot["slot_data"]["address"]))
 
 def complete(toolchain, elf0, hexf0, hexf1=None):
     if os.path.isfile(str(hexf0)) and os.path.isfile(str(hexf1)):
