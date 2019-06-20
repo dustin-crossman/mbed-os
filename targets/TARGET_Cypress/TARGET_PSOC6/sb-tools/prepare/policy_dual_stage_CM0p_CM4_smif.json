@@ -2,7 +2,7 @@
     "debug" :
     {
         "m0p" : {
-            "permission" : "disabled",
+            "permission" : "enabled",
             "control" : "firmware",
             "key" : 5
         },
@@ -48,7 +48,7 @@
         }
     },
     "wounding" :
-    {     
+    {
     },
     "boot_upgrade" :
     {
@@ -58,7 +58,7 @@
                     3
                 ],
                 "id": 0,
-                "launch": 4,
+                "launch": 1,
                 "monotonic": 0,
                 "smif_id": 0,
                 "upgrade": false,
@@ -81,9 +81,37 @@
             },
             {
                 "boot_auth": [
+                    6
+                ],
+                "id": 1,
+                "launch": 16,
+                "monotonic": 0,
+                "smif_id": 0,
+                "upgrade": false,
+                "encrypt": false,
+                "encrypt_key_id": 1,
+                "upgrade_auth": [
+                    6
+                ],
+                "backup": false,
+                "resources": [
+                    {
+                        "type": "BOOT",
+                        "address": 268959744,
+                        "size": 327680
+                    },
+                    {
+                        "type": "UPGRADE",
+                        "address": 268632064,
+                        "size": 327680
+                    }
+                ]
+            },
+            {
+                "boot_auth": [
                     8
                 ],
-                "id": 4,
+                "id": 16,
                 "monotonic": 0,
                 "smif_id": 0,
                 "upgrade": true,
@@ -94,13 +122,13 @@
                 "resources": [
                     {
                         "type": "BOOT",
-                        "address": 268443648,
-                        "size": 327680
+                        "address": 268435456,
+                        "size": 524288
                     },
                     {
                         "type": "UPGRADE",
-                        "address": 268771328,
-                        "size": 327680
+                        "address": 402653184,
+                        "size": 524288
                     }
                 ]
             }
