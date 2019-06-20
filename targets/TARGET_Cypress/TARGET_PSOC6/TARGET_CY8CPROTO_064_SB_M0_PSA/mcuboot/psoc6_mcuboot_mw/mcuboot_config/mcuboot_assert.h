@@ -4,5 +4,7 @@
  * Cypress-specific assert() macro redefinition
  *
  */
-#define ASSERT CY_ASSERT
-#define assert CY_ASSERT
+#include "mbed_assert.h"
+
+#define ASSERT MBED_ASSERT
+#define assert MBED_ASSERT
