@@ -103,8 +103,8 @@ whd_driver_t whd_drv;
 bool sdio_initialized = false;
 cyhal_sdio_t sdio_obj;
 
-static whd_enable_intr_func_t cy_enable_oob_intr;
-static whd_get_intr_config_func_t cy_get_intr_config;
+static void cy_enable_oob_intr(whd_driver_t whd_driver, const whd_variant_t intr, whd_bool_t whd_enable);
+static void cy_get_intr_config(whd_driver_t whd_driver, const whd_variant_t intr, whd_intr_config_t *config);
 
 static whd_buffer_funcs_t buffer_ops =
 {
