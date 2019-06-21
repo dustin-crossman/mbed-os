@@ -310,6 +310,21 @@ __STATIC_INLINE uint32_t Cy_Crypto_Core_Vu_StatusRead(CRYPTO_Type *base)
     return((uint32_t)REG_CRYPTO_VU_STATUS(base));
 }
 
+/*******************************************************************************
+* Function Name: Cy_Crypto_Core_VU_RegInvertEndianness
+****************************************************************************//**
+*
+* Reverts the memory data block pointed in given register.
+*
+* \param base
+* The pointer to the CRYPTO instance.
+*
+* \param srcReg
+* The source vector unit register.
+*
+*******************************************************************************/
+void Cy_Crypto_Core_VU_RegInvertEndianness(CRYPTO_Type *base, uint32_t srcReg);
+
 /** \} group_crypto_lld_vu_functions */
 
 #endif /* #if (CPUSS_CRYPTO_VU == 1) */

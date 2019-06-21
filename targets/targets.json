@@ -8313,8 +8313,9 @@
             "PU_ENABLE",
             "MCUBOOT_POLICY=1",
             "MCUBOOT_LOG_LEVEL=0",
-            "CONFIG_FLASH_PAGE_LAYOUT",
-            "MCUBOOT_HAVE_ASSERT_H"
+            "MCUBOOT_HAVE_ASSERT_H",
+            "MCUBOOT_USE_SMIF_XIP",
+            "MCUBOOT_USE_SMIF_STAGE"
         ],
         "deliver_to_target": "CY8CPROTO_064_SB_PSA",
         "delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_CY8CPROTO_064_SB_PSA/prebuilt",
@@ -8508,7 +8509,7 @@
         "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
         "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW43012", "CORDIO"],
-        "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
+        "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1", "MBED_TICKLESS"],
         "detect_code": ["1906"],
         "hex_filename": "psoc6_01_cm0p_sleep.hex",
         "post_binary_hook": {

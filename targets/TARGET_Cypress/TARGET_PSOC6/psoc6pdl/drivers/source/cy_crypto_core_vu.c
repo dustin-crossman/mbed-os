@@ -202,6 +202,13 @@ bool Cy_Crypto_Core_Vu_IsRegLess(CRYPTO_Type *base, uint32_t srcReg0, uint32_t s
     return tmpResult;
 }
 
+void Cy_Crypto_Core_VU_RegInvertEndianness(CRYPTO_Type *base, uint32_t srcReg)
+{
+    uint32_t  dataSize = CY_CRYPTO_BYTE_SIZE_OF_BITS(Cy_Crypto_Core_Vu_RegBitSizeRead(base, srcReg));
+    uint32_t *dataAddr = Cy_Crypto_Core_Vu_RegMemPointer(base, srcReg);
+    Cy_Crypto_Core_InvertEndianness(dataAddr, dataSize);
+}
+
 
 #endif /* #if (CPUSS_CRYPTO_VU == 1) */
 
