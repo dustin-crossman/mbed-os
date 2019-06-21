@@ -94,9 +94,6 @@ void USBPhyHw::init(USBPhyEvents *events)
     in_event_mask  = 0;
     out_event_mask = 0;
     
-    // Clear abort mask
-    ep_abort_mask = 0;
-    
     // Configure interrupt and hook interrupt handler 
     cyhal_usb_dev_register_irq(hal_obj, (cyhal_usb_dev_irq_handler_t)&_usbisr);
     cyhal_usb_dev_irq_enable(hal_obj, true);
@@ -133,16 +130,13 @@ static void usb_dev_sof_callback(uint32_t frame_number)
 
 static void usb_dev_endpoint_callback(cyhal_usb_dev_ep_t endpoint)
 {
-    if (0 == (instance->ep_abort_mask & USB_DEV_EP_BIT(endpoint)))
+    if (CYHAL_USB_DEV_IS_IN_EP(endpoint))
     {
-        if (CYHAL_USB_DEV_IS_IN_EP(endpoint))
-        {
-            instance->in_event_mask  |= USB_DEV_EP_BIT(endpoint);
-        }
-        else
-        {
-            instance->out_event_mask |= USB_DEV_EP_BIT(endpoint);
-        }
+        instance->in_event_mask  |= USB_DEV_EP_BIT(endpoint);
+    }
+    else
+    {
+        instance->out_event_mask |= USB_DEV_EP_BIT(endpoint);
     }
 }
 
@@ -329,7 +323,6 @@ void USBPhyHw::endpoint_remove(usb_ep_t endpoint)
     // Clear endpoint masks
     in_event_mask  &= ~USB_DEV_EP_BIT(endpoint);
     out_event_mask &= ~USB_DEV_EP_BIT(endpoint);
-    ep_abort_mask  &= ~USB_DEV_EP_BIT(endpoint);
 }
 
 void USBPhyHw::endpoint_stall(usb_ep_t endpoint)
@@ -364,14 +357,7 @@ bool USBPhyHw::endpoint_write(usb_ep_t endpoint, uint8_t *data, uint32_t size)
 
 void USBPhyHw::endpoint_abort(usb_ep_t endpoint)
 {
-    // Set flag to avoid generation of event
-    ep_abort_mask |= USB_DEV_EP_BIT(endpoint);
-
-    // Request abort operation: does not work completely now. Tracked in MIDDLEWARE-990
     (void) cyhal_usb_dev_endpoint_abort(&obj, endpoint);
-
-    // Abort completed release flag
-    ep_abort_mask &= ~USB_DEV_EP_BIT(endpoint);
 }
 
 void USBPhyHw::process()
