@@ -17,7 +17,7 @@ import os
 from time import sleep
 from execute.helper import check_mode
 from execute.enums import ProtectionState
-from execute.sys_call import get_prov_details, provision_keys_and_policies
+from execute.sys_call import get_prov_details, provision_keys_and_policies, transition_to_secure, get_prov_det_noprint
 from execute.p6_memory_map import FLASH_ADDRESS, CY_BOOTLOADER_SIZE, PROVISION_JWT_PACKET_ADDRESS, \
     PROVISION_JWT_PACKET_SIZE
 from execute.gen_data_from_json import ENTRANCE_EXAM_FW_STATUS_REG, ENTRANCE_EXAM_FW_STATUS_MASK, \
@@ -57,10 +57,9 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, pro
 
     print(os.linesep + 'Erase main flash and TOC3:')
     print('erasing...')
-    tool.erase(FLASH_ADDRESS, CY_BOOTLOADER_SIZE)
     if protection_state != ProtectionState.secure:
         tool.erase(PROVISION_JWT_PACKET_ADDRESS, PROVISION_JWT_PACKET_SIZE)
-    reset_device(tool)
+    tool.erase(FLASH_ADDRESS, CY_BOOTLOADER_SIZE)
 
     print(os.linesep + 'Read FB Firmware status:')
     fb_firmware_status = tool.read32(ENTRANCE_EXAM_FW_STATUS_REG)
@@ -76,6 +75,9 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, pro
         print(os.linesep + 'PROGRAMMING APP HEX:')
         tool.program(cy_bootloader_hex)
 
+    if protection_state != ProtectionState.secure:
+        is_exam_pass = transition_to_secure(tool, False)
+
     if is_exam_pass:
         print(os.linesep + 'Run provisioning syscall')
         # Set a value indicating whether to convert device to SECURE CLAIMED mode
@@ -90,6 +92,13 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, pro
             print(os.linesep)
         else:
             print('FAIL: Unexpected ProvisionKeysAndPolicies syscall response')
+
+    if is_exam_pass:
+        is_exam_pass, pub_key = get_prov_det_noprint(tool, 1);
+        if is_exam_pass:
+            print('Device public key has been read successfully.')
+        else:
+            print('FAIL: Cannot read device public key.')
 
     if is_exam_pass:
         print('*****************************************')
