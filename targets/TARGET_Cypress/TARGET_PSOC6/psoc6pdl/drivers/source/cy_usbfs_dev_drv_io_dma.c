@@ -744,8 +744,8 @@ cy_en_usbfs_dev_drv_status_t AddEndpointRamBuffer(USBFS_Type *base,
 * \param base
 * The pointer to the USBFS instance.
 *
-* \param endpoint
-* The OUT data endpoint number.
+* \param endpointData
+* The pointer to the endpoint data structure.
 *
 * \param context
 * The pointer to the context structure \ref cy_stc_usbfs_dev_drv_context_t
@@ -841,7 +841,10 @@ cy_en_usbfs_dev_drv_status_t LoadInEndpointDma(USBFS_Type    *base,
     {
         return CY_USBFS_DEV_DRV_BAD_PARAM;
     }
-    
+
+    /* Clear abort mask for the endpoint (there is no transfer during abort) */
+    context->epAbortMask &= (uint8_t) ~EP2MASK(endpoint);
+
     /* Set count and data toggle */
     Cy_USBFS_Dev_Drv_SetSieEpCount(base, endpoint, size, (uint32_t) endpointData->toggle);
 
@@ -1048,6 +1051,9 @@ cy_en_usbfs_dev_drv_status_t LoadInEndpointDmaAuto(USBFS_Type    *base,
     {
         return CY_USBFS_DEV_DRV_BAD_PARAM;
     }
+
+    /* Clear abort mask for the endpoint (there is no transfer during abort) */
+    context->epAbortMask &= (uint8_t) ~EP2MASK(endpoint);
 
     /* Endpoint pending: Waits for the host read data after exiting this function */
     endpointData->state = CY_USB_DEV_EP_PENDING;

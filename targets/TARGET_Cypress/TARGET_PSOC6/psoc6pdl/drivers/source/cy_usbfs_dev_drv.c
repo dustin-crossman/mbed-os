@@ -60,6 +60,10 @@ static uint32_t ReadEp0Buffer (USBFS_Type const *base, uint8_t *buffer, uint32_t
 
 static void RestoreDeviceConfiguration(USBFS_Type *base, cy_stc_usbfs_dev_drv_context_t *context);
 
+static void EndpointTransferComplete(USBFS_Type *base, uint32_t endpoint,
+                                    cy_stc_usbfs_dev_drv_endpoint_data_t *endpointData,
+                                    cy_stc_usbfs_dev_drv_context_t *context);
+
 /*******************************************************************************
 * Function Name: Cy_USBFS_Dev_Drv_Init
 ****************************************************************************//**
@@ -545,10 +549,81 @@ static void BusResetIntrHandler(USBFS_Type *base, cy_stc_usbfs_dev_drv_context_t
         context->ep0CtrlState = CY_USBFS_DEV_DRV_EP0_CTRL_STATE_IDLE;
         context->curBufAddr   = 0U;
         context->activeEpMask = 0U;
+        context->epAbortMask  = 0U;
 
         /* Enable device to responds to USB traffic with address 0 */
         USBFS_DEV_CR0(base) = USBFS_USBDEV_CR0_USB_ENABLE_Msk;
         (void) USBFS_DEV_CR0(base);
+    }
+}
+
+
+/*******************************************************************************
+* Function Name: EndpointTransferComplete
+****************************************************************************//**
+*
+* Handles endpoint transfer complete: updates endpoint state, 
+* calls transfer completion callback, handles abort.
+*
+* \param base
+* The pointer to the USBFS instance.
+*
+* \param endpoint
+* The data endpoint index.
+*
+* \param endpointData
+* The pointer to the endpoint data structure.
+*
+* \param context
+* The pointer to the context structure \ref cy_stc_usbfs_dev_drv_context_t
+* allocated by the user. The structure is used during the USBFS Device 
+* operation for internal configuration and data retention. The user must not 
+* modify anything in this structure.
+*
+*******************************************************************************/
+static void EndpointTransferComplete(USBFS_Type *base, uint32_t endpoint,
+                                    cy_stc_usbfs_dev_drv_endpoint_data_t *endpointData,
+                                    cy_stc_usbfs_dev_drv_context_t *context)
+{
+    /* Update toggle (exclude ISOC endpoints) */
+    if (false == IS_EP_ISOC(endpointData->sieMode))
+    {
+        endpointData->toggle ^= (uint8_t) USBFS_USBDEV_SIE_EP_DATA_TOGGLE_Msk;
+    }
+
+    if (0U != (context->epAbortMask & EP2MASK(endpoint)))
+    {
+        /* Clear endpoint abort: Do not invoke callback, the state was set to idle */
+        context->epAbortMask &= (uint8_t) ~EP2MASK(endpoint);
+    }
+    else
+    {
+        /* Data has been transferred to the bus set-endpoint complete state */
+        endpointData->state = CY_USB_DEV_EP_COMPLETED;
+
+        /* Involve callback if it is registered */
+        if (NULL != endpointData->epComplete)
+        {
+            uint32_t errorType = 0UL;
+            
+            /* Check transfer errors (detect by hardware) */
+            if (0U != Cy_USBFS_Dev_Drv_GetSieEpError(base, endpoint))
+            {
+                errorType = CY_USBFS_DEV_ENDPOINT_TRANSFER_ERROR;
+            }
+            
+            /* Check data toggle bit of current transfer (exclude ISOC endpoints) */
+            if (false == IS_EP_ISOC(endpointData->sieMode))
+            {
+                if (endpointData->toggle == Cy_USBFS_Dev_Drv_GetSieEpToggle(base, endpoint))
+                {
+                    errorType |= CY_USBFS_DEV_ENDPOINT_SAME_DATA_TOGGLE;
+                }
+            }
+
+            /* Call endpoint complete callback */
+            endpointData->epComplete(base, (uint32_t) endpointData->address, errorType, context);
+        }
     }
 }
 
@@ -618,40 +693,8 @@ static void ArbiterIntrHandler(USBFS_Type *base, cy_stc_usbfs_dev_drv_context_t 
                 /* Set DMA channel to start new transfer */
                 DmaOutEndpointRestore(endpointData);
 
-                /* Update toggle (exclude ISOC endpoints) */
-                if (false == IS_EP_ISOC(endpointData->sieMode))
-                {
-                    endpointData->toggle ^= (uint8_t) USBFS_USBDEV_SIE_EP_DATA_TOGGLE_Msk;
-                }
-
-                /* Notifies that data has been copied from the endpoint hardware buffer into the 
-                * endpoint SRAM buffer.
-                */
-                endpointData->state = CY_USB_DEV_EP_COMPLETED;
-
-                /* Involve callback if registered */
-                if (endpointData->epComplete != NULL)
-                {
-                    uint32_t errorType = 0UL;
-                    
-                    /* Check transfer errors (detect by hardware) */
-                    if (0U != Cy_USBFS_Dev_Drv_GetSieEpError(base, endpoint))
-                    {
-                        errorType = CY_USBFS_DEV_ENDPOINT_TRANSFER_ERROR;
-                    }
-                    
-                    /* Check data toggle bit of current transfer (exclude ISOC endpoints) */
-                    if (false == IS_EP_ISOC(endpointData->sieMode))
-                    {
-                        if (endpointData->toggle == Cy_USBFS_Dev_Drv_GetSieEpToggle(base, endpoint))
-                        {
-                            errorType |= CY_USBFS_DEV_ENDPOINT_SAME_DATA_TOGGLE;
-                        }
-                    }
-                    
-                    /* Call endpoint complete callback */
-                    endpointData->epComplete(base, errorType, context);
-                }
+                /* Complete endpoint transfer */
+                EndpointTransferComplete(base, endpoint, endpointData, context);
             }
 
             /* This error condition indicates system failure */
@@ -728,40 +771,10 @@ static void SieEnpointIntrHandler(USBFS_Type *base, uint32_t endpoint,
     inEndpoint   = CY_USBFS_DEV_DRV_IS_EP_DIR_IN(endpointData->address);
     zeroLengthPacket = (0U == Cy_USBFS_Dev_Drv_GetSieEpCount(base, endpoint));
 
-    if ( (!modeDmaAuto) || (modeDmaAuto && (inEndpoint || zeroLengthPacket)) )
+    if ( (!modeDmaAuto) || 
+         (modeDmaAuto && (inEndpoint || zeroLengthPacket)) )
     {
-        /* Update toggle (exclude ISOC endpoints) */
-        if (false == IS_EP_ISOC(endpointData->sieMode))
-        {
-            endpointData->toggle ^= (uint8_t) USBFS_USBDEV_SIE_EP_DATA_TOGGLE_Msk;
-        }
-
-        /* Data has been transferred to the bus set-endpoint complete state */
-        endpointData->state = CY_USB_DEV_EP_COMPLETED;
-
-        /* Involve callback if it is registered */
-        if (NULL != endpointData->epComplete)
-        {
-            uint32_t errorType = 0UL;
-            
-            /* Check transfer errors (detect by hardware) */
-            if (0U != Cy_USBFS_Dev_Drv_GetSieEpError(base, endpoint))
-            {
-                errorType = CY_USBFS_DEV_ENDPOINT_TRANSFER_ERROR;
-            }
-            
-            /* Check data toggle bit of current transfer (exclude ISOC endpoints) */
-            if (false == IS_EP_ISOC(endpointData->sieMode))
-            {
-                if (endpointData->toggle == Cy_USBFS_Dev_Drv_GetSieEpToggle(base, endpoint))
-                {
-                    errorType |= CY_USBFS_DEV_ENDPOINT_SAME_DATA_TOGGLE;
-                }
-            }
-
-            /* Call endpoint complete callback */
-            endpointData->epComplete(base, errorType, context);
-        }
+        EndpointTransferComplete(base, endpoint, endpointData, context);
     }
 }
 
@@ -794,56 +807,55 @@ static void SieEnpointIntrHandler(USBFS_Type *base, uint32_t endpoint,
 void Cy_USBFS_Dev_Drv_Interrupt(USBFS_Type *base, uint32_t intrCause, 
                                 cy_stc_usbfs_dev_drv_context_t *context)
 {
-    uint32_t endpoint = 0u;
+    uint32_t endpoint = 0U;
+    uint32_t intrCauseEp;
 
     /* Clear SIE interrupts while are served below */
     Cy_USBFS_Dev_Drv_ClearSieInterrupt(base, intrCause);
 
     /* LPM */
-    if (0u != (intrCause & USBFS_USBLPM_INTR_CAUSE_LPM_INTR_Msk))
+    if (0U != (intrCause & USBFS_USBLPM_INTR_CAUSE_LPM_INTR_Msk))
     {
         LpmIntrHandler(base, context);
     }
 
     /* Arbiter: Data endpoints */
-    if (0u != (intrCause & USBFS_USBLPM_INTR_CAUSE_ARB_EP_INTR_Msk))
+    if (0U != (intrCause & USBFS_USBLPM_INTR_CAUSE_ARB_EP_INTR_Msk))
     {
         /* This interrupt is cleared inside the handler */
         ArbiterIntrHandler(base, context);
     }
 
-    /* Control EP0 */
-    if (0u != (intrCause & USBFS_USBLPM_INTR_CAUSE_EP0_INTR_Msk))
-    {
-        Ep0IntrHandler(base, context);
-    }
-
-    /* SOF */
-    if (0u != (intrCause & USBFS_USBLPM_INTR_CAUSE_SOF_INTR_Msk))
-    {
-        SofIntrHandler(base, context);
-    }
-
-    /* Bus Reset */
-    if (0u != (intrCause & USBFS_USBLPM_INTR_CAUSE_BUS_RESET_INTR_Msk))
-    {
-        BusResetIntrHandler(base, context);
-    }
-
-    /* Remove handled interrupt statuses */
-    intrCause >>= USBFS_USBLPM_INTR_CAUSE_EP1_INTR_Pos;
-
     /* SIE: Data endpoints */
-    while (0u != intrCause)
+    intrCauseEp = (intrCause >> USBFS_USBLPM_INTR_CAUSE_EP1_INTR_Pos);
+    while (0U != intrCauseEp)
     {
-        if (0u != (intrCause & 0x1u))
+        if (0u != (intrCauseEp & 0x1U))
         {
             /* These interrupts are cleared inside the handler */
             SieEnpointIntrHandler(base, endpoint, context);
         }
 
-        intrCause >>= 1u;
+        intrCauseEp >>= 1U;
         ++endpoint;
+    }
+
+    /* SOF */
+    if (0U != (intrCause & USBFS_USBLPM_INTR_CAUSE_SOF_INTR_Msk))
+    {
+        SofIntrHandler(base, context);
+    }
+        
+    /* Control EP0 */
+    if (0U != (intrCause & USBFS_USBLPM_INTR_CAUSE_EP0_INTR_Msk))
+    {
+        Ep0IntrHandler(base, context);
+    }
+
+    /* Bus Reset */
+    if (0U != (intrCause & USBFS_USBLPM_INTR_CAUSE_BUS_RESET_INTR_Msk))
+    {
+        BusResetIntrHandler(base, context);
     }
 }
 

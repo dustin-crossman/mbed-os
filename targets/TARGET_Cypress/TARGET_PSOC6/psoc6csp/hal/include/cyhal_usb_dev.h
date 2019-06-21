@@ -270,7 +270,7 @@ uint32_t cyhal_usb_dev_ep0_get_max_packet(cyhal_usb_dev_t *obj);
  void cyhal_usb_dev_ep0_stall(cyhal_usb_dev_t *obj);
 
 /**
- * Configure an endpoint and optionally enables it.
+ * Configure an endpoint.
  *
  * @param[in,out] obj   The usb device object
  * @param[in] alloc     True to allocates buffer for the endpoint, false to skip allocation
@@ -379,6 +379,12 @@ cy_rslt_t cyhal_usb_dev_endpoint_add(cyhal_usb_dev_t *obj, bool alloc, bool enab
  * if this function has an effect on receive endpoints.
  *
  * @return The status of an abort request
+ *
+ * @note
+ * For the ISOC endpoints in pending state this function does not wait for 
+ * bus activity completion because these endpoints do not have handshake and are 
+ * always accessible to the Host. Therefore it is safe to call this function for 
+ * ISOC endpoint when the Host will not access them during abort.
  */
  cy_rslt_t cyhal_usb_dev_endpoint_abort(cyhal_usb_dev_t *obj, cyhal_usb_dev_ep_t endpoint);
 
