@@ -292,12 +292,6 @@ void cyhal_uart_register_irq(cyhal_uart_t *obj, cyhal_uart_irq_handler_t handler
  */
 void cyhal_uart_irq_enable(cyhal_uart_t *obj, cyhal_uart_irq_event_t event, bool enable);
 
-/** Enable per rx not emtpy and tx empty.  This is to support mbed low level callbacks.
- *
- * @param[in] obj      The uart object
- */
-void cyhal_uart_lowlevel_irqs(cyhal_uart_t *obj);
-
 /** \} group_hal_uart_functions */
 
 #if defined(__cplusplus)

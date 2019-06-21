@@ -87,13 +87,8 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
     static const cyhal_uart_irq_event_t ENABLE_EVENTS =
         CYHAL_UART_IRQ_TX_DONE | CYHAL_UART_IRQ_TX_ERROR |
         CYHAL_UART_IRQ_RX_DONE | CYHAL_UART_IRQ_RX_ERROR;
-#else
-    static const cyhal_uart_irq_event_t ENABLE_EVENTS =
-        CYHAL_UART_IRQ_RX_NOT_EMPTY | CYHAL_UART_IRQ_TX_EMPTY;
-// TODO(kmwh): The serial port fails to receive when this is enabled
-//    cyhal_uart_lowlevel_irqs(&(ser->hal_obj));
-#endif
     cyhal_uart_irq_enable(&(ser->hal_obj), ENABLE_EVENTS, true);
+#endif
     if (tx == STDIO_UART_TX) {
         memmove(&stdio_uart, obj, sizeof(serial_t));
         stdio_uart_inited = 1;
@@ -160,13 +155,17 @@ void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
     if (irq == RxIrq) {
+        static const cyhal_uart_irq_event_t interrupt_mask = CYHAL_UART_IRQ_RX_DONE | CYHAL_UART_IRQ_RX_ERROR | CYHAL_UART_IRQ_RX_NOT_EMPTY;
         ser->rx_event_mask = enable
-                             ? (ser->rx_event_mask | CYHAL_UART_IRQ_RX_DONE | CYHAL_UART_IRQ_RX_ERROR | CYHAL_UART_IRQ_RX_NOT_EMPTY)
-                             : (ser->rx_event_mask & ~(CYHAL_UART_IRQ_RX_DONE | CYHAL_UART_IRQ_RX_ERROR | CYHAL_UART_IRQ_RX_NOT_EMPTY));
+                             ? (ser->rx_event_mask | interrupt_mask)
+                             : (ser->rx_event_mask & ~interrupt_mask);
+        cyhal_uart_irq_enable(&(ser->hal_obj), interrupt_mask, (bool)enable);
     } else if (irq == TxIrq) {
+        static const cyhal_uart_irq_event_t interrupt_mask = CYHAL_UART_IRQ_TX_DONE | CYHAL_UART_IRQ_TX_ERROR | CYHAL_UART_IRQ_TX_EMPTY;
         ser->tx_event_mask = enable
-                             ? (ser->tx_event_mask | CYHAL_UART_IRQ_TX_DONE | CYHAL_UART_IRQ_TX_ERROR | CYHAL_UART_IRQ_TX_EMPTY)
-                             : (ser->tx_event_mask & ~(CYHAL_UART_IRQ_TX_DONE | CYHAL_UART_IRQ_TX_ERROR | CYHAL_UART_IRQ_TX_EMPTY));
+                             ? (ser->tx_event_mask | interrupt_mask)
+                             : (ser->tx_event_mask & ~interrupt_mask);
+        cyhal_uart_irq_enable(&(ser->hal_obj), interrupt_mask, (bool)enable);
     }
 }
 
