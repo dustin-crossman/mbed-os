@@ -24,7 +24,7 @@ whd_result_t cy_host_buffer_get(whd_buffer_t *buffer, whd_buffer_dir_t direction
 {
     UNUSED_PARAMETER( direction );
     struct pbuf *p = NULL;
-    if ( direction == WHD_NETWORK_TX)
+    if ( ( direction == WHD_NETWORK_TX) && ( size <= PBUF_POOL_BUFSIZE ) )
     {
     	p = pbuf_alloc(PBUF_RAW, size, PBUF_POOL);
     }
