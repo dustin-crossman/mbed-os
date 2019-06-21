@@ -62,7 +62,6 @@ public:
     
     uint8_t in_event_mask;
     uint8_t out_event_mask;
-    uint8_t ep_abort_mask;
     
 private:
     virtual void usb_dev_execute_ep_callbacks(void);
