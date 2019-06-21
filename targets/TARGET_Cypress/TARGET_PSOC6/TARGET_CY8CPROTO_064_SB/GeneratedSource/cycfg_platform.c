@@ -63,7 +63,7 @@
 #define CY_CFG_SYSCLK_CLKSLOW_ENABLED 1
 #define CY_CFG_SYSCLK_CLKTIMER_ENABLED 1
 /*rnok: define should be disabled since CY8CPROTO-064-SB kit lacks low frequency clock source*/
-/* #define CY_CFG_SYSCLK_WCO_ENABLED 1 */
+#define CY_CFG_SYSCLK_WCO_ENABLED 1
 #define CY_CFG_PWR_ENABLED 1
 #define CY_CFG_PWR_USING_LDO 1
 #define CY_CFG_PWR_USING_PMIC 0
