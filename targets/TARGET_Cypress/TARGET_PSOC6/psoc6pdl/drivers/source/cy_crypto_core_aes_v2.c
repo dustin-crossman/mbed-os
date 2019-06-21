@@ -171,7 +171,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Aes_Init(CRYPTO_Type *base,
     CY_ASSERT_L1(NULL != aesBuffers);
     CY_ASSERT_L3(CY_CRYPTO_IS_KEYLENGTH_VALID(keyLength));
 
-    uint32_t keySize = CY_CRYPTO_AES_128_KEY_SIZE + ((uint32_t)keyLength * 8u);
+    uint16_t keySize = CY_CRYPTO_AES_128_KEY_SIZE + ((uint16_t)keyLength * 8u);
 
     Cy_Crypto_Core_V2_MemSet(base, aesState, 0u, sizeof(cy_stc_crypto_aes_state_t));
 

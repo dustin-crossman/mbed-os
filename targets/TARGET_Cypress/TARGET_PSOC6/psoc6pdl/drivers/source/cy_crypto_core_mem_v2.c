@@ -142,7 +142,7 @@ void Cy_Crypto_Core_V2_MemSet(CRYPTO_Type *base, void* dst, uint8_t data, uint16
 *******************************************************************************/
 uint32_t Cy_Crypto_Core_V2_MemCmp(CRYPTO_Type *base, void const *src0, void const *src1, uint16_t size)
 {
-    uint32_t memResult = 1;
+    uint32_t memResult = 1U;
 
     if (size != 0U)
     {
