@@ -242,20 +242,19 @@ def transition_to_secure(tool, blow_secure_efuse):
         print(hex(response))
 
         # # Read region_hash values from application
-        # scratch_addr  = tool.read32(ENTRANCE_EXAM_SRAM_ADDR + 0x04)
-        # read_hash_size = tool.read32(scratch_addr+0x00)
-        # read_hash_addr = tool.read32(scratch_addr+0x04)
-        # got_encrypted_hash = ''
-        # response = ''
-        #
-        # i = 0
-        # while i < read_hash_size:
-        #     # Save data in string format
-        #     hash_byte_chr = chr(tool.read8(read_hash_addr + i))
-        #     response += hash_byte_chr
-        #     i += 1
-        # response = response.strip()
-        # print(response)
+        scratch_addr  = tool.read32(ENTRANCE_EXAM_SRAM_ADDR + 0x04)
+        read_hash_size = tool.read32(scratch_addr+0x00)
+        read_hash_addr = tool.read32(scratch_addr+0x04)
+        response = ''
+
+        i = 0
+        while i < read_hash_size:
+            # Save data in string format
+            hash_byte_chr = chr(tool.read8(read_hash_addr + i))
+            response += hash_byte_chr
+            i += 1
+        response = response.strip()
+        print(response)
 
 
         print('Transition to Secure complete')
