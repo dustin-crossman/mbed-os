@@ -222,6 +222,7 @@ def transition_to_secure(tool, blow_secure_efuse):
 
     # Set RAM address and Opcode
     tool.write32(CYREG_IPC2_STRUCT_DATA, ENTRANCE_EXAM_SRAM_ADDR)
+    print('enable_blowing_secure =', enable_blowing_secure)
     tool.write32(ENTRANCE_EXAM_SRAM_ADDR, (TRANSISION_TO_SECURE_OPCODE << 24) + (enable_blowing_secure << 16) + 0)
     scratch_addr = ENTRANCE_EXAM_SRAM_ADDR + 0x08
     tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x04, scratch_addr)
