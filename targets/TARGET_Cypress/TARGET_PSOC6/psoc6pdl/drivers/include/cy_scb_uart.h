@@ -850,7 +850,14 @@ cy_en_syspm_status_t Cy_SCB_UART_HibernateCallback(cy_stc_syspm_callback_params_
 * the source of the error
 */
 #define CY_SCB_UART_TRANSMIT_ERR_EVENT     (0x20UL)
+
+/** The receive fifo is not empty. To use this event the \ref CY_SCB_RX_INTR_NOT_EMPTY interrupt must be enabled by the user. */
+#define CY_SCB_UART_RECEIVE_NOT_EMTPY       (0x40UL)
+
+/** The transmit fifo is empty. To use this event the \ref CY_SCB_UART_TX_EMPTY interrupt must be enabled by the user. */
+#define CY_SCB_UART_TRANSMIT_EMTPY          (0x80UL)
 /** \} group_scb_uart_macros_callback_events */
+
 
 /** Data returned by the hardware when an empty RX FIFO is read */
 #define CY_SCB_UART_RX_NO_DATA         (0xFFFFFFFFUL)

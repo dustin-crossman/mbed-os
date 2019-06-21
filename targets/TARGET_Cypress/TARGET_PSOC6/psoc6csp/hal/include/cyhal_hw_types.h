@@ -386,6 +386,7 @@ typedef struct {
     bool                        is_user_clock;
     cyhal_clock_divider_t       clock;
     cy_stc_scb_uart_context_t   context;
+    cy_stc_scb_uart_config_t    config;
     uint32_t                    irq_cause;
     cy_stc_syspm_callback_params_t pm_params;
     cy_stc_syspm_callback_t     pm_callback;

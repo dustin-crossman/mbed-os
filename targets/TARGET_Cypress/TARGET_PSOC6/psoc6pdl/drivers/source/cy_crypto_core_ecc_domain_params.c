@@ -28,6 +28,8 @@
 #include "cy_syslib.h"
 
 
+#if defined(CY_IP_MXCRYPTO)
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_ECC_GetCurveParams
 ****************************************************************************//**
@@ -466,5 +468,6 @@ cy_stc_crypto_ecc_dp_type *Cy_Crypto_Core_ECC_GetCurveParams(cy_en_crypto_ecc_cu
     return tmpResult;
 }
 
+#endif /* CY_IP_MXCRYPTO */
 
 /* [] END OF FILE */

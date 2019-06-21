@@ -9,7 +9,7 @@ before_script:
 astyle:
   stage: build
   tags:
-    - mti-win10
+    - devops-linux
   script:
     - bash -ex cy-astyle.sh
 

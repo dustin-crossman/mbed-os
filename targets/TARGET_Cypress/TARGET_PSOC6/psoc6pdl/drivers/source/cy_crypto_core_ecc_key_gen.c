@@ -33,6 +33,8 @@
 #define CY_ECC_CONFIG_TR_FIRO_CTL      0x52D246E1uL
 
 
+#if defined(CY_IP_MXCRYPTO)
+
 /*******************************************************************************
 * Function Name: Cy_Crypto_Core_ECC_MakeKeyPair
 ****************************************************************************//**
@@ -392,5 +394,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
     return (tmpResult);
 }
 
+#endif /* CY_IP_MXCRYPTO */
 
 /* [] END OF FILE */

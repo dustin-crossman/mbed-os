@@ -137,15 +137,19 @@
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
 *   <tr>
-*     <td rowspan="4">2.30</td>
+*     <td rowspan="5">2.30</td>
 *     <td>Fixed MISRA violation.</td>
 *     <td>MISRA compliance.</td>
 *   </tr>
 *   <tr>
 *     <td>Changed values CY_SCB_SPI_CPHA0_CPOL1 and CY_SCB_SPI_CPHA1_CPOL0 in enum \ref cy_en_scb_spi_sclk_mode_t.</td>
-*     <td>The incorrect values in the \ref cy_en_scb_spi_sclk_mode_t results incorrect initialization of
-*         phase and polarity combinations "CHPA = 0, CPOL = 1" and "CHPA = 1, CPOL = 0".
+*     <td>The incorrect values in \ref cy_en_scb_spi_sclk_mode_t caused incorrect initialization of the combination of
+*         phases and polarity: "CHPA = 0, CPOL = 1" and "CHPA = 1, CPOL = 0".
 *     </td>
+*   </tr>
+*   <tr>
+*     <td>Added new CY_SCB_UART_RECEIVE_NOT_EMTPY and CY_SCB_UART_TRANSMIT_EMTPY callback events \ref group_scb_uart_macros_callback_events.</td>
+*     <td>Extended the driver callback events to support the MBED-OS.</td>
 *   </tr>
 *	<tr>
 *     <td>Merged SCB changelogs for each mode into one changelog.</td>
@@ -153,7 +157,7 @@
 *   </tr>
 *	<tr>
 *     <td>Merged SCB MISRA-C Compliance sections for each mode into one section.</td>
-*     <td>SCB MISRA-C Compliance sections optimization.</td>
+*     <td>To optimize the SCB MISRA-C Compliance sections.</td>
 *   </tr>
 *   <tr>
 *     <td> 2.20.1</td>

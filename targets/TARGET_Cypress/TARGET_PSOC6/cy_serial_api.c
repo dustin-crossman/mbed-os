@@ -49,19 +49,21 @@ static void serial_handler_internal(void *handler_arg, cyhal_uart_irq_event_t ev
     if (NULL != async_rx_handler && (event & ser->rx_event_mask)) {
         (*async_rx_handler)();
     }
-    void (*async_tx_handler)(void) = (void (*)(void)ser->async_tx_handler;
-                                      if (NULL != async_tx_handler && (event & ser->tx_event_mask))
-                                      (*async_tx_handler)();
-#endif
-                                      void (*handler)(uint32_t, int) = (void (*)(uint32_t, int))ser->handler;
+    void (*async_tx_handler)(void) = (void (*)(void))ser->async_tx_handler;
+    if (NULL != async_tx_handler && (event & ser->tx_event_mask)) {
+        (*async_tx_handler)();
+    }
+#else
+    void (*handler)(uint32_t, int) = (void (*)(uint32_t, int))ser->handler;
     if (NULL != handler) {
-        if (CYHAL_UART_IRQ_NONE != (event & ser->rx_event_mask)) {
-                (*handler)(ser->handler_arg, (int)RxIrq);
-            }
-            if (CYHAL_UART_IRQ_NONE != (event & ser->tx_event_mask)) {
-                (*handler)(ser->handler_arg, (int)TxIrq);
-            }
+        if (CYHAL_UART_IRQ_RX_NOT_EMPTY == (event & ser->rx_event_mask)) {
+            (*handler)(ser->handler_arg, (int)RxIrq);
         }
+        if (CYHAL_UART_IRQ_TX_EMPTY == (event & ser->tx_event_mask)) {
+            (*handler)(ser->handler_arg, (int)TxIrq);
+        }
+    }
+#endif
 }
 
 void serial_init(serial_t *obj, PinName tx, PinName rx)
@@ -80,9 +82,16 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SERIAL, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_uart_init");
     }
     cyhal_uart_register_irq(&(ser->hal_obj), &serial_handler_internal, obj);
+
+#if DEVICE_SERIAL_ASYNCH
     static const cyhal_uart_irq_event_t ENABLE_EVENTS =
         CYHAL_UART_IRQ_TX_DONE | CYHAL_UART_IRQ_TX_ERROR |
         CYHAL_UART_IRQ_RX_DONE | CYHAL_UART_IRQ_RX_ERROR;
+#else
+    static const cyhal_uart_irq_event_t ENABLE_EVENTS =
+        CYHAL_UART_IRQ_RX_NOT_EMPTY | CYHAL_UART_IRQ_TX_EMPTY;
+    cyhal_uart_lowlevel_irqs(&(ser->hal_obj));
+#endif
     cyhal_uart_irq_enable(&(ser->hal_obj), ENABLE_EVENTS, true);
     if (tx == STDIO_UART_TX) {
         memmove(&stdio_uart, obj, sizeof(serial_t));
@@ -99,7 +108,7 @@ void serial_free(serial_t *obj)
 void serial_baud(serial_t *obj, int baudrate)
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
-    if (CY_RSLT_SUCCESS != cyhal_uart_baud(&(ser->hal_obj), baudrate)) {
+    if (CY_RSLT_SUCCESS != cyhal_uart_baud(&(ser->hal_obj), baudrate, NULL)) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SERIAL, MBED_ERROR_CODE_FAILED_OPERATION), "serial_baud");
     }
     ser->baud = (uint32_t)baudrate;
@@ -151,12 +160,12 @@ void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
     struct serial_s *ser = cy_serial_get_struct(obj);
     if (irq == RxIrq) {
         ser->rx_event_mask = enable
-                             ? (ser->rx_event_mask | CYHAL_UART_IRQ_RX_DONE | CYHAL_UART_IRQ_RX_ERROR)
-                             : (ser->rx_event_mask & ~(CYHAL_UART_IRQ_RX_DONE | CYHAL_UART_IRQ_RX_ERROR));
+                             ? (ser->rx_event_mask | CYHAL_UART_IRQ_RX_DONE | CYHAL_UART_IRQ_RX_ERROR | CYHAL_UART_IRQ_RX_NOT_EMPTY)
+                             : (ser->rx_event_mask & ~(CYHAL_UART_IRQ_RX_DONE | CYHAL_UART_IRQ_RX_ERROR | CYHAL_UART_IRQ_RX_NOT_EMPTY));
     } else if (irq == TxIrq) {
         ser->tx_event_mask = enable
-                             ? (ser->tx_event_mask | CYHAL_UART_IRQ_TX_DONE | CYHAL_UART_IRQ_TX_ERROR)
-                             : (ser->tx_event_mask & ~(CYHAL_UART_IRQ_TX_DONE | CYHAL_UART_IRQ_TX_ERROR));
+                             ? (ser->tx_event_mask | CYHAL_UART_IRQ_TX_DONE | CYHAL_UART_IRQ_TX_ERROR | CYHAL_UART_IRQ_TX_EMPTY)
+                             : (ser->tx_event_mask & ~(CYHAL_UART_IRQ_TX_DONE | CYHAL_UART_IRQ_TX_ERROR | CYHAL_UART_IRQ_TX_EMPTY));
     }
 }
 
@@ -248,9 +257,9 @@ const PinMap *serial_rts_pinmap(void)
 int serial_tx_asynch(serial_t *obj, const void *tx, size_t tx_length, uint8_t, uint32_t handler, uint32_t event, DMAUsage)
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
-    // handler calls serial_irq_handler_asynch
+    // handler calls serial_irq_handler_async
     ser->async_tx_handler = (void *)handler;
-    if (CY_RSLT_SUCCESS != cyhal_uart_tx_asynch(&(ser->hal_obj), tx, tx_length)) {
+    if (CY_RSLT_SUCCESS != cyhal_uart_tx_async(&(ser->hal_obj), tx, tx_length)) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SERIAL, MBED_ERROR_CODE_WRITE_FAILED), "serial_tx_asynch");
     }
     return 0;
@@ -259,9 +268,9 @@ int serial_tx_asynch(serial_t *obj, const void *tx, size_t tx_length, uint8_t, u
 void serial_rx_asynch(serial_t *obj, void *rx, size_t rx_length, uint8_t, uint32_t handler, uint32_t event, uint8_t char_match, DMAUsage)
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
-    // handler calls serial_irq_handler_asynch
+    // handler calls serial_irq_handler_async
     ser->async_rx_handler = (void *)handler;
-    if (CY_RSLT_SUCCESS != cyhal_uart_rx_asynch(&(ser->hal_obj), rx, rx_length)) {
+    if (CY_RSLT_SUCCESS != cyhal_uart_rx_async(&(ser->hal_obj), rx, rx_length)) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SERIAL, MBED_ERROR_CODE_WRITE_FAILED), "serial_rx_asynch");
     }
 }

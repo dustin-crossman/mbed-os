@@ -102,4 +102,5 @@ DELIVERY/
 PSA_AUTOGEN/
 
 # AStyle tool
-/AStyle*
+/tools/AStyle*
+/tools/astyle*
