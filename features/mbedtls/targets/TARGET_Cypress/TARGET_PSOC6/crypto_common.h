@@ -18,6 +18,7 @@
 
 /**
  * \file    crypto_common.h
+ * \version 1.0
  *
  * \brief   Header file for common mbedtls acceleration functions
  *

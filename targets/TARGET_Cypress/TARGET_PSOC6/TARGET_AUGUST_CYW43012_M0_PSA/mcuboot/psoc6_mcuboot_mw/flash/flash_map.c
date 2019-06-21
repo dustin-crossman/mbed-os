@@ -66,7 +66,7 @@
 #include <sysflash/sysflash.h>
 
 #include <stddef.h>	/* offsetof() */
-#include <errno.h>	/* EINVAL */
+#include <mcuboot_errno.h>	/* EINVAL */
 
 #include "bootutil/bootutil_log.h"
 
@@ -89,10 +89,12 @@
 #define CONTAINER_OF(ptr, type, field) \
 	((type *)(((char *)(ptr)) - offsetof(type, field)))
 
+#if 0 
+/* Linker error in IAR no definition for "__builtin_types_compatible_p" */
 /* Evaluates to 0 if array is an array; compile error if not array (e.g.
  * pointer)
  */
-#define IS_ARRAY(array) \
+ #define IS_ARRAY(array) \
 	ZERO_OR_COMPILE_ERROR( \
 		!__builtin_types_compatible_p(__typeof__(array), \
 					      __typeof__(&(array)[0])))
@@ -103,8 +105,11 @@
 #define ARRAY_SIZE(array) \
 	((unsigned long) (IS_ARRAY(array) + \
 		(sizeof(array) / sizeof((array)[0]))))
+#else
+	
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))		
 
-
+#endif /* 0 */
 
 
 extern struct device *boot_flash_device;
