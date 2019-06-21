@@ -90,7 +90,8 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
 #else
     static const cyhal_uart_irq_event_t ENABLE_EVENTS =
         CYHAL_UART_IRQ_RX_NOT_EMPTY | CYHAL_UART_IRQ_TX_EMPTY;
-    cyhal_uart_lowlevel_irqs(&(ser->hal_obj));
+// TODO(kmwh): The serial port fails to receive when this is enabled
+//    cyhal_uart_lowlevel_irqs(&(ser->hal_obj));
 #endif
     cyhal_uart_irq_enable(&(ser->hal_obj), ENABLE_EVENTS, true);
     if (tx == STDIO_UART_TX) {
