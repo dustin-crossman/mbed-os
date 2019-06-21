@@ -1,6 +1,6 @@
  /***************************************************************************//**
 * \file cy_ble_clk.c
-* \version 3.10
+* \version 3.20
 *
 * \brief
 *  This driver provides the source code for API BLE ECO clock.

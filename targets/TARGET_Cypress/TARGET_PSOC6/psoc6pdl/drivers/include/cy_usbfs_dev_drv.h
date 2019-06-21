@@ -647,13 +647,13 @@
 *           unconfigure the device or remove all endpoints, add endpoints, configure 
 *           the device. Updated the functions:
 *           \ref Cy_USBFS_Dev_Drv_UnConfigureDevice, \ref Cy_USBFS_Dev_Drv_AddEndpoint 
-*           and \ref Cy_USBFS_Dev_Drv_ConfigureDevice. 
+*           and \ref Cy_USBFS_Dev_Drv_ConfigDevice. 
 *            Removed the Cy_USBFS_Dev_Drv_ConfigDeviceComplete function because it is no needed anymore.
 *         - Updated the functions \ref Cy_USBFS_Dev_Drv_ReadOutEndpoint and 
 *           \ref Cy_USBFS_Dev_Drv_LoadInEndpoint for CPU mode (Mode 1, register access 16-bit) 
             to not require an extra byte in the endpoint buffer for odd-sized endpoints.
-*         - Added the functions: \ref Cy_USBFS_Dev_Drv_Ep0ReadResult(), \ref Cy_USBFS_Dev_Drv_SetAddress(),
-*           \ref Cy_USBFS_Dev_Drv_GetEp0MaxPacket() and \ref Cy_USBFS_Dev_Drv_GetSofNubmer(). 
+*         - Added the functions: \ref Cy_USBFS_Dev_Drv_Ep0ReadResult(), \ref Cy_USBFS_Dev_Drv_SetAddress()
+*           and \ref Cy_USBFS_Dev_Drv_GetEp0MaxPacket(). 
 *         - Changed the function signature \ref Cy_USBFS_Dev_Drv_Ep0Stall().
 *         - Obsolete function Cy_USBFS_Dev_Drv_GetEndpointStallState; the \ref 
             Cy_USBFS_Dev_Drv_GetEndpointState() updated to be used instead of the obsolete function.
