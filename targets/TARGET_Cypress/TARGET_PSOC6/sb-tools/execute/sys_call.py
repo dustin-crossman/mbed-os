@@ -21,6 +21,10 @@ from execute.p6_reg import CYREG_IPC2_STRUCT_ACQUIRE, CYREG_IPC2_STRUCT_DATA, CY
 PROVISION_KEYS_AND_POLICIES_OPCODE = 0x33  # ProvisionKeysAndPolicies API opcode
 GET_PROV_DETAILS_OPCODE = 0x37  # GetProvDetails() API opcode
 REGION_HASH_OPCODE = 0x31  # RegionHash() API opcode
+TRANSISION_TO_SECURE_OPCODE = 0x32  # TransitionToSecure() API code
+GET_OPCODE = 0x37
+
+ENTRANCE_EXAM_SRAM_ADDR_CLAIMED = ENTRANCE_EXAM_SRAM_ADDR + (ENTRANCE_EXAM_SRAM_SIZE >> 1)
 
 
 def region_hash(tool, address, length, mode, exp_value):
@@ -196,3 +200,101 @@ def provision_keys_and_policies(tool, blow_secure_efuse, filename):
 
     print('ProvisionKeysAndPolicies', 'complete' if result else f'error response: {hex(response)}')
     return result
+
+
+def transition_to_secure(tool, blow_secure_efuse):
+    """
+    Calls TransitionToSecure syscall over IPC.
+    :param tool: Programming/debugging tool used for communication with device.
+    :param blow_secure_efuse: Indicates whether to convert device to SECURE mode.
+    :return: True if success, otherwise False.
+    """
+    enable_blowing_secure = 0 if blow_secure_efuse else 1
+    print('Chip will be converted to SECURE mode' if blow_secure_efuse else 'Chip will NOT be converted to SECURE mode')
+
+    # Acquires IPC structure.
+    tool.write32(CYREG_IPC2_STRUCT_ACQUIRE, 0x80000000)
+    print(hex(CYREG_IPC2_STRUCT_ACQUIRE), hex(tool.read32(CYREG_IPC2_STRUCT_ACQUIRE)))
+
+    ipc_acquire = 0
+    while (ipc_acquire & 0x80000000) == 0:
+        ipc_acquire = tool.read32(CYREG_IPC2_STRUCT_ACQUIRE)
+
+    # Set RAM address and Opcode
+    tool.write32(CYREG_IPC2_STRUCT_DATA, ENTRANCE_EXAM_SRAM_ADDR)
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR, (TRANSISION_TO_SECURE_OPCODE << 24) + (enable_blowing_secure << 16) + 0)
+    scratch_addr = ENTRANCE_EXAM_SRAM_ADDR + 0x08
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x04, scratch_addr)
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x08, 0)
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x0C, 0)
+
+    # IPC_STRUCT[ipc_id].IPC_NOTIFY -
+    tool.write32(CYREG_IPC2_STRUCT_NOTIFY, 0x00000001)
+    # Wait on response
+    response = 0x80000000
+    while (response & 0x80000000) != 0:
+        response = tool.read32(CYREG_IPC2_STRUCT_LOCK_STATUS)
+
+    response = tool.read32(ENTRANCE_EXAM_SRAM_ADDR)
+    if response & 0xFF000000 == 0xa0000000:
+        print('Transition to Secure complete')
+        return True
+    else:
+        print('Transition to Secure Error response:')
+        print(hex(CYREG_IPC2_STRUCT_DATA), hex(tool.read32(CYREG_IPC2_STRUCT_DATA)))
+        print(hex(ENTRANCE_EXAM_SRAM_ADDR), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR)))
+        return False
+
+
+def get_prov_det_noprint(tool, key_id):
+    print(hex(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED))
+
+    op_code = GET_OPCODE << 24
+    # Acquire IPC structure
+    tool.write32(CYREG_IPC2_STRUCT_ACQUIRE, 0x80000000)
+    ipc_acquire = 0
+    while (ipc_acquire & 0x80000000) == 0:
+        ipc_acquire = tool.read32(CYREG_IPC2_STRUCT_ACQUIRE)
+
+    # Set RAM address and Opcode
+    tool.write32(CYREG_IPC2_STRUCT_DATA, ENTRANCE_EXAM_SRAM_ADDR_CLAIMED)
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED, op_code)
+    scratch_addr = ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x08
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x04, scratch_addr)
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x08, key_id)
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x0C, 0)
+
+    # IPC_STRUCT[ipc_id].IPC_NOTIFY -
+    tool.write32(CYREG_IPC2_STRUCT_NOTIFY, 0x00000001)
+    # Wait on response
+    response = 0x80000000
+    while (response & 0x80000000) != 0:
+        response = tool.read32(CYREG_IPC2_STRUCT_LOCK_STATUS)
+
+    response = tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED)
+
+    print(hex(CYREG_IPC2_STRUCT_DATA), hex(tool.read32(CYREG_IPC2_STRUCT_DATA)))
+    print(hex(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED)))
+    print(hex(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x04), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x04)))
+    print(hex(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x08), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x08)))
+
+    if response & 0xFF000000 == 0xa0000000:
+        scratch_addr = tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x04)
+
+        read_hash_size = tool.read32(scratch_addr)
+        read_hash_addr = tool.read32(scratch_addr + 0x04)
+        response = ''
+
+        i = 0
+        while i < read_hash_size:
+            # Save data in string format
+            hash_byte_chr = chr(tool.read8(read_hash_addr + i))
+            response += hash_byte_chr
+            i += 1
+        response = response.strip()
+        return True, response
+    else:
+        print(hex(CYREG_IPC2_STRUCT_DATA), hex(tool.read32(CYREG_IPC2_STRUCT_DATA)))
+        print(hex(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED)))
+        response = ''
+        return False, response
