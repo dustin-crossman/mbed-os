@@ -132,8 +132,13 @@ public:
     /* get bssid of the AP  if success return WICED_SUCCESS else WICED_ERROR */
     int get_bssid(uint8_t *bssid);
 
+    /* print WHD log (this routine will malloc/free a buffer
+     * You need to enable printing with WHD_LOGGING_BUFFER_ENABLE
+     */
+    int whd_log_print ( void );
+
     /* read WHD log */
-    int whd_log ( char *buffer, int buffer_size );
+    int whd_log_read ( char *buffer, int buffer_size );
 
     /* Get EDCF AC params */
     nsapi_error_t wifi_get_ac_params_sta(void * ac_param );
