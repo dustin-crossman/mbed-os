@@ -243,7 +243,7 @@ int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
     {
         addr = addr - smifMemConfigs[0]->baseAddress + FLASH_DEVICE_BASE;
         Flash_SMIF_GetAddrBuff(addr, addrBuf)
-        rc = Flash_SMIF_ReadMemory(SMIF0             /* SMIF_Type *baseaddr*/,
+        rc = Flash_SMIF_ReadMemory(QSPI_HW             /* SMIF_Type *baseaddr*/,
                                     &QSPIContext   /* cy_stc_smif_context_t *smifContext*/,
                                     dst             /* uint8_t rxBuffer[]*/,
                                     len             /* uint32_t rxSize*/,
@@ -254,7 +254,7 @@ int flash_area_read(const struct flash_area *area, uint32_t off, void *dst,
     {
 #if (defined(MCUBOOT_USE_SMIF_STAGE) && defined(MCUBOOT_USE_SMIF_XIP))
         /* Preferable READ mode is Memory/XIP. */
-        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
+        Cy_SMIF_SetMode(QSPI_HW, CY_SMIF_MEMORY);
 #endif
         rc = psoc6_flash_read(addr, dst, len);
     }
@@ -273,11 +273,11 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
     {
 #ifdef MCUBOOT_USE_SMIF_XIP
         /* Memory/XIP Read is Done. Switching back to Normal/CMD */
-        Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
+        Cy_SMIF_SetMode(QSPI_HW, CY_SMIF_NORMAL);
 #endif
         addr = addr - smifMemConfigs[0]->baseAddress+FLASH_DEVICE_BASE;
         Flash_SMIF_GetAddrBuff(addr, addrBuf);
-        rc = Flash_SMIF_WriteMemory(SMIF0    /* SMIF_Type *baseaddr */,
+        rc = Flash_SMIF_WriteMemory(QSPI_HW    /* SMIF_Type *baseaddr */,
                                     &QSPIContext       /* cy_stc_smif_context_t *smifContext */,
                                     src     /* uint8_t txBuffer[] */,
                                     len     /* uint32_t txSize */,
@@ -302,7 +302,7 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
     {
 #ifdef MCUBOOT_USE_SMIF_XIP
         /* Memory/XIP Read is Done. Switching back to Normal/CMD */
-        Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
+        Cy_SMIF_SetMode(QSPI_HW, CY_SMIF_NORMAL);
 #endif
         uint8_t zero_buff[SMIF_ZERO_BUFF_SIZE];
         uint32_t buff_num, rem_num, cur_addr;
@@ -320,7 +320,7 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
         {
             Flash_SMIF_GetAddrBuff(cur_addr, addrBuf);
 
-            rc = Flash_SMIF_WriteMemory(SMIF0       /* SMIF_Type *baseaddr */,
+            rc = Flash_SMIF_WriteMemory(QSPI_HW       /* SMIF_Type *baseaddr */,
                                         &QSPIContext/* cy_stc_smif_context_t *smifContext */,
                                         zero_buff   /* uint8_t txBuffer[] */,
                                         SMIF_ZERO_BUFF_SIZE     /* uint32_t txSize */,
@@ -332,7 +332,7 @@ int flash_area_erase(const struct flash_area *area, uint32_t off, uint32_t len)
         if((0 != rem_num)&&(0 == rc))
         {
             Flash_SMIF_GetAddrBuff(cur_addr, addrBuf);
-            rc = Flash_SMIF_WriteMemory(SMIF0       /* SMIF_Type *baseaddr */,
+            rc = Flash_SMIF_WriteMemory(QSPI_HW       /* SMIF_Type *baseaddr */,
                                         &QSPIContext/* cy_stc_smif_context_t *smifContext */,
                                         zero_buff   /* uint8_t txBuffer[] */,
                                         rem_num     /* uint32_t txSize */,
