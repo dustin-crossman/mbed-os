@@ -2034,7 +2034,9 @@ boot_go(struct boot_rsp *rsp)
     size_t bootMaxImgSect = Cy_BootMaxImgSectors();
 
     boot_sector_t *slot0_sectors = malloc(sizeof(boot_sector_t)*bootMaxImgSect);
+    assert(slot0_sectors != 0);
     boot_sector_t *slot1_sectors = malloc(sizeof(boot_sector_t)*bootMaxImgSect);
+    assert(slot1_sectors != 0);
 
     boot_data.imgs[0].sectors = slot0_sectors;
     boot_data.imgs[1].sectors = slot1_sectors;
