@@ -23,12 +23,13 @@
  * Parses provisioning packet (JWT) and looks for provisioning request JWT packet
  * */
 int Cy_JWT_ParseProvisioningPacket(char *provPacket, bnu_policy_t *bnuPolicy,
-        uint8_t masterImageId);
+        debug_policy_t *debugPolicy, uint8_t masterImageId);
 
 /*
  * Parses provisioning request packet (JWT) and looks for Boot and Upgrade policy
  * */
 int Cy_JWT_ParseProvisioningRequest(char *provReq, char *buff, uint32_t buffLen,
-        bnu_policy_t *bnuPolicy, uint8_t masterImageId);
+        bnu_policy_t *bnuPolicy, debug_policy_t *debugPolicy,
+        uint8_t masterImageId);
 
 #endif /* __CY_JWT_BNU_POLICY__ */
