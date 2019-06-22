@@ -189,7 +189,7 @@ void Cy_PDL_Init(const cy_stc_device_t * device);
 *               Register Access Helper Macros
 *******************************************************************************/
 
-#define CY_CRYPTO_HW_V1                     (1U == cy_device->cryptoVersion) /* true if the mxcrypto version is 1 */
+#define CY_CRYPTO_V1                        (1U == cy_device->cryptoVersion) /* true if the mxcrypto version is 1 */
 
 #define CY_SRSS_NUM_CLKPATH                 ((uint32_t)(cy_device->srssNumClkpath))
 #define CY_SRSS_NUM_PLL                     ((uint32_t)(cy_device->srssNumPll))

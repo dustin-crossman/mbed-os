@@ -66,7 +66,7 @@ extern "C" {
 * \ref cy_en_crypto_status_t
 *
 * \funcusage
-* \snippet crypto/2.10/snippet/main.c snippet_myCryptoServerStartBase
+* \snippet crypto/snippet/main.c snippet_myCryptoServerStartBase
 *
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Server_Start_Base(cy_stc_crypto_config_t const *config,
