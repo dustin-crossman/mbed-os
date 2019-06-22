@@ -46,7 +46,7 @@ cy_stc_smif_context_t QSPIContext;
 *******************************************************************************/
 void Flash_SMIF_Interrupt_User(void)
 {
-    Cy_SMIF_Interrupt(SMIF0, &QSPIContext);
+    Cy_SMIF_Interrupt(QSPI_HW, &QSPIContext);
 }
 cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
 {
@@ -82,23 +82,23 @@ cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
                                     uint32_t timeout,
                                     cy_stc_smif_context_t *context)
     */
-    qspiStatus = Cy_SMIF_Init(SMIF0, &QSPI_config, SMIF_TIMEOUT_1_MS, &QSPIContext);
+    qspiStatus = Cy_SMIF_Init(QSPI_HW, &QSPI_config, SMIF_TIMEOUT_1_MS, &QSPIContext);
 
     if(qspiStatus == CY_SMIF_SUCCESS)
     {
-        Cy_SMIF_SetDataSelect(SMIF0, CY_SMIF_SLAVE_SELECT_0, CY_SMIF_DATA_SEL0);
-        Cy_SMIF_Enable(SMIF0, &QSPIContext);
+        Cy_SMIF_SetDataSelect(QSPI_HW, CY_SMIF_SLAVE_SELECT_0, CY_SMIF_DATA_SEL0);
+        Cy_SMIF_Enable(QSPI_HW, &QSPIContext);
         BOOT_LOG_INF("SMIF Block Enabled\r\n");
 
         /* Map memory device to memory map */
-        qspiStatus = Cy_SMIF_Memslot_Init(SMIF0, &smifBlockConfig, &QSPIContext);
+        qspiStatus = Cy_SMIF_Memslot_Init(QSPI_HW, &smifBlockConfig, &QSPIContext);
     }
 
     if(qspiStatus == CY_SMIF_SUCCESS)
     {
         BOOT_LOG_INF("SMIF Normal Mode");
         /* Need to start from CommandMode as we will switch FlashMemory to Quad first */
-        Cy_SMIF_SetMode(SMIF0, CY_SMIF_NORMAL);
+        Cy_SMIF_SetMode(QSPI_HW, CY_SMIF_NORMAL);
     }
 #if (CY_CPU_CORTEX_M0P)
 	NVIC_EnableIRQ(SMIF_NVIC_IRQN);

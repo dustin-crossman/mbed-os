@@ -158,9 +158,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha1_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha1_buffers_t*)shaBuffers)->hash;
 
-                hashState->mode           = mode;
-                hashState->modeHw         = CY_CRYPTO_V2_SHA1_OPC;
-                hashState->initialHash    = sha1InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA1_OPC;
+                hashState->initialHash    = (const uint8_t*)sha1InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA1_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA1_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA1_DIGEST_SIZE;
@@ -171,9 +171,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha256_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha256_buffers_t*)shaBuffers)->hash;
 
-                hashState->mode           = mode;
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_256_OPC;
-                hashState->initialHash    = sha256InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_256_OPC;
+                hashState->initialHash    = (const uint8_t*)sha256InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA256_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA256_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA256_DIGEST_SIZE;
@@ -182,9 +182,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha256_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha256_buffers_t*)shaBuffers)->hash;
 
-                hashState->mode           = mode;
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_256_OPC;
-                hashState->initialHash    = sha224InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_256_OPC;
+                hashState->initialHash    = (const uint8_t*)sha224InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA256_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA256_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA224_DIGEST_SIZE;
@@ -195,9 +195,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->hash;
 
-                hashState->mode           = mode;
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_512_OPC;
-                hashState->initialHash    = sha512InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_512_OPC;
+                hashState->initialHash    = (const uint8_t*)sha512InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA512_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA512_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA512_DIGEST_SIZE;
@@ -206,9 +206,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->hash;
 
-                hashState->mode           = mode;
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_512_OPC;
-                hashState->initialHash    = sha384InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_512_OPC;
+                hashState->initialHash    = (const uint8_t*)sha384InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA512_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA512_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA384_DIGEST_SIZE;
@@ -217,9 +217,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->hash;
 
-                hashState->mode           = mode;
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_512_OPC;
-                hashState->initialHash    = sha512_256InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_512_OPC;
+                hashState->initialHash    = (const uint8_t*)sha512_256InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA512_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA512_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA512_256_DIGEST_SIZE;
@@ -228,9 +228,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->hash;
 
-                hashState->mode           = mode;
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_512_OPC;
-                hashState->initialHash    = sha512_224InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_512_OPC;
+                hashState->initialHash    = (const uint8_t*)sha512_224InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA512_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA512_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA512_224_DIGEST_SIZE;
@@ -512,7 +512,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Free(CRYPTO_Type *base, cy_stc_crypt
         Cy_Crypto_Core_V2_MemSet(base, hashState->hash,  0x00U, (uint16_t)hashState->hashSize);
 
         /* Clears the hash state */
-        Cy_Crypto_Core_V2_MemSet(base, hashState, 0x00U, sizeof(cy_stc_crypto_sha_state_t));
+        Cy_Crypto_Core_V2_MemSet(base, hashState, 0x00U, (uint16_t)sizeof(cy_stc_crypto_sha_state_t));
 
         /* Clears the memory buffer. */
         Cy_Crypto_Core_V2_RBClear(base);

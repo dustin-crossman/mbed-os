@@ -7,7 +7,7 @@
             "key" : 5
         },
         "m4" : {
-            "permission" : "enabled",
+            "permission" : "allowed",
             "control" : "firmware",
             "key" : 5
         },
@@ -113,7 +113,7 @@
                 ],
                 "id": 16,
                 "monotonic": 0,
-                "smif_id": 0,
+                "smif_id": 2,
                 "upgrade": true,
                 "upgrade_auth": [
                     8

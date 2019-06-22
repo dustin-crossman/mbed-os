@@ -75,7 +75,7 @@ const char *mem_region_names[POLICY_MAX_N_OF_PROT_REGIONS] =
     "FLASH_MAIN_CODE", "FLASH_MAIN_XO","FLASH_MAIN_DATA", "FLASH_SUPERVISORY",
     "FLASH_WORK_SECURE", "FLASH_WORK", "SRAM_PC0_PRIV", "SRAM_PC0_PUB",
     "SRAM_SPM_PRIV", "SRAM_SPM_PUB", "SRAM_PC1_PRIV", "SRAM_PC2_PRIV",
-    "SRAM_PC3_PRIV", "SRAM_PC4_PRIV", "SRAM_MAIN", "SMIF_CODE",
+    "SRAM_PC3_PRIV", "SRAM_PC4_PRIV", "SRAM_MAIN", "SRAM_DAP", "SMIF_CODE",
     "SMIF_XO", "SMIF_DATA"
 };
 
@@ -1334,6 +1334,16 @@ int Cy_JWT_BnUPolicyParse(cJSON *bnu_json, bnu_policy_t *bnu_policy, uint32_t ma
                         break;
                     }
                 }
+            }
+
+            item = Cy_JWT_FindJsonItemByKey("smif_id", policy);
+            if(NULL != item)
+            {
+                bnu_policy->bnu_img_policy.smif_id = item->valueint;
+            }
+            else
+            {
+                bnu_policy->bnu_img_policy.smif_id = 0;
             }
         }
     }

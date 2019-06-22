@@ -73,6 +73,30 @@
 
 #define CY_BOOTLOADER_MASTER_IMG_ID CY_BOOTLOADER_IMG_ID_OEMTF_CM0P
 
+/* DAPControl SysCall opcode */
+#define DAPCONTROL_SYSCALL_OPCODE       (0x3AUL << 24UL)
+
+/* PSA crypto SysCall return codes */
+#define CY_FB_SYSCALL_SUCCESS           (0xA0000000UL)
+
+/* SysCall timeout value */
+#define SYSCALL_TIMEOUT                 (15000UL)
+
+/* DAPControl SysCall parameter: access port state */
+typedef enum
+{
+    CY_AP_DIS = 0,
+    CY_AP_EN = 1
+}cy_ap_control_t;
+
+/* DAPControl SysCall parameter: access port name */
+typedef enum
+{
+    CY_CM0_AP = 0,
+    CY_CM4_AP = 1,
+    CY_SYS_AP = 2
+}cy_ap_name_t;
+
 const char devName[] = FLASH_DEV_NAME;
 struct device *boot_flash_device;
 
@@ -114,6 +138,9 @@ typedef struct
 /* Boot & Upgrade policy structure */
 bnu_policy_t bnu_policy;
 
+/* Debug policy structure */
+debug_policy_t debug_policy;
+
 CY_SECTION(".cy_ramfunc") CY_NOINLINE
 static void Cy_SRAM_BusyLoop(void)
 {
@@ -126,11 +153,72 @@ static void Cy_SRAM_TestBitLoop(void)
     while((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL);
 }
 
+int cy_access_port_control(cy_ap_name_t ap, cy_ap_control_t en)
+{
+    int rc = -1;
+    volatile uint32_t syscallCmd = 0;
+    uint32_t timeout = 0;
+
+    syscallCmd |= DAPCONTROL_SYSCALL_OPCODE;
+    syscallCmd |= (uint8_t)en << 16;
+    syscallCmd |= (uint8_t)ap << 8;
+    syscallCmd |= 1;
+
+    IPC->STRUCT[CY_IPC_CHAN_SYSCALL].DATA = syscallCmd;
+
+    while(((IPC->STRUCT[CY_IPC_CHAN_SYSCALL].ACQUIRE &
+            IPC_STRUCT_ACQUIRE_SUCCESS_Msk) == 0) &&
+            (timeout < SYSCALL_TIMEOUT))
+    {
+        ++timeout;
+    }
+
+    if(timeout < SYSCALL_TIMEOUT)
+    {
+        timeout = 0;
+
+        IPC->STRUCT[CY_IPC_CHAN_SYSCALL].NOTIFY = 1;
+
+        while(((IPC->STRUCT[CY_IPC_CHAN_SYSCALL].LOCK_STATUS &
+                IPC_STRUCT_ACQUIRE_SUCCESS_Msk) != 0) &&
+                (timeout < SYSCALL_TIMEOUT))
+        {
+            ++timeout;
+        }
+
+        if(timeout < SYSCALL_TIMEOUT)
+        {
+            syscallCmd = IPC->STRUCT[CY_IPC_CHAN_SYSCALL].DATA;
+            if(CY_FB_SYSCALL_SUCCESS != syscallCmd)
+            {
+                rc = syscallCmd;
+            }
+            else
+            {
+                rc = 0;
+            }
+        }
+    }
+
+    return rc;
+}
+
 void cy_assert(int expr)
 {
     if(0 == expr)
     {
         BOOT_LOG_ERR("There is an error occurred during bootloader flow. MCU stopped.");
+
+        if((PERM_ENABLED == debug_policy.m4_policy.permission) ||
+                (PERM_ALLOWED == debug_policy.m4_policy.permission))
+        {
+            int rc = cy_access_port_control(CY_CM4_AP, CY_AP_EN);
+            ASSERT(0 == rc);
+
+            /* The delay is required after Access port was enabled for
+             * debugger/programmer to connect and set TEST BIT */
+            Cy_SysLib_Delay(100);
+        }
 
         if((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL)
         {
@@ -139,30 +227,12 @@ void cy_assert(int expr)
             __disable_irq();
         }
 
+        Cy_SysEnableCM4(CY_BL_CM4_ROM_LOOP_ADDR);
+
         Cy_SRAM_BusyLoop();
     }
 }
 
-/********************************************
- * NOTE:
- * SPE CM0p Debug is disabled by default.
- *
- * Please, add ENABLE_CM0P_DEBUG symbol
- * into targets.json into "macros_add"
- * section of CY8CPROTO_064_SB_M0_PSA
- * target if debugging is required.
- *
- * ******************************************/
-#if defined(ENABLE_CM0P_DEBUG)
-void Cy_SystemInit(void)
-{
-    if((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL)
-    {
-		IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
-		while((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL);
-    }
-}
-#endif
 static void turn_on_cm4(void)
 {
     uint32_t regValue;
@@ -190,12 +260,23 @@ static void do_boot(struct boot_rsp *rsp)
      * reset vector
      */
     rc = flash_device_base(rsp->br_flash_dev_id, &flash_base);
-    assert(rc == 0);
+    ASSERT(rc == 0);
 
     app_addr = flash_base + rsp->br_image_off + rsp->br_hdr->ih_hdr_size;
 
     /* Set Protection Context 6 for CM4 */
     Cy_Prot_SetActivePC(CPUSS_MS_ID_CM4, CY_PROT_PC6);
+
+    if((PERM_ENABLED == debug_policy.m4_policy.permission) ||
+        (PERM_ALLOWED == debug_policy.m4_policy.permission))
+    {
+        rc = cy_access_port_control(CY_CM4_AP, CY_AP_EN);
+        ASSERT(0 == rc);
+
+        /* The delay is required after Access port was enabled for
+         * debugger/programmer to connect and set TEST BIT */
+        Cy_SysLib_Delay(100);
+    }
 
     /* Stop in case we are in the TEST MODE */
     if ( (CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & (TST_MODE_TEST_MODE_MASK)) != 0UL )
@@ -232,24 +313,6 @@ void spm_hal_start_nspe(void)
     struct boot_rsp rsp;
     int rc = 0;
 
-#ifdef MCUBOOT_USE_SMIF_STAGE
-    cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
-
-    qspi_status = Flash_SMIF_QSPI_Start();
-    if(0 != qspi_status)
-    {
-         BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
-    }
-    /* Set QE */
-    Flash_SMIF_EnableQuadMode(SMIF0, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
-#ifdef MCUBOOT_USE_SMIF_XIP
-    if(qspi_status == CY_SMIF_SUCCESS)
-    {
-        BOOT_LOG_INF("SMIF Memory/XIP Mode");
-        Cy_SMIF_SetMode(SMIF0, CY_SMIF_MEMORY);
-    }
-#endif
-#endif
     boot_flash_device = (struct device*)&psoc6_flash_device;
 
 #if(MCUBOOT_POLICY == 1)
@@ -268,7 +331,7 @@ void spm_hal_start_nspe(void)
     }
     if(0 == rc)
     {
-        rc = Cy_JWT_ParseProvisioningPacket(jwt, &bnu_policy,
+        rc = Cy_JWT_ParseProvisioningPacket(jwt, &bnu_policy, &debug_policy,
                   CY_BOOTLOADER_IMG_ID_SPE_CM0P); /* SPE IMG ID = 1*/
     }
     if(0 != rc)
@@ -295,6 +358,32 @@ void spm_hal_start_nspe(void)
     bnu_policy.bnu_img_policy.upgrade_auth[0]   = MCUBOOT_POLICY_UPGRADE_AUTH;
     bnu_policy.bnu_img_policy.id                = MCUBOOT_POLICY_IMG_ID;
     bnu_policy.bnu_img_policy.upgrade           = MCUBOOT_POLICY_UPGRADE;
+#endif
+
+#ifdef MCUBOOT_USE_SMIF_STAGE
+    /* read smif_id from policy */
+    int32_t smif_id = bnu_policy.bnu_img_policy.smif_id;
+    if(smif_id != 0)
+    {
+        /* reload one will be used with exact external memory module */
+        smifMemConfigs[0] = multi_smifMemConfigs[smif_id-1];
+        cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
+
+        qspi_status = Flash_SMIF_QSPI_Start();
+        if(0 != qspi_status)
+        {
+             BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
+        }
+        /* Set QE */
+        Flash_SMIF_EnableQuadMode(QSPI_HW, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
+#ifdef MCUBOOT_USE_SMIF_XIP
+        if(qspi_status == CY_SMIF_SUCCESS)
+        {
+            BOOT_LOG_INF("SMIF Memory/XIP Mode");
+            Cy_SMIF_SetMode(QSPI_HW, CY_SMIF_MEMORY);
+        }
+#endif
+    }
 #endif
 
     BOOT_LOG_INF("Processing available images");
