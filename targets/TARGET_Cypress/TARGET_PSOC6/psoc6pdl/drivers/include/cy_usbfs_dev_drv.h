@@ -651,12 +651,17 @@
 *            Removed the Cy_USBFS_Dev_Drv_ConfigDeviceComplete function because it is no needed anymore.
 *         - Updated the functions \ref Cy_USBFS_Dev_Drv_ReadOutEndpoint and 
 *           \ref Cy_USBFS_Dev_Drv_LoadInEndpoint for CPU mode (Mode 1, register access 16-bit) 
-            to not require an extra byte in the endpoint buffer for odd-sized endpoints.
+*           to not require an extra byte in the endpoint buffer for odd-sized endpoints.
 *         - Added the functions: \ref Cy_USBFS_Dev_Drv_Ep0ReadResult(), \ref Cy_USBFS_Dev_Drv_SetAddress()
 *           and \ref Cy_USBFS_Dev_Drv_GetEp0MaxPacket(). 
 *         - Changed the function signature \ref Cy_USBFS_Dev_Drv_Ep0Stall().
 *         - Obsolete function Cy_USBFS_Dev_Drv_GetEndpointStallState; the \ref 
-            Cy_USBFS_Dev_Drv_GetEndpointState() updated to be used instead of the obsolete function.
+*           Cy_USBFS_Dev_Drv_GetEndpointState() updated to be used instead of the obsolete function.
+*         - Reduced time required to complete abort operation in function \ref Cy_USBFS_Dev_Drv_Abort.
+*           Obsolete function Cy_USBFS_Dev_Drv_AbortComplete because entire abort operation is handled by
+*           \ref Cy_USBFS_Dev_Drv_Abort.
+*         - Added endpoint address argument to the \ref cy_cb_usbfs_dev_drv_ep_callback_t to simplify
+*           endpoint transfer complete event processing for the MBED-OS USB Device stack.
 *     </td>
 *     <td>Updated the driver to support the MBED-OS USB Device stack and Cypress 
 *         USB Device middleware.</td>
@@ -757,7 +762,7 @@ typedef enum
     /** Operation completed successfully */
     CY_USBFS_DEV_DRV_SUCCESS = 0U,
     
-    /** One or more input parameters are invalid */                                
+    /** One or more input parameters are invalid */
     CY_USBFS_DEV_DRV_BAD_PARAM               = (CY_USBFS_ID | CY_PDL_STATUS_ERROR | CY_USBFS_DEV_DRV_STATUS_CODE | 1U), 
     
     /** There is not enough space in the buffer to be allocated for endpoint (hardware or RAM) */ 
@@ -915,6 +920,7 @@ typedef void (* cy_cb_usbfs_dev_drv_callback_t)(USBFS_Type *base,
 * completion event.
 */
 typedef void (* cy_cb_usbfs_dev_drv_ep_callback_t)(USBFS_Type *base, 
+                                                   uint32_t endpointAddr,
                                                    uint32_t errorType, 
                                                    struct cy_stc_usbfs_dev_drv_context *context);
 
@@ -1000,7 +1006,7 @@ typedef struct cy_stc_usbfs_dev_drv_config
     * Pointer to the buffer allocated for OUT endpoints (applicable only when \ref mode 
     * is \ref CY_USBFS_DEV_DRV_EP_MANAGEMENT_DMA_AUTO)
     */
-    uint8_t  *epBuffer;     
+    uint8_t  *epBuffer;
     
     /** 
     * The size of the buffer for OUT endpoints (applicable only when \ref mode 
@@ -1075,6 +1081,9 @@ typedef struct cy_stc_usbfs_dev_drv_context
 
     /** The device address to set */
     uint8_t address;
+
+    /** Defines the list of endpoints that waits for abort completion */
+    volatile uint8_t epAbortMask;
 
     /** Endpoints management mode */
     cy_en_usbfs_dev_drv_ep_management_mode_t mode;
@@ -1197,7 +1206,7 @@ uint32_t Cy_USBFS_Dev_Drv_Ep0ReadResult(USBFS_Type const *base,
 
 __STATIC_INLINE void Cy_USBFS_Dev_Drv_Ep0Stall(USBFS_Type *base);
 
-__STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetEp0MaxPacket(USBFS_Type *base);
+__STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetEp0MaxPacket(USBFS_Type const *base);
 /** \} group_usbfs_dev_hal_functions_ep0_service */
 
 
@@ -1248,13 +1257,9 @@ __STATIC_INLINE cy_en_usbfs_dev_drv_status_t Cy_USBFS_Dev_Drv_ReadOutEndpoint(US
                                                               uint32_t *actSize,
                                                               cy_stc_usbfs_dev_drv_context_t *context);
 
-cy_en_usb_dev_ep_state_t Cy_USBFS_Dev_Drv_Abort(USBFS_Type *base,
-                                                uint32_t   endpoint,
-                                                cy_stc_usbfs_dev_drv_context_t const *context);
-
-cy_en_usbfs_dev_drv_status_t Cy_USBFS_Dev_Drv_AbortComplete(USBFS_Type *base,
-                                                            uint32_t   endpoint,
-                                                            cy_stc_usbfs_dev_drv_context_t *context);
+cy_en_usbfs_dev_drv_status_t Cy_USBFS_Dev_Drv_Abort(USBFS_Type *base,
+                                                    uint32_t   endpoint,
+                                                    cy_stc_usbfs_dev_drv_context_t *context);
 
 __STATIC_INLINE bool     Cy_USBFS_Dev_Drv_GetEndpointAckState(USBFS_Type const *base, uint32_t endpoint);
 __STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetEndpointCount   (USBFS_Type const *base, uint32_t endpoint);
@@ -2358,7 +2363,7 @@ __STATIC_INLINE void Cy_USBFS_Dev_Drv_Ep0Stall(USBFS_Type *base)
 * The endpoint 0 maximum packet size (endpoint 0 has a dedicated hardware buffer).
 *
 *******************************************************************************/
-__STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetEp0MaxPacket(USBFS_Type *base)
+__STATIC_INLINE uint32_t Cy_USBFS_Dev_Drv_GetEp0MaxPacket(USBFS_Type const *base)
 {
     /* Suppress a compiler warning about unused variables */
     (void) base;
