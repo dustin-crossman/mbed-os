@@ -53,15 +53,11 @@ static void active_idle_hook(void)
 void mbed_sdk_init(void)
 {
 #if (CY_CPU_CORTEX_M0P)
-    #if !defined(COMPONENT_SPM_MAILBOX)
-        /* Disable global interrupts */
-        __disable_irq();
-    #endif
+#if !defined(COMPONENT_SPM_MAILBOX)
+    /* Disable global interrupts */
+    __disable_irq();
 #endif
-
-    /* Initialize shared resource manager */
-    cy_srm_initialize();
-
+#endif
     /* Initialize system and clocks. */
     /* Placed here as it must be done after proper LIBC initialization. */
     SystemInit();
@@ -74,20 +70,20 @@ void mbed_sdk_init(void)
 #endif
 
 #if (CY_CPU_CORTEX_M0P)
-    #if defined(COMPONENT_SPE)
-        /* Set up the device based on configurator selections */
-        init_cycfg_all();
-    #endif
+#if defined(COMPONENT_SPE)
+    /* Set up the device based on configurator selections */
+    init_cycfg_all();
+#endif
 
-    #if !defined(COMPONENT_SPM_MAILBOX)
-        /* Enable global interrupts */
-        __enable_irq();
-    #endif
+#if !defined(COMPONENT_SPM_MAILBOX)
+    /* Enable global interrupts */
+    __enable_irq();
+#endif
 #else
-    #if !defined(COMPONENT_NSPE)
-        /* Set up the device based on configurator selections */
-        init_cycfg_all();
-    #endif
+#if !defined(COMPONENT_NSPE)
+    /* Set up the device based on configurator selections */
+    init_cycfg_all();
+#endif
 
     /* Enable global interrupts (disabled in CM4 startup assembly) */
     __enable_irq();
