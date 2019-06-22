@@ -294,8 +294,12 @@
 *     <td>2.30</td>
 *     <td>
 *         <ul>
-*         <li>Added multi-instance support for AES and SHA.</li>
-*         <li>Added support for ARM Compiler 6.</li>
+*         <li>Added a multi-instance support for AES and SHA.</li>
+*		  <li>Added a small chunks mode for SHA with any chunk size (from one
+*             byte).</li>
+*         <li>Added the operation memory buffer management (set a new address,
+*             get a size).</li>
+*         <li>Added a support for ARM Compiler 6.</li>
 *         </ul>
 *     </td>
 *     <td>Integration with mbedOS/mbedTLS, restructured the implementation of
@@ -717,7 +721,7 @@
 *
 * \note The <b>modulus</b> and <b>exponent</b> values in the
 * \ref cy_stc_crypto_rsa_pub_key_t must be in little-endian order.<br>
-* Use the \ref Cy_Crypto_Rsa_InvertEndianness function to convert to or from
+* Use the \ref Cy_Crypto_InvertEndianness function to convert to or from
 * little-endian order.
 *
 * The remaining fields represent three pre-calculated coefficients that can
@@ -740,11 +744,11 @@
 *   -# Calculate the SHA digest of the data to be verified with
 *      \ref Cy_Crypto_Sha_Run.
 *   -# Ensure that the RSA signature is in little-endian format.
-*      Use \ref Cy_Crypto_Rsa_InvertEndianness.
+*      Use \ref Cy_Crypto_InvertEndianness.
 *   -# Decrypt the RSA signature with a public key, by calling
 *      \ref Cy_Crypto_Rsa_Proc.
 *   -# Invert the byte order of the output, to return to big-endian format.
-*      Use \ref Cy_Crypto_Rsa_InvertEndianness.
+*      Use \ref Cy_Crypto_InvertEndianness.
 *   -# Call \ref Cy_Crypto_Rsa_Verify (which requires data in big-endian format).
 *
 * \section group_crypto_irq_implements Implementing Crypto Interrupts
@@ -1773,7 +1777,7 @@ cy_en_crypto_status_t Cy_Crypto_Tdes_Run(cy_en_crypto_dir_mode_t dirMode,
 * little-endian order.<br>
 * The <b>modulus</b> and <b>exponent</b> values in the \ref cy_stc_crypto_rsa_pub_key_t
 * must also be in little-endian order.<br>
-* Use \ref Cy_Crypto_Rsa_InvertEndianness function to convert to or from
+* Use \ref Cy_Crypto_InvertEndianness function to convert to or from
 * little-endian order.
 *
 * \param pubKey
@@ -1888,10 +1892,145 @@ cy_en_crypto_status_t Cy_Crypto_Rsa_Verify(cy_en_crypto_rsa_ver_result_t *verRes
                                            cy_stc_crypto_context_rsa_ver_t *cfContext);
 #endif /* #if (CPUSS_CRYPTO_SHA == 1) */
 
+/*******************************************************************************
+* Function Name: Cy_Crypto_ECDSA_SignHash
+****************************************************************************//**
+*
+* Sign a message digest.
+*
+* \param hash
+* The message digest to sign. Provided as is in data buffer.
+*
+* \param hashlen
+* The length of the digest in bytes.
+*
+* \param sig
+* [out] The destination for the signature, 'R' followed by 'S'.
+*
+* \param key
+* Key used for signature generation. See \ref cy_stc_crypto_ecc_key.
+*
+* \param messageKey
+* Message key.
+*
+* \param cfContext
+* The pointer to the \ref cy_stc_crypto_context_ecc_t structure that stores
+* the ECC operation context.
+*
+* \return status code. See \ref cy_en_crypto_status_t.
+*
+*******************************************************************************/
+cy_en_crypto_status_t Cy_Crypto_ECDSA_SignHash(const uint8_t *hash,
+                                        uint32_t hashlen,
+                                        uint8_t *sig,
+                                        const cy_stc_crypto_ecc_key *key,
+                                        const uint8_t *messageKey,
+                                        cy_stc_crypto_context_ecc_t *cfContext);
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_ECDSA_VerifyHash
+****************************************************************************//**
+*
+* Verify an ECC signature.
+*
+* \param sig
+* The signature to verify, 'R' followed by 'S'.
+*
+* \param hash
+* The message digest that was signed. Provided as is in data buffer.
+*
+* \param hashlen
+* The length of the digest in bytes.
+*
+* \param stat
+* Result of signature, 1==valid, 0==invalid.
+*
+* \param key
+* The corresponding public ECC key. See \ref cy_stc_crypto_ecc_key.
+*
+* \param cfContext
+* The pointer to the \ref cy_stc_crypto_context_ecc_t structure that stores
+* the ECC operation context.
+*
+* \return status code. See \ref cy_en_crypto_status_t.
+*
+*******************************************************************************/
+cy_en_crypto_status_t Cy_Crypto_ECDSA_VerifyHash(const uint8_t *sig,
+                                        const uint8_t *hash,
+                                        uint32_t hashlen,
+                                        uint8_t *stat,
+                                        const cy_stc_crypto_ecc_key *key,
+                                        cy_stc_crypto_context_ecc_t *cfContext);
+
 #endif /* #if (CPUSS_CRYPTO_VU == 1) */
 
 /*******************************************************************************
-* Function Name: Cy_Crypto_Rsa_InvertEndianness
+* Function Name: Cy_Crypto_SetMemBufAddress
+****************************************************************************//**
+*
+* This function sets a new operation memory buffer.
+*
+* \param newMembufAddress
+* The pointer to the new operation memory buffer.
+* __Must be 4-byte aligned.__
+*
+* \param newMembufSize
+* The size of the new memory buffer (in bytes)
+*
+* \param cfContext
+* The pointer to the \ref cy_stc_crypto_context_str_t structure that stores
+* the data context.
+*
+* \return
+* \ref cy_en_crypto_status_t
+*
+*******************************************************************************/
+cy_en_crypto_status_t Cy_Crypto_SetMemBufAddress(uint32_t const *newMembufAddress,
+                                           uint32_t newMembufSize,
+                                           cy_stc_crypto_context_str_t *cfContext);
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_GetMemBufAddress
+****************************************************************************//**
+*
+* This function gets an operation memory buffer location.
+*
+* \param membufAddress
+* The pointer of the operation memory buffer.
+*
+* \param cfContext
+* The pointer to the \ref cy_stc_crypto_context_str_t structure that stores
+* the data context.
+*
+* \return
+* \ref cy_en_crypto_status_t
+*
+*******************************************************************************/
+cy_en_crypto_status_t Cy_Crypto_GetMemBufAddress(uint32_t **membufAddress,
+                                           cy_stc_crypto_context_str_t *cfContext);
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_GetMemBufSize
+****************************************************************************//**
+*
+* This function gets an operation memory buffer size.
+*
+* \param membufSize
+* The size of the memory buffer (in bytes)
+*
+* \param cfContext
+* The pointer to the \ref cy_stc_crypto_context_str_t structure that stores
+* the data context.
+*
+* \return
+* \ref cy_en_crypto_status_t
+*
+*******************************************************************************/
+cy_en_crypto_status_t Cy_Crypto_GetMemBufSize(uint32_t *membufSize,
+                                           cy_stc_crypto_context_str_t *cfContext);
+
+/*******************************************************************************
+* Function Name: Cy_Crypto_InvertEndianness
 ****************************************************************************//**
 *
 * This function reverts byte-array memory block, like:<br>
@@ -1910,7 +2049,12 @@ cy_en_crypto_status_t Cy_Crypto_Rsa_Verify(cy_en_crypto_rsa_ver_result_t *verRes
 * The length of the memory array whose endianness is to be inverted (in bytes)
 *
 *******************************************************************************/
-void Cy_Crypto_Rsa_InvertEndianness(void *inArrPtr, uint32_t byteSize);
+void Cy_Crypto_InvertEndianness(void *inArrPtr, uint32_t byteSize);
+
+/** \cond INTERNAL */
+/* For backward compatibility */
+#define Cy_Crypto_Rsa_InvertEndianness(p, s) Cy_Crypto_InvertEndianness((p), (s))
+/** \endcond */
 
 /** \} group_crypto_cli_functions */
 
