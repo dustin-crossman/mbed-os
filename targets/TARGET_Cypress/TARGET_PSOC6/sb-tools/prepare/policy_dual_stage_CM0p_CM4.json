@@ -7,7 +7,7 @@
             "key" : 5
         },
         "m4" : {
-            "permission" : "enabled",
+            "permission" : "allowed",
             "control" : "firmware",
             "key" : 5
         },

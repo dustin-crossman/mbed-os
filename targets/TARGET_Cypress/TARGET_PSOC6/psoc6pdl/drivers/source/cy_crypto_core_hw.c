@@ -46,7 +46,7 @@
  */
 const cy_stc_cryptoIP_t * cy_cryptoIP = NULL;
 
-static uint32_t  cy_cryptoVuMemSize = 0;
+static uint32_t  cy_cryptoVuMemSize = 0u;
 
 /* Platform and peripheral crypto block configuration */
 const cy_stc_cryptoIP_t cy_cryptoIpBlockCfgPSoC6_01 =
@@ -124,13 +124,15 @@ const cy_stc_cryptoIP_t cy_cryptoIpBlockCfgPSoC6_02 =
 *******************************************************************************/
 void Cy_Crypto_Core_Vu_RunInstr(CRYPTO_Type *base, bool blockingMode, uint32_t instr, uint32_t params)
 {
+    bool isRelocated = Cy_Crypto_Core_GetVuMemoryAddress(base) != REG_CRYPTO_MEM_BUFF(base);
+
     /* Check whether FIFO has enough space for 1 instruction */
     Cy_Crypto_Core_WaitForInstrFifoAvailable(base, CY_CRYPTO_INSTR_SINGLE);
 
     REG_CRYPTO_INSTR_FF_WR(base) = (uint32_t)((instr << CY_CRYPTO_OPCODE_POS) |
                                    (params));
 
-    if ( (blockingMode) || (Cy_Crypto_Core_GetVuMemoryAddress(base) != REG_CRYPTO_MEM_BUFF(base)) )
+    if ( (blockingMode) || (isRelocated) )
     {
         Cy_Crypto_Core_WaitForFifoAvailable(base);
         Cy_Crypto_Core_Vu_WaitForComplete(base);
@@ -184,7 +186,7 @@ void Cy_Crypto_Core_ClearVuRegisters(CRYPTO_Type *base)
 *******************************************************************************/
 void Cy_Crypto_Core_HwInit(void)
 {
-    cy_cryptoIP = (cy_device->cryptoVersion == 1u) ? &cy_cryptoIpBlockCfgPSoC6_01 : &cy_cryptoIpBlockCfgPSoC6_02;
+    cy_cryptoIP = (CY_CRYPTO_V1) ? &cy_cryptoIpBlockCfgPSoC6_01 : &cy_cryptoIpBlockCfgPSoC6_02;
 }
 
 /*******************************************************************************
@@ -283,7 +285,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_SetVuMemoryAddress(CRYPTO_Type *base,
 
             if (memFrameMask != 0xFFFFFFFFuL)
             {
-            	if (!(CY_CRYPTO_HW_V1))
+            	if (!(CY_CRYPTO_V1))
     			{
                     memAlignMask = vuMemSize - 1uL;
     			}
@@ -291,7 +293,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_SetVuMemoryAddress(CRYPTO_Type *base,
             	/* Use the new address when it aligned to appropriate memory block size */
     			if (((uint32_t)vuMemAddr & (memAlignMask)) == 0uL)
     			{
-    				if (!(CY_CRYPTO_HW_V1))
+    				if (!(CY_CRYPTO_V1))
     				{
     					REG_CRYPTO_VU_CTL2(base) = _VAL2FLD(CRYPTO_V2_VU_CTL2_MASK, memFrameMask);
     				}
@@ -331,7 +333,7 @@ uint32_t Cy_Crypto_Core_GetVuMemorySize(CRYPTO_Type *base)
 
     if ( (cy_cryptoIP != NULL) && (cy_cryptoVuMemSize != 0uL))
     {
-        if (CY_CRYPTO_HW_V1)
+        if (CY_CRYPTO_V1)
         {
             memSize = cy_cryptoVuMemSize;
         }
@@ -402,7 +404,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Enable(CRYPTO_Type *base)
 {
     Cy_Crypto_Core_HwInit();
 
-    if (CY_CRYPTO_HW_V1)
+    if (CY_CRYPTO_V1)
     {
         /* Enable Crypto HW */
         REG_CRYPTO_CTL(base) = (uint32_t)(_VAL2FLD(CRYPTO_CTL_PWR_MODE, CY_CRYPTO_PWR_MODE_ENABLED) |
@@ -479,7 +481,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_GetLibInfo(cy_en_crypto_lib_info_t *libInfo
 *******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_Core_Disable(CRYPTO_Type *base)
 {
-    if (CY_CRYPTO_HW_V1)
+    if (CY_CRYPTO_V1)
     {
         /* Disable Crypto HW */
         REG_CRYPTO_CTL(base) = (uint32_t)(_VAL2FLD(CRYPTO_CTL_PWR_MODE, CY_CRYPTO_PWR_MODE_OFF) |

@@ -46,7 +46,7 @@ void Cy_Crypto_Core_Vu_SetMemValue(CRYPTO_Type *base, uint32_t dstReg, uint8_t c
 
     Cy_Crypto_Core_Vu_WaitForComplete(base);
 
-    if (CY_CRYPTO_HW_V1)
+    if (CY_CRYPTO_V1)
     {
         CY_CRYPTO_VU_SAVE_REG(base, CY_CRYPTO_VU_HW_REG0, &reg0_data);
         CY_CRYPTO_VU_SAVE_REG(base, CY_CRYPTO_VU_HW_REG1, &reg1_data);
@@ -59,10 +59,10 @@ void Cy_Crypto_Core_Vu_SetMemValue(CRYPTO_Type *base, uint32_t dstReg, uint8_t c
     CY_ASSERT_L1(size <= Cy_Crypto_Core_Vu_RegBitSizeRead(base, dstReg));
     CY_ASSERT_L1( ((destAddr + byteSize) - 1u) < ((uint32_t)Cy_Crypto_Core_GetVuMemoryAddress(base) + Cy_Crypto_Core_GetVuMemorySize(base)));
 
-    Cy_Crypto_Core_MemSet(base, (void*)destAddr, 0u, CY_CRYPTO_WORD_SIZE_OF_BITS(size) * 4u);
+    Cy_Crypto_Core_MemSet(base, (void*)destAddr, 0u, (uint16_t)CY_CRYPTO_WORD_SIZE_OF_BITS(size) * 4u);
     Cy_Crypto_Core_MemCpy(base, (void*)destAddr, (const void*)src, byteSize);
 
-    if (CY_CRYPTO_HW_V1)
+    if (CY_CRYPTO_V1)
     {
         CY_CRYPTO_VU_RESTORE_REG(base, CY_CRYPTO_VU_HW_REG0, reg0_data);
         CY_CRYPTO_VU_RESTORE_REG(base, CY_CRYPTO_VU_HW_REG1, reg1_data);
@@ -76,7 +76,7 @@ void Cy_Crypto_Core_Vu_GetMemValue(CRYPTO_Type *base, uint8_t *dst, uint32_t src
 
     Cy_Crypto_Core_Vu_WaitForComplete(base);
 
-    if (CY_CRYPTO_HW_V1)
+    if (CY_CRYPTO_V1)
     {
         CY_CRYPTO_VU_SAVE_REG(base, CY_CRYPTO_VU_HW_REG0, &reg0_data);
         CY_CRYPTO_VU_SAVE_REG(base, CY_CRYPTO_VU_HW_REG1, &reg1_data);
@@ -91,7 +91,7 @@ void Cy_Crypto_Core_Vu_GetMemValue(CRYPTO_Type *base, uint8_t *dst, uint32_t src
 
     Cy_Crypto_Core_MemCpy(base, (void*)dst, (void*)dataAddr, byteSize);
 
-    if (CY_CRYPTO_HW_V1)
+    if (CY_CRYPTO_V1)
     {
         CY_CRYPTO_VU_RESTORE_REG(base, CY_CRYPTO_VU_HW_REG0, reg0_data);
         CY_CRYPTO_VU_RESTORE_REG(base, CY_CRYPTO_VU_HW_REG1, reg1_data);
@@ -121,7 +121,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_Cleanup(CRYPTO_Type *base)
     /* AES */
     REG_CRYPTO_AES_CTL(base)      = 0u;
 
-    if (CY_CRYPTO_HW_V1)
+    if (CY_CRYPTO_V1)
     {
         REG_CRYPTO_CRC_LFSR_CTL(base) = 0u;
         REG_CRYPTO_SHA_CTL(base)  = 0u;
@@ -204,9 +204,9 @@ bool Cy_Crypto_Core_Vu_IsRegLess(CRYPTO_Type *base, uint32_t srcReg0, uint32_t s
 
 void Cy_Crypto_Core_VU_RegInvertEndianness(CRYPTO_Type *base, uint32_t srcReg)
 {
-    uint32_t  dataSize = CY_CRYPTO_BYTE_SIZE_OF_BITS(Cy_Crypto_Core_Vu_RegBitSizeRead(base, srcReg));
+    uint32_t  byteSize = CY_CRYPTO_BYTE_SIZE_OF_BITS(Cy_Crypto_Core_Vu_RegBitSizeRead(base, srcReg));
     uint32_t *dataAddr = Cy_Crypto_Core_Vu_RegMemPointer(base, srcReg);
-    Cy_Crypto_Core_InvertEndianness(dataAddr, dataSize);
+    Cy_Crypto_Core_InvertEndianness(dataAddr, byteSize);
 }
 
 

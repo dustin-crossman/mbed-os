@@ -66,8 +66,9 @@ const cy_smpu_region_config_t sram_spm_smpu_config[] = {
         .regionSize = CY_PROT_SIZE_256KB, /* 0x40000 */
         /* 0xC7 - disable regions 0, 1, 2 (NSPE RAM) 6, 7 (FLASHBOOT)
            Range 0x08018000...0x08030000 are protected (SPE, CyBootloader) */
-        .subregions = (CY_PROT_SUBREGION_DIS7 | CY_PROT_SUBREGION_DIS6 | 
-                       CY_PROT_SUBREGION_DIS2 | CY_PROT_SUBREGION_DIS1 |
+        .subregions = (CY_PROT_SUBREGION_DIS7 |
+                       CY_PROT_SUBREGION_DIS6 |
+                       CY_PROT_SUBREGION_DIS1 |
                        CY_PROT_SUBREGION_DIS0),
         .userPermission = CY_PROT_PERM_DISABLED,
         .privPermission = CY_PROT_PERM_RWX,

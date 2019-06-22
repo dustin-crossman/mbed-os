@@ -279,6 +279,12 @@
 *         scenarios, it brings little benefit in adding this to the affected
 *         functions. </td>
 *   </tr>
+*   <tr>
+*     <td>20.6</td>
+*     <td>R</td>
+*     <td>The macro offsetof, in library <stddef.h>, shall not be used.</td>
+*     <td>The only HW block register offsets are defined using this macro.</td>
+*   </tr>
 * </table>
 *
 * \section group_crypto_changelog Changelog
@@ -715,7 +721,7 @@
 *
 * \note The <b>modulus</b> and <b>exponent</b> values in the
 * \ref cy_stc_crypto_rsa_pub_key_t must be in little-endian order.<br>
-* Use the \ref Cy_Crypto_Rsa_InvertEndianness function to convert to or from
+* Use the \ref Cy_Crypto_InvertEndianness function to convert to or from
 * little-endian order.
 *
 * The remaining fields represent three pre-calculated coefficients that can
@@ -738,11 +744,11 @@
 *   -# Calculate the SHA digest of the data to be verified with
 *      \ref Cy_Crypto_Sha_Run.
 *   -# Ensure that the RSA signature is in little-endian format.
-*      Use \ref Cy_Crypto_Rsa_InvertEndianness.
+*      Use \ref Cy_Crypto_InvertEndianness.
 *   -# Decrypt the RSA signature with a public key, by calling
 *      \ref Cy_Crypto_Rsa_Proc.
 *   -# Invert the byte order of the output, to return to big-endian format.
-*      Use \ref Cy_Crypto_Rsa_InvertEndianness.
+*      Use \ref Cy_Crypto_InvertEndianness.
 *   -# Call \ref Cy_Crypto_Rsa_Verify (which requires data in big-endian format).
 *
 * \section group_crypto_irq_implements Implementing Crypto Interrupts
@@ -1771,7 +1777,7 @@ cy_en_crypto_status_t Cy_Crypto_Tdes_Run(cy_en_crypto_dir_mode_t dirMode,
 * little-endian order.<br>
 * The <b>modulus</b> and <b>exponent</b> values in the \ref cy_stc_crypto_rsa_pub_key_t
 * must also be in little-endian order.<br>
-* Use \ref Cy_Crypto_Rsa_InvertEndianness function to convert to or from
+* Use \ref Cy_Crypto_InvertEndianness function to convert to or from
 * little-endian order.
 *
 * \param pubKey
@@ -1886,6 +1892,34 @@ cy_en_crypto_status_t Cy_Crypto_Rsa_Verify(cy_en_crypto_rsa_ver_result_t *verRes
                                            cy_stc_crypto_context_rsa_ver_t *cfContext);
 #endif /* #if (CPUSS_CRYPTO_SHA == 1) */
 
+/*******************************************************************************
+* Function Name: Cy_Crypto_ECDSA_SignHash
+****************************************************************************//**
+*
+* Sign a message digest.
+*
+* \param hash
+* The message digest to sign. Provided as is in data buffer.
+*
+* \param hashlen
+* The length of the digest in bytes.
+*
+* \param sig
+* [out] The destination for the signature, 'R' followed by 'S'.
+*
+* \param key
+* Key used for signature generation. See \ref cy_stc_crypto_ecc_key.
+*
+* \param messageKey
+* Message key.
+*
+* \param cfContext
+* The pointer to the \ref cy_stc_crypto_context_ecc_t structure that stores
+* the ECC operation context.
+*
+* \return status code. See \ref cy_en_crypto_status_t.
+*
+*******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_ECDSA_SignHash(const uint8_t *hash,
                                         uint32_t hashlen,
                                         uint8_t *sig,
@@ -1893,6 +1927,34 @@ cy_en_crypto_status_t Cy_Crypto_ECDSA_SignHash(const uint8_t *hash,
                                         const uint8_t *messageKey,
                                         cy_stc_crypto_context_ecc_t *cfContext);
 
+/*******************************************************************************
+* Function Name: Cy_Crypto_ECDSA_VerifyHash
+****************************************************************************//**
+*
+* Verify an ECC signature.
+*
+* \param sig
+* The signature to verify, 'R' followed by 'S'.
+*
+* \param hash
+* The message digest that was signed. Provided as is in data buffer.
+*
+* \param hashlen
+* The length of the digest in bytes.
+*
+* \param stat
+* Result of signature, 1==valid, 0==invalid.
+*
+* \param key
+* The corresponding public ECC key. See \ref cy_stc_crypto_ecc_key.
+*
+* \param cfContext
+* The pointer to the \ref cy_stc_crypto_context_ecc_t structure that stores
+* the ECC operation context.
+*
+* \return status code. See \ref cy_en_crypto_status_t.
+*
+*******************************************************************************/
 cy_en_crypto_status_t Cy_Crypto_ECDSA_VerifyHash(const uint8_t *sig,
                                         const uint8_t *hash,
                                         uint32_t hashlen,
@@ -1989,8 +2051,10 @@ cy_en_crypto_status_t Cy_Crypto_GetMemBufSize(uint32_t *membufSize,
 *******************************************************************************/
 void Cy_Crypto_InvertEndianness(void *inArrPtr, uint32_t byteSize);
 
+/** \cond INTERNAL */
 /* For backward compatibility */
 #define Cy_Crypto_Rsa_InvertEndianness(p, s) Cy_Crypto_InvertEndianness((p), (s))
+/** \endcond */
 
 /** \} group_crypto_cli_functions */
 

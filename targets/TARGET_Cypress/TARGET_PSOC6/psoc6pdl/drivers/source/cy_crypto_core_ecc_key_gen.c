@@ -163,7 +163,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO_Type *base,
             if ((bytesize * 8u) > bitsize)
             {
                 /* Shift random data right */
-                CY_CRYPTO_VU_SET_REG(base, p_temp, bytesize * 8u - bitsize, 1u);
+                CY_CRYPTO_VU_SET_REG(base, p_temp, (bytesize * 8u) - bitsize, 1u);
                 CY_CRYPTO_VU_LSR(base, p_key, p_key, p_temp);
             }
 
@@ -240,7 +240,8 @@ cy_en_crypto_status_t Cy_Crypto_Core_ECC_MakePublicKey(CRYPTO_Type *base,
 
     cy_stc_crypto_ecc_dp_type *eccDp = Cy_Crypto_Core_ECC_GetCurveParams(curveID);
 
-    if ((eccDp != NULL) && (privateKey != NULL) && (publicKey != NULL))
+    if ((eccDp != NULL) && (privateKey != NULL) && (publicKey != NULL) &&
+        (publicKey->pubkey.x != NULL) && (publicKey->pubkey.y != NULL))
     {
         uint32_t bitsize = eccDp->size;
 

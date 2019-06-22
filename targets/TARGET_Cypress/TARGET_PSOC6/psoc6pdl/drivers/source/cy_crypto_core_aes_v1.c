@@ -202,7 +202,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V1_Aes_Init(CRYPTO_Type *base,
                                                  cy_stc_crypto_aes_state_t *aesState,
 												 cy_stc_crypto_aes_buffers_t *aesBuffers)
 {
-    uint32_t keySize = CY_CRYPTO_AES_128_KEY_SIZE + ((uint32_t)keyLength * 8u);
+    uint16_t keySize = CY_CRYPTO_AES_128_KEY_SIZE + ((uint16_t)keyLength * 8u);
 
     aesState->keyLength = keyLength;
     aesState->buffers = aesBuffers;

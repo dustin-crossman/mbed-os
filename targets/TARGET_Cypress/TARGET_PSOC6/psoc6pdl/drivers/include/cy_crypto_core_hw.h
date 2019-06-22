@@ -375,7 +375,7 @@ __STATIC_INLINE void Cy_Crypto_Core_WaitForReady(CRYPTO_Type *base)
 __STATIC_INLINE void Cy_Crypto_Core_Vu_WaitForComplete(CRYPTO_Type *base)
 {
     /* Wait until the VU instruction is complete */
-    if (CY_CRYPTO_HW_V1)
+    if (CY_CRYPTO_V1)
     {
         while (0uL != _FLD2VAL(CRYPTO_STATUS_VU_BUSY, REG_CRYPTO_STATUS(base)))
         {
