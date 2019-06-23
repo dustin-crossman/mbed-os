@@ -5,7 +5,7 @@
 * PSoC6_01 device GPIO HAL header for 124-BGA-SIP package
 *
 * \note
-* Generator version: 1.4.7104.26717
+* Generator version: 1.4.7107.26790
 *
 ********************************************************************************
 * \copyright
@@ -170,6 +170,7 @@ extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inp_comp1[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_oa0_out_10x[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_oa1_out_10x[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_pads[8];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctdac_voutsw[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_dsi_ctb_cmp0[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_dsi_ctb_cmp1[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_sarmux_pads[8];

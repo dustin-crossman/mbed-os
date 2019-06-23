@@ -41,9 +41,9 @@
 #include "cyhal_pin_package.h"
 #include <stdbool.h>
 
-#if defined(CY8C6247BZI_D54) /* TODO: BSP-525 */
+#if defined(CYHAL_UDB_SDIO)
     #include "SDIO_HOST.h"
-#endif /* defined(CY8C6247BZI_D54) */
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,6 +73,10 @@ typedef struct {
     SAR_Type*                   base;
     cyhal_resource_inst_t       resource;
     cyhal_clock_divider_t       clock;
+    bool                        dedicated_clock;
+    // channel_used is a bit field. The maximum channel count 
+    // supported by the SAR IP is 16
+    uint16_t                    channel_used; 
 #else
     void *empty;
 #endif
@@ -83,6 +87,7 @@ typedef struct {
 #ifdef CY_IP_MXS40PASS_SAR
     cyhal_adc_t*                adc;
     cyhal_gpio_t                pin;
+    uint8_t                     channel_idx;
 #else
     void *empty;
 #endif
@@ -113,7 +118,6 @@ typedef struct {
     CTDAC_Type*                 base;
     cyhal_resource_inst_t       resource;
     cyhal_gpio_t                pin;
-    cyhal_clock_divider_t       clock;
 #else
     void *empty;
 #endif
@@ -290,8 +294,7 @@ typedef struct {
     uint32_t                    frequencyhal_hz;
     uint16_t                    block_size;
     uint32_t                    irq_cause;
-
-#elif defined(CY8C6247BZI_D54)
+#elif defined(CYHAL_UDB_SDIO)
     cyhal_resource_inst_t       resource;
     cyhal_gpio_t                pin_clk;
     cyhal_gpio_t                pin_cmd;

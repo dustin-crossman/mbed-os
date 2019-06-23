@@ -23,6 +23,7 @@
 * limitations under the License.
 *******************************************************************************/
 
+#include <string.h>
 #include "cy_smif.h"
 #include "cyhal_utils.h"
 #include "cyhal_qspi.h"

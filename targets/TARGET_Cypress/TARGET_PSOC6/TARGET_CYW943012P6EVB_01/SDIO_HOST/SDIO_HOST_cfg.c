@@ -1,7 +1,5 @@
 #include "SDIO_HOST_cfg.h"
 
-#if defined(CY8C6247BZI_D54) /* Cypress ticket: BSP-525 */
-
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -1016,7 +1014,5 @@ void SDIO_Host_Config_UDBs(void)
 #if defined(__cplusplus)
 }
 #endif
-
-#endif /* defined(CY8C6247BZI_D54) */
 
 /* [] END OF FILE */

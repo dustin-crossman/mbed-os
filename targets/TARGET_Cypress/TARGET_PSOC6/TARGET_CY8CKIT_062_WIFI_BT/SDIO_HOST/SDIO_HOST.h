@@ -26,7 +26,7 @@
 
 /**
 * \defgroup group_udb_sdio UDB_SDIO
-* \ingroup group_bsp_cy8kit_062_wifi_bt
+* \ingroup group_bsp
 * \{
 *  SDIO - Secure Digital Input Output Is a standard for communicating with various
     external devices such as Wifi and bluetooth devices. 
@@ -59,12 +59,12 @@
 *
 * \} group_udb_sdio_general_description
 */
-
+    
 #if !defined(CY_SDIO_H)
 #define CY_SDIO_H
 
 #include "SDIO_HOST_cfg.h"
-
+    
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -80,9 +80,9 @@ extern "C" {
 */
 
 #define SDIO_CMD_TIMEOUT                (100000u)    /**< Value used for firmware timeout*/
-#define SDIO_DAT_TIMEOUT                (500000u)    /**< Value used for firmware timeout*/
+#define SDIO_DAT_TIMEOUT                (500000u) /**< Value used for firmware timeout*/
 #define SDIO_SRC_CLK_FREQ_HZ            (10000000u)  /**< Frequency of CLK_PERI*/
-#define SDIO_ENABLE_CNT                 (0x20u)      /**< Bit to set in Aux Ctrl reg to enable 7 bit counters.*/
+#define SDIO_ENABLE_CNT                 (0x20u)     /**< Bit to set in Aux Ctrl reg to enable 7 bit counters.*/ 
 
 /*!
 \defgroup group_sdio_cmd_constants Constants for the command channel
@@ -151,8 +151,8 @@ typedef void (* sdio_card_int_cb_t)(void);
 */
 typedef enum en_sdio_event
 {
-    SdCmdEventCmdDone           = (1u),    /**< Check to see if a command is done*/
-    SdCmdEventTransferDone      = (2u)     /**< Check to see if a transfer is done*/
+    SdCmdEventCmdDone           = (1u),     /**< Check to see if a command is done*/         
+    SdCmdEventTransferDone      = (2u)      /**< Check to see if a transfer is done*/
     
 }en_sdio_event_t;
 
@@ -161,14 +161,14 @@ typedef enum en_sdio_event
 */
 typedef enum en_sdio_result
 {
-    Ok                = 0x00,     /**< No error*/ 
-    Error             = 0x01,     /**< Non-specific error code*/ 
-    CommandCrcError   = 0x02,     /**< There was a CRC error on the Command/Response*/ 
-    CommandIdxError   = 0x04,     /**< The index for the command didn't match*/ 
-    CommandEndError   = 0x08,     /**< There was an end bit error on the command*/ 
-    DataCrcError      = 0x10,     /**< There was a data CRC Error*/ 
-    CMDTimeout        = 0x20,     /**< The command didn't finish before the timeout period was over*/
-    DataTimeout       = 0x40,     /**< The data didn't finish before the timeout period was over*/
+    Ok                          = 0x00,     /**< No error*/ 
+    Error                       = 0x01,     /**< Non-specific error code*/ 
+    CommandCrcError             = 0x02,     /**< There was a CRC error on the Command/Response*/ 
+    CommandIdxError             = 0x04,     /**< The index for the command didn't match*/ 
+    CommandEndError             = 0x08,     /**< There was an end bit error on the command*/ 
+    DataCrcError                = 0x10,     /**< There was a data CRC Error*/ 
+    CMDTimeout                  = 0x20,     /**< The command didn't finish before the timeout period was over*/
+    DataTimeout                 = 0x40,     /**< The data didn't finish before the timeout period was over*/
     ResponseFlagError = 0x80      /**< There was an error in the response flag for command 53*/ 
     
 } en_sdio_result_t;
@@ -178,9 +178,9 @@ typedef enum en_sdio_result
 */
 typedef struct stc_sdcmd_event_flag
 {
-    uint8_t     u8CmdComplete;      /**< If non-zero a command has completed*/
-    uint8_t     u8TransComplete;    /**< If non-zero a transfer has completed*/
-    uint8_t     u8CRCError;         /**< If non-zero a CRC error was detected in a data transfer*/
+    uint8_t     u8CmdComplete;              /**< If non-zero a command has completed*/
+    uint8_t     u8TransComplete;            /**< If non-zero a transfer has completed*/
+    uint8_t     u8CRCError;                 /**< If non-zero a CRC error was detected in a data transfer*/
     
 }stc_sdio_event_flag_t;
 
@@ -189,7 +189,7 @@ typedef struct stc_sdcmd_event_flag
 */
 typedef struct stc_sdio_irq_cb
 {
-    sdio_card_int_cb_t pfnCardIntCb;     /**< Pointer to card interrupt callback function*/
+    sdio_card_int_cb_t pfnCardIntCb;            /**< Pointer to card interrupt callback function*/
 }stc_sdio_irq_cb_t;
 
 /**
@@ -197,8 +197,8 @@ typedef struct stc_sdio_irq_cb
 */
 typedef struct stc_sdio_gInternalData
 {
-    stc_sdio_irq_cb_t       pstcCallBacks;    /**< Holds pointers to all the call back functions*/
-    stc_sdio_event_flag_t   stcEvents;        /**< Holds all of the event count flags, set in interrupt used in check events*/
+    stc_sdio_irq_cb_t       pstcCallBacks;      /**< Holds pointers to all the call back functions*/
+    stc_sdio_event_flag_t   stcEvents;          /**< Holds all of the event count flags, set in interrupt used in check events*/
 }stc_sdio_gInternalData_t;
 
 /**
@@ -207,7 +207,7 @@ typedef struct stc_sdio_gInternalData
 typedef struct stc_sdio_cmd_config
 {
     uint8_t                 u8CmdIndex;           /**< Command index*/
-    uint32_t                u32Argument;          /**< The argument of command */
+    uint32_t                u32Argument;          /**< The argument of command */          
     uint8_t                 bResponseRequired;    /**< TRUE: A Response is required*/
     uint8_t                 *pu8ResponseBuf;      /**< Pointer to location to store response*/   
     
@@ -218,10 +218,10 @@ typedef struct stc_sdio_cmd_config
 */
 typedef struct stc_sdio_data_config
 {
-    uint8_t     bRead;            /**< TRUE: Read, FALSE: write*/
-    uint16_t    u16BlockSize;     /**< Block size*/
-    uint16_t    u16BlockCount;    /**< Holds the number of blocks to send*/
-    uint8_t     *pu8Data;         /**< Pointer data buffer*/
+    uint8_t     bRead;                    /**< TRUE: Read, FALSE: write*/
+    uint16_t    u16BlockSize;             /**< Block size*/
+    uint16_t    u16BlockCount;            /**< Holds the number of blocks to send*/
+    uint8_t     *pu8Data;                 /**< Pointer data buffer*/
     
 }stc_sdio_data_config_t;
 
@@ -230,13 +230,13 @@ typedef struct stc_sdio_data_config
 */
 typedef struct stc_sdio_cmd
 {
-    uint32_t     u32CmdIdx;        /**< Command index*/
-    uint32_t     u32Arg;           /**< The argument of command*/
-    uint32_t     *pu32Response;    /**< Pointer to location to store response*/
-    uint8_t      *pu8Data;         /**< Pointer data buffer*/
-    uint8_t      bRead;            /**< TRUE: Read, FALSE: write*/
-    uint16_t     u16BlockCnt;      /**< Number of blocks to send*/  
-    uint16_t     u16BlockSize;     /**< Block size*/
+    uint32_t                u32CmdIdx;          /**< Command index*/
+    uint32_t                u32Arg;             /**< The argument of command*/  
+    uint32_t                *pu32Response;      /**< Pointer to location to store response*/
+    uint8_t                 *pu8Data;           /**< Pointer data buffer*/
+    uint8_t                 bRead;              /**< TRUE: Read, FALSE: write*/
+    uint16_t                u16BlockCnt;        /**< Number of blocks to send*/  
+    uint16_t                u16BlockSize;       /**< Block size*/
 }stc_sdio_cmd_t;
 
 /** \} group_udb_sdio_data_structures */

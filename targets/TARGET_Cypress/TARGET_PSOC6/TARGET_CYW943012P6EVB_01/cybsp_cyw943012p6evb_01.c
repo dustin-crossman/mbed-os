@@ -53,6 +53,8 @@ cy_rslt_t cybsp_init(void)
        when starting up WiFi. */
     if (CY_RSLT_SUCCESS == result)
     {
+        /* TODO: Routing should be part of the UDB SDIO once HAL APIs are available for it. */
+        init_cycfg_routing();
         result = cybsp_sdio_init();
     }
 #endif
