@@ -13,13 +13,14 @@
 * the software package with which this file was provided.
 *******************************************************************************/
 #include "SDIO_HOST.h"
-#include "cmsis_os2.h"
-#if defined(CY8C6247BZI_D54) /* Cypress ticket: BSP-525 */
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
-#define SEMAPHORE
+
+#ifdef SEMAPHORE
+#include "cmsis_os2.h"
+#endif
 
 
 /*Globals Needed for DMA */
@@ -86,7 +87,7 @@ void SDIO_Init(stc_sdio_irq_cb_t* pfuCb)
     SDIO_SetNumBlocks(1);
 
     /*Enable SDIO ISR*/
-    NVIC_EnableIRQ(SDIO_HOST_sdio_int__INTC_NUMBER);
+    NVIC_EnableIRQ((IRQn_Type) SDIO_HOST_sdio_int__INTC_NUMBER);
 
     /*Enable the Status Reg to generate an interrupt*/
     SDIO_STATUS_AUX_CTL |= (0x10);
@@ -117,13 +118,13 @@ void SDIO_Init(stc_sdio_irq_cb_t* pfuCb)
     SDIO_WRITE_CRC_CNT_CONTROL_REG  |=  SDIO_ENABLE_CNT;
     SDIO_CRC_BIT_CNT_CONTROL_REG    |=  SDIO_ENABLE_CNT;
     SDIO_BYTE_CNT_CONTROL_REG       |=  SDIO_ENABLE_CNT;
-
+    
     /*Set block byte count to 64, this will be changed later */
     SDIO_SetBlockSize(64);
-    
+
     /*Set the read and write FIFOs to use the half full status*/
     (*(reg32 *) SDIO_HOST_bSDIO_Write_DP__DP_AUX_CTL_REG) |= 0x0c;
-    (*(reg32 *) SDIO_HOST_bSDIO_Read_DP__DP_AUX_CTL_REG) |= 0x0c;
+    (*(reg32 *) SDIO_HOST_bSDIO_Read_DP__DP_AUX_CTL_REG)  |= 0x0c;
 
     /*Set clock to 400k, and enable it*/
     SDIO_SetSdClkFrequency(400000);
@@ -173,7 +174,7 @@ void SDIO_SendCommand(stc_sdio_cmd_config_t *pstcCmdConfig)
     /*If a response is expected setup DMA to receive the response*/
     if(pstcCmdConfig->bResponseRequired == true)
     {
-         /*Clear the flag in hardware that says skip response*/
+        /*Clear the flag in hardware that says skip response*/
         SDIO_CONTROL_REG &= ~SDIO_CTRL_SKIP_RESPONSE;
 
         /*Set the destination address*/
@@ -325,9 +326,9 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
         Cy_DMA_Channel_Disable(SDIO_HOST_Write_DMA_HW, SDIO_HOST_Write_DMA_DW_CHANNEL );
 
         /*Clear any pending interrupts in the DMA*/
-        Cy_DMA_Channel_ClearInterrupt(SDIO_HOST_Read_DMA_HW,SDIO_HOST_Read_DMA_DW_CHANNEL);
-        //TODO: Don't hardcode this
-        NVIC_ClearPendingIRQ((IRQn_Type)69);
+        Cy_DMA_Channel_ClearInterrupt(SDIO_HOST_Read_DMA_HW, SDIO_HOST_Read_DMA_DW_CHANNEL);
+
+        NVIC_ClearPendingIRQ((IRQn_Type) SDIO_HOST_Read_Int_INTC_NUMBER);
 
         /*setup the destination addresses*/
         readDesr0.dst = (uint32_t)(pstcDataConfig->pu8Data);
@@ -374,7 +375,7 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
             readDesr0.ctl |= 0x01000000;
 
             /*Disable Interrupt*/
-            NVIC_DisableIRQ((IRQn_Type)69);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Read_Int_INTC_NUMBER);
         }
         else if(dataSize <=2048)
         {
@@ -397,7 +398,7 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
             readDesr1.ctl |= 0x01000000;
 
             /*Disable Interrupt*/
-            NVIC_DisableIRQ((IRQn_Type)69);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Read_Int_INTC_NUMBER);
         }
         else /*dataSize must be greater than 2048*/
         {
@@ -430,7 +431,7 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
             yCounts -= 2;
 
             /*Enable DMA interrupt*/
-            NVIC_EnableIRQ((IRQn_Type)69);
+            NVIC_EnableIRQ((IRQn_Type) SDIO_HOST_Read_Int_INTC_NUMBER);
         }
 
         /*Initialize the channel with the first descriptor*/
@@ -447,15 +448,13 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
     /*Otherwise it is a write*/
     else
     {
-
         /*First disable the Read channel*/
         Cy_DMA_Channel_Disable(SDIO_HOST_Read_DMA_HW, SDIO_HOST_Read_DMA_DW_CHANNEL );
 
         /*Clear any pending interrupts in the DMA*/
-        Cy_DMA_Channel_ClearInterrupt(SDIO_HOST_Write_DMA_HW,SDIO_HOST_Write_DMA_DW_CHANNEL);
+        Cy_DMA_Channel_ClearInterrupt(SDIO_HOST_Write_DMA_HW, SDIO_HOST_Write_DMA_DW_CHANNEL);
 
-        //TODO: Remove hardcoded number
-        NVIC_ClearPendingIRQ((IRQn_Type)67);
+        NVIC_ClearPendingIRQ((IRQn_Type) SDIO_HOST_Write_Int_INTC_NUMBER);
 
         /*setup the SRC addresses*/
         writeDesr0.src = (uint32_t)(pstcDataConfig->pu8Data);
@@ -481,7 +480,7 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
             writeDesr0.ctl |= 0x01000000;
 
             /*Disable Interrupt*/
-            NVIC_DisableIRQ((IRQn_Type)67);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Write_Int_INTC_NUMBER);
         }
         else if(dataSize <=2048)
         {
@@ -504,7 +503,7 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
             writeDesr1.ctl |= 0x01000000;
 
             /*Disable Interrupt*/
-            NVIC_DisableIRQ((IRQn_Type)67);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Write_Int_INTC_NUMBER);
         }
         else /*dataSize must be greater than 2048*/
         {
@@ -537,7 +536,7 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
             yCounts -= 2;
 
             /*Enable DMA interrupt*/
-            NVIC_EnableIRQ((IRQn_Type)67);
+            NVIC_EnableIRQ((IRQn_Type) SDIO_HOST_Write_Int_INTC_NUMBER);
         }
 
         /*Initialize the channel with the first descriptor*/
@@ -566,7 +565,7 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
     /*Store the command and data configurations*/
     stc_sdio_cmd_config_t   stcCmdConfig;
     stc_sdio_data_config_t  stcDataConfig;
-
+    
 #ifdef SEMAPHORE
     en_sdio_result_t result;
 #endif
@@ -579,11 +578,11 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
 #ifndef SEMAPHORE_CMD
     uint32_t u32CmdTimeout = 0;
 #endif
-
+    
     /*Returns from various function calls*/
     en_sdio_result_t enRet = Error;
     en_sdio_result_t enRetTmp = Ok;
-
+    
     /*Hold value of if these checks are needed*/
     uint8_t             bCmdIndexCheck;       
     uint8_t             bCmdCrcCheck; 
@@ -625,7 +624,6 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
         stcCmdConfig.pu8ResponseBuf = u8responseBuf;
     }
     
-
     /*Check if the command is 53, if it is then setup the data transfer*/
     if(pstcCmd->u32CmdIdx == 53)
     { 
@@ -700,7 +698,7 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                         }
 
 #ifndef SEMAPHORE
-                         /*Wait for the transfer to finish*/
+                        /*Wait for the transfer to finish*/
                         do
                         {
 
@@ -749,14 +747,13 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
 
 
 #ifndef SEMAPHORE
-    u32Timeout = 0;
+     u32Timeout = 0;
 #endif
-
+    
     /*If there were no errors then indicate transfer was okay*/
     if(enRet == Error)
     {
         enRet = Ok;
-
     }
 
     /*reset CmdTimeout value*/
@@ -791,11 +788,10 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
 *******************************************************************************/
 en_sdio_result_t SDIO_CheckForEvent(en_sdio_event_t enEventType)
 {
-
     en_sdio_result_t  enRet      = Error;
 
     /*Disable Interrupts while modifying the global*/
-    NVIC_DisableIRQ(SDIO_HOST_sdio_int__INTC_NUMBER);
+    NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_sdio_int__INTC_NUMBER);
     
     /*Switch the event to check*/
     switch ( enEventType )
@@ -826,7 +822,7 @@ en_sdio_result_t SDIO_CheckForEvent(en_sdio_event_t enEventType)
     }
      
     /*Re-enable Interrupts*/
-    NVIC_EnableIRQ(SDIO_HOST_sdio_int__INTC_NUMBER);
+    NVIC_EnableIRQ((IRQn_Type) SDIO_HOST_sdio_int__INTC_NUMBER);
     return enRet;
 }
 
@@ -981,6 +977,7 @@ void SDIO_EnableSdClk(void)
     SDIO_CONTROL_REG |= SDIO_CTRL_SD_CLK;
 }
 
+
 /*******************************************************************************
 * Function Name: SDIO_DisableSdClk
 ****************************************************************************//**
@@ -1090,7 +1087,7 @@ void SDIO_SetupDMA(void)
 
     /*Enable the interrupt*/
     Cy_DMA_Channel_SetInterruptMask(SDIO_HOST_Write_DMA_HW, SDIO_HOST_Write_DMA_DW_CHANNEL,CY_DMA_INTR_MASK);
-
+    
     /*Enable DMA block*/
     Cy_DMA_Enable(SDIO_HOST_Write_DMA_HW);
 
@@ -1178,7 +1175,7 @@ void SDIO_IRQ(void)
     {
         if(NULL != gstcInternalData.pstcCallBacks.pfnCardIntCb)
         {
-            gstcInternalData.pstcCallBacks.pfnCardIntCb();
+              gstcInternalData.pstcCallBacks.pfnCardIntCb();
         }
     }
     
@@ -1195,7 +1192,7 @@ void SDIO_IRQ(void)
         /*Clear the Write flag and CMD53 flag*/
         SDIO_CONTROL_REG &= ~(SDIO_CTRL_ENABLE_WRITE | SDIO_CTRL_ENABLE_INT);
 
-        /*Check if this is CRC status return was bad*/
+        /*Check if the CRC status return was bad*/
         if(u8Status & SDIO_STS_CRC_ERR )
         {
             /*CRC was bad, set the flag*/
@@ -1229,7 +1226,7 @@ void SDIO_IRQ(void)
 #endif
     }
 
-    NVIC_ClearPendingIRQ(SDIO_HOST_sdio_int__INTC_NUMBER);
+    NVIC_ClearPendingIRQ((IRQn_Type) SDIO_HOST_sdio_int__INTC_NUMBER);
 }
 
 
@@ -1249,7 +1246,7 @@ void SDIO_READ_DMA_IRQ(void)
             /* In this case all we need to change is the next descriptor and disable*/
             readDesr1.nextPtr = 0;
             readDesr1.ctl |= 0x01000000;
-            NVIC_DisableIRQ((IRQn_Type)69);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Read_Int_INTC_NUMBER);
         }
         else if(yCounts == 0 && (yCountRemainder > 0))
         {
@@ -1259,14 +1256,14 @@ void SDIO_READ_DMA_IRQ(void)
             /*Also change the yCount*/
             readDesr1.yCtl = _VAL2FLD(CY_DMA_CTL_COUNT, (yCountRemainder-1)) |
                                     _VAL2FLD(CY_DMA_CTL_DST_INCR, 2);
-            NVIC_DisableIRQ((IRQn_Type)69);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Read_Int_INTC_NUMBER);
         }
     }
 
     /*If the current descriptor is 1, then change descriptor 0*/
     if(Cy_DMA_Channel_GetCurrentDescriptor(SDIO_HOST_Read_DMA_HW, SDIO_HOST_Read_DMA_DW_CHANNEL) == &readDesr1)
     {
-        /*We need to increment the destination address every-time*/
+        /*We need to increment the destination address everytime*/
         readDesr0.dst += 2048;
 
         /*If this is the last descriptor*/
@@ -1275,7 +1272,7 @@ void SDIO_READ_DMA_IRQ(void)
             /* In this case all we need to change is the next descriptor and disable*/
             readDesr0.nextPtr = 0;
             readDesr0.ctl |= 0x01000000;
-            NVIC_DisableIRQ((IRQn_Type)69);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Read_Int_INTC_NUMBER);
         }
         else if(yCounts == 0 && (yCountRemainder > 0))
         {
@@ -1285,12 +1282,12 @@ void SDIO_READ_DMA_IRQ(void)
             /*Also change the yCount*/
             readDesr0.yCtl = _VAL2FLD(CY_DMA_CTL_COUNT, (yCountRemainder-1)) |
                                     _VAL2FLD(CY_DMA_CTL_DST_INCR, 2);
-            NVIC_DisableIRQ((IRQn_Type)69);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Read_Int_INTC_NUMBER);
         }
     }
 
     /*Clear the interrupt*/
-    Cy_DMA_Channel_ClearInterrupt(SDIO_HOST_Read_DMA_HW,SDIO_HOST_Read_DMA_DW_CHANNEL);
+    Cy_DMA_Channel_ClearInterrupt(SDIO_HOST_Read_DMA_HW, SDIO_HOST_Read_DMA_DW_CHANNEL);
     /*decrement y counts*/
     yCounts--;
 }
@@ -1303,7 +1300,7 @@ void SDIO_WRITE_DMA_IRQ(void)
     /*If the current descriptor is 0, then change descriptor 1*/
     if(Cy_DMA_Channel_GetCurrentDescriptor(SDIO_HOST_Write_DMA_HW, SDIO_HOST_Write_DMA_DW_CHANNEL) == &writeDesr0)
     {
-        /*We also need to increment the destination address*/
+        /*We also need to increment the destination address every-time*/
         writeDesr1.src += 2048;
 
         /*If this is the last descriptor*/
@@ -1312,7 +1309,7 @@ void SDIO_WRITE_DMA_IRQ(void)
             /* In this case all we need to change is the next descriptor and disable*/
             writeDesr1.nextPtr = 0;
             writeDesr1.ctl |= 0x01000000;
-            NVIC_DisableIRQ((IRQn_Type)67);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Write_Int_INTC_NUMBER);
 
         }
         else if(yCounts == 0 && (yCountRemainder > 0))
@@ -1323,8 +1320,9 @@ void SDIO_WRITE_DMA_IRQ(void)
             /*Also change the yCount*/
             writeDesr1.yCtl = _VAL2FLD(CY_DMA_CTL_COUNT, (yCountRemainder -1)) |
                                     _VAL2FLD(CY_DMA_CTL_SRC_INCR, 2);
-            NVIC_DisableIRQ((IRQn_Type)67);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Write_Int_INTC_NUMBER);
         }
+
     }
 
     /*If the current descriptor is 1, then change descriptor 0*/
@@ -1338,7 +1336,7 @@ void SDIO_WRITE_DMA_IRQ(void)
             /* In this case all we need to change is the next descriptor and disable*/
             writeDesr0.nextPtr = 0;
             writeDesr0.ctl |= 0x01000000;
-            NVIC_DisableIRQ((IRQn_Type)67);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Write_Int_INTC_NUMBER);
         }
         else if(yCounts == 0 && (yCountRemainder > 0))
         {
@@ -1348,15 +1346,16 @@ void SDIO_WRITE_DMA_IRQ(void)
             /*Also change the yCount*/
             writeDesr0.yCtl = _VAL2FLD(CY_DMA_CTL_COUNT, (yCountRemainder -1)) |
                                     _VAL2FLD(CY_DMA_CTL_SRC_INCR, 2);
-            NVIC_DisableIRQ((IRQn_Type)67);
+            NVIC_DisableIRQ((IRQn_Type) SDIO_HOST_Write_Int_INTC_NUMBER);
         }
     }
 
     /*Clear the interrupt*/
-    Cy_DMA_Channel_ClearInterrupt(SDIO_HOST_Write_DMA_HW,SDIO_HOST_Write_DMA_DW_CHANNEL);
+    Cy_DMA_Channel_ClearInterrupt(SDIO_HOST_Write_DMA_HW, SDIO_HOST_Write_DMA_DW_CHANNEL);
     yCounts--;
 }
 
+#ifdef SEMAPHORE
 
 /**
  * Creates a semaphore
@@ -1473,7 +1472,7 @@ en_sdio_result_t cy_rtos_deinit_semaphore(cy_semaphore_t *semaphore)
     return Ok;
 }
 
-#endif /* defined(CY8C6247BZI_D54) */
+#endif // SEMAPHORE
 
 #if defined(__cplusplus)
 }

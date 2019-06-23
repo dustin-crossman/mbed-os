@@ -1,9 +1,9 @@
 /***************************************************************************//**
-* \file cybsp_cy8ckit_062_ble.c
+* \file cyhal_analog_common.c
 *
-* Description:
-* Provides APIs for interacting with the hardware contained on the Cypress
-* CY8CKIT-062-BLE pioneer kit.
+* \brief
+* Provides common functionality that needs to be shared among all drivers that
+* interact with the Programmable Analog Subsystem.
 *
 ********************************************************************************
 * \copyright
@@ -23,42 +23,41 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include <stdlib.h>
-#include "cybsp_cy8ckit_062_ble.h"
-#include "cyhal_implementation.h"
-#include "cycfg.h"
+#include "cy_pdl.h"
+
+#if defined(CY_IP_MXS40PASS_INSTANCES)
 
 #if defined(__cplusplus)
-extern "C" {
-#endif
-
-cy_rslt_t cybsp_init(void)
+extern "C"
 {
-	init_cycfg_system();
-
-    cy_rslt_t result = CY_RSLT_SUCCESS;
-    /* Initialize User LEDs */
-    result |= cybsp_led_init(CYBSP_LED_RGB_RED);
-    result |= cybsp_led_init(CYBSP_LED_RGB_BLUE);
-    result |= cybsp_led_init(CYBSP_LED_RGB_GREEN);
-    result |= cybsp_led_init(CYBSP_USER_LED0);
-    result |= cybsp_led_init(CYBSP_USER_LED1);
-    /* Initialize User Buttons */
-    result |= cybsp_btn_init(CYBSP_USER_BTN0);
-
-    CY_ASSERT(CY_RSLT_SUCCESS == result);
-
-#if defined(CYBSP_RETARGET_ENABLED)
-    /* Initialize retargetting stdio to 'DEBUG_UART' peripheral */
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cybsp_retarget_init();
-    }
 #endif
 
-    return result;
+static uint16_t cyhal_analog_ref_count = 0;
+
+void cyhal_analog_init()
+{
+    if(cyhal_analog_ref_count == 0)
+    {
+        Cy_SysAnalog_Init(&Cy_SysAnalog_Fast_Local);
+        Cy_SysAnalog_Enable();
+    }
+
+    ++cyhal_analog_ref_count;
+}
+
+void cyhal_analog_free()
+{
+    CY_ASSERT(cyhal_analog_ref_count > 0);
+    --cyhal_analog_ref_count;
+    if(cyhal_analog_ref_count)
+    {
+        Cy_SysAnalog_Disable();
+        Cy_SysAnalog_DeInit();
+    }
 }
 
 #if defined(__cplusplus)
 }
 #endif
+
+#endif /* defined(CY_IP_MXS40PASS_INSTANCES) */

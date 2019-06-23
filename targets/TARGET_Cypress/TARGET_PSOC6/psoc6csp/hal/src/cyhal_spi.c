@@ -24,6 +24,7 @@
 *******************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 #include "cyhal_implementation.h"
 
 #ifdef CY_IP_MXSCB

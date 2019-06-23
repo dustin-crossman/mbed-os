@@ -56,6 +56,7 @@ extern "C" {
 enum cyhal_rslt_module_chip
 {
     CYHAL_RSLT_MODULE_CHIP_HWMGR = CY_RSLT_MODULE_ABSTRACTION_HAL_BASE, //!< An error occurred in hardware management module
+    CYHAL_RSLT_MODULE_ADC,                                              //!< An error occurred in ADC module
     CYHAL_RSLT_MODULE_COMP,                                             //!< An error occurred in comparator module
     CYHAL_RSLT_MODULE_CRC,                                              //!< An error occurred in crypto CRC module
     CYHAL_RSLT_MODULE_DAC,                                              //!< An error occurred in DAC module
