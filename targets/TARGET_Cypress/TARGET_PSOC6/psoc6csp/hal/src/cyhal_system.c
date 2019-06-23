@@ -173,6 +173,17 @@ cy_rslt_t try_set_pll(uint8_t clock, uint8_t pll, uint32_t target_freq)
     return rslt;
 }
 
+/* This should be part of the PDL */
+static inline bool Cy_SysClk_ClkHfIsEnabled(uint32_t clkHf)
+{
+    bool retVal = false;
+    if (clkHf < CY_SRSS_NUM_HFROOT)
+    {
+        retVal = _FLD2BOOL(SRSS_CLK_ROOT_SELECT_ENABLE, SRSS_CLK_ROOT_SELECT[clkHf]);
+    }
+    return (retVal);
+}
+
 cy_rslt_t cyhal_system_clock_frequency(uint8_t clock, uint32_t frequencyhal_hz)
 {
     cy_en_clkhf_in_sources_t path = Cy_SysClk_ClkHfGetSource((uint32_t)clock);
@@ -193,11 +204,12 @@ cy_rslt_t cyhal_system_clock_frequency(uint8_t clock, uint32_t frequencyhal_hz)
         return rslt;
     }
 
-    if (fll_pll_used == 0)
+    bool enabled = Cy_SysClk_ClkHfIsEnabled(clock);
+    if (enabled && fll_pll_used == 0)
     {
         return try_set_fll(clock, frequencyhal_hz);
     }
-    else if (fll_pll_used <= SRSS_NUM_PLL)
+    else if (enabled && fll_pll_used <= SRSS_NUM_PLL)
     {
         return try_set_pll(clock, fll_pll_used, frequencyhal_hz);
     }
@@ -222,11 +234,15 @@ cy_rslt_t cyhal_system_clock_frequency(uint8_t clock, uint32_t frequencyhal_hz)
                 rslt = CYHAL_SYSTEM_RSLT_UNABLE_TO_SET_CLK_FREQ;
             }
 
+            if (!enabled && rslt == CY_RSLT_SUCCESS)
+            {
+                rslt = Cy_SysClk_ClkHfEnable(clock);
+            }
+
             if (rslt != CY_RSLT_SUCCESS)
             {
                 cyhal_hwmgr_free(&inst);
             }
-
         }
     }
     return rslt;
