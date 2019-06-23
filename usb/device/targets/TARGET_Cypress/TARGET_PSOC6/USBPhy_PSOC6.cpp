@@ -18,6 +18,8 @@
 #include "USBPhyHw.h"
 #include "mbed_assert.h"
 
+#if defined(DEVICE_USBDEVICE)
+
 #define USB_EP_ATTR_DATA_EP             (USB_EP_ATTR_ALLOW_BULK | USB_EP_ATTR_ALLOW_INT | USB_EP_ATTR_ALLOW_ISO)
 #define USB_EP_ATTR_NON_ISO             (USB_EP_ATTR_ALLOW_BULK | USB_EP_ATTR_ALLOW_INT)
 #define USB_DEV_EP_NON_ISOC_MAX_PACKET  (64U)
@@ -380,3 +382,5 @@ void USBPhyHw::_usbisr(void)
     cyhal_usb_dev_irq_enable(hal_obj, false);
     instance->events->start_process();
 }
+
+#endif /* (DEVICE_USBDEVICE) */
