@@ -17,7 +17,10 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
-#define SEMAPHORE
+
+#ifdef SEMAPHORE
+#include "cmsis_os2.h"
+#endif
 
 
 /*Globals Needed for DMA */
@@ -1352,6 +1355,7 @@ void SDIO_WRITE_DMA_IRQ(void)
     yCounts--;
 }
 
+#ifdef SEMAPHORE
 
 /**
  * Creates a semaphore
@@ -1467,6 +1471,8 @@ en_sdio_result_t cy_rtos_deinit_semaphore(cy_semaphore_t *semaphore)
 
     return Ok;
 }
+
+#endif // SEMAPHORE
 
 #if defined(__cplusplus)
 }

@@ -8453,7 +8453,7 @@
             "CYW43012",
             "CORDIO"
         ],
-        "macros_add": ["CY8C6247BZI_D54", "CYHAL_UDB_SDIO"],
+        "macros_add": ["CY8C6247BZI_D54", "CYHAL_UDB_SDIO", "SEMAPHORE"],
         "detect_code": ["1906"],
         "post_binary_hook": {
             "function": "PSOC6Code.complete"
