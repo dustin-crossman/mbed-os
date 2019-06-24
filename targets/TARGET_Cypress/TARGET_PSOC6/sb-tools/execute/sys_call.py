@@ -223,7 +223,7 @@ def transition_to_secure(tool, blow_secure_efuse):
     # Set RAM address and Opcode
     tool.write32(CYREG_IPC2_STRUCT_DATA, ENTRANCE_EXAM_SRAM_ADDR)
     print('enable_blowing_secure =', enable_blowing_secure)
-    tool.write32(ENTRANCE_EXAM_SRAM_ADDR, (TRANSISION_TO_SECURE_OPCODE << 24) + (enable_blowing_secure << 16) + 0)
+    tool.write32(ENTRANCE_EXAM_SRAM_ADDR, (TRANSISION_TO_SECURE_OPCODE << 24) + (enable_blowing_secure << 16))
     scratch_addr = ENTRANCE_EXAM_SRAM_ADDR + 0x08
     tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x04, scratch_addr)
     tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x08, 0)
@@ -238,13 +238,10 @@ def transition_to_secure(tool, blow_secure_efuse):
 
     response = tool.read32(ENTRANCE_EXAM_SRAM_ADDR)
     if response & 0xFF000000 == 0xa0000000:
-
-        print(hex(response))
-
         # # Read region_hash values from application
-        scratch_addr  = tool.read32(ENTRANCE_EXAM_SRAM_ADDR + 0x04)
-        read_hash_size = tool.read32(scratch_addr+0x00)
-        read_hash_addr = tool.read32(scratch_addr+0x04)
+        scratch_addr = tool.read32(ENTRANCE_EXAM_SRAM_ADDR + 0x04)
+        read_hash_size = tool.read32(scratch_addr + 0x00)
+        read_hash_addr = tool.read32(scratch_addr + 0x04)
         response = ''
 
         i = 0
@@ -253,10 +250,7 @@ def transition_to_secure(tool, blow_secure_efuse):
             hash_byte_chr = chr(tool.read8(read_hash_addr + i))
             response += hash_byte_chr
             i += 1
-        response = response.strip()
-        print(response)
-
-
+        print('response =', response.strip())
         print('Transition to Secure complete')
         return True
     else:

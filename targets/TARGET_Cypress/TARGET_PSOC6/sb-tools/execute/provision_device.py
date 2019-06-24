@@ -76,12 +76,13 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, pro
         tool.program(cy_bootloader_hex)
 
     if protection_state != ProtectionState.secure:
+        print(os.linesep + 'Run transition to secure:')
         is_exam_pass = transition_to_secure(tool, False)
 
     if is_exam_pass:
-        print(os.linesep + 'Run provisioning syscall')
+        print(os.linesep + 'Run provisioning syscall:')
         # Set a value indicating whether to convert device to SECURE CLAIMED mode
-        blow_secure_fuse = 1 if protection_state == ProtectionState.secure else 0
+        blow_secure_fuse = 1 if protection_state == ProtectionState.secure else 2
         is_exam_pass = provision_keys_and_policies(tool, blow_secure_fuse, os.path.join(prov_cmd_jwt))
         print(hex(NVSTORE_AREA_1_ADDRESS) + ': ', sep=' ', end='', flush=True)
         if is_exam_pass:
@@ -93,12 +94,12 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, pro
         else:
             print('FAIL: Unexpected ProvisionKeysAndPolicies syscall response')
 
-    if is_exam_pass:
-        is_exam_pass, pub_key = get_prov_det_noprint(tool, 1);
-        if is_exam_pass:
-            print('Device public key has been read successfully.')
-        else:
-            print('FAIL: Cannot read device public key.')
+    # if protection_state != ProtectionState.secure and is_exam_pass:
+    #     is_exam_pass, pub_key = get_prov_det_noprint(tool, 1);
+    #     if is_exam_pass:
+    #         print('Device public key has been read successfully.')
+    #     else:
+    #         print('FAIL: Cannot read device public key.')
 
     if is_exam_pass:
         print('*****************************************')
