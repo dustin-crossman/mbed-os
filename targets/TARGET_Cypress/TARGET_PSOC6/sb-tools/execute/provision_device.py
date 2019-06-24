@@ -17,7 +17,7 @@ import os
 from time import sleep
 from execute.helper import check_mode
 from execute.enums import ProtectionState
-from execute.sys_call import get_prov_details, provision_keys_and_policies, transition_to_secure, get_prov_det_noprint
+from execute.sys_call import get_prov_details, provision_keys_and_policies, transition_to_secure
 from execute.p6_memory_map import FLASH_ADDRESS, CY_BOOTLOADER_SIZE, PROVISION_JWT_PACKET_ADDRESS, \
     PROVISION_JWT_PACKET_SIZE
 from execute.gen_data_from_json import ENTRANCE_EXAM_FW_STATUS_REG, ENTRANCE_EXAM_FW_STATUS_MASK, \
@@ -93,13 +93,6 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, pro
             print(os.linesep)
         else:
             print('FAIL: Unexpected ProvisionKeysAndPolicies syscall response')
-
-    # if protection_state != ProtectionState.secure and is_exam_pass:
-    #     is_exam_pass, pub_key = get_prov_det_noprint(tool, 1);
-    #     if is_exam_pass:
-    #         print('Device public key has been read successfully.')
-    #     else:
-    #         print('FAIL: Cannot read device public key.')
 
     if is_exam_pass:
         print('*****************************************')

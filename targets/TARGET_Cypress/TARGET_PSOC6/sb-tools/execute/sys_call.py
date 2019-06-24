@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import os
-from execute.gen_data_from_json import ENTRANCE_EXAM_SRAM_ADDR, ENTRANCE_EXAM_SRAM_SIZE
+from execute.gen_data_from_json import ENTRANCE_EXAM_SRAM_ADDR, ENTRANCE_EXAM_SRAM_SIZE, ENTRANCE_EXAM_FW_STATUS_REG
 from execute.p6_reg import CYREG_IPC2_STRUCT_ACQUIRE, CYREG_IPC2_STRUCT_DATA, CYREG_IPC2_STRUCT_NOTIFY, \
     CYREG_IPC2_STRUCT_LOCK_STATUS
 
@@ -195,6 +195,9 @@ def provision_keys_and_policies(tool, blow_secure_efuse, filename):
         i += 4
     print(os.linesep)
 
+    fb_firmware_status = tool.read32(ENTRANCE_EXAM_FW_STATUS_REG)
+    print(f'FB Firmware status = {hex(fb_firmware_status)}')
+
     response = tool.read32(ENTRANCE_EXAM_SRAM_ADDR)
     result = (response & 0xFF000000) == 0xa0000000
 
@@ -258,57 +261,3 @@ def transition_to_secure(tool, blow_secure_efuse):
         print(hex(CYREG_IPC2_STRUCT_DATA), hex(tool.read32(CYREG_IPC2_STRUCT_DATA)))
         print(hex(ENTRANCE_EXAM_SRAM_ADDR), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR)))
         return False
-
-
-def get_prov_det_noprint(tool, key_id):
-    print(hex(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED))
-
-    op_code = GET_OPCODE << 24
-    # Acquire IPC structure
-    tool.write32(CYREG_IPC2_STRUCT_ACQUIRE, 0x80000000)
-    ipc_acquire = 0
-    while (ipc_acquire & 0x80000000) == 0:
-        ipc_acquire = tool.read32(CYREG_IPC2_STRUCT_ACQUIRE)
-
-    # Set RAM address and Opcode
-    tool.write32(CYREG_IPC2_STRUCT_DATA, ENTRANCE_EXAM_SRAM_ADDR_CLAIMED)
-    tool.write32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED, op_code)
-    scratch_addr = ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x08
-    tool.write32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x04, scratch_addr)
-    tool.write32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x08, key_id)
-    tool.write32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x0C, 0)
-
-    # IPC_STRUCT[ipc_id].IPC_NOTIFY -
-    tool.write32(CYREG_IPC2_STRUCT_NOTIFY, 0x00000001)
-    # Wait on response
-    response = 0x80000000
-    while (response & 0x80000000) != 0:
-        response = tool.read32(CYREG_IPC2_STRUCT_LOCK_STATUS)
-
-    response = tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED)
-
-    print(hex(CYREG_IPC2_STRUCT_DATA), hex(tool.read32(CYREG_IPC2_STRUCT_DATA)))
-    print(hex(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED)))
-    print(hex(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x04), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x04)))
-    print(hex(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x08), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x08)))
-
-    if response & 0xFF000000 == 0xa0000000:
-        scratch_addr = tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED + 0x04)
-
-        read_hash_size = tool.read32(scratch_addr)
-        read_hash_addr = tool.read32(scratch_addr + 0x04)
-        response = ''
-
-        i = 0
-        while i < read_hash_size:
-            # Save data in string format
-            hash_byte_chr = chr(tool.read8(read_hash_addr + i))
-            response += hash_byte_chr
-            i += 1
-        response = response.strip()
-        return True, response
-    else:
-        print(hex(CYREG_IPC2_STRUCT_DATA), hex(tool.read32(CYREG_IPC2_STRUCT_DATA)))
-        print(hex(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR_CLAIMED)))
-        response = ''
-        return False, response
