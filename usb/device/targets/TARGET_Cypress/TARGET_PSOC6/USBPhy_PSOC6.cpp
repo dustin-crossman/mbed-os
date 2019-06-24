@@ -68,11 +68,8 @@ void USBPhyHw::init(USBPhyEvents *events)
     instance->events = events;
     
     // Initialize USB Device (CYHAL find required resources).
-    if (CY_RSLT_SUCCESS != cyhal_usb_dev_init(hal_obj, USBDP, USBDM, NULL))
-    {
-        // The CYHAL USB Device initialization failed
-        MBED_ASSERT(0);
-    }
+    cy_rslt_t ret = cyhal_usb_dev_init(hal_obj, USBDP, USBDM, NULL);
+    MBED_ASSERT(CY_RSLT_SUCCESS == ret);
     
     // Hook device handlers to be called by driver
     cyhal_usb_dev_register_event_callback(hal_obj, CYHAL_USB_DEV_EVENT_BUS_RESET, &usb_dev_bus_reset_callback);
@@ -329,12 +326,14 @@ void USBPhyHw::endpoint_remove(usb_ep_t endpoint)
 
 void USBPhyHw::endpoint_stall(usb_ep_t endpoint)
 {
-    (void) cyhal_usb_dev_endpoint_stall(&obj, endpoint);
+    cy_rslt_t ret = cyhal_usb_dev_endpoint_stall(&obj, endpoint);
+    MBED_ASSERT(CY_RSLT_SUCCESS == ret);
 }
 
 void USBPhyHw::endpoint_unstall(usb_ep_t endpoint)
 {
-    (void) cyhal_usb_dev_endpoint_unstall(&obj, endpoint);
+    cy_rslt_t ret = cyhal_usb_dev_endpoint_unstall(&obj, endpoint);
+    MBED_ASSERT(CY_RSLT_SUCCESS == ret);
 }
 
 bool USBPhyHw::endpoint_read(usb_ep_t endpoint, uint8_t *data, uint32_t size)
@@ -347,7 +346,8 @@ uint32_t USBPhyHw::endpoint_read_result(usb_ep_t endpoint)
     uint32_t actSize = 0;
 
     // The read result return actual size zero in case of failure
-    (void) cyhal_usb_dev_endpoint_read_result(&obj, endpoint, &actSize);
+    cy_rslt_t ret = cyhal_usb_dev_endpoint_read_result(&obj, endpoint, &actSize);
+    MBED_ASSERT(CY_RSLT_SUCCESS == ret);
 
     return actSize;
 }
@@ -359,7 +359,8 @@ bool USBPhyHw::endpoint_write(usb_ep_t endpoint, uint8_t *data, uint32_t size)
 
 void USBPhyHw::endpoint_abort(usb_ep_t endpoint)
 {
-    (void) cyhal_usb_dev_endpoint_abort(&obj, endpoint);
+    cy_rslt_t ret = cyhal_usb_dev_endpoint_abort(&obj, endpoint);
+    MBED_ASSERT(CY_RSLT_SUCCESS == ret);
 }
 
 void USBPhyHw::process()
