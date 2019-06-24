@@ -80,7 +80,7 @@ void mbed_sdk_init(void)
     __enable_irq();
 #endif
 #else
-#if !defined(COMPONENT_NSPE)
+#if !defined(COMPONENT_SPE)
     /* Set up the device based on configurator selections */
     cybsp_init();
 #endif
