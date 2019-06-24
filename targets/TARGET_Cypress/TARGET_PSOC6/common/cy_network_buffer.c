@@ -24,13 +24,18 @@ whd_result_t cy_host_buffer_get(whd_buffer_t *buffer, whd_buffer_dir_t direction
 {
     UNUSED_PARAMETER( direction );
     struct pbuf *p = NULL;
-    if ( direction == WHD_NETWORK_TX)
+    if ( ( direction == WHD_NETWORK_TX) && ( size <= PBUF_POOL_BUFSIZE ) )
     {
     	p = pbuf_alloc(PBUF_RAW, size, PBUF_POOL);
     }
     else
     {
     	p = pbuf_alloc(PBUF_RAW, size+SDIO_BLOCK_SIZE, PBUF_RAM);
+        if ( p != NULL )
+        {
+            p->len = size;
+            p->tot_len -=  SDIO_BLOCK_SIZE;
+    	}
     }
     if (p != NULL )
     {
