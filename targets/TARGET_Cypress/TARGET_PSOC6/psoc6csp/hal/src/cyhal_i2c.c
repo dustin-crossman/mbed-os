@@ -54,7 +54,7 @@ static cyhal_i2c_irq_event_t cyhal_convert_interrupt_cause(uint32_t pdl_cause);
 static en_clk_dst_t get_scb_cls(uint8_t scb_block_instance);
 
 static cyhal_i2c_t *cyhal_i2c_config_structs[CY_IP_MXSCB_INSTANCES];
-static cyhal_i2c_irq_handler_t cyhal_i2c_user_callbacks[CY_IP_MXSCB_INSTANCES];
+static cyhal_i2c_irq_handler cyhal_i2c_user_callbacks[CY_IP_MXSCB_INSTANCES];
 static void *cyhal_i2c_callback_args[CY_IP_MXSCB_INSTANCES];
 
 static void cyhal_i2c_0_cb_wrapper(uint32_t event) __attribute__((unused));
@@ -519,7 +519,7 @@ cy_rslt_t cyhal_i2c_init(cyhal_i2c_t *obj, cyhal_gpio_t sda, cyhal_gpio_t scl, c
 void cyhal_i2c_free(cyhal_i2c_t *obj)
 {
     CY_ASSERT(NULL != obj);
-
+    
     if (CYHAL_RSC_INVALID != obj->resource.type)
     {
         cyhal_hwmgr_set_unconfigured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
@@ -793,8 +793,8 @@ cy_rslt_t cyhal_i2c_mem_read(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_ad
 
 cy_rslt_t cyhal_i2c_transfer_async(cyhal_i2c_t *obj, const void *tx, size_t tx_size, void *rx, size_t rx_size, uint16_t address)
 {
-    obj->rx_config.slaveAddress = address >> 1;
-    obj->tx_config.slaveAddress = address >> 1;
+	obj->rx_config.slaveAddress = address;
+    obj->tx_config.slaveAddress = address;
 
     obj->rx_config.buffer = rx;
     obj->rx_config.bufferSize = rx_size;
@@ -805,9 +805,14 @@ cy_rslt_t cyhal_i2c_transfer_async(cyhal_i2c_t *obj, const void *tx, size_t tx_s
     if (tx_size)
     {
         /* Write first, then read, or write only. */
-        obj->pending = (rx_size > 0)
-            ? PENDING_TX_RX
-            : PENDING_TX;
+        if (rx_size > 0)
+        {
+            obj->pending = PENDING_TX_RX;
+        }
+        else
+        {
+            obj->pending = PENDING_TX;
+        }
         Cy_SCB_I2C_MasterWrite(obj->base, &obj->tx_config, &obj->context);
     }
     else if (rx_size)
@@ -816,6 +821,7 @@ cy_rslt_t cyhal_i2c_transfer_async(cyhal_i2c_t *obj, const void *tx, size_t tx_s
         obj->pending = PENDING_RX;
         Cy_SCB_I2C_MasterRead(obj->base, &obj->rx_config, &obj->context);
     }
+
     return CY_RSLT_SUCCESS;
 }
 

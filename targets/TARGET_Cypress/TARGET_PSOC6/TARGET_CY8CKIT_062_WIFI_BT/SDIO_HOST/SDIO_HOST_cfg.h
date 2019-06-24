@@ -1,5 +1,3 @@
-/*Test header file to check if I can remove the DMA files*/
-
 #if !defined(CY_SDIO_CFG_H)
 #define CY_SDIO_CFG_H
 
@@ -8,8 +6,6 @@
 #include "cy_dma.h"
 #include "cy_sysclk.h"
 #include "cy_trigmux.h"
-
-#if defined(CY8C6247BZI_D54) /* Cypress ticket: BSP-525 */
 
 #if defined(__cplusplus)
 extern "C" {
@@ -74,80 +70,6 @@ extern "C" {
 #define CYDEV_UDB_DSI11_BASE 0x40346580u
 
 #define CYREG_UDB_UDBIF_INT_CLK_CTL 0x40347904u
-
-
-/***************************CMD DMA***************************************/
-#define SDIO_HOST_CMD_DMA_DW_BLOCK       (0u)
-#define SDIO_HOST_CMD_DMA_DW_CHANNEL     (1u)
-#define SDIO_HOST_CMD_DMA_HW             (DW0)
-#define SDIO_HOST_CMD_DMA_INTR_MASK      (CY_DMA_INTR_MASK)
-
-/* Channel settings */
-#define SDIO_HOST_CMD_DMA_PRIORITY       (1u)
-#define SDIO_HOST_CMD_DMA_DESCRIPTOR_NUM (1u)
-#define SDIO_HOST_CMD_DMA_PREEMPTABLE    (true)
-
-extern cy_stc_dma_descriptor_config_t SDIO_HOST_CMD_DMA_CMD_DMA_Desc_config;
-extern cy_stc_dma_descriptor_t SDIO_HOST_CMD_DMA_CMD_DMA_Desc;
-
-/***************************Read DMA***************************************/
-#define SDIO_HOST_Read_DMA_DW_BLOCK       (1u)
-#define SDIO_HOST_Read_DMA_DW_CHANNEL     (3u)
-#define SDIO_HOST_Read_DMA_HW             (DW1)
-#define SDIO_HOST_Read_DMA_INTR_MASK      (CY_DMA_INTR_MASK)
-
-/* Channel settings */
-#define SDIO_HOST_Read_DMA_PRIORITY       (0u)
-#define SDIO_HOST_Read_DMA_DESCRIPTOR_NUM (1u)
-#define SDIO_HOST_Read_DMA_PREEMPTABLE    (false)
-
-extern cy_stc_dma_descriptor_config_t SDIO_HOST_Read_DMA_Read_DMA_Desc_config;
-extern cy_stc_dma_descriptor_t SDIO_HOST_Read_DMA_Read_DMA_Desc;
-
-/***************************Resp DMA***************************************/
-#define SDIO_HOST_Resp_DMA_DW_BLOCK       (0u)
-#define SDIO_HOST_Resp_DMA_DW_CHANNEL     (0u)
-#define SDIO_HOST_Resp_DMA_HW             (DW0)
-#define SDIO_HOST_Resp_DMA_INTR_MASK      (CY_DMA_INTR_MASK)
-
-/* Channel settings */
-#define SDIO_HOST_Resp_DMA_PRIORITY       (1u)
-#define SDIO_HOST_Resp_DMA_DESCRIPTOR_NUM (1u)
-#define SDIO_HOST_Resp_DMA_PREEMPTABLE    (true)
-
-extern cy_stc_dma_descriptor_config_t SDIO_HOST_Resp_DMA_Resp_DMA_Desc_config;
-extern cy_stc_dma_descriptor_t SDIO_HOST_Resp_DMA_Resp_DMA_Desc;
-
-/***************************Write DMA***************************************/
-#define SDIO_HOST_Write_DMA_DW_BLOCK       (1u)
-#define SDIO_HOST_Write_DMA_DW_CHANNEL     (1u)
-#define SDIO_HOST_Write_DMA_HW             (DW1)
-#define SDIO_HOST_Write_DMA_INTR_MASK      (CY_DMA_INTR_MASK)
-
-/* Channel settings */
-#define SDIO_HOST_Write_DMA_PRIORITY       (0u)
-#define SDIO_HOST_Write_DMA_DESCRIPTOR_NUM (1u)
-#define SDIO_HOST_Write_DMA_PREEMPTABLE    (false)
-
-extern cy_stc_dma_descriptor_config_t SDIO_HOST_Write_DMA_Write_DMA_Desc_config;
-extern cy_stc_dma_descriptor_t SDIO_HOST_Write_DMA_Write_DMA_Desc;
-
-/***************************SDIO Clock**************************************/
-/* The peripheral clock divider number */
-#define SDIO_HOST_Internal_Clock_DIV_NUM ((uint32_t)0)
-/* The peripheral clock divider type */
-#define SDIO_HOST_Internal_Clock_DIV_TYPE ((cy_en_divider_types_t)CY_SYSCLK_DIV_8_BIT)
-
-
-/*Function for configuring UDBs*/
-void SDIO_Host_Config_UDBs(void);
-
-
-/**************************SDIO Interrupt*****************************/
-#define SDIO_HOST_sdio_int__INTC_CORTEXM4_ASSIGNED 1
-#define SDIO_HOST_sdio_int__INTC_CORTEXM4_PRIORITY 7u
-#define SDIO_HOST_sdio_int__INTC_NUMBER ((IRQn_Type)122u)
-
 
 /*************Defines for UDBs from Creator*****************************/
 /***********These come for cyfitter.h**********************************/
@@ -883,11 +805,100 @@ void SDIO_Host_Config_UDBs(void);
 #define SDIO_HOST_Write_DMA_DW__CHANNEL_NUMBER 1u
 #define SDIO_HOST_Write_DMA_DW__TR_IN TRIG1_OUT_CPUSS_DW1_TR_IN1
 
+
+/***************************CMD DMA***************************************/
+#define SDIO_HOST_CMD_DMA_DW_BLOCK       (0u)
+#define SDIO_HOST_CMD_DMA_DW_CHANNEL     (1u)
+#define SDIO_HOST_CMD_DMA_HW             (DW0)
+#define SDIO_HOST_CMD_DMA_INTR_MASK      (CY_DMA_INTR_MASK)
+
+/* Channel settings */
+#define SDIO_HOST_CMD_DMA_PRIORITY       (1u)
+#define SDIO_HOST_CMD_DMA_DESCRIPTOR_NUM (1u)
+#define SDIO_HOST_CMD_DMA_PREEMPTABLE    (true)
+
+extern cy_stc_dma_descriptor_config_t SDIO_HOST_CMD_DMA_CMD_DMA_Desc_config;
+extern cy_stc_dma_descriptor_t SDIO_HOST_CMD_DMA_CMD_DMA_Desc;
+
+/***************************Read DMA***************************************/
+#define SDIO_HOST_Read_DMA_DW_BLOCK       (1u)
+#define SDIO_HOST_Read_DMA_DW_CHANNEL     (3u)
+#define SDIO_HOST_Read_DMA_HW             (DW1)
+#define SDIO_HOST_Read_DMA_INTR_MASK      (CY_DMA_INTR_MASK)
+
+/* Channel settings */
+#define SDIO_HOST_Read_DMA_PRIORITY       (0u)
+#define SDIO_HOST_Read_DMA_DESCRIPTOR_NUM (1u)
+#define SDIO_HOST_Read_DMA_PREEMPTABLE    (false)
+
+extern cy_stc_dma_descriptor_config_t SDIO_HOST_Read_DMA_Read_DMA_Desc_config;
+extern cy_stc_dma_descriptor_t SDIO_HOST_Read_DMA_Read_DMA_Desc;
+
+/***************************Resp DMA***************************************/
+#define SDIO_HOST_Resp_DMA_DW_BLOCK       (0u)
+#define SDIO_HOST_Resp_DMA_DW_CHANNEL     (0u)
+#define SDIO_HOST_Resp_DMA_HW             (DW0)
+#define SDIO_HOST_Resp_DMA_INTR_MASK      (CY_DMA_INTR_MASK)
+
+/* Channel settings */
+#define SDIO_HOST_Resp_DMA_PRIORITY       (1u)
+#define SDIO_HOST_Resp_DMA_DESCRIPTOR_NUM (1u)
+#define SDIO_HOST_Resp_DMA_PREEMPTABLE    (true)
+
+extern cy_stc_dma_descriptor_config_t SDIO_HOST_Resp_DMA_Resp_DMA_Desc_config;
+extern cy_stc_dma_descriptor_t SDIO_HOST_Resp_DMA_Resp_DMA_Desc;
+
+/***************************Write DMA***************************************/
+#define SDIO_HOST_Write_DMA_DW_BLOCK       (1u)
+#define SDIO_HOST_Write_DMA_DW_CHANNEL     (1u)
+#define SDIO_HOST_Write_DMA_HW             (DW1)
+#define SDIO_HOST_Write_DMA_INTR_MASK      (CY_DMA_INTR_MASK)
+
+/* Channel settings */
+#define SDIO_HOST_Write_DMA_PRIORITY       (0u)
+#define SDIO_HOST_Write_DMA_DESCRIPTOR_NUM (1u)
+#define SDIO_HOST_Write_DMA_PREEMPTABLE    (false)
+
+extern cy_stc_dma_descriptor_config_t SDIO_HOST_Write_DMA_Write_DMA_Desc_config;
+extern cy_stc_dma_descriptor_t SDIO_HOST_Write_DMA_Write_DMA_Desc;
+
+/***************************SDIO Clock**************************************/
+/* The peripheral clock divider number */
+#define SDIO_HOST_Internal_Clock_DIV_NUM ((uint32_t)0)
+/* The peripheral clock divider type */
+#define SDIO_HOST_Internal_Clock_DIV_TYPE ((cy_en_divider_types_t)CY_SYSCLK_DIV_8_BIT)
+
+
+/*Function for configuring UDBs*/
+void SDIO_Host_Config_UDBs(void);
+
+/* SDIO_HOST_Read_Int */
+#define SDIO_HOST_Read_Int__INTC_CORTEXM4_ASSIGNED 1
+#define SDIO_HOST_Read_Int__INTC_CORTEXM4_PRIORITY 7u
+#define SDIO_HOST_Read_Int__INTC_NUMBER 69u
+#define SDIO_HOST_Read_Int_INTC_CORTEXM4_ASSIGNED 1
+#define SDIO_HOST_Read_Int_INTC_CORTEXM4_PRIORITY 7u
+#define SDIO_HOST_Read_Int_INTC_NUMBER 69u
+
+/* SDIO_HOST_sdio_int */
+#define SDIO_HOST_sdio_int__INTC_CORTEXM4_ASSIGNED 1
+#define SDIO_HOST_sdio_int__INTC_CORTEXM4_PRIORITY 7u
+#define SDIO_HOST_sdio_int__INTC_NUMBER 122u
+#define SDIO_HOST_sdio_int_INTC_CORTEXM4_ASSIGNED 1
+#define SDIO_HOST_sdio_int_INTC_CORTEXM4_PRIORITY 7u
+#define SDIO_HOST_sdio_int_INTC_NUMBER 122u
+
+/* SDIO_HOST_Write_Int */
+#define SDIO_HOST_Write_Int__INTC_CORTEXM4_ASSIGNED 1
+#define SDIO_HOST_Write_Int__INTC_CORTEXM4_PRIORITY 7u
+#define SDIO_HOST_Write_Int__INTC_NUMBER 67u
+#define SDIO_HOST_Write_Int_INTC_CORTEXM4_ASSIGNED 1
+#define SDIO_HOST_Write_Int_INTC_CORTEXM4_PRIORITY 7u
+#define SDIO_HOST_Write_Int_INTC_NUMBER 67u
+
 #if defined(__cplusplus)
 }
 #endif
-
-#endif /* defined(CY8C6247BZI_D54) */
 
 #endif /* !defined(CY_SDIO_CFG_H) */
 

@@ -1022,18 +1022,27 @@ void cyhal_uart_irq_enable(cyhal_uart_t *obj, cyhal_uart_irq_event_t event, bool
     if (enable)
     {
         obj->irq_cause |= event;
+        if (event & CYHAL_UART_IRQ_RX_NOT_EMPTY)
+        {
+            Cy_SCB_SetRxInterruptMask(obj->base, Cy_SCB_GetRxInterruptMask(obj->base) | CY_SCB_RX_INTR_NOT_EMPTY);
+        }
+        if (event & CYHAL_UART_IRQ_TX_EMPTY)
+        {
+            Cy_SCB_SetTxInterruptMask(obj->base, Cy_SCB_GetTxInterruptMask(obj->base) | CY_SCB_UART_TX_EMPTY);
+        }
     }
     else
     {
         obj->irq_cause &= ~event;
+        if (event & CYHAL_UART_IRQ_RX_NOT_EMPTY)
+        {
+            Cy_SCB_SetRxInterruptMask(obj->base, Cy_SCB_GetRxInterruptMask(obj->base) & ~CY_SCB_RX_INTR_NOT_EMPTY);
+        }
+        if (event & CYHAL_UART_IRQ_TX_EMPTY)
+        {
+            Cy_SCB_SetTxInterruptMask(obj->base, Cy_SCB_GetTxInterruptMask(obj->base) & ~CY_SCB_UART_TX_EMPTY);
+        }
     }
 }
-
-void cyhal_uart_lowlevel_irqs(cyhal_uart_t *obj)
-{
-    Cy_SCB_SetRxInterruptMask(obj->base, CY_SCB_RX_INTR_NOT_EMPTY);
-    Cy_SCB_SetTxInterruptMask(obj->base, CY_SCB_UART_TX_EMPTY);
-}
-
 
 #endif /* CY_IP_MXSCB */

@@ -109,7 +109,7 @@ __STATIC_INLINE cy_en_crypto_status_t Cy_Crypto_Core_Aes_Init(CRYPTO_Type *base,
 {
     cy_en_crypto_status_t tmpResult;
 
-    cy_stc_crypto_aes_buffers_t *aesBuffers = (cy_stc_crypto_aes_buffers_t *)(REG_CRYPTO_MEM_BUFF(base));
+    cy_stc_crypto_aes_buffers_t *aesBuffers = (cy_stc_crypto_aes_buffers_t *)Cy_Crypto_Core_GetVuMemoryAddress(base);
 
     if (CY_CRYPTO_V1)
     {

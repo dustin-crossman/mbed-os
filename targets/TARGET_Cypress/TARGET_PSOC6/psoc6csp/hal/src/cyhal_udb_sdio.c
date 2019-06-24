@@ -25,7 +25,7 @@
 
 #include "cyhal_hwmgr.h"
 
-#if defined(CY8C6247BZI_D54)
+#if defined(CYHAL_UDB_SDIO)
 
 #include <stdlib.h>
 #include "SDIO_HOST_cfg.h"
@@ -52,7 +52,6 @@
 /* The 1 byte transition mode define */
 #define CY_HAL_SDIO_1B        (1u)
 
-
 /*******************************************************************************
 *       (Internal) Configuration structures for SDIO pins
 *******************************************************************************/
@@ -60,7 +59,7 @@ const cy_stc_gpio_pin_config_t pin_cmd_config =
 {
     .outVal = 1,
     .driveMode = CY_GPIO_DM_STRONG,
-    .hsiom = P2_4_DSI_DSI, /* DSI controls 'out' and 'output enable' */
+    .hsiom = HSIOM_SEL_DSI_DSI, /* DSI controls 'out' and 'output enable' */
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
     .vtrip = CY_GPIO_VTRIP_CMOS,
@@ -77,7 +76,7 @@ const cy_stc_gpio_pin_config_t pin_data_config =
 {
     .outVal = 1,
     .driveMode = CY_GPIO_DM_STRONG,
-    .hsiom = P2_0_DSI_DSI, /* DSI controls 'out' and 'output enable' */
+    .hsiom = HSIOM_SEL_DSI_DSI, /* DSI controls 'out' and 'output enable' */
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
     .vtrip = CY_GPIO_VTRIP_CMOS,
@@ -94,7 +93,7 @@ const cy_stc_gpio_pin_config_t pin_clk_config =
 {
     .outVal = 1,
     .driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-    .hsiom = P2_5_DSI_GPIO, /* DSI controls 'out', GPIO controls 'output enable' */
+    .hsiom = HSIOM_SEL_DSI_GPIO, /* DSI controls 'out', GPIO controls 'output enable' */
     .intEdge = CY_GPIO_INTR_DISABLE,
     .intMask = 0UL,
     .vtrip = CY_GPIO_VTRIP_CMOS,
@@ -471,7 +470,7 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     en_sdio_result_t status;
     uint32_t cmdResponse;
     cy_rslt_t retVal = CY_RSLT_SUCCESS;
-
+    uint8_t* tempBuffer = NULL;
     if (response != NULL)
     {
         *response = 0;
@@ -485,10 +484,21 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
     cmd.pu8Data = (uint8_t *) data;
     cmd.bRead = (direction != CYHAL_READ) ? false : true;
 
+    /* Cypress ID BSP-542 */
+    if (cmd.bRead)
+    {
+        tempBuffer = (uint8_t*)malloc(length + obj->block_size - 1);
+    }
+
     if (length >= obj->block_size)
     {
         cmd.u16BlockCnt = (uint16_t) ((length + obj->block_size - 1)/obj->block_size);
         cmd.u16BlockSize = obj->block_size;
+
+        if (cmd.bRead)
+        {
+            cmd.pu8Data = tempBuffer;
+        }
     }
     else
     {
@@ -504,9 +514,19 @@ cy_rslt_t cyhal_sdio_bulk_transfer(cyhal_sdio_t *obj, cyhal_transfer_t direction
         retVal = CYHAL_SDIO_RSLT_ERR_FUNC_RET(status);
     }
 
+    if(retVal == CY_RSLT_SUCCESS && length >= obj->block_size && cmd.bRead)
+    {
+        memcpy((uint8_t *)data, tempBuffer, (size_t)length);
+    }
+
     if (response != NULL)
     {
         *response = cmdResponse;
+    }
+
+    if (tempBuffer != NULL)
+    {
+        free(tempBuffer);
     }
 
     return retVal;
@@ -575,5 +595,4 @@ void cyhal_sdio_irq_enable(cyhal_sdio_t *obj, cyhal_sdio_irq_event_t event, bool
     }
 }
 
-
-#endif /* defined(CY8C6247BZI_D54) */
+#endif /* defined(CYHAL_UDB_SDIO) */

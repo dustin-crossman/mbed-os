@@ -5,7 +5,7 @@
 * PSoC6_01 device GPIO HAL header for 43-SMT package
 *
 * \note
-* Generator version: 1.4.7104.26717
+* Generator version: 1.4.7107.26790
 *
 ********************************************************************************
 * \copyright
@@ -37,6 +37,7 @@ static const cyhal_resource_inst_t CYHAL_PDM_0 = { CYHAL_RSC_PDM, 0, 0 };
 static const cyhal_resource_inst_t CYHAL_LPCOMP_0_0 = { CYHAL_RSC_LPCOMP, 0, 0 };
 static const cyhal_resource_inst_t CYHAL_OPAMP_0 = { CYHAL_RSC_OPAMP, 0, 0 };
 static const cyhal_resource_inst_t CYHAL_ADC_0 = { CYHAL_RSC_ADC, 0, 0 };
+static const cyhal_resource_inst_t CYHAL_DAC_0 = { CYHAL_RSC_DAC, 0, 0 };
 static const cyhal_resource_inst_t CYHAL_SCB_0 = { CYHAL_RSC_SCB, 0, 0 };
 static const cyhal_resource_inst_t CYHAL_SCB_1 = { CYHAL_RSC_SCB, 1, 0 };
 static const cyhal_resource_inst_t CYHAL_SCB_2 = { CYHAL_RSC_SCB, 2, 0 };
@@ -151,6 +152,11 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_pads[7] = {
     {P9_4, &CYHAL_OPAMP_0, CYHAL_PIN_ANALOG_FUNCTION(P9_4_PASS_CTB_PADS4)},
     {P9_5, &CYHAL_OPAMP_0, CYHAL_PIN_ANALOG_FUNCTION(P9_5_PASS_CTB_PADS5)},
     {P9_6, &CYHAL_OPAMP_0, CYHAL_PIN_ANALOG_FUNCTION(P9_6_PASS_CTB_PADS6)},
+};
+
+/* Connections for: pass_ctdac_voutsw */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctdac_voutsw[1] = {
+    {P9_6, &CYHAL_DAC_0, CYHAL_PIN_ANALOG_FUNCTION(P9_6_PASS_CTB_PADS6)},
 };
 
 /* Connections for: pass_dsi_ctb_cmp0 */

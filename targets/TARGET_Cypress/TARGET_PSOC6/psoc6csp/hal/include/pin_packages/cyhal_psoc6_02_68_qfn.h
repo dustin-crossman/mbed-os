@@ -5,7 +5,7 @@
 * PSoC6_02 device GPIO HAL header for 68-QFN package
 *
 * \note
-* Generator version: 1.4.7104.26717
+* Generator version: 1.4.7107.26790
 *
 ********************************************************************************
 * \copyright

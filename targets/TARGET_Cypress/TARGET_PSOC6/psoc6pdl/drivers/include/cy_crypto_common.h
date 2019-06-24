@@ -147,6 +147,12 @@
 /* The width of the Crypto hardware registers values in bits. */
 #define CY_CRYPTO_HW_REGS_WIDTH             (32UL)
 
+/* Calculates the actual size in bytes of the bits value */
+#define CY_CRYPTO_BYTE_SIZE_OF_BITS(x)      (uint32_t)(((uint32_t)(x) + 7u) >> 3u)
+
+/* Calculates the actual size in 32-bit words of the bits value */
+#define CY_CRYPTO_WORD_SIZE_OF_BITS(x)      (uint32_t)(((uint32_t)(x) + 31u) >> 5u)
+
 /** \endcond */
 
 #endif /* #if (CPUSS_CRYPTO_SHA == 1) */
@@ -155,11 +161,15 @@
 #if (CPUSS_CRYPTO_VU == 1)
 
 /** Processed message size for the RSA 1024Bit mode (in bytes) */
-#define CY_CRYPTO_RSA1024_MESSAGE_SIZE      (128)
+#define CY_CRYPTO_RSA1024_MESSAGE_SIZE      CY_CRYPTO_BYTE_SIZE_OF_BITS(1024u)
 /** Processed message size for the RSA 1536Bit mode (in bytes) */
-#define CY_CRYPTO_RSA1536_MESSAGE_SIZE      (192)
+#define CY_CRYPTO_RSA1536_MESSAGE_SIZE      CY_CRYPTO_BYTE_SIZE_OF_BITS(1536u)
 /** Processed message size for the RSA 2048Bit mode (in bytes) */
-#define CY_CRYPTO_RSA2048_MESSAGE_SIZE      (256)
+#define CY_CRYPTO_RSA2048_MESSAGE_SIZE      CY_CRYPTO_BYTE_SIZE_OF_BITS(2048u)
+/** Processed message size for the RSA 3072Bit mode (in bytes) */
+#define CY_CRYPTO_RSA3072_MESSAGE_SIZE      CY_CRYPTO_BYTE_SIZE_OF_BITS(3072u)
+/** Processed message size for the RSA 4096Bit mode (in bytes) */
+#define CY_CRYPTO_RSA4096_MESSAGE_SIZE      CY_CRYPTO_BYTE_SIZE_OF_BITS(4096u)
 
 #endif /* #if (CPUSS_CRYPTO_VU == 1) */
 
@@ -264,7 +274,7 @@ typedef struct
 *
 * \note The <b>modulus</b> and <b>exponent</b> values in the
 * \ref cy_stc_crypto_rsa_pub_key_t must also be in little-endian order.<br>
-* Use \ref Cy_Crypto_Rsa_InvertEndianness function to convert to or from
+* Use \ref Cy_Crypto_InvertEndianness function to convert to or from
 * little-endian order.
 */
 typedef struct
@@ -437,6 +447,25 @@ typedef enum
 
 /** \} group_crypto_enums */
 
+/**
+* \addtogroup group_crypto_lld_asymmetric_enums
+* \{
+*/
+
+/** List of supported elliptic curve IDs */
+typedef enum {
+    CY_CRYPTO_ECC_ECP_NONE = 0,
+    CY_CRYPTO_ECC_ECP_SECP192R1,
+    CY_CRYPTO_ECC_ECP_SECP224R1,
+    CY_CRYPTO_ECC_ECP_SECP256R1,
+    CY_CRYPTO_ECC_ECP_SECP384R1,
+    CY_CRYPTO_ECC_ECP_SECP521R1,
+    /* Count of supported curves */
+    CY_CRYPTO_ECC_ECP_CURVES_CNT
+} cy_en_crypto_ecc_curve_id_t;
+
+/** \} group_crypto_lld_asymmetric_enums */
+
 /** \cond INTERNAL */
 
 /** Instruction to communicate between Client and Server */
@@ -499,7 +528,22 @@ typedef enum
     CY_CRYPTO_INSTR_RSA_VER      = 0x19u,
 #endif /* #if (CPUSS_CRYPTO_SHA == 1) */
 
-    CY_CRYPTO_INSTR_SRV_INFO     = 0x55u
+    CY_CRYPTO_INSTR_SRV_INFO     = 0x55u,
+
+#if (CPUSS_CRYPTO_VU == 1)
+    CY_CRYPTO_INSTR_MEMBUF_SET   = 0x56u,
+    CY_CRYPTO_INSTR_MEMBUF_ADDR  = 0x57u,
+    CY_CRYPTO_INSTR_MEMBUF_SIZE  = 0x58u,
+
+    CY_CRYPTO_INSTR_ECC_GET_DP   = 0x59u,
+    CY_CRYPTO_INSTR_ECC_ECP_MUL  = 0x5Au,
+    CY_CRYPTO_INSTR_ECP_GEN_PRIK = 0x5Bu,
+    CY_CRYPTO_INSTR_ECP_GEN_PUBK = 0x5Cu,
+
+    CY_CRYPTO_INSTR_ECDSA_SIGN   = 0x5Du,
+    CY_CRYPTO_INSTR_ECDSA_VER    = 0x5Eu
+#endif /* #if (CPUSS_CRYPTO_VU == 1) */
+
 } cy_en_crypto_comm_instr_t;
 
 /** \endcond */
@@ -572,6 +616,32 @@ typedef struct
 } cy_stc_crypto_sha_state_t;
 
 #endif /* (CPUSS_CRYPTO_SHA == 1) */
+
+/** A point on a ECC curve */
+typedef struct {
+    /** The x co-ordinate */
+    void *x;
+    /** The y co-ordinate */
+    void *y;
+} cy_stc_crypto_ecc_point;
+
+/** An ECC key type */
+typedef enum cy_en_crypto_ecc_key_type {
+   PK_PUBLIC     = 0u,
+   PK_PRIVATE    = 1u
+} cy_en_crypto_ecc_key_type_t;
+
+/** An ECC key */
+typedef struct {
+    /** Type of key, PK_PRIVATE or PK_PUBLIC */
+    cy_en_crypto_ecc_key_type_t type;
+    /** See \ref cy_en_crypto_ecc_curve_id_t */
+    cy_en_crypto_ecc_curve_id_t curveID;
+    /** The public key */
+    cy_stc_crypto_ecc_point pubkey;
+    /** The private key */
+    void *k;
+} cy_stc_crypto_ecc_key;
 
 /** \} group_crypto_data_structures */
 
@@ -885,6 +955,35 @@ typedef struct
     uint32_t *result;
     /** \endcond */
 } cy_stc_crypto_context_rsa_t;
+
+/** The structure for storing the ECC operations context.
+* All fields for the context structure are internal. Firmware never reads or
+* writes these values. Firmware allocates the structure and provides the
+* address of the structure to the driver in function calls. Firmware must
+* ensure that the defined instance of this structure remains in scope
+* while the drive is in use.
+*/
+typedef struct
+{
+    /** \cond INTERNAL */
+    /** Elliptic curve ID */
+    cy_en_crypto_ecc_curve_id_t curveID;
+    /** Pointer to key data */
+    const cy_stc_crypto_ecc_key *key;
+    /** Operation data length */
+    uint32_t datalen;
+    /** Pointer to the first  source data block */
+    const uint8_t *src0;
+    /** Pointer to the second source data block */
+    const uint8_t *src1;
+    /** Pointer to the third  source data block */
+    const uint8_t *src2;
+    /** Pointer to the first  destination data block */
+    uint8_t *dst0;
+    /** Pointer to the second destination data block */
+    uint8_t *dst1;
+    /** \endcond */
+} cy_stc_crypto_context_ecc_t;
 #endif /* #if (CPUSS_CRYPTO_VU == 1) */
 
 /** \} group_crypto_cli_data_structures */
@@ -892,5 +991,6 @@ typedef struct
 #endif /* CY_IP_MXCRYPTO */
 
 #endif /* #if !defined(CY_CRYPTO_COMMON_H) */
+
 
 /* [] END OF FILE */

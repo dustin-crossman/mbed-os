@@ -155,13 +155,12 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
     {
         #if (CPUSS_CRYPTO_SHA1 == 1)
             case CY_CRYPTO_MODE_SHA1:
-                hashState->mode           = (uint32_t)mode;
-
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha1_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha1_buffers_t*)shaBuffers)->hash;
 
-                hashState->modeHw         = CY_CRYPTO_V2_SHA1_OPC;
-                hashState->initialHash    = sha1InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA1_OPC;
+                hashState->initialHash    = (const uint8_t*)sha1InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA1_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA1_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA1_DIGEST_SIZE;
@@ -169,25 +168,23 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
         #endif /* #if (CPUSS_CRYPTO_SHA1 == 1) */
         #if (CPUSS_CRYPTO_SHA256 == 1)
             case CY_CRYPTO_MODE_SHA256:
-                hashState->mode           = (uint32_t)mode;
-
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha256_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha256_buffers_t*)shaBuffers)->hash;
 
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_256_OPC;
-                hashState->initialHash    = sha256InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_256_OPC;
+                hashState->initialHash    = (const uint8_t*)sha256InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA256_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA256_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA256_DIGEST_SIZE;
                 break;
             case CY_CRYPTO_MODE_SHA224:
-                hashState->mode           = (uint32_t)mode;
-
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha256_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha256_buffers_t*)shaBuffers)->hash;
 
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_256_OPC;
-                hashState->initialHash    = sha224InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_256_OPC;
+                hashState->initialHash    = (const uint8_t*)sha224InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA256_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA256_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA224_DIGEST_SIZE;
@@ -195,49 +192,45 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Init(CRYPTO_Type *base,
         #endif /* #if (CPUSS_CRYPTO_SHA256 == 1) */
         #if (CPUSS_CRYPTO_SHA512 == 1)
             case CY_CRYPTO_MODE_SHA512:
-                hashState->mode           = (uint32_t)mode;
-
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->hash;
 
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_512_OPC;
-                hashState->initialHash    = sha512InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_512_OPC;
+                hashState->initialHash    = (const uint8_t*)sha512InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA512_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA512_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA512_DIGEST_SIZE;
                 break;
             case CY_CRYPTO_MODE_SHA384:
-                hashState->mode           = (uint32_t)mode;
-
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->hash;
 
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_512_OPC;
-                hashState->initialHash    = sha384InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_512_OPC;
+                hashState->initialHash    = (const uint8_t*)sha384InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA512_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA512_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA384_DIGEST_SIZE;
                 break;
             case CY_CRYPTO_MODE_SHA512_256:
-                hashState->mode           = (uint32_t)mode;
-
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->hash;
 
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_512_OPC;
-                hashState->initialHash    = sha512_256InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_512_OPC;
+                hashState->initialHash    = (const uint8_t*)sha512_256InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA512_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA512_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA512_256_DIGEST_SIZE;
                 break;
             case CY_CRYPTO_MODE_SHA512_224:
-                hashState->mode           = (uint32_t)mode;
-
                 hashState->block          = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->block;
                 hashState->hash           = (uint8_t*)((cy_stc_crypto_v2_sha512_buffers_t*)shaBuffers)->hash;
 
-                hashState->modeHw         = CY_CRYPTO_V2_SHA2_512_OPC;
-                hashState->initialHash    = sha512_224InitHash;
+                hashState->mode           = (uint32_t)mode;
+                hashState->modeHw         = (uint32_t)CY_CRYPTO_V2_SHA2_512_OPC;
+                hashState->initialHash    = (const uint8_t*)sha512_224InitHash;
                 hashState->blockSize      = CY_CRYPTO_SHA512_BLOCK_SIZE;
                 hashState->hashSize       = CY_CRYPTO_SHA512_HASH_SIZE;
                 hashState->digestSize     = CY_CRYPTO_SHA512_224_DIGEST_SIZE;
@@ -279,8 +272,6 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Start(CRYPTO_Type *base, cy_stc_cryp
         if (hashState->hashSize != 0U)
         {
             Cy_Crypto_Core_V2_MemCpy(base, hashState->hash, hashState->initialHash, (uint16_t)hashState->hashSize);
-
-            Cy_Crypto_Core_V2_MemSet(base, hashState->block, 0x00U, (uint16_t)hashState->blockSize);
 
             tmpResult = CY_CRYPTO_SUCCESS;
         }
@@ -331,6 +322,9 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Update(CRYPTO_Type *base,
             {
                 hashState->messageSize += messageSize;
 
+                uint32_t hashBlockIdx  = hashState->blockIdx;
+                uint32_t hashBlockSize = hashState->blockSize;
+
                 /* Load the calculated hash from the context buffer */
                 Cy_Crypto_Core_V2_RBClear(base);
                 Cy_Crypto_Core_V2_Sync(base);
@@ -340,29 +334,48 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Update(CRYPTO_Type *base,
                 Cy_Crypto_Core_V2_Sync(base);
                 Cy_Crypto_Core_V2_RBSwap(base);
 
+                /* Load the remaining block from the context buffer */
+                if (hashBlockIdx != 0U)
+                {
+                    Cy_Crypto_Core_V2_FFStart(base, CY_CRYPTO_V2_RB_FF_LOAD0, hashState->block, hashBlockIdx);
+                    Cy_Crypto_Core_V2_RBXor(base, 0U, hashBlockIdx);
+                    Cy_Crypto_Core_V2_Sync(base);
+                }
+
                 /* Start the hash calculating */
                 Cy_Crypto_Core_V2_FFContinue(base, CY_CRYPTO_V2_RB_FF_LOAD0, message, messageSize);
 
-                while (messageSize >= hashState->blockSize)
+                /* Processing the fully filled blocks with remaining buffer data */
+                while ((hashBlockIdx + messageSize) >= hashBlockSize)
                 {
-                    Cy_Crypto_Core_V2_RBXor(base, 0U, hashState->blockSize);
+                    uint32_t tempBlockSize = hashBlockSize - hashBlockIdx;
 
-                    messageSize -= hashState->blockSize;
+                    Cy_Crypto_Core_V2_RBXor(base, hashBlockIdx, tempBlockSize);
 
                     Cy_Crypto_Core_V2_Run(base, hashState->modeHw);
+
+                    messageSize -= tempBlockSize;
+
+                    hashBlockIdx = 0U;
                 }
 
-                /* Remaining block will be calculated Finish function */
-                hashState->blockIdx = messageSize;
+                /* The remaining block will be calculated in the Finish function */
+                hashState->blockIdx = hashBlockIdx + messageSize;
 
                 /* Load the end of the message (tail that less then block size) to the register buffer */
-                Cy_Crypto_Core_V2_RBXor(base, 0U, messageSize);
-                Cy_Crypto_Core_V2_Sync(base);
+                if (messageSize != 0U)
+                {
+                    Cy_Crypto_Core_V2_RBXor(base, hashBlockIdx, messageSize);
+                    Cy_Crypto_Core_V2_Sync(base);
+                }
 
-                /* Save the end of the message (tail that less then block size) to the context buffer */
-                Cy_Crypto_Core_V2_FFStart(base, CY_CRYPTO_V2_RB_FF_STORE, hashState->block, messageSize);
-                Cy_Crypto_Core_V2_RBStore(base, 0U, messageSize);
-                Cy_Crypto_Core_V2_Sync(base);
+                /* Save the remaining data to the context buffer */
+                if (hashState->blockIdx != 0U)
+                {
+                    Cy_Crypto_Core_V2_FFStart(base, CY_CRYPTO_V2_RB_FF_STORE, hashState->block, hashState->blockIdx);
+                    Cy_Crypto_Core_V2_RBStore(base, 0U, hashState->blockIdx);
+                    Cy_Crypto_Core_V2_Sync(base);
+                }
 
                 /* Store the calculated hash to the context buffer */
                 Cy_Crypto_Core_V2_FFStart(base, CY_CRYPTO_V2_RB_FF_STORE, hashState->hash, hashState->hashSize);
@@ -406,19 +419,19 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Finish(CRYPTO_Type *base,
 
     if ((hashState != NULL) && (digest != NULL))
     {
-        uint32_t myBlockSize   = hashState->blockSize;
-        uint32_t myBlockIdx    = hashState->blockIdx;
+        uint32_t hashBlockSize   = hashState->blockSize;
+        uint32_t hashBlockIdx    = hashState->blockIdx;
 
         uint64_t finalMessageSizeInBits = (uint64_t)hashState->messageSize * 8U;
-        uint32_t size;
+        uint32_t padSize;
 
-        if (CY_CRYPTO_SHA512_BLOCK_SIZE == myBlockSize)
+        if (CY_CRYPTO_SHA512_BLOCK_SIZE == hashBlockSize)
         {
-            size = CY_CRYPTO_SHA512_PAD_SIZE; /* Pad size = 112 */
+            padSize = CY_CRYPTO_SHA512_PAD_SIZE; /* Pad size = 112 */
         }
         else
         {
-            size = CY_CRYPTO_SHA256_PAD_SIZE; /* Pad size = 56 */
+            padSize = CY_CRYPTO_SHA256_PAD_SIZE; /* Pad size = 56 */
         }
 
         /* Load the calculated hash from the context buffer */
@@ -431,16 +444,16 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Finish(CRYPTO_Type *base,
         Cy_Crypto_Core_V2_RBSwap(base);
 
         /* Load the end of the message (tail that less then block size) to the register buffer */
-        Cy_Crypto_Core_V2_FFStart(base, CY_CRYPTO_V2_RB_FF_LOAD0, hashState->block, myBlockIdx);
-        Cy_Crypto_Core_V2_RBXor(base, 0U, myBlockIdx);
+        Cy_Crypto_Core_V2_FFStart(base, CY_CRYPTO_V2_RB_FF_LOAD0, hashState->block, hashBlockIdx);
+        Cy_Crypto_Core_V2_RBXor(base, 0U, hashBlockIdx);
 
         /* Sync until XOR operation is completed */
         Cy_Crypto_Core_V2_Sync(base);
 
         /* Append 1 bit to the end of the message */
-        Cy_Crypto_Core_V2_RBSetByte(base, myBlockIdx, 0x80U);
+        Cy_Crypto_Core_V2_RBSetByte(base, hashBlockIdx, 0x80U);
 
-        if (myBlockIdx >= size)
+        if (hashBlockIdx >= padSize)
         {
             Cy_Crypto_Core_V2_Run(base, hashState->modeHw);
             Cy_Crypto_Core_V2_Sync(base);
@@ -449,12 +462,12 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Finish(CRYPTO_Type *base,
         /* Append message size into last of the block */
 
         /* In case of u32SizeInByte * 8 > u32Max */
-        Cy_Crypto_Core_V2_RBSetByte(base, myBlockSize - 5U, (uint8_t)(finalMessageSizeInBits >> 32U));
+        Cy_Crypto_Core_V2_RBSetByte(base, hashBlockSize - 5U, (uint8_t)(finalMessageSizeInBits >> 32U));
 
-        Cy_Crypto_Core_V2_RBSetByte(base, myBlockSize - 4U, (uint8_t)(finalMessageSizeInBits >> 24U));
-        Cy_Crypto_Core_V2_RBSetByte(base, myBlockSize - 3U, (uint8_t)(finalMessageSizeInBits >> 16U));
-        Cy_Crypto_Core_V2_RBSetByte(base, myBlockSize - 2U, (uint8_t)(finalMessageSizeInBits >> 8U));
-        Cy_Crypto_Core_V2_RBSetByte(base, myBlockSize - 1U, (uint8_t)(finalMessageSizeInBits));
+        Cy_Crypto_Core_V2_RBSetByte(base, hashBlockSize - 4U, (uint8_t)(finalMessageSizeInBits >> 24U));
+        Cy_Crypto_Core_V2_RBSetByte(base, hashBlockSize - 3U, (uint8_t)(finalMessageSizeInBits >> 16U));
+        Cy_Crypto_Core_V2_RBSetByte(base, hashBlockSize - 2U, (uint8_t)(finalMessageSizeInBits >> 8U));
+        Cy_Crypto_Core_V2_RBSetByte(base, hashBlockSize - 1U, (uint8_t)(finalMessageSizeInBits));
 
         Cy_Crypto_Core_V2_Run(base, hashState->modeHw);
         Cy_Crypto_Core_V2_Sync(base);
@@ -499,7 +512,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha_Free(CRYPTO_Type *base, cy_stc_crypt
         Cy_Crypto_Core_V2_MemSet(base, hashState->hash,  0x00U, (uint16_t)hashState->hashSize);
 
         /* Clears the hash state */
-        Cy_Crypto_Core_V2_MemSet(base, hashState, 0x00U, sizeof(cy_stc_crypto_sha_state_t));
+        Cy_Crypto_Core_V2_MemSet(base, hashState, 0x00U, (uint16_t)sizeof(cy_stc_crypto_sha_state_t));
 
         /* Clears the memory buffer. */
         Cy_Crypto_Core_V2_RBClear(base);
@@ -550,6 +563,7 @@ cy_en_crypto_status_t Cy_Crypto_Core_V2_Sha(CRYPTO_Type *base,
     /* Allocate space for the structure which stores the SHA context */
     cy_stc_crypto_sha_state_t hashState = { 0 };
 
+    /* No buffers are needed for the Crypto_ver2 IP block. */
     tmpResult = Cy_Crypto_Core_V2_Sha_Init   (base, &hashState, mode, &shaBuffers);
 
     if (CY_CRYPTO_SUCCESS == tmpResult)
