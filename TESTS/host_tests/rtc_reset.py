@@ -33,7 +33,7 @@ class RtcResetTest(BaseHostTest):
     START_TIME_TOLERANCE = 10
     """Time to delay after sending reset"""
     DELAY_TIME = 5.0
-    DELAY_TOLERANCE = 2.0
+    DELAY_TOLERANCE = 1.0
     VALUE_PLACEHOLDER = "0"
 
     def setup(self):
