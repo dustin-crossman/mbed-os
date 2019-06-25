@@ -61,6 +61,7 @@ typedef enum
     CYHAL_RSC_I2S,       /*!< I2S communications block */
     CYHAL_RSC_LCD,       /*!< Segment LCD controller */
     CYHAL_RSC_LPCOMP,    /*!< Low power comparator */
+    CYHAL_RSC_LPTIMER,   /*!< Low power timer */
     CYHAL_RSC_OPAMP,     /*!< Opamp */
     CYHAL_RSC_PDM,       /*!< PCM/PDM communications block */
     CYHAL_RSC_SMIF,      /*!< Quad-SPI communications block */
@@ -71,7 +72,6 @@ typedef enum
     CYHAL_RSC_TCPWM,     /*!< Timer/Counter/PWM block */
     CYHAL_RSC_UDB,       /*!< UDB Array */
     CYHAL_RSC_USB,       /*!< USB communication block */
-    CYHAL_RSC_WDT,       /*!< Watchdog timer */
     CYHAL_RSC_INVALID,   /*!< Placeholder for invalid type */
 } cyhal_resource_t;
 

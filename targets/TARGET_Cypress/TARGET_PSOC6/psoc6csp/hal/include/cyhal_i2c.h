@@ -145,7 +145,7 @@ cy_rslt_t cyhal_i2c_set_config(cyhal_i2c_t *obj, const cyhal_i2c_cfg_t *cfg);
  * I2C master send
  *
  * @param[in]  obj       The I2C object
- * @param[in]  dev_addr  device address
+ * @param[in]  dev_addr  device address (7-bit)
  * @param[in]  data      i2c send data
  * @param[in]  size      i2c send data size
  * @param[in]  timeout   timeout in milisecond, set this value to 0 if you want to wait forever
@@ -158,7 +158,7 @@ cy_rslt_t cyhal_i2c_master_send(cyhal_i2c_t *obj, uint16_t dev_addr, const uint8
  * I2C master recv
  *
  * @param[in]   obj       The I2C object
- * @param[in]   dev_addr  device address
+ * @param[in]   dev_addr  device address (7-bit)
  * @param[out]  data      i2c receive data
  * @param[in]   size      i2c receive data size
  * @param[in]   timeout   timeout in milisecond, set this value to 0 if you want to wait forever
@@ -196,7 +196,7 @@ cy_rslt_t cyhal_i2c_slave_recv(cyhal_i2c_t *obj, uint8_t *data, uint16_t size, u
 /** Perform an i2c write using a block of data stored at the specified memory location
  *
  * @param[in]  obj            The I2C object
- * @param[in]  address        device address
+ * @param[in]  address        device address (7-bit)
  * @param[in]  mem_addr       mem address to store the written data
  * @param[in]  mem_addr_size  number of bytes in the mem address
  * @param[in]  data           i2c master send data
@@ -209,7 +209,7 @@ cy_rslt_t cyhal_i2c_mem_write(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_a
 /** Perform an i2c read using a block of data stored at the specified memory location
  *
  * @param[in]  obj            The I2C object
- * @param[in]  address        device address
+ * @param[in]  address        device address (7-bit)
  * @param[in]  mem_addr       mem address to store the written data
  * @param[in]  mem_addr_size  number of bytes in the mem address
  * @param[out] data           i2c master send data
@@ -226,7 +226,7 @@ cy_rslt_t cyhal_i2c_mem_read(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_ad
  * @param[in]  tx_size  The number of bytes to transmit
  * @param[out] rx       The receive buffer
  * @param[in]  rx_size  The number of bytes to receive
- * @param[in]  address  The address to be set - 7bit
+ * @param[in]  address  device address (7-bit)
  * @return The status of the transfer_async request
  */
 cy_rslt_t cyhal_i2c_transfer_async(cyhal_i2c_t *obj, const void *tx, size_t tx_size, void *rx, size_t rx_size, uint16_t address);
