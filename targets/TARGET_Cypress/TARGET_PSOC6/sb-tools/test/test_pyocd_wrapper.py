@@ -12,7 +12,6 @@ from execute.programmer.exceptions import ExtendedTransferFaultError
 TOOL = 'pyocd'
 TARGET = 'cy8c64xx_cm4'
 PROBE_ID = '19071301f304140502f3041400000000000000002e127069'  # DAP-Link
-#PROBE_ID = '1A06199701047400'  # CMSIS-DAP
 
 # PSoC6 BLE Memory Regions
 RAM_ADDR = 0x08000000
