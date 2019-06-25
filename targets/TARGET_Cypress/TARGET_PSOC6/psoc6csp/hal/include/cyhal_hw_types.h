@@ -134,11 +134,7 @@ typedef struct {
 
 /** Flash object */
 typedef struct {
-#ifdef CY_IP_M4CPUSS
-    cyhal_resource_inst_t       resource;
-#else
     void *empty;
-#endif /* CY_IP_M4CPUSS */
 } cyhal_flash_t;
 
 /** I2C object */
