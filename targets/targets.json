@@ -8425,7 +8425,7 @@
     "AUGUST_CYW43012": {
         "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
-        "extra_labels_add": ["PSOC6_01", "WICED", "CYW43XXX", "CYW43012", "CORDIO"],
+        "extra_labels_add": ["PSOC6_01", "WICED_SRC", "CYW43XXX", "CYW43012", "CORDIO"],
         "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1", "MBED_TICKLESS"],
         "detect_code": ["190D"],
         "forced_reset_timeout": 30,
@@ -8450,7 +8450,8 @@
             "MCUBOOT_POLICY=1",
             "MCUBOOT_LOG_LEVEL=0",
             "MCUBOOT_USE_SMIF_STAGE",
-            "MCUBOOT_USE_SMIF_XIP"
+            "MCUBOOT_USE_SMIF_XIP",
+            "MCUBOOT_HAVE_ASSERT_H"
         ],
         "deliver_to_target": "AUGUST_CYW43012_PSA",
         "delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_AUGUST_CYW43012_PSA/prebuilt",
