@@ -56,7 +56,6 @@ typedef enum
     CYHAL_RSC_CRC,       /*!< CRC hardware accelerator */
     CYHAL_RSC_DAC,       /*!< Digital to analog converter */
     CYHAL_RSC_DMA,       /*!< DMA controller */
-    CYHAL_RSC_FLASH,     /*!< Flash memory */
     CYHAL_RSC_GPIO,      /*!< General purpose I/O pin */
     CYHAL_RSC_I2S,       /*!< I2S communications block */
     CYHAL_RSC_LCD,       /*!< Segment LCD controller */
