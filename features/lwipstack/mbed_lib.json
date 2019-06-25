@@ -214,7 +214,7 @@
             "tcp-mss": 1540,
             "tcp-snd-buf": "(6 * TCP_MSS)",
             "tcp-wnd": "(TCP_MSS * 6)",
-            "pbuf-pool-size": 48,
+            "pbuf-pool-size": 64,
             "mem-size": 65536
         },
         "MIMXRT1050_EVK": {
