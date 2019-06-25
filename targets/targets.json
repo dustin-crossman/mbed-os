@@ -8306,6 +8306,7 @@
         "components_add": ["SPM_MAILBOX", "FLASHIAP"],
         "extra_labels_add": ["PSA", "MBED_SPM", "MCUBOOT"],
         "macros_add": [
+            "CY_CFG_SYSCLK_WCO_ENABLED=1",
             "MBED_TICKLESS",
             "MBEDTLS_PSA_CRYPTO_SPM",
             "MBEDTLS_PSA_CRYPTO_C",
