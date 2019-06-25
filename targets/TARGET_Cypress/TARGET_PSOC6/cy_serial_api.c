@@ -254,18 +254,18 @@ const PinMap *serial_rts_pinmap(void)
 
 #if DEVICE_SERIAL_ASYNCH
 
-int serial_tx_asynch(serial_t *obj, const void *tx, size_t tx_length, uint8_t, uint32_t handler, uint32_t event, DMAUsage)
+int serial_tx_asynch(serial_t *obj, const void *tx, size_t tx_length, MBED_UNUSED uint8_t tx_width, uint32_t handler, uint32_t event, MBED_UNUSED DMAUsage dma)
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
     // handler calls serial_irq_handler_async
     ser->async_tx_handler = (void *)handler;
-    if (CY_RSLT_SUCCESS != cyhal_uart_tx_async(&(ser->hal_obj), tx, tx_length)) {
+    if (CY_RSLT_SUCCESS != cyhal_uart_tx_async(&(ser->hal_obj), (void *)tx, tx_length)) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SERIAL, MBED_ERROR_CODE_WRITE_FAILED), "serial_tx_asynch");
     }
     return 0;
 }
 
-void serial_rx_asynch(serial_t *obj, void *rx, size_t rx_length, uint8_t, uint32_t handler, uint32_t event, uint8_t char_match, DMAUsage)
+void serial_rx_asynch(serial_t *obj, void *rx, size_t rx_length, MBED_UNUSED uint8_t rx_width, uint32_t handler, uint32_t event, uint8_t char_match, MBED_UNUSED DMAUsage dma)
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
     // handler calls serial_irq_handler_async
@@ -277,11 +277,13 @@ void serial_rx_asynch(serial_t *obj, void *rx, size_t rx_length, uint8_t, uint32
 
 uint8_t serial_tx_active(serial_t *obj)
 {
+    struct serial_s *ser = cy_serial_get_struct(obj);
     return cyhal_uart_is_tx_active(&(ser->hal_obj)) ? 1 : 0;
 }
 
-uint8_t serial_rx_active(serial_t *obj);
+uint8_t serial_rx_active(serial_t *obj)
 {
+    struct serial_s *ser = cy_serial_get_struct(obj);
     return cyhal_uart_is_rx_active(&(ser->hal_obj)) ? 1 : 0;
 }
 
@@ -289,16 +291,16 @@ int serial_irq_handler_asynch(serial_t *obj)
 {
     struct serial_s *ser = cy_serial_get_struct(obj);
     int flags = 0;
-    if (ser->event_flags & CYHAL_UART_TX_DONE) {
+    if (ser->event_flags & CYHAL_UART_IRQ_TX_DONE) {
         ser->async_tx_handler = NULL;
         flags |= SERIAL_EVENT_TX_COMPLETE;
     }
-    if (ser->event_flags & CYHAL_UART_RX_DONE) {
+    if (ser->event_flags & CYHAL_UART_IRQ_RX_DONE) {
         ser->async_rx_handler = NULL;
         flags |= SERIAL_EVENT_RX_COMPLETE;
     }
     // HAL event type does not specify which error occurred
-    if (ser->event_flags & CYHAL_UART_RX_ERROR) {
+    if (ser->event_flags & CYHAL_UART_IRQ_RX_ERROR) {
         flags |= SERIAL_EVENT_RX_FRAMING_ERROR;
     }
     return flags;
