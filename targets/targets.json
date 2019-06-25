@@ -8254,7 +8254,8 @@
             "SLEEP",
             "FLASH",
             "TRNG",
-            "CRC"
+            "CRC",
+            "USBDEVICE"
         ],
         "release_versions": ["5"],
         "extra_labels": ["Cypress", "PSOC6"],
@@ -8398,6 +8399,7 @@
     },
     "CY8CKIT_062_BLE": {
         "inherits": ["MCU_PSOC6_M4"],
+        "device_has_remove": ["USBDEVICE"],
         "supported_form_factors": ["ARDUINO"],
         "extra_labels_add": [
             "PSOC6_01",
