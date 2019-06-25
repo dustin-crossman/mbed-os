@@ -74,8 +74,8 @@ def main(prov_cmd_jwt, cy_bootloader_hex, pub_key_json, pub_key_pem, protection_
         tool.disconnect()
 
     if test_status:
-        # Read device response file and take device key from it
-        if ProtectionState(protection_state) == ProtectionState.secure and os.path.exists(pub_key_json):
+        # Read device public key from response file and save the key in pem format
+        if os.path.exists(pub_key_json):
             pem = PemKey(pub_key_json)
             pem.save(pub_key_pem, private_key=False)
     else:
