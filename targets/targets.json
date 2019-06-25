@@ -8293,7 +8293,7 @@
         "inherits": ["MCU_PSOC6_M4"],
         "supported_form_factors": ["ARDUINO"],
         "extra_labels_add": ["PSOC6_01"],
-        "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1"],
+        "macros_add": ["CY8C6247BZI_D54", "PSOC6_DYNSRM_DISABLE=1", "CY_CFG_SYSCLK_WCO_ENABLED=1"],
         "detect_code": ["1907"],
         "forced_reset_timeout": 30,
         "reset_method": "default",
@@ -8306,6 +8306,7 @@
         "components_add": ["SPM_MAILBOX", "FLASHIAP"],
         "extra_labels_add": ["PSA", "MBED_SPM", "MCUBOOT"],
         "macros_add": [
+            "CY_CFG_SYSCLK_WCO_ENABLED=1",
             "MBED_TICKLESS",
             "MBEDTLS_PSA_CRYPTO_SPM",
             "MBEDTLS_PSA_CRYPTO_C",

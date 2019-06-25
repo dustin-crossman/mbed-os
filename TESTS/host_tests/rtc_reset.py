@@ -33,14 +33,14 @@ class RtcResetTest(BaseHostTest):
     START_TIME_TOLERANCE = 10
     """Time to delay after sending reset"""
     DELAY_TIME = 5.0
-    DELAY_TOLERANCE = 1.0
+    DELAY_TOLERANCE = 2.0
     VALUE_PLACEHOLDER = "0"
 
     def setup(self):
         """Register callbacks required for the test"""
         self._error = False
         generator = self.rtc_reset_test()
-        generator.next()
+        next(generator)
 
         def run_gen(key, value, time):
             """Run the generator, and fail testing if the iterator stops"""
