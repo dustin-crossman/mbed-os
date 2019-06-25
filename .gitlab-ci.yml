@@ -16,7 +16,7 @@ test_provisioning:
     - virtualenv venv
     - .\venv\Scripts\activate.ps1
     - echo "[INFO] Getting latest pyocd"
-    - if (-Not(Test-Path pyocd)) { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd; cd pyocd; git checkout tags/AH_SECURITY_RELEASE_2; git branch; cd .. }
+    - if (-Not(Test-Path pyocd)) { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd; cd pyocd; git checkout tags/AH_FINAL_RELEASE_TC1; git branch; cd .. }
     - echo "[INFO] Installing recquired python modules"
     - pip install cmsis-pack-manager
     - pip install colorama
@@ -87,7 +87,7 @@ pyocd_wrapper:
     - virtualenv venv
     - .\venv\Scripts\activate.ps1
     - echo "[INFO] Getting latest pyocd"
-    - if (-Not(Test-Path pyocd)) { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd; cd pyocd; git checkout tags/AH_SECURITY_RELEASE_2; git branch; cd .. }
+    - if (-Not(Test-Path pyocd)) { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd; cd pyocd; git checkout tags/AH_FINAL_RELEASE_TC1; git branch; cd .. }
     - echo "[INFO] Installing recquired python modules"
     - pip install cmsis-pack-manager
     - pip install colorama
