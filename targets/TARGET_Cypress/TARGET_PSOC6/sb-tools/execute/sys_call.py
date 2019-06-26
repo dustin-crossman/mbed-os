@@ -14,17 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import os
-from execute.gen_data_from_json import ENTRANCE_EXAM_SRAM_ADDR, ENTRANCE_EXAM_SRAM_SIZE, ENTRANCE_EXAM_FW_STATUS_REG
+from execute.gen_data_from_json import ENTRANCE_EXAM_SRAM_ADDR, ENTRANCE_EXAM_SRAM_SIZE
 from execute.p6_reg import CYREG_IPC2_STRUCT_ACQUIRE, CYREG_IPC2_STRUCT_DATA, CYREG_IPC2_STRUCT_NOTIFY, \
     CYREG_IPC2_STRUCT_LOCK_STATUS
 
 PROVISION_KEYS_AND_POLICIES_OPCODE = 0x33  # ProvisionKeysAndPolicies API opcode
 GET_PROV_DETAILS_OPCODE = 0x37  # GetProvDetails() API opcode
 REGION_HASH_OPCODE = 0x31  # RegionHash() API opcode
-TRANSISION_TO_SECURE_OPCODE = 0x32  # TransitionToSecure() API code
-GET_OPCODE = 0x37
-
-ENTRANCE_EXAM_SRAM_ADDR_CLAIMED = ENTRANCE_EXAM_SRAM_ADDR + (ENTRANCE_EXAM_SRAM_SIZE >> 1)
 
 
 def region_hash(tool, address, length, mode, exp_value):
@@ -195,69 +191,8 @@ def provision_keys_and_policies(tool, blow_secure_efuse, filename):
         i += 4
     print(os.linesep)
 
-    fb_firmware_status = tool.read32(ENTRANCE_EXAM_FW_STATUS_REG)
-    print(f'FB Firmware status = {hex(fb_firmware_status)}')
-
     response = tool.read32(ENTRANCE_EXAM_SRAM_ADDR)
     result = (response & 0xFF000000) == 0xa0000000
 
     print('ProvisionKeysAndPolicies', 'complete' if result else f'error response: {hex(response)}')
     return result
-
-
-def transition_to_secure(tool, blow_secure_efuse):
-    """
-    Calls TransitionToSecure syscall over IPC.
-    :param tool: Programming/debugging tool used for communication with device.
-    :param blow_secure_efuse: Indicates whether to convert device to SECURE mode.
-    :return: True if success, otherwise False.
-    """
-    enable_blowing_secure = 0 if blow_secure_efuse else 1
-    print('Chip will be converted to SECURE mode' if blow_secure_efuse else 'Chip will NOT be converted to SECURE mode')
-
-    # Acquires IPC structure.
-    tool.write32(CYREG_IPC2_STRUCT_ACQUIRE, 0x80000000)
-    print(hex(CYREG_IPC2_STRUCT_ACQUIRE), hex(tool.read32(CYREG_IPC2_STRUCT_ACQUIRE)))
-
-    ipc_acquire = 0
-    while (ipc_acquire & 0x80000000) == 0:
-        ipc_acquire = tool.read32(CYREG_IPC2_STRUCT_ACQUIRE)
-
-    # Set RAM address and Opcode
-    tool.write32(CYREG_IPC2_STRUCT_DATA, ENTRANCE_EXAM_SRAM_ADDR)
-    print('enable_blowing_secure =', enable_blowing_secure)
-    tool.write32(ENTRANCE_EXAM_SRAM_ADDR, (TRANSISION_TO_SECURE_OPCODE << 24) + (enable_blowing_secure << 16))
-    scratch_addr = ENTRANCE_EXAM_SRAM_ADDR + 0x08
-    tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x04, scratch_addr)
-    tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x08, 0)
-    tool.write32(ENTRANCE_EXAM_SRAM_ADDR + 0x0C, 0)
-
-    # IPC_STRUCT[ipc_id].IPC_NOTIFY -
-    tool.write32(CYREG_IPC2_STRUCT_NOTIFY, 0x00000001)
-    # Wait on response
-    response = 0x80000000
-    while (response & 0x80000000) != 0:
-        response = tool.read32(CYREG_IPC2_STRUCT_LOCK_STATUS)
-
-    response = tool.read32(ENTRANCE_EXAM_SRAM_ADDR)
-    if response & 0xFF000000 == 0xa0000000:
-        # # Read region_hash values from application
-        scratch_addr = tool.read32(ENTRANCE_EXAM_SRAM_ADDR + 0x04)
-        read_hash_size = tool.read32(scratch_addr + 0x00)
-        read_hash_addr = tool.read32(scratch_addr + 0x04)
-        response = ''
-
-        i = 0
-        while i < read_hash_size:
-            # Save data in string format
-            hash_byte_chr = chr(tool.read8(read_hash_addr + i))
-            response += hash_byte_chr
-            i += 1
-        print('response =', response.strip())
-        print('Transition to Secure complete')
-        return True
-    else:
-        print('Transition to Secure Error response:')
-        print(hex(CYREG_IPC2_STRUCT_DATA), hex(tool.read32(CYREG_IPC2_STRUCT_DATA)))
-        print(hex(ENTRANCE_EXAM_SRAM_ADDR), hex(tool.read32(ENTRANCE_EXAM_SRAM_ADDR)))
-        return False

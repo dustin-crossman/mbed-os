@@ -17,7 +17,7 @@ import os
 import sys
 import click
 from execute.helper import get_target_name
-from execute.enums import DebugCore, ProtectionState
+from execute.enums import DebugCore
 from execute.provision_device import provision_execution
 from execute.programmer.programmer import ProgrammingTool
 from prepare.provisioning_lib.cyprov_pem import PemKey
@@ -45,20 +45,16 @@ ACCESS_PORT = DebugCore.debug_sys_ap  # Access port used for device provisioning
               default='keys/dev_pub_key.pem',
               type=click.STRING,
               help='File where to save public key in PEM format')
-@click.option('--protection-state', 'protection_state',
-              default=ProtectionState.secure,
-              type=click.INT,
-              help='Expected target protection state. The argument is for Cypress internal use only.',
-              hidden=True)
-@click.option('--probe-id', 'probe_id',
-              default=None,
-              type=click.STRING,
-              help='Probe ID. The argument is used to avoid prompt to select HW when more than one HW connected.',
-              hidden=True)
-def main(prov_cmd_jwt, cy_bootloader_hex, pub_key_json, pub_key_pem, protection_state, probe_id=None):
+def main(prov_cmd_jwt, cy_bootloader_hex, pub_key_json, pub_key_pem):
     """
     Parses command line arguments and provides high level support for
     provisioning device with the specified programming tool.
+    :param prov_cmd_jwt: Path to provisioning JWT file (packet which contains
+           all data necessary for provisioning, including policy, authorization
+           packets and keys).
+    :param cy_bootloader_hex: Path to Cypress Bootloader program file.
+    :param pub_key_json: File where to save public key in JSON format.
+    :param pub_key_pem: File where to save public key in PEM format.
     """
     # Verify arguments
     target = get_target_name(TOOL_NAME, ACCESS_PORT)
@@ -68,13 +64,11 @@ def main(prov_cmd_jwt, cy_bootloader_hex, pub_key_json, pub_key_pem, protection_
 
     test_status = False
     tool = ProgrammingTool.create(TOOL_NAME)
-    if tool.connect(target, probe_id=probe_id):
-        test_status = provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex,
-                                          ProtectionState(protection_state))
-        tool.disconnect()
+    if tool.connect(target):
+        test_status = provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex)
 
     if test_status:
-        # Read device public key from response file and save the key in pem format
+        # Read device response file and take device key from it
         if os.path.exists(pub_key_json):
             pem = PemKey(pub_key_json)
             pem.save(pub_key_pem, private_key=False)
