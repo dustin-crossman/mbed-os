@@ -17,15 +17,14 @@ import os
 from time import sleep
 from execute.helper import check_mode
 from execute.enums import ProtectionState
-from execute.sys_call import get_prov_details, provision_keys_and_policies, transition_to_secure
-from execute.p6_memory_map import FLASH_ADDRESS, FLASH_SIZE, PROVISION_JWT_PACKET_ADDRESS, \
-    PROVISION_JWT_PACKET_SIZE
+from execute.sys_call import get_prov_details, provision_keys_and_policies
+from execute.p6_memory_map import FLASH_ADDRESS, FLASH_SIZE
 from execute.gen_data_from_json import ENTRANCE_EXAM_FW_STATUS_REG, ENTRANCE_EXAM_FW_STATUS_MASK, \
     ENTRANCE_EXAM_FW_STATUS_VAL
 from execute.p6_reg import CYREG_CPUSS_PROTECTION, NVSTORE_AREA_1_ADDRESS
 
 
-def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, protection_state=ProtectionState.secure):
+def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex):
     """
     Programs Cypress Bootloader and calls system calls for device provisioning.
     :param tool: Programming/debugging tool used for communication with device.
@@ -34,7 +33,6 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, pro
            all data necessary for provisioning, including policy, authorization
            packets and keys).
     :param cy_bootloader_hex: Path to Cypress Bootloader program file.
-    :param protection_state: Expected target protection state.
     :return: True if provisioning passed, otherwise False.
     """
     tool.set_frequency(200)
@@ -52,14 +50,13 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, pro
 
     # Check the device life-cycle stage
     print('Check device protection state')
-    if not check_mode(tool, protection_state):
+    if not check_mode(tool, ProtectionState.secure):
         return False
 
     print(os.linesep + 'Erase main flash and TOC3:')
     print('erasing...')
-    if protection_state != ProtectionState.secure:
-        tool.erase(PROVISION_JWT_PACKET_ADDRESS, PROVISION_JWT_PACKET_SIZE)
     tool.erase(FLASH_ADDRESS, FLASH_SIZE)
+    reset_device(tool)
 
     print(os.linesep + 'Read FB Firmware status:')
     fb_firmware_status = tool.read32(ENTRANCE_EXAM_FW_STATUS_REG)
@@ -74,15 +71,11 @@ def provision_execution(tool, pub_key_json, prov_cmd_jwt, cy_bootloader_hex, pro
     if is_exam_pass:
         print(os.linesep + 'PROGRAMMING APP HEX:')
         tool.program(cy_bootloader_hex)
-
-    if protection_state != ProtectionState.secure:
-        print(os.linesep + 'Run transition to secure:')
-        is_exam_pass = transition_to_secure(tool, False)
+        reset_device(tool)
 
     if is_exam_pass:
-        print(os.linesep + 'Run provisioning syscall:')
-        # Set a value indicating whether to convert device to SECURE CLAIMED mode
-        blow_secure_fuse = 1 if protection_state == ProtectionState.secure else 2
+        print(os.linesep + 'Run provisioning syscall')
+        blow_secure_fuse = 1  # indicates whether to convert device to SECURE CLAIMED mode
         is_exam_pass = provision_keys_and_policies(tool, blow_secure_fuse, os.path.join(prov_cmd_jwt))
         print(hex(NVSTORE_AREA_1_ADDRESS) + ': ', sep=' ', end='', flush=True)
         if is_exam_pass:
