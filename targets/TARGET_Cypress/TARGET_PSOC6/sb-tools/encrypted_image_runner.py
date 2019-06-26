@@ -16,11 +16,8 @@ limitations under the License.
 import os
 import sys
 import click
-import platform
 import subprocess
-from pathlib import Path
-from execute.helper import get_target_name
-from execute.enums import DebugCore
+from pathlib import Path, PurePath
 
 from intelhex import IntelHex, hex2bin, bin2hex
 from intelhex.compat import asbytes
@@ -31,8 +28,36 @@ AES_HEADER="aes_header.txt"   # near the script file
 def check_file_exist(file):
     if not Path(file).exists():
         print("ERROR: File %s not found. Check script arguments."% file)
+        return False
+    else:
+        return True
+
+def get_final_hex_name(file):
+    for part in PurePath(file).parts:
+        if "_unsigned.hex" in part:
+            # suppose file came from mbed-os build execution
+            return file[:-13] + "_enc_upgrade.hex"
+    # suppose stand alone script execution
+    return file[:-4] + "_enc_upgrade.hex"
+
+def manage_output(process, input_f, output_f):
+    
+    stderr = process.communicate()
+    rc = process.wait()
+
+    if rc != 0:
+        print("ERROR: Encryption script ended with error!")
+        print("ERROR: " + stderr[1].decode("utf-8"))
+        raise Exception("imgtool finished execution with errors!")
+        
+    if check_file_exist(output_f):
+        os.remove(input_f)
 
 @click.command()
+@click.option('--sdk-path', 'sdk_path',
+              default=Path("."),
+              type=click.STRING,
+              help='TBD')
 @click.option('--hex-file', 'hex_file',
               default=None,
               type=click.STRING,
@@ -70,7 +95,9 @@ def check_file_exist(file):
               type=click.STRING,
               help='TBD')
 
-def main(hex_file,
+
+def main(sdk_path,
+            hex_file,
             key_priv,
             key_pub,
             key_aes,
@@ -86,22 +113,28 @@ def main(hex_file,
     check_file_exist(key_pub)
     check_file_exist(key_aes)
     check_file_exist(hex_file)
-    
-    bin_file        = hex_file[:-4] + ".bin"
-    hex_file_final  = hex_file[:-4] + "_enc_upgrade.hex"
-    bin_sig         = bin_file[:-4] + "_signed.bin"
-    bin_sig_enc     = bin_file[:-4] + "_sig_enc.bin"
-    bin_sig_enc_sig = bin_file[:-4] + "_sig_enc_sig.bin"
-    
+
+    in_f = hex_file[:-4] + "_i.bin"
+    out_f = hex_file[:-4] + "_o.bin"
+
+    hex_file_final = get_final_hex_name(hex_file)
+    print("FINAL HEX NAME IS:")
+    print(hex_file_final)
+#    bin_file        = hex_file[:-4] + ".bin"
+#    hex_file_final  = hex_file[:-4] + "_enc_upgrade.hex"
+#    bin_sig         = bin_file[:-4] + "_signed.bin"
+#    bin_sig_enc     = bin_file[:-4] + "_sig_enc.bin"
+#    bin_sig_enc_sig = bin_file[:-4] + "_sig_enc_sig.bin" 
+
     ih = IntelHex(hex_file)
     img_start_addr = ih.start_addr['EIP']
     
-    hex2bin(hex_file, bin_file)
+    hex2bin(hex_file, in_f) #bin_file)
 
     # $PYTHON $IMGTOOL sign --key $KEY --header-size $HEADER_SIZE --pad-header --align 8 --version $VERSION --image-id $ID --rollback_counter $ROLLBACK_COUNTER --slot-size $SLOT_SIZE --overwrite-only $binFileName $signedFileName is_file_created $signedFileName
-    
+
     # call imgtool for signature
-    process = subprocess.Popen([sys.executable, "imgtool/imgtool.py", "sign",
+    process = subprocess.Popen([sys.executable, sdk_path + "/imgtool/imgtool.py", "sign",
                                 "--key", key_priv,
                                 "--header-size", str(hex(HEADER_SIZE)),
                                 "--pad-header",
@@ -111,19 +144,19 @@ def main(hex_file,
                                 "--rollback_counter", rlb_count,
                                 "--slot-size", slot_size,
                                 "--overwrite-only",
-                                bin_file,
-                                bin_sig],
+                                in_f,
+                                out_f],
+                                #bin_file,
+                                #bin_sig],
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    # catch stderr outputs
-    stderr = process.communicate()
-    rc = process.wait()
-    check_file_exist(bin_sig)
+    manage_output(process, in_f, out_f)
+    
     
     # AES
     # $PYTHON $(dirname "${IMGTOOL}")"/create_aesHeader.py" -k $KEY -p $KEY_DEV --key_to_encrypt "$KEY_AES" $AES_HEADER
     # call aesHeader for crypto header generation
-    process = subprocess.Popen([sys.executable, "imgtool/create_aesHeader.py",
+    process = subprocess.Popen([sys.executable, sdk_path + "/imgtool/create_aesHeader.py",
                                 "-k", key_priv,
                                 "-p", key_pub,
                                 "--key_to_encrypt", key_aes,
@@ -139,23 +172,27 @@ def main(hex_file,
     # $PYTHON $(dirname "${IMGTOOL}")"/aes_cipher.py" -k $KEY_AES $signedFileName $aes_encryptedFileName
     # is_file_created $aes_encryptedFileName
     # encrypt signed image
-    process = subprocess.Popen([sys.executable, "imgtool/aes_cipher.py",
+    process = subprocess.Popen([sys.executable, sdk_path + "/imgtool/aes_cipher.py",
                                 "-k", key_aes,
-                                bin_sig,
-                                bin_sig_enc],
+                                out_f,
+                                in_f],
+                                #bin_sig,
+                                #bin_sig_enc],
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
+    manage_output(process, out_f, in_f)
     # catch stderr outputs
-    stderr = process.communicate()
-    rc = process.wait()
-    check_file_exist(bin_sig_enc)
+    #stderr = process.communicate()
+    #rc = process.wait()
+    #check_file_exist(bin_sig_enc)
+    #os.remove(bin_sig)
 
     # second part - obtain signed image from encrypted file - with padding - for staging area
     # $PYTHON $IMGTOOL sign --key $KEY --header-size $HEADER_SIZE --pad-header --align 8 --version $VERSION --image-id $ID --rollback_counter $ROLLBACK_COUNTER --slot-size $SLOT_SIZE --overwrite-only $PAD -a $AES_HEADER $aes_encryptedFileName $signedEncFileName
     # is_file_created $signedEncFileName
     
     # call imgtool for signature
-    process = subprocess.Popen([sys.executable, "imgtool/imgtool.py", "sign",
+    process = subprocess.Popen([sys.executable, sdk_path + "/imgtool/imgtool.py", "sign",
                                 "--key", key_priv,
                                 "--header-size", str(hex(HEADER_SIZE)),
                                 "--pad-header",
@@ -167,16 +204,22 @@ def main(hex_file,
                                 "--overwrite-only",
                                 "--pad",
                                 "-a", AES_HEADER,
-                                bin_sig_enc,
-                                bin_sig_enc_sig],
+                                in_f,
+                                out_f],
+                                #bin_sig_enc,
+                                #bin_sig_enc_sig],
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
+    manage_output(process, in_f, out_f)
     # catch stderr outputs
-    stderr = process.communicate()
-    rc = process.wait()
-    check_file_exist(bin_sig_enc_sig)
-    
-    bin2hex(bin_sig_enc_sig, hex_file_final, img_start_addr)
+    #stderr = process.communicate()
+    #rc = process.wait()
+    #check_file_exist(bin_sig_enc_sig)
+    #os.remove(bin_sig_enc)
+
+    #bin2hex(bin_sig_enc_sig, hex_file_final, img_start_addr)
+    bin2hex(out_f, hex_file_final, img_start_addr)
+    os.remove(out_f)
     
     os.remove(AES_HEADER)
     
