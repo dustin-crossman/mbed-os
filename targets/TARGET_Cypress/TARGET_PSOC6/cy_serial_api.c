@@ -53,7 +53,7 @@ static void serial_handler_internal(void *handler_arg, cyhal_uart_irq_event_t ev
     if (NULL != async_tx_handler && (event & ser->tx_event_mask)) {
         (*async_tx_handler)();
     }
-#else
+#endif
     void (*handler)(uint32_t, int) = (void (*)(uint32_t, int))ser->handler;
     if (NULL != handler) {
         if (CYHAL_UART_IRQ_RX_NOT_EMPTY == (event & ser->rx_event_mask)) {
@@ -63,7 +63,6 @@ static void serial_handler_internal(void *handler_arg, cyhal_uart_irq_event_t ev
             (*handler)(ser->handler_arg, (int)TxIrq);
         }
     }
-#endif
 }
 
 void serial_init(serial_t *obj, PinName tx, PinName rx)
