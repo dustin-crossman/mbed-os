@@ -62,8 +62,8 @@ def read_key_from_file(keyfile):
         content = f.read().splitlines()
     if len(content) < 2:
         raise Exception("Not anough AES input data: in the file should be two lines: key, iv ...")
-    key = content[0]
-    iv = content[1]
+    key = bytes.fromhex(content[0])
+    iv = bytes.fromhex(content[1])
 
     if 8*len(key) not in set([128, 192, 256]):
         raise Exception("Invalid AES Key length: should be 128, 192 or 256 bits")
