@@ -149,7 +149,8 @@ void cyhal_uart_free(cyhal_uart_t *obj);
  *
  * @param[in,out] obj      The uart object
  * @param[in]     baudrate The baud rate to be configured
- * @param[out]    actualbaud The actual baud rate to be configured, if non NULL
+ * @param[out]    actualbaud The actual baud rate achieved by the HAL
+ *                Specify NULL if you do not want this information.
  * @return The status of the baud request
  */
 cy_rslt_t cyhal_uart_baud(cyhal_uart_t *obj, uint32_t baudrate, uint32_t *actualbaud);
@@ -224,9 +225,10 @@ cy_rslt_t cyhal_uart_tx(cyhal_uart_t *obj, void *tx, size_t *tx_length);
  */
 cy_rslt_t cyhal_uart_rx(cyhal_uart_t *obj, void *rx, size_t *rx_length);
 
-/** Begin asynchronous TX transfer. The transmit buffer is a user defined buffer that will be
- *  sent on the uart.  The user must call cyhal_uart_irq_enable prior to this. If enabled
- *  the transmit done callback is triggered on completion.
+/** Begin asynchronous TX transfer. The transmit buffer is a user defined buffer that will be 
+ *  sent on the uart. The user must register a callback with cyhal_uart_irq_register_irq. If
+ *  desired, TX callback events can be enabled using cyhal_uart_irq_enable with the appropriate
+ *  events.
  *
  * @param[in] obj     The uart object
  * @param[in] tx      The transmit buffer
@@ -235,9 +237,9 @@ cy_rslt_t cyhal_uart_rx(cyhal_uart_t *obj, void *rx, size_t *rx_length);
  */
 cy_rslt_t cyhal_uart_tx_async(cyhal_uart_t *obj, void *tx, size_t length);
 
-/** Begin asynchronous RX transfer (enable interrupt for data collecting)
- *  Recevied data is placed in the user specified buffer, and if enabled
- *  the receive done callback is triggered on completion.
+/** Begin asynchronous RX transfer. Recevied data is placed in the user specified buffer.
+ *  The user must register a callback with cyhal_uart_irq_register_irq. RX callback events
+ *  can be enabled using cyhal_uart_irq_enable with the appropriate events.
  *
  * @param[in]  obj     The uart object
  * @param[out] rx      The user specified receive buffer
