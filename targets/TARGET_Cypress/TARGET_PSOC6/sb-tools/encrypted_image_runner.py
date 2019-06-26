@@ -18,6 +18,7 @@ import sys
 import click
 import platform
 import subprocess
+from pathlib import Path
 from execute.helper import get_target_name
 from execute.enums import DebugCore
 
@@ -26,6 +27,10 @@ from intelhex.compat import asbytes
 
 HEADER_SIZE = 0x400
 AES_HEADER="aes_header.txt"   # near the script file
+
+def check_file_exist(file):
+    if not Path(file).exists():
+        print("ERROR: File %s not found. Check script arguments."% file)
 
 @click.command()
 @click.option('--hex-file', 'hex_file',
@@ -77,6 +82,11 @@ def main(hex_file,
             ):
     """    TBD    """
 
+    check_file_exist(key_priv)
+    check_file_exist(key_pub)
+    check_file_exist(key_aes)
+    check_file_exist(hex_file)
+    
     bin_file        = hex_file[:-4] + ".bin"
     bin_sig         = bin_file[:-4] + "_signed.bin"
     bin_sig_enc     = bin_file[:-4] + "_sig_enc.bin"
@@ -104,6 +114,7 @@ def main(hex_file,
     # catch stderr outputs
     stderr = process.communicate()
     rc = process.wait()
+    check_file_exist(bin_sig)
     
     # AES
     # $PYTHON $(dirname "${IMGTOOL}")"/create_aesHeader.py" -k $KEY -p $KEY_DEV --key_to_encrypt "$KEY_AES" $AES_HEADER
@@ -118,6 +129,7 @@ def main(hex_file,
     # catch stderr outputs
     stderr = process.communicate()
     rc = process.wait()
+    check_file_exist(AES_HEADER)
 
     # aes_cipher.py script file should be in the same folder as imgtool.py    
     # $PYTHON $(dirname "${IMGTOOL}")"/aes_cipher.py" -k $KEY_AES $signedFileName $aes_encryptedFileName
@@ -132,6 +144,7 @@ def main(hex_file,
     # catch stderr outputs
     stderr = process.communicate()
     rc = process.wait()
+    check_file_exist(bin_sig_enc)
 
     # second part - obtain signed image from encrypted file - with padding - for staging area
     # $PYTHON $IMGTOOL sign --key $KEY --header-size $HEADER_SIZE --pad-header --align 8 --version $VERSION --image-id $ID --rollback_counter $ROLLBACK_COUNTER --slot-size $SLOT_SIZE --overwrite-only $PAD -a $AES_HEADER $aes_encryptedFileName $signedEncFileName
@@ -157,8 +170,9 @@ def main(hex_file,
     # catch stderr outputs
     stderr = process.communicate()
     rc = process.wait()
+    check_file_exist(bin_sig_enc_sig)
     
-#    os.remove(AES_HEADER)
+    os.remove(AES_HEADER)
     
 if __name__ == "__main__":
     main()
