@@ -17,6 +17,7 @@ import os
 import sys
 import click
 import subprocess
+import binascii
 from pathlib import Path, PurePath
 
 from intelhex import IntelHex, hex2bin, bin2hex
@@ -33,6 +34,10 @@ def check_file_exist(file):
         return True
 
 def get_final_hex_name(file):
+    """
+    Determine if script is called from mbed-os build system
+    for Secure Boot target processing or directly
+    """
     for part in PurePath(file).parts:
         if "_unsigned.hex" in part:
             # suppose file came from mbed-os build execution
@@ -41,13 +46,15 @@ def get_final_hex_name(file):
     return file[:-4] + "_enc_upgrade.hex"
 
 def manage_output(process, input_f, output_f):
-    
-    stderr = process.communicate()
+    """
+    Function takes care of subprocess 
+    """
+    stderr = process.communicate()[1]
     rc = process.wait()
 
     if rc != 0:
         print("ERROR: Encryption script ended with error!")
-        print("ERROR: " + stderr[1].decode("utf-8"))
+        print("ERROR: " + stderr.decode("utf-8"))
         raise Exception("imgtool finished execution with errors!")
         
     if check_file_exist(output_f):
@@ -57,44 +64,47 @@ def manage_output(process, input_f, output_f):
 @click.option('--sdk-path', 'sdk_path',
               default=Path("."),
               type=click.STRING,
-              help='TBD')
+              help='Path to Secure Boot tools in case running script from outside')
 @click.option('--hex-file', 'hex_file',
               default=None,
               type=click.STRING,
-              help='TBD')
+              help='Hex file to process')
 @click.option('--key-priv', 'key_priv',
               default=None,
               type=click.STRING,
-              help='TBD')
+              help='Private key file to use for signing BOOT or UPGRADE image')
 @click.option('--key-pub', 'key_pub',
               default=None,
               type=click.STRING,
-              help='TBD')
+              help='Path to device public key - obtained from device on provisioning stage')
 @click.option('--key-aes', 'key_aes',
               default=None,
               type=click.STRING,
-              help='TBD')
+              help='Path to encryption key')
 @click.option('--ver', 'version',
               default=None,
               type=click.STRING,
-              help='TBD')
+              help='Version')
 @click.option('--img-id', 'img_id',
               default=None,
               type=click.STRING,
-              help='TBD')
+              help='Image ID - should correspond to values, used in policy file')
 @click.option('--rlb-count', 'rlb_count',
               default=None,
               type=click.STRING,
-              help='TBD')
+              help='Rollback counter value')
 @click.option('--slot-size', 'slot_size',
               default=None,
               type=click.STRING,
-              help='TBD')
+              help='Size of slot available for BOOT or UPGRADE image')
 @click.option('--pad', 'pad',
               default=None,
               type=click.STRING,
-              help='TBD')
-
+              help='Add padding to image - required for UPGRADE image')
+@click.option('--img-offset', 'img_offset',
+              default=None,
+              type=click.STRING,
+              help='Offset of hex file for UPGRADE image')
 
 def main(sdk_path,
             hex_file,
@@ -105,9 +115,12 @@ def main(sdk_path,
             img_id,
             rlb_count,
             slot_size,
-            pad
-            ):
-    """    TBD    """
+            pad,
+            img_offset):
+    """
+    Function consequentially performs operations with provided hex file
+    and produces an encrypted and signed hex file for UPGRADE
+    """
 
     check_file_exist(key_priv)
     check_file_exist(key_pub)
@@ -118,16 +131,10 @@ def main(sdk_path,
     out_f = hex_file[:-4] + "_o.bin"
 
     hex_file_final = get_final_hex_name(hex_file)
-    print("FINAL HEX NAME IS:")
-    print(hex_file_final)
-#    bin_file        = hex_file[:-4] + ".bin"
-#    hex_file_final  = hex_file[:-4] + "_enc_upgrade.hex"
-#    bin_sig         = bin_file[:-4] + "_signed.bin"
-#    bin_sig_enc     = bin_file[:-4] + "_sig_enc.bin"
-#    bin_sig_enc_sig = bin_file[:-4] + "_sig_enc_sig.bin" 
+    print("Image UPGRADE:" + hex_file_final)
 
-    ih = IntelHex(hex_file)
-    img_start_addr = ih.start_addr['EIP']
+    # ih = IntelHex(hex_file)
+    # img_start_addr = ih.start_addr['EIP']
     
     hex2bin(hex_file, in_f) #bin_file)
 
@@ -146,12 +153,8 @@ def main(sdk_path,
                                 "--overwrite-only",
                                 in_f,
                                 out_f],
-                                #bin_file,
-                                #bin_sig],
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
     manage_output(process, in_f, out_f)
-    
     
     # AES
     # $PYTHON $(dirname "${IMGTOOL}")"/create_aesHeader.py" -k $KEY -p $KEY_DEV --key_to_encrypt "$KEY_AES" $AES_HEADER
@@ -176,16 +179,8 @@ def main(sdk_path,
                                 "-k", key_aes,
                                 out_f,
                                 in_f],
-                                #bin_sig,
-                                #bin_sig_enc],
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
     manage_output(process, out_f, in_f)
-    # catch stderr outputs
-    #stderr = process.communicate()
-    #rc = process.wait()
-    #check_file_exist(bin_sig_enc)
-    #os.remove(bin_sig)
 
     # second part - obtain signed image from encrypted file - with padding - for staging area
     # $PYTHON $IMGTOOL sign --key $KEY --header-size $HEADER_SIZE --pad-header --align 8 --version $VERSION --image-id $ID --rollback_counter $ROLLBACK_COUNTER --slot-size $SLOT_SIZE --overwrite-only $PAD -a $AES_HEADER $aes_encryptedFileName $signedEncFileName
@@ -209,18 +204,11 @@ def main(sdk_path,
                                 #bin_sig_enc,
                                 #bin_sig_enc_sig],
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
     manage_output(process, in_f, out_f)
-    # catch stderr outputs
-    #stderr = process.communicate()
-    #rc = process.wait()
-    #check_file_exist(bin_sig_enc_sig)
-    #os.remove(bin_sig_enc)
 
-    #bin2hex(bin_sig_enc_sig, hex_file_final, img_start_addr)
-    bin2hex(out_f, hex_file_final, img_start_addr)
+    bin2hex(out_f, hex_file_final, int(img_offset))
     os.remove(out_f)
-    
+
     os.remove(AES_HEADER)
     
 if __name__ == "__main__":

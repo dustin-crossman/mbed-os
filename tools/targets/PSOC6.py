@@ -170,19 +170,12 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
                 slot0 = slot
             if fw_nspe["upgrade"] and True:
                 slot1 = slot
-
-                print("+++++ NSPE")
-                print(slot1)
-
                 if slot["type"] == "UPGRADE":
                     if fw_nspe["encrypt"] and True:
                         # mark slot1 image as one, that should be encrypted
                         slot1.update({'encrypt': True})
                         toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE NSPE will"
                                               " be ENCRYPTED per policy settings.")
-
-                        print("+++++ NSPE")
-                        print(slot1)
             else:
                 toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
                                       " be built per policy settings.")
@@ -238,18 +231,11 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
             if fw_spe["upgrade"] and True:
                 if slot["type"] == "UPGRADE":
                     slot1 = slot
-
-                    print("+++++ SPE")
-                    print(slot1)
-
                     if fw_spe["encrypt"] and True:
                         # mark slot1 image as one, that should be encrypted
                         slot1.update({'encrypt': True})
                         toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE SPE will"
-                                              " be ENCRYPTED per policy settings.")
-                        print("+++++ SPE")
-                        print(slot1)
-                    
+                                              " be ENCRYPTED per policy settings.")                    
             else:
                 toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
                                       " be produced per policy settings.")            
@@ -370,10 +356,8 @@ def process_target(toolchain, target):
 
                 target_sig_data[1].update({"aes_key": sb_config["aes_key_file"], "dev_pub_key": sb_config["dev_pub_key_file"]})
 
-                print("target_sig_data =++++++++++++++++ ")
-                print(target_sig_data)
         except KeyError:
-            toolchain.notify.info("[PSOC6.sign_image] INFO:  Image for slot UPGRADE would not be encrypted per policy settings")
+            toolchain.notify.info("[PSOC6.sign_image] INFO: Image for slot UPGRADE would not be encrypted per policy settings")
 
     return target_sig_data
 
@@ -399,19 +383,9 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
         raise Exception("imgtool finished execution with errors!")
 
     for slot in target_sig_data:
-        print("FOR slot lpop")
-        print(slot)
-
         # first check if image for slot under processing should be encrypted
         try:        
             if slot["slot_data"]["encrypt"] is True:
-
-                print("SLOT ENCRYPTION BLOCK")
-
-
-#python encrypted_image_runner.py --hex-file MCUBoot_CM0p_mainapp.bin --key-priv MCUBOOT_CM0P_KEY_PRIV.pem --key-pub dev_pub_key.pem
-# --key-aes image-aes-128.key --ver 0.1 --img-id 3 --rlb-count 0 --slot-size 0x20000 --pad 1
-
                 # call ecrypt_img to perform encryption
                 process = subprocess.Popen([sys.executable, str(slot["sdk_path"] / "encrypted_image_runner.py"),
                                            "--sdk-path", str(slot["sdk_path"]), "--hex-file", os.getcwd() + '/' + mbed_hex,
@@ -420,20 +394,19 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
                                            "--key-aes", str(slot["sdk_path"] / slot["aes_key"]),
                                            "--ver", str(slot["img_data"]["VERSION"]), "--img-id", str(slot["id"]),
                                            "--rlb-count", str(slot["img_data"]["ROLLBACK_COUNTER"]),
-                                           "--slot-size", str(hex(slot["slot_data"]["size"])), "--pad", "1"],
+                                           "--slot-size", str(hex(slot["slot_data"]["size"])), "--pad", "1",
+                                           "--img-offset", str(slot["slot_data"]["address"])],
                                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                # catch stderr outputs
-                stderr = process.communicate()
-                stdout = process.communicate()
-                
-                rc = process.wait()
 
-                for i in stdout:
-                    print(i.decode("utf-8"))
+                # catch standard process pipes outputs
+                stderr = process.communicate()[1]
+                stdout = process.communicate()[0]
+                rc = process.wait()
+                print(stdout.decode("utf-8"))
 
                 if rc != 0:
                     toolchain.notify.debug("[PSOC6.sign_image] ERROR: Encryption script ended with error!")
-                    toolchain.notify.debug("[PSOC6.sign_image] Message from encryption script: " + stderr[1].decode("utf-8"))
+                    toolchain.notify.debug("[PSOC6.sign_image] Message from encryption script: " + stderr.decode("utf-8"))
                     raise Exception("imgtool finished execution with errors!")
                 else:
                     toolchain.notify.info("[PSOC6.sign_image] SUCCESS: Image for slot " +
@@ -457,12 +430,12 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
                                         mbed_hex, out_hex_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             # catch stderr outputs
-            stderr = process.communicate()
+            stderr = process.communicate()[1]
             rc = process.wait()
 
             if rc != 0:
                 toolchain.notify.debug("[PSOC6.sign_image] ERROR: Signature is not added!")
-                toolchain.notify.debug("[PSOC6.sign_image] Message from imgtool: " + stderr[1].decode("utf-8"))
+                toolchain.notify.debug("[PSOC6.sign_image] Message from imgtool: " + stderr.decode("utf-8"))
                 raise Exception("imgtool finished execution with errors!")
             else:
                 toolchain.notify.info("[PSOC6.sign_image] SUCCESS: Image for slot " +
@@ -478,6 +451,7 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
             # produce hex file for slot1
             if slot["slot_data"]["type"] == "UPGRADE":
                 bin2hex(out_bin_name, out_hex_name, offset=int(slot["slot_data"]["address"]))
+                print("Image UPGRADE: " + out_hex_name + "\n")
 
 def complete(toolchain, elf0, hexf0, hexf1=None):
     if os.path.isfile(str(hexf0)) and os.path.isfile(str(hexf1)):
