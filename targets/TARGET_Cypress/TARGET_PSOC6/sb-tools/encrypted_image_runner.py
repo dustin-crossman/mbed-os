@@ -82,14 +82,7 @@ def main(hex_file,
     bin_sig_enc     = bin_file[:-4] + "_sig_enc.bin"
     bin_sig_enc_sig = bin_file[:-4] + "_sig_enc_sig.bin"
     
-    # print(hex_file)
-    # print(bin_file)
-    # print(bin_sig)
-    # print(bin_sig_enc)
-    # print(bin_sig_enc_sig)
-    # print(AES_HEADER)
-    
-    # TODO: hex2bin(hex_file, bin_file)
+    hex2bin(hex_file, bin_file)
 
     # $PYTHON $IMGTOOL sign --key $KEY --header-size $HEADER_SIZE --pad-header --align 8 --version $VERSION --image-id $ID --rollback_counter $ROLLBACK_COUNTER --slot-size $SLOT_SIZE --overwrite-only $binFileName $signedFileName is_file_created $signedFileName
     
@@ -165,7 +158,7 @@ def main(hex_file,
     stderr = process.communicate()
     rc = process.wait()
     
-    os.remove(AES_HEADER)
+#    os.remove(AES_HEADER)
     
 if __name__ == "__main__":
     main()
