@@ -834,6 +834,7 @@ typedef uint32_t whd_result_t;
 #define WHD_RTOS_ERROR                   WHD_RESULT_CREATE(1067)   /**< RTOS operation failed */
 #define WHD_CLM_BLOB_DLOAD_ERROR         WHD_RESULT_CREATE(1068)   /**< CLM blob download failed */
 #define WHD_HAL_ERROR                    WHD_RESULT_CREATE(1069)   /**< WHD HAL Error */
+#define WHD_RTOS_STATIC_MEM_LIMIT        WHD_RESULT_CREATE(1070)   /**< Exceeding the RTOS static objects memory */
 
 #define WLAN_ENUM_OFFSET 2000            /**< WLAN enum offset for WHD_WLAN error processing */
 

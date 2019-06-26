@@ -90,12 +90,6 @@ whd_result_t whd_thread_init(whd_driver_t whd_driver)
         return retval;
     }
 
-    whd_driver->thread_info.thread_stack_size = 3 * 1024;
-    if (whd_driver->thread_info.thread_stack_start == NULL)
-    {
-        whd_driver->thread_info.thread_stack_start = (char *)malloc(whd_driver->thread_info.thread_stack_size);
-    }
-
     retval = whd_rtos_create_thread_with_arg(&whd_driver->thread_info.whd_thread, whd_thread_func,
                                              "WHD", whd_driver->thread_info.thread_stack_start,
                                              whd_driver->thread_info.thread_stack_size,

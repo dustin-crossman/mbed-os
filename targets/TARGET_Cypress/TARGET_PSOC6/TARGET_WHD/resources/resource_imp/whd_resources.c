@@ -261,15 +261,19 @@ uint32_t host_get_resource_block_size(whd_driver_t whd_drv, whd_resource_type_t 
 
 uint32_t host_get_resource_no_of_blocks(whd_driver_t whd_drv, whd_resource_type_t type, uint32_t *block_count)
 {
-    uint32_t resource_size;
-    uint32_t block_size;
+    if (type == WHD_RESOURCE_WLAN_NVRAM)
+        *block_count = 1;
+    else
+    {
+        uint32_t resource_size;
+        uint32_t block_size;
 
-    host_platform_resource_size(whd_drv, type, &resource_size);
-    host_get_resource_block_size(whd_drv, type, &block_size);
-    *block_count = resource_size / block_size;
-    if (resource_size % block_size)
-        *block_count += 1;
-
+        host_platform_resource_size(whd_drv, type, &resource_size);
+        host_get_resource_block_size(whd_drv, type, &block_size);
+        *block_count = resource_size / block_size;
+        if (resource_size % block_size)
+            *block_count += 1;
+    }
     return WHD_SUCCESS;
 }
 

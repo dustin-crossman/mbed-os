@@ -186,9 +186,9 @@ static whd_result_t whd_bus_common_download_resource(whd_driver_t whd_driver, wh
             transfer_progress = 0;
         for (j = 0; j < num_buff; j++)
         {
+            transfer_size = (uint16_t)MIN_OF(BLOCK_SIZE, image_size - transfer_progress);
             packet = (uint8_t *)whd_buffer_get_current_piece_data_pointer(whd_driver, buffer);
             memcpy(packet + sizeof(whd_buffer_header_t), &image[transfer_progress], transfer_size);
-
 
             /* Round up the size of the chunk */
             transfer_size = (uint16_t)ROUND_UP(transfer_size, WHD_BUS_ROUND_UP_ALIGNMENT);
