@@ -155,6 +155,15 @@ void cyhal_uart_free(cyhal_uart_t *obj);
  */
 cy_rslt_t cyhal_uart_baud(cyhal_uart_t *obj, uint32_t baudrate, uint32_t *actualbaud);
 
+/** Configure the data bits, stop bits, and parity
+ *
+ * @param[in,out] obj      The uart object
+ * @param[in]     cfg      The uart configuration data for data bits, stop bits and parity.
+ *                         rx_buffer and rx_buffer_size are ignored.
+ * @return The status of the format request
+ */
+cy_rslt_t cyhal_uart_format(cyhal_uart_t *obj, const cyhal_uart_cfg_t *cfg);
+
 /** Get character. This is a blocking call, waiting for a character
  *
  * @param[in] obj    The uart object
