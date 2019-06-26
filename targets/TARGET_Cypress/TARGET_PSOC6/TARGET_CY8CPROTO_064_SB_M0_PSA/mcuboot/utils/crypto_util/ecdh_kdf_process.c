@@ -26,6 +26,8 @@
 #include "ecdh_kdf_process.h"
 #include "flashboot_psacrypto.h"
 
+#define PSA_CRYPTO_LEGACY_OFFSET (35u)
+
 encrypted_image_header enc_img_hdr;
 
 /**************************************************************************/
@@ -75,7 +77,7 @@ int Cy_ECDH_ExtractDerivedKey(header_crypto_data *crypto_data,
     }
     if(status == PSA_SUCCESS)
     {
-        publicKeyLength = PSA_KEY_EXPORT_MAX_SIZE( publicKeyType, keyBits );
+        publicKeyLength = PSA_KEY_EXPORT_MAX_SIZE( publicKeyType, keyBits ) + PSA_CRYPTO_LEGACY_OFFSET;
         publicKey = malloc(publicKeyLength);
         if(publicKey == NULL)
         {
@@ -154,7 +156,7 @@ int Cy_ECDH_ExtractDerivedKey(header_crypto_data *crypto_data,
     }
     if(status == PSA_SUCCESS)
     {
-        publicKeyLength = PSA_KEY_EXPORT_MAX_SIZE( publicKeyType, keyBits );
+        publicKeyLength = PSA_KEY_EXPORT_MAX_SIZE( publicKeyType, keyBits ) + PSA_CRYPTO_LEGACY_OFFSET;
         publicKey = malloc(publicKeyLength);
         if(publicKey == NULL)
         {
