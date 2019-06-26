@@ -1,1 +1,0 @@
-python encrypted_image_runner.py --hex-file MCUBoot_CM0p_mainapp.bin --key-priv MCUBOOT_CM0P_KEY_PRIV.pem --key-pub dev_pub_key.pem --key-aes image-aes-128.key --ver 0.1 --img-id 3 --rlb-count 0 --slot-size 0x20000 --pad 1

@@ -88,9 +88,13 @@ def main(hex_file,
     check_file_exist(hex_file)
     
     bin_file        = hex_file[:-4] + ".bin"
+    hex_file_final  = hex_file[:-4] + "_enc_upgrade.hex"
     bin_sig         = bin_file[:-4] + "_signed.bin"
     bin_sig_enc     = bin_file[:-4] + "_sig_enc.bin"
     bin_sig_enc_sig = bin_file[:-4] + "_sig_enc_sig.bin"
+    
+    ih = IntelHex(hex_file)
+    img_start_addr = ih.start_addr['EIP']
     
     hex2bin(hex_file, bin_file)
 
@@ -171,6 +175,8 @@ def main(hex_file,
     stderr = process.communicate()
     rc = process.wait()
     check_file_exist(bin_sig_enc_sig)
+    
+    bin2hex(bin_sig_enc_sig, hex_file_final, img_start_addr)
     
     os.remove(AES_HEADER)
     
