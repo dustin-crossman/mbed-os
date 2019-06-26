@@ -376,6 +376,24 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
         stderr = process.communicate()
         rc = process.wait()
 
+        # TODO: if encrypt = true only
+        # TODO: if slot_1 only
+        
+        # TODO: add AES_HEADER-section
+        # catch stderr outputs
+#        stderr = process.communicate()
+#        rc = process.wait()
+        
+        # TODO: add aes_cipher-section
+        # catch stderr outputs
+#        stderr = process.communicate()
+#        rc = process.wait()
+        
+        # TODO: repeat/add IMGTOOL-section again applying to encrypted binary
+        # catch stderr outputs
+#        stderr = process.communicate()
+#        rc = process.wait()
+        
         if rc != 0:
             toolchain.notify.debug("[PSOC6.sign_image] ERROR: Signature is not added!")
             toolchain.notify.debug("[PSOC6.sign_image] Message from imgtool: " + stderr[1].decode("utf-8"))

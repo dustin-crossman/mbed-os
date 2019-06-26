@@ -172,6 +172,8 @@ def main(hex_file,
     rc = process.wait()
     check_file_exist(bin_sig_enc_sig)
     
+    bin2hex(hex_file, bin_file, address)
+    
     os.remove(AES_HEADER)
     
 if __name__ == "__main__":

@@ -56,7 +56,9 @@ Default arguments can be overridden with a custom:
     
 **_NOTE:_** PSoC 6 supply voltage must be 2.5 V to perform provisioning.
 
-## 5. To generate encrypted image for UPGRADE (slot_1) area policy.json needs to have "encrypt"=true and "encrypt_id"=1 (which means Device Key will be used in ECDH/HKDF protocol. The generic HEX can be converted into encrypted image by following script call:
+## 5. Encrypted upgrade image:
+
+To generate encrypted image for UPGRADE (slot_1) area policy.json needs to have "encrypt"=true and "encrypt_id"=1 (which means Device Key will be used in ECDH/HKDF protocol. The generic HEX can be converted into encrypted image by following script call:
 
     python encrypted_image_runner.py --hex-file someApplication.hex --key-priv keys/MCUBOOT_CM0P_KEY_PRIV.pem --key-pub keys/dev_pub_key.pem --key-aes keys/aes128_key.key --ver 0.1 --img-id 3 --rlb-count 0 --slot-size 0x50000 --pad 1
     
