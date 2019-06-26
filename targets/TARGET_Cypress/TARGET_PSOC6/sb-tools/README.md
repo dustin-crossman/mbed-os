@@ -3,11 +3,17 @@ These files are relevant to CY8CPROTO_064_SB or CY8CPROTO_064_SB_M0_PSA, CY8CPRO
 
 # DEVICE PROVISIONING
 
-## 1.   Generate new keys pairs or encryption keys by executing the following commands from ./keys:
+## 1.   Generate new keys by executing the following commands from ./keys:
+
+    *Create keys for image signing:*
 
     python.exe keygen.py -k 6 --jwk MCUBOOT_CM0P_KEY.json --pem-priv MCUBOOT_CM0P_KEY_PRIV.pem
     python.exe keygen.py -k 8 --jwk USERAPP_CM4_KEY.json --pem-priv USERAPP_CM4_KEY_PRIV.pem
-    python.exe keygen.py --aes aes128_key.key
+
+    *Create key for image encription:*
+
+    python.exe keygen.py --aes aes.key
+
         
 **_NOTE_:** DO NOT COMMIT any new keys to repository. ---
 
