@@ -45,7 +45,7 @@ wwd_result_t internal_host_buffer_get(wiced_buffer_t * buffer, wwd_buffer_dir_t 
       }
       pkt = (wiced_buffer_impl_t *)pbuffer->payload;
       *buffer = (wiced_buffer_t) pbuffer->payload;
-       pkt->parent = pbuffer;
+       pkt->parent = (uint8_t *)pbuffer;
     }
     else
     {
@@ -57,7 +57,7 @@ wwd_result_t internal_host_buffer_get(wiced_buffer_t * buffer, wwd_buffer_dir_t 
     	 *buffer = p;
 
     }
-    (*buffer)->ptr = &pkt[1];
+    (*buffer)->ptr = (uint8_t *)&pkt[1];
 
     (*buffer)->size = size;
     (*buffer)->offset = 0;
@@ -79,7 +79,7 @@ void host_buffer_release(wiced_buffer_t buffer, wwd_buffer_dir_t direction )
     }
     else
     {
-    	pbuf_free(buffer->parent);
+    	pbuf_free((struct pbuf *)buffer->parent);
     }
 }
 
