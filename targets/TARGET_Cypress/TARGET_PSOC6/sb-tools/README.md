@@ -75,23 +75,23 @@ Type of upgrade images is determined by the following policy setting which are a
 - **_"smif_id":_** 0, - should be set to 2 if AUGUST_CYW43012 target is used, 1 - if CY8CPROTO_064_SB
 - **_"upgrade":_** true/false, - should be set to *true* if UPGRADE supported, *false* - if disabled
 - **_"encrypt":_** true/false, - should be set to *true* if encrypted UPGRADE supported, *false* - if disabled
-- **_"encrypt_key_id":_** 1, - should remain unchaged where present, or shold be added, where missed (means that Device Key will be used in ECDH/HKDF protocol.)
+- **_"encrypt_key_id":_** 1, - should remain unchaged, means that Device Key will be used in ECDH/HKDF protocol
 
 Requirements:
 - Policy with **_smif.json** from prepare/ folder should be used.
 For encrypted image:
 - aes.key generated, as described in **DEVICE_PROVISIONING - 1**
-- dev_pub_key.pem obtained after provisioning is located in keys/ folder (default)
-- secure_image_parameters.json file of target is populated with valid pathes to mentioned keys.
+- dev_pub_key.pem that was obtained after provisioning is located in keys/ folder (default)
+- secure_image_parameters.json file in the target directory must contain valid keys paths
 
 Non encrypted UPGRADE image 
-**_Example settings for AUGUST_CYW43012:_**
+**_Example policy for AUGUST_CYW43012:_**
         
         "smif_id": 2,
         "upgrade": true,
         "encrypt": false,
         "encrypt_key_id": 1,
-**_Example settings for CY8CPROTO_064_SB:_**
+**_Example policy for CY8CPROTO_064_SB:_**
         
         "smif_id": 1,
         "upgrade": true,
@@ -100,13 +100,13 @@ Non encrypted UPGRADE image
 
 Encrypted UPGRADE image:
 
-**_Example settings for AUGUST_CYW43012:_**
+**_Example policy for AUGUST_CYW43012:_**
         
         "smif_id": 2,
         "upgrade": true,
         "encrypt": true,
         "encrypt_key_id": 1,
-**_Example settings for CY8CPROTO_064_SB:_**
+**_Example policy for CY8CPROTO_064_SB:_**
         
         "smif_id": 1,
         "upgrade": true,
@@ -123,7 +123,7 @@ Now mbed-os application or test can be built as described in section **TESTS**. 
 Upgrade image can be programmed to target board using Daplink. Upgrade procedure is performed after first reset.
 
 **_Encrypt generic image:_**
-The generic HEX file (for example one that is prodiced by mbed-os build system) can be converted into encrypted image using script encrypted_image_runner.py located in sb-tools. Example usage:
+The generic HEX file (for example one that is produced by mbed-os build system) can be converted into encrypted image using script encrypted_image_runner.py located in sb-tools. Example usage:
 
         python encrypted_image_runner.py --sdk-path . --hex-file someApplication.hex --key-priv keys/MCUBOOT_CM0P_KEY_PRIV.pem --key-pub keys/dev_pub_key.pem --key-aes keys/aes128_key.key --ver 0.1 --img-id 3 --rlb-count 0 --slot-size 0x50000 --pad 1 --img-offset 402653184
     
