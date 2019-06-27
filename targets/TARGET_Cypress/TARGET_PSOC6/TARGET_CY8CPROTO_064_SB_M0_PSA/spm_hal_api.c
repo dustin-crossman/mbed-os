@@ -366,7 +366,7 @@ void spm_hal_start_nspe(void)
     if(smif_id != 0)
     {
         /* reload one will be used with exact external memory module */
-        smifMemConfigs[0] = multi_smifMemConfigs[smif_id-1];
+        smifMemConfigs[0] = (cy_stc_smif_mem_config_t*)multi_smifMemConfigs[smif_id-1];
         cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
 
         qspi_status = Flash_SMIF_QSPI_Start();

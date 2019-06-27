@@ -91,7 +91,7 @@ cy_en_smif_status_t Flash_SMIF_QSPI_Start(void)
         BOOT_LOG_INF("SMIF Block Enabled\r\n");
 
         /* Map memory device to memory map */
-        qspiStatus = Cy_SMIF_Memslot_Init(QSPI_HW, &smifBlockConfig, &QSPIContext);
+        qspiStatus = Cy_SMIF_Memslot_Init(QSPI_HW, (cy_stc_smif_block_config_t * const)&smifBlockConfig, &QSPIContext);
     }
 
     if(qspiStatus == CY_SMIF_SUCCESS)
