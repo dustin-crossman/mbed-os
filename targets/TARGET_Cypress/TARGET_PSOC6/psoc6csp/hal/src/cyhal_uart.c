@@ -434,37 +434,38 @@ static cy_en_syspm_status_t cyhal_uart_pm_callback(cy_stc_syspm_callback_params_
     uint8_t txpin = (uint8_t)CYHAL_GET_PIN(obj->pin_tx), rtspin = (uint8_t)CYHAL_GET_PIN(obj->pin_rts);
     switch (mode)
     {
-    case CY_SYSPM_CHECK_READY:
-        if (rslt == CY_SYSPM_SUCCESS)
-        {
+        case CY_SYSPM_CHECK_READY:
+            if (rslt == CY_SYSPM_SUCCESS)
+            {
+                if (NULL != txport)
+                {
+                    obj->saved_tx_hsiom = Cy_GPIO_GetHSIOM(txport, txpin);
+                    Cy_GPIO_Set(txport, txpin);
+                    Cy_GPIO_SetHSIOM(txport, txpin, HSIOM_SEL_GPIO);
+                }
+                if (NULL != rtsport)
+                {
+                    obj->saved_rts_hsiom = Cy_GPIO_GetHSIOM(rtsport, rtspin);
+                    Cy_GPIO_Set(rtsport, rtspin);
+                    Cy_GPIO_SetHSIOM(rtsport, rtspin, HSIOM_SEL_GPIO);
+                }
+            }
+            break;
+
+        case CY_SYSPM_CHECK_FAIL: // fallthrough
+        case CY_SYSPM_AFTER_TRANSITION:
             if (NULL != txport)
             {
-                obj->saved_tx_hsiom = Cy_GPIO_GetHSIOM(txport, txpin);
-                Cy_GPIO_Clr(txport, txpin);
-                Cy_GPIO_SetHSIOM(txport, txpin, HSIOM_SEL_GPIO);
+                Cy_GPIO_SetHSIOM(txport, txpin, obj->saved_tx_hsiom);
             }
             if (NULL != rtsport)
             {
-                obj->saved_rts_hsiom = Cy_GPIO_GetHSIOM(rtsport, rtspin);
-                Cy_GPIO_Clr(rtsport, rtspin);
-                Cy_GPIO_SetHSIOM(rtsport, rtspin, HSIOM_SEL_GPIO);
+                Cy_GPIO_SetHSIOM(rtsport, rtspin, obj->saved_rts_hsiom);
             }
-        }
-        break;
-    case CY_SYSPM_CHECK_FAIL: // fallthrough
-    case CY_SYSPM_AFTER_TRANSITION:
-        if (NULL != txport)
-        {
-            Cy_GPIO_SetHSIOM(txport, txpin, obj->saved_tx_hsiom);
-            Cy_GPIO_Set(txport, txpin);
-        }
-        if (NULL != rtsport)
-        {
-            Cy_GPIO_SetHSIOM(rtsport, rtspin, obj->saved_rts_hsiom);
-            Cy_GPIO_Set(rtsport, rtspin);
-        }
-        break;
-    default: break;
+            break;
+
+        default:
+            break;
     }
     return rslt;
 }

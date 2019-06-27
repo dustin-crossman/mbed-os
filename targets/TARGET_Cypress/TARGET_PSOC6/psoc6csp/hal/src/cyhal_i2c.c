@@ -54,7 +54,7 @@ static cyhal_i2c_irq_event_t cyhal_convert_interrupt_cause(uint32_t pdl_cause);
 static en_clk_dst_t get_scb_cls(uint8_t scb_block_instance);
 
 static cyhal_i2c_t *cyhal_i2c_config_structs[CY_IP_MXSCB_INSTANCES];
-static cyhal_i2c_irq_handler cyhal_i2c_user_callbacks[CY_IP_MXSCB_INSTANCES];
+static cyhal_i2c_irq_handler_t cyhal_i2c_user_callbacks[CY_IP_MXSCB_INSTANCES];
 static void *cyhal_i2c_callback_args[CY_IP_MXSCB_INSTANCES];
 
 static void cyhal_i2c_0_cb_wrapper(uint32_t event) __attribute__((unused));
@@ -944,7 +944,7 @@ static en_clk_dst_t get_scb_cls(uint8_t scb_block_instance)
     return source;
 }
 
-void cyhal_i2c_register_irq(cyhal_i2c_t *obj, cyhal_i2c_irq_handler handler, void *handler_arg)
+void cyhal_i2c_register_irq(cyhal_i2c_t *obj, cyhal_i2c_irq_handler_t handler, void *handler_arg)
 {
     uint8_t idx = obj->resource.block_num;
     cyhal_i2c_config_structs[idx] = obj;
