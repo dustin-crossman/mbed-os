@@ -570,20 +570,6 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
         CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_iovar(ifp, CDC_SET, buffer, NULL), &ap->whd_wifi_sleep_flag);
     }
 
-    /* Configuring the max number of associated STA in SoftAP mode. */
-    result = whd_wifi_set_iovar_value(ifp, IOVAR_STR_MAX_ASSOC, WHD_WIFI_CONFIG_AP_MAX_ASSOC);
-    if (result == WHD_WLAN_RANGE)
-    {
-        WPRINT_WHD_INFO( ("configure maxassoc : Not In Range!( value : %d )\n", WHD_WIFI_CONFIG_AP_MAX_ASSOC) );
-        return result;
-    }
-    else if (result != WHD_SUCCESS)
-    {
-        WPRINT_WHD_INFO( ("configure maxassoc : ioctl failed!( err code : %" PRIu32 " )\n", result) );
-        whd_assert("start_ap: Failed to configure maxassoc\r\n", result == WHD_SUCCESS);
-        return result;
-    }
-
     return WHD_SUCCESS;
 }
 

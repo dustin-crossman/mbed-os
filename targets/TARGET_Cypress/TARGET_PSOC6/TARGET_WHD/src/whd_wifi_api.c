@@ -470,6 +470,9 @@ uint32_t whd_wifi_get_channel(whd_interface_t ifp, uint32_t *channel)
 
     CHECK_IFP_NULL(ifp);
 
+    if (channel == NULL)
+        return WHD_BADARG;
+
     whd_driver = ifp->whd_driver;
 
     CHECK_DRIVER_NULL(whd_driver);
@@ -573,7 +576,14 @@ uint32_t whd_wifi_sae_password(whd_interface_t ifp, const uint8_t *security_key,
 uint32_t whd_wifi_get_rssi(whd_interface_t ifp, int32_t *rssi)
 {
     CHECK_IFP_NULL(ifp);
-    return whd_wifi_get_ioctl_buffer(ifp, WLC_GET_RSSI, (uint8_t *)rssi, sizeof(*rssi) );
+
+    if (rssi == NULL)
+        return WHD_BADARG;
+    if (ifp->role == WHD_STA_ROLE)
+    {
+        return whd_wifi_get_ioctl_buffer(ifp, WLC_GET_RSSI, (uint8_t *)rssi, sizeof(*rssi) );
+    }
+    return WHD_BADARG;
 }
 
 /** Callback for join events
@@ -1323,9 +1333,20 @@ uint32_t whd_wifi_join_specific(whd_interface_t ifp, const whd_scan_result_t *ap
     WHD_WLAN_KEEP_AWAKE(whd_driver);
     ifp->role = WHD_STA_ROLE;
 
+    if (ap->bss_type == WHD_BSS_TYPE_MESH)
+    {
+        return WHD_UNSUPPORTED;
+    }
+
     if (ap->bss_type == WHD_BSS_TYPE_ADHOC)
     {
         security |= IBSS_ENABLED;
+    }
+
+    if (BROADCAST_ID(ap->BSSID.octet) )
+    {
+        WPRINT_WHD_ERROR( ("Broadcast address is not allowed/valid in join with specific BSSID of AP\n") );
+        return WHD_BADARG;
     }
 
     CHECK_RETURN(whd_rtos_init_semaphore(&join_semaphore) );
@@ -1714,15 +1735,6 @@ static void *whd_wifi_scan_events_handler(whd_interface_t ifp, const whd_event_h
         return handler_user_data;
     }
 
-    /* If its an unknown type, try parsing for Mesh ID tag */
-    if (record->bss_type == WHD_BSS_TYPE_UNKNOWN)
-    {
-        if (whd_parse_dot11_tlvs(cp, len, DOT11_IE_ID_MESH_ID) != NULL)
-        {
-            record->bss_type = WHD_BSS_TYPE_MESH;
-        }
-    }
-
     /* Find an RSN IE (Robust-Security-Network Information-Element) */
     rsnie = (rsn_ie_fixed_portion_t *)whd_parse_dot11_tlvs(cp, len, DOT11_IE_ID_RSN);
 
@@ -2084,6 +2096,14 @@ uint32_t whd_wifi_scan(whd_interface_t ifp,
 
     whd_assert("Bad args", callback != NULL);
 
+    if (!( (scan_type == WHD_SCAN_TYPE_ACTIVE) || (scan_type == WHD_SCAN_TYPE_PASSIVE) ||
+           (scan_type == WHD_SCAN_TYPE_PROHIBITED_CHANNELS) || (scan_type == WHD_SCAN_TYPE_NO_BSSID_FILTER) ) )
+        return WHD_BADARG;
+
+    if (!( (bss_type == WHD_BSS_TYPE_INFRASTRUCTURE) || (bss_type == WHD_BSS_TYPE_ADHOC) ||
+           (bss_type == WHD_BSS_TYPE_ANY) ) )
+        return WHD_BADARG;
+
     /* Determine size of channel_list, and add it to the parameter size so correct sized buffer can be allocated */
     if (optional_channel_list != NULL)
     {
@@ -2305,6 +2325,9 @@ uint32_t whd_wifi_get_mac_address(whd_interface_t ifp, whd_mac_t *mac)
 
     CHECK_IFP_NULL(ifp);
 
+    if (mac == NULL)
+        return WHD_BADARG;
+
     whd_driver = ifp->whd_driver;
 
     CHECK_DRIVER_NULL(whd_driver);
@@ -2475,6 +2498,9 @@ uint32_t whd_wifi_get_powersave_mode(whd_interface_t ifp, uint32_t *value)
 
     CHECK_IFP_NULL(ifp);
 
+    if (value == NULL)
+        return WHD_BADARG;
+
     whd_driver = ifp->whd_driver;
 
     CHECK_DRIVER_NULL(whd_driver);
@@ -2496,7 +2522,7 @@ uint32_t whd_wifi_enable_powersave_with_throughput(whd_interface_t ifp, uint16_t
 
     if (return_to_sleep_delay_ms == 0)
     {
-        return_to_sleep_delay_ms = DEFAULT_PM2_SLEEP_RET_TIME;
+        return WHD_BADARG;
     }
     else if (return_to_sleep_delay_ms < PM2_SLEEP_RET_TIME_MIN)
     {
@@ -2665,17 +2691,25 @@ uint32_t whd_wifi_set_listen_interval(whd_interface_t ifp, uint8_t listen_interv
 
     CHECK_IFP_NULL(ifp);
 
-    if (time_unit == WHD_LISTEN_INTERVAL_TIME_UNIT_DTIM)
+    switch (time_unit)
     {
-        listen_interval_dtim = listen_interval;
-    }
-    else
-    {
-        /* If the wake interval measured in DTIMs is set to 0, the wake interval is measured in beacon periods */
-        listen_interval_dtim = 0;
+        case WHD_LISTEN_INTERVAL_TIME_UNIT_DTIM:
+        {
+            listen_interval_dtim = listen_interval;
+            break;
+        }
+        case WHD_LISTEN_INTERVAL_TIME_UNIT_BEACON:
+        {
+            /* If the wake interval measured in DTIMs is set to 0, the wake interval is measured in beacon periods */
+            listen_interval_dtim = 0;
 
-        /* The wake period is measured in beacon periods, set the value as required */
-        CHECK_RETURN(whd_wifi_set_iovar_value(ifp, IOVAR_STR_LISTEN_INTERVAL_BEACON, listen_interval) );
+            /* The wake period is measured in beacon periods, set the value as required */
+            CHECK_RETURN(whd_wifi_set_iovar_value(ifp, IOVAR_STR_LISTEN_INTERVAL_BEACON, listen_interval) );
+            break;
+        }
+        default:
+            WPRINT_WHD_ERROR( ("whd_wifi_set_listen_interval: Invalid Time unit specified \n") );
+            return WHD_BADARG;
     }
 
     CHECK_RETURN(whd_wifi_set_iovar_value(ifp, IOVAR_STR_LISTEN_INTERVAL_DTIM, listen_interval_dtim) );
@@ -2694,6 +2728,9 @@ uint32_t whd_wifi_get_listen_interval(whd_interface_t ifp, whd_listen_interval_t
     whd_driver_t whd_driver;
 
     CHECK_IFP_NULL(ifp);
+
+    if (li == NULL)
+        return WHD_BADARG;
 
     whd_driver = ifp->whd_driver;
 
@@ -3095,8 +3132,13 @@ uint32_t whd_wifi_get_clm_version(whd_interface_t ifp, char *version, uint8_t le
 {
     whd_result_t result;
 
-    version[0] = '\0';
     CHECK_IFP_NULL(ifp);
+
+    if (version == NULL)
+        return WHD_BADARG;
+
+    version[0] = '\0';
+
     result = whd_wifi_get_iovar_buffer(ifp, IOVAR_STR_CLMVER, (uint8_t *)version, length);
     if ( (result == WHD_SUCCESS) && version[0] )
     {

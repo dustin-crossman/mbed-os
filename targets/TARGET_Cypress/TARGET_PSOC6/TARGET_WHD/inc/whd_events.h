@@ -78,6 +78,8 @@ extern "C"
 #define WLC_E_STATUS_ERROR          16  /**< request failed due to error */
 #define WLC_E_STATUS_INVALID        0xff /**< Invalid status code to init variables. */
 
+#define WLC_SUP_STATUS_OFFSET      (256) /**< Status offset added to the status codes to match the values from firmware. */
+
 /**
  * @brief Status code for event WLC_E_PSK_SUP
  *
@@ -102,21 +104,21 @@ extern "C"
  */
 typedef enum sup_auth_status
 {
-    WLC_SUP_DISCONNECTED = 0,                               /**< Disconnected */
-    WLC_SUP_CONNECTING,                                     /**< Connecting */
-    WLC_SUP_IDREQUIRED,                                     /**< ID Required */
-    WLC_SUP_AUTHENTICATING,                                 /**< Authenticating */
-    WLC_SUP_AUTHENTICATED,                                  /**< Authenticated */
-    WLC_SUP_KEYXCHANGE,                                     /**< Key Exchange */
-    WLC_SUP_KEYED,                                          /**< Key Exchanged */
-    WLC_SUP_TIMEOUT,                                        /**< Timeout */
-    WLC_SUP_LAST_BASIC_STATE,                               /**< Last Basic State */
-    WLC_SUP_KEYXCHANGE_WAIT_M1 = WLC_SUP_AUTHENTICATED,     /**< Waiting to receive handshake msg M1 */
-    WLC_SUP_KEYXCHANGE_PREP_M2 = WLC_SUP_KEYXCHANGE,        /**< Preparing to send handshake msg M2 */
-    WLC_SUP_KEYXCHANGE_WAIT_M3 = WLC_SUP_LAST_BASIC_STATE,  /**< Waiting to receive handshake msg M3 */
-    WLC_SUP_KEYXCHANGE_PREP_M4,                             /**< Preparing to send handshake msg M4 */
-    WLC_SUP_KEYXCHANGE_WAIT_G1,                             /**< Waiting to receive handshake msg G1 */
-    WLC_SUP_KEYXCHANGE_PREP_G2                              /**< Preparing to send handshake msg G2 */
+    WLC_SUP_DISCONNECTED = 0 + WLC_SUP_STATUS_OFFSET,        /**< Disconnected */
+    WLC_SUP_CONNECTING = 1 + WLC_SUP_STATUS_OFFSET,          /**< Connecting */
+    WLC_SUP_IDREQUIRED = 2 + WLC_SUP_STATUS_OFFSET,          /**< ID Required */
+    WLC_SUP_AUTHENTICATING = 3 + WLC_SUP_STATUS_OFFSET,      /**< Authenticating */
+    WLC_SUP_AUTHENTICATED = 4 + WLC_SUP_STATUS_OFFSET,       /**< Authenticated */
+    WLC_SUP_KEYXCHANGE = 5 + WLC_SUP_STATUS_OFFSET,          /**< Key Exchange */
+    WLC_SUP_KEYED = 6 + WLC_SUP_STATUS_OFFSET,               /**< Key Exchanged */
+    WLC_SUP_TIMEOUT = 7 + WLC_SUP_STATUS_OFFSET,             /**< Timeout */
+    WLC_SUP_LAST_BASIC_STATE = 8 + WLC_SUP_STATUS_OFFSET,    /**< Last Basic State */
+    WLC_SUP_KEYXCHANGE_WAIT_M1 = WLC_SUP_AUTHENTICATED,      /**< Waiting to receive handshake msg M1 */
+    WLC_SUP_KEYXCHANGE_PREP_M2 = WLC_SUP_KEYXCHANGE,         /**< Preparing to send handshake msg M2 */
+    WLC_SUP_KEYXCHANGE_WAIT_M3 = WLC_SUP_LAST_BASIC_STATE,   /**< Waiting to receive handshake msg M3 */
+    WLC_SUP_KEYXCHANGE_PREP_M4 = 9 + WLC_SUP_STATUS_OFFSET,  /**< Preparing to send handshake msg M4 */
+    WLC_SUP_KEYXCHANGE_WAIT_G1 = 10 + WLC_SUP_STATUS_OFFSET, /**< Waiting to receive handshake msg G1 */
+    WLC_SUP_KEYXCHANGE_PREP_G2  = 11 + WLC_SUP_STATUS_OFFSET /**< Preparing to send handshake msg G2 */
 } sup_auth_status_t;
 
 #define WHD_MSG_IFNAME_MAX 16 /**< Max length of Interface name */
