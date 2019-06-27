@@ -168,16 +168,20 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
         for slot in fw_nspe["resources"]:
             if slot["type"] == "BOOT":
                 slot0 = slot
+
             if fw_nspe["upgrade"] and True:
                 slot1 = slot
                 if slot["type"] == "UPGRADE":
-                    if fw_nspe["encrypt"] and True:
-                        # mark slot1 image as one, that should be encrypted
-                        slot1.update({'encrypt': True})
-                        toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE NSPE will"
-                                              " be ENCRYPTED per policy settings.")
-            else:
-                toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
+                    try:
+                        if fw_nspe["encrypt"] and True:
+                            # mark slot1 image as one, that should be encrypted
+                            slot1.update({'encrypt': True})
+                            toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE NSPE will"
+                                                " be ENCRYPTED per policy settings.")
+                    except KeyError:
+                        None
+                else:
+                    toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
                                       " be built per policy settings.")
         if slot0 is None:
             toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section not found in policy resources")
@@ -224,6 +228,7 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
                                    " does not correspond launch ID in SPE part!")
             raise Exception("imgtool finished execution with errors!")
 
+
         # check slots addresses and sizes if upgrade is set to True
         for slot in fw_spe["resources"]:
             if slot["type"] == "BOOT":
@@ -231,11 +236,14 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
             if fw_spe["upgrade"] and True:
                 if slot["type"] == "UPGRADE":
                     slot1 = slot
-                    if fw_spe["encrypt"] and True:
-                        # mark slot1 image as one, that should be encrypted
-                        slot1.update({'encrypt': True})
-                        toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE SPE will"
-                                              " be ENCRYPTED per policy settings.")                    
+                    try:
+                        if fw_spe["encrypt"] and True:
+                            # mark slot1 image as one, that should be encrypted
+                            slot1.update({'encrypt': True})
+                            toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE SPE will"
+                                              " be ENCRYPTED per policy settings.")
+                    except KeyError:
+                        None                    
             else:
                 toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
                                       " be produced per policy settings.")            
