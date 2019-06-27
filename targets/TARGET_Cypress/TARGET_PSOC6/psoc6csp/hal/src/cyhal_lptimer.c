@@ -54,7 +54,7 @@ static const uint16_t CY_MCWDT_RESET_TIME_US = 62;
 static const uint16_t CY_MCWDT_SETMATCH_TIME_US = 93;
 
 typedef struct {
-    cyhal_lptimer_irq_handler handler;
+    cyhal_lptimer_irq_handler_t handler;
     void *handler_arg;
 } cyhal_lptimer_irq_info_t;
 
@@ -159,7 +159,7 @@ uint32_t cyhal_lptimer_read(const cyhal_lptimer_t *obj)
     return Cy_MCWDT_GetCount(obj->base, CY_MCWDT_COUNTER0);
 }
 
-void cyhal_lptimer_register_irq(cyhal_lptimer_t *obj, cyhal_lptimer_irq_handler handler, void *handler_arg)
+void cyhal_lptimer_register_irq(cyhal_lptimer_t *obj, cyhal_lptimer_irq_handler_t handler, void *handler_arg)
 {
     CY_ASSERT_L2(CYHAL_RSC_INVALID != obj->resource.block_num);
     cyhal_lptimer_handlers[obj->resource.block_num].handler = NULL;

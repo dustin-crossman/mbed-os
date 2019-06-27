@@ -1,15 +1,12 @@
-/***************************************************************************//**
-* \file cy_abstraction_chip.h
+/*******************************************************************************
+* File Name: cycfg_routing.c
 *
-* \brief
-* Basic abstraction layer for dealing with chips containing a Cypress MCU. This
-* API provides convenience methods for initializing and manipulating different
-* hardware peripherals. Depending on the specific chip being used, not all
-* features may be supported.
-*
+* Description:
+* Establishes all necessary connections between hardware elements.
+* This file was automatically generated and should not be modified.
+* 
 ********************************************************************************
-* \copyright
-* Copyright 2018-2019 Cypress Semiconductor Corporation
+* Copyright 2017-2019 Cypress Semiconductor Corporation
 * SPDX-License-Identifier: Apache-2.0
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,8 +20,10 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-*******************************************************************************/
+********************************************************************************/
 
-#pragma once
+#include "cycfg_routing.h"
 
-#include "cyhal.h"
+void init_cycfg_routing(void)
+{
+}

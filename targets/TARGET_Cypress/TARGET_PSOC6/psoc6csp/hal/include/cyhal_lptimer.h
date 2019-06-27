@@ -67,7 +67,7 @@ typedef enum {
 */
 
 /** Handler for LPTIMER interrupts */
-typedef void (*cyhal_lptimer_irq_handler)(void *handler_arg, cyhal_lptimer_irq_event_t event);
+typedef void (*cyhal_lptimer_irq_handler_t)(void *handler_arg, cyhal_lptimer_irq_event_t event);
 
 /** \} group_hal_lptimer_data_structures */
 
@@ -151,7 +151,7 @@ uint32_t cyhal_lptimer_read(const cyhal_lptimer_t *obj);
  * @param[in] handler     The callback handler which will be invoked when the interrupt triggers
  * @param[in] handler_arg Generic argument that will be provided to the handler when called
  */
-void cyhal_lptimer_register_irq(cyhal_lptimer_t *obj, cyhal_lptimer_irq_handler handler, void *handler_arg);
+void cyhal_lptimer_register_irq(cyhal_lptimer_t *obj, cyhal_lptimer_irq_handler_t handler, void *handler_arg);
 
 /** Configure and Enable/Disable the LPTIMER interrupt
  *
