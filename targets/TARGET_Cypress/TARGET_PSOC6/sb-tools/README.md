@@ -11,7 +11,7 @@ Version of Python required is 3.7+
     python keygen.py -k 6 --jwk MCUBOOT_CM0P_KEY.json --pem-priv MCUBOOT_CM0P_KEY_PRIV.pem
     python keygen.py -k 8 --jwk USERAPP_CM4_KEY.json --pem-priv USERAPP_CM4_KEY_PRIV.pem
 
-    *Create key for image encription:*
+    *Create key for image encryption:*
 
     python keygen.py --aes aes.key
 
