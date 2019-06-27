@@ -142,7 +142,7 @@ def load_data_from_file(filename):
 @click.command(help='Create a signed or unsigned image')
 def sign(key, align, version, header_size, pad_header, slot_size, pad,
          max_sectors, overwrite_only, aes_header_file, image_id, rollback_counter, infile, outfile):
-
+    
     if aes_header_file is not None :
         aes_header = load_data_from_file(aes_header_file)
     else:
