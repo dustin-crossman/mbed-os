@@ -35,21 +35,21 @@ Execute from ./prepare folder:
         
 * To enable SMIF make sure targets.json has following names defined: SMIF MCUBOOT_USE_SMIF_STAGE, MCUBOOT_USE_SMIF_XIP. This applies for AUGUST_CYW43012_M0_PSA and CY8CPROTO_064_SB_M0_PSA targets. smif_id = 0 if SMIF disabled or N/A; smif_id = 1 for CY8CPROTO_064_SB; smif_id = 2 for AUGUST_CYW43012.
         
-Prebuild folder contains CyBootloader_WithLogs and CyBootloader_Release with corresponding hex and jwt files.
-  * WithLogs enables logs print to terminal.
+Prebuild folder contains CyBootloader_WithLogs and CyBootloader_Release with corresponding *.hex and *.jwt files.
+  * WithLogs prints execution results to terminal.
   * Release does not print to terminal and boots up silently.
 
-**_NOTE:_** CypressBootloader_CM0p.jwt and CypressBootloader_CM0p.hex must be used in pair from the same directory while creation of provisioning packet (.packets/prov_cmd.jwt) and performing of provisioning. ---
+**_NOTE:_** CypressBootloader_CM0p.jwt and CypressBootloader_CM0p.hex must be used in pair from the same directory in provisioning packet generation (.packets/prov_cmd.jwt) and provisioning procedure itself. ---
 
 ## 3. Run entrance exam
 
         python entrance_exam_runner.py
 
 ## 4.   Perform provisioning:
-**_ATTENTION:_** If UPGRADE image support is requred proceed to **UPGRADE IMAGES** section first
+**_ATTENTION:_** Proceed to **UPGRADE IMAGES** section first if UPGRADE image is needed.
 
 Execute *provision_device_runner.py*.
-If arguments for the script are not specified it will run with the default arguments.
+The script will run with the default arguments if no arguments specified.
 
 Default arguments can be overridden with a custom:
 
@@ -62,27 +62,27 @@ Default arguments can be overridden with a custom:
     
     python provision_device_runner.py --prov-jwt packet/prov_cmd.jwt --hex prebuild/CyBootloader_Release/CypressBootloader_CM0p.hex --pubkey-json keys/dev_pub_key.json --pubkey-pem keys/dev_pub_key.pem
     
-**_NOTE:_** PSoC 6 supply voltage must be 2.5 V to perform provisioning.
+**_NOTE:_** PSoC6 supply voltage of 2.5V is required to perform provisioning.
 
 ## UPGRADE IMAGES
 
-Secure Boot enabled targets may support image upgrades, if enabled in policy. There are two types of upgrade images supported:
+Secure Boot enabled targets support image upgrades, if specified by policy. There are two types of upgrade images supported:
 - signed, non encrypted
 - signed, encrypted
 
-Type of upgrade images is determined by the following policy setting which are available for firmware sections:
+The upgrade images types are determined by the following policy setting (firmware sections):
 
-- **_"smif_id":_** 0, - should be set to 2 if AUGUST_CYW43012 target is used, 1 - if CY8CPROTO_064_SB
+- **_"smif_id":_** 0, - should be set to 2 if AUGUST_CYW43012 target is used, 1 - if CY8CPROTO_064_SB, 0 - SMIF disabled
 - **_"upgrade":_** true/false, - should be set to *true* if UPGRADE supported, *false* - if disabled
 - **_"encrypt":_** true/false, - should be set to *true* if encrypted UPGRADE supported, *false* - if disabled
-- **_"encrypt_key_id":_** 1, - should remain unchaged, means that Device Key will be used in ECDH/HKDF protocol
+- **_"encrypt_key_id":_** 1, - should remain unchanged, means that Device Key will be used in ECDH/HKDF protocol
 
 Requirements:
 - Policy with **_smif.json** from prepare/ folder should be used.
 For encrypted image:
 - aes.key generated, as described in **DEVICE_PROVISIONING - 1**
-- dev_pub_key.pem that was obtained after provisioning is located in keys/ folder (default)
-- secure_image_parameters.json file in the target directory must contain valid keys paths
+- dev_pub_key.pem must be placed in keys/ folder (this key is generated in provisioning procedure)
+- secure_image_parameters.json file in the target directory must contain valid keys' paths
 
 Non encrypted UPGRADE image 
 **_Example policy for AUGUST_CYW43012:_**
@@ -123,9 +123,9 @@ Now mbed-os application or test can be built as described in section **TESTS**. 
 Upgrade image can be programmed to target board using Daplink. Upgrade procedure is performed after first reset.
 
 **_Encrypt generic image:_**
-The generic HEX file (for example one that is produced by mbed-os build system) can be converted into encrypted image using script encrypted_image_runner.py located in sb-tools. Example usage:
+The generic HEX file (for example one that is produced by mbed-os build system) can be converted into encrypted image by using encrypted_image_runner.py script located in sb-tools. Usage example:
 
-        python encrypted_image_runner.py --sdk-path . --hex-file someApplication.hex --key-priv keys/MCUBOOT_CM0P_KEY_PRIV.pem --key-pub keys/dev_pub_key.pem --key-aes keys/aes128_key.key --ver 0.1 --img-id 3 --rlb-count 0 --slot-size 0x50000 --pad 1 --img-offset 402653184
+        python encrypted_image_runner.py --sdk-path . --hex-file someApplication.hex --key-priv keys/MCUBOOT_CM0P_KEY_PRIV.pem --key-pub keys/dev_pub_key.pem --key-aes keys/aes.key --ver 0.1 --img-id 3 --rlb-count 0 --slot-size 0x50000 --pad 1 --img-offset 402653184
     
 - **_--sdk-path_** - Path to Secure Boot tools folder
 - **_--key-priv_** - ECC Private key used for image signing and for generating shared secret as per ECDH/HKDF.
@@ -167,12 +167,12 @@ The generic HEX file (for example one that is produced by mbed-os build system) 
         mbed test --build OUT/CY8CPROTO_064_SB_PSA --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n tests-psa-* -v
         mbedgt -i tests-psa-spm*,tests-psa-crypto_access* -v
 
-**_NOTE:_** In case of using non Windows platform flag --build OUT/@TARGET_NAME@ can be ommited.
+**_NOTE:_** In case of using non Windows platform flag --build OUT/@TARGET_NAME@ can be omitted.
 
 # TROUBLESHOOTING:
 
 1. In case of messages like "unable to find device" execute "mbedls -m 1907:CY8CPROTO_064_SB", then check with "mbedls" if device is detected as CY8CPROTO_064_SB with code 1907.
 2. Keys, from ./keys folder is used for signing images by default, these keys should be used for provisioning.
-3. Use CyBootloader from CyBootloader_WithLogs folder. It produces logs, which is useful to understand whether CyBootloader works correctly.
-4. In case of using _smif.json policy field "smif_id": should be 1 for CY8CPROTO_064_SB or 2 for AUGUST_CYW43012
-5. Low frequency quarz oscillator should be soldered to CY8CPROTO_064_SB (abscent in stock)
+3. Consider using CyBootloader from CyBootloader_WithLogs folder. It produces logs, which are useful to understand whether CyBootloader works correctly.
+4. When running application with SMIF and _smif.json policy the field "smif_id" should be set to 1 for CY8CPROTO_064_SB or 2 for AUGUST_CYW43012
+5. Low frequency quartz (32768 Hz) oscillator have to be soldered on CY8CPROTO_064_SB (not present in stock version of board).
