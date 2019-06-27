@@ -29,7 +29,7 @@
 #define POLICY_MAX_N_OF_PERIPH          (10)
 #define POLICY_MAX_N_OF_SW              (5)
 #define POLICY_MAX_N_OF_DESTR_REGIONS   (5)
-#define POLICY_MAX_N_OF_PROT_REGIONS    (22)
+#define POLICY_MAX_N_OF_PROT_REGIONS    (23)
 
 /* The size for composite XY key storage */
 #define KEY_XY_LENGTH   (44)
@@ -95,6 +95,7 @@ typedef enum
     CY_PROT_SRAM_PC3_PRIV,
     CY_PROT_SRAM_PC4_PRIV,
     CY_PROT_SRAM_MAIN,
+    CY_PROT_SRAM_DAP,
     CY_PROT_SMIF_CODE,
     CY_PROT_SMIF_XO,
     CY_PROT_SMIF_DATA
@@ -146,6 +147,7 @@ typedef struct
 {
     uint8_t id;
     bool upgrade;
+    int8_t smif_id;
     bool encrypt;
     uint8_t encrypt_key_id;
     uint32_t monotonic;
@@ -169,6 +171,7 @@ typedef struct
         {
             uint8_t id;
             uint8_t upgrade;
+            uint8_t smif_id;
             uint8_t encrypt;
             uint8_t monotonic;
             struct

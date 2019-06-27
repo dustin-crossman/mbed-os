@@ -18,19 +18,25 @@
 
 
 /* -------------------------------------- Includes ----------------------------------- */
+#ifdef MCUBOOT_HAVE_ASSERT_H
+#include "mcuboot_config/mcuboot_assert.h"
+#else
 #include <assert.h>
+#endif
 
 #include "cy_sysint.h"
 #include "spm_internal.h"
 #include "cy_device.h"
 
+#include "flash_smif.h"
+
 #ifdef PU_ENABLE
 #include "cyprotection_config.h"
-#endif // PU_ENABLE
+#endif /* PU_ENABLE */
 
 #ifdef TARGET_MCUBOOT
 
-#include "cy_policy.h"
+#include "mcuboot/cy_policy.h"
 /* mcuboot Headers */
 #include "cy_device_headers.h"
 #include "cycfg_peripherals.h"
@@ -66,6 +72,30 @@
 #define CY_BOOTLOADER_IMG_ID_CM4        (4UL)
 
 #define CY_BOOTLOADER_MASTER_IMG_ID CY_BOOTLOADER_IMG_ID_OEMTF_CM0P
+
+/* DAPControl SysCall opcode */
+#define DAPCONTROL_SYSCALL_OPCODE       (0x3AUL << 24UL)
+
+/* PSA crypto SysCall return codes */
+#define CY_FB_SYSCALL_SUCCESS           (0xA0000000UL)
+
+/* SysCall timeout value */
+#define SYSCALL_TIMEOUT                 (15000UL)
+
+/* DAPControl SysCall parameter: access port state */
+typedef enum
+{
+    CY_AP_DIS = 0,
+    CY_AP_EN = 1
+}cy_ap_control_t;
+
+/* DAPControl SysCall parameter: access port name */
+typedef enum
+{
+    CY_CM0_AP = 0,
+    CY_CM4_AP = 1,
+    CY_SYS_AP = 2
+}cy_ap_name_t;
 
 const char devName[] = FLASH_DEV_NAME;
 struct device *boot_flash_device;
@@ -108,6 +138,9 @@ typedef struct
 /* Boot & Upgrade policy structure */
 bnu_policy_t bnu_policy;
 
+/* Debug policy structure */
+debug_policy_t debug_policy;
+
 CY_SECTION(".cy_ramfunc") CY_NOINLINE
 static void Cy_SRAM_BusyLoop(void)
 {
@@ -120,11 +153,72 @@ static void Cy_SRAM_TestBitLoop(void)
     while((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL);
 }
 
+int cy_access_port_control(cy_ap_name_t ap, cy_ap_control_t en)
+{
+    int rc = -1;
+    volatile uint32_t syscallCmd = 0;
+    uint32_t timeout = 0;
+
+    syscallCmd |= DAPCONTROL_SYSCALL_OPCODE;
+    syscallCmd |= (uint8_t)en << 16;
+    syscallCmd |= (uint8_t)ap << 8;
+    syscallCmd |= 1;
+
+    IPC->STRUCT[CY_IPC_CHAN_SYSCALL].DATA = syscallCmd;
+
+    while(((IPC->STRUCT[CY_IPC_CHAN_SYSCALL].ACQUIRE &
+            IPC_STRUCT_ACQUIRE_SUCCESS_Msk) == 0) &&
+            (timeout < SYSCALL_TIMEOUT))
+    {
+        ++timeout;
+    }
+
+    if(timeout < SYSCALL_TIMEOUT)
+    {
+        timeout = 0;
+
+        IPC->STRUCT[CY_IPC_CHAN_SYSCALL].NOTIFY = 1;
+
+        while(((IPC->STRUCT[CY_IPC_CHAN_SYSCALL].LOCK_STATUS &
+                IPC_STRUCT_ACQUIRE_SUCCESS_Msk) != 0) &&
+                (timeout < SYSCALL_TIMEOUT))
+        {
+            ++timeout;
+        }
+
+        if(timeout < SYSCALL_TIMEOUT)
+        {
+            syscallCmd = IPC->STRUCT[CY_IPC_CHAN_SYSCALL].DATA;
+            if(CY_FB_SYSCALL_SUCCESS != syscallCmd)
+            {
+                rc = syscallCmd;
+            }
+            else
+            {
+                rc = 0;
+            }
+        }
+    }
+
+    return rc;
+}
+
 void cy_assert(int expr)
 {
     if(0 == expr)
     {
         BOOT_LOG_ERR("There is an error occurred during bootloader flow. MCU stopped.");
+
+        if((PERM_ENABLED == debug_policy.m4_policy.permission) ||
+                (PERM_ALLOWED == debug_policy.m4_policy.permission))
+        {
+            int rc = cy_access_port_control(CY_CM4_AP, CY_AP_EN);
+            ASSERT(0 == rc);
+
+            /* The delay is required after Access port was enabled for
+             * debugger/programmer to connect and set TEST BIT */
+            Cy_SysLib_Delay(100);
+        }
 
         if((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL)
         {
@@ -132,6 +226,8 @@ void cy_assert(int expr)
             BOOT_LOG_INF("TEST MODE");
             __disable_irq();
         }
+
+        Cy_SysEnableCM4(CY_BL_CM4_ROM_LOOP_ADDR);
 
         Cy_SRAM_BusyLoop();
     }
@@ -164,12 +260,23 @@ static void do_boot(struct boot_rsp *rsp)
      * reset vector
      */
     rc = flash_device_base(rsp->br_flash_dev_id, &flash_base);
-    assert(rc == 0);
+    ASSERT(rc == 0);
 
     app_addr = flash_base + rsp->br_image_off + rsp->br_hdr->ih_hdr_size;
 
     /* Set Protection Context 6 for CM4 */
     Cy_Prot_SetActivePC(CPUSS_MS_ID_CM4, CY_PROT_PC6);
+
+    if((PERM_ENABLED == debug_policy.m4_policy.permission) ||
+        (PERM_ALLOWED == debug_policy.m4_policy.permission))
+    {
+        rc = cy_access_port_control(CY_CM4_AP, CY_AP_EN);
+        ASSERT(0 == rc);
+
+        /* The delay is required after Access port was enabled for
+         * debugger/programmer to connect and set TEST BIT */
+        Cy_SysLib_Delay(100);
+    }
 
     /* Stop in case we are in the TEST MODE */
     if ( (CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & (TST_MODE_TEST_MODE_MASK)) != 0UL )
@@ -186,9 +293,6 @@ static void do_boot(struct boot_rsp *rsp)
     }
     /* It is aligned to 0x400 (256 records in vector table*4bytes each) */
     BOOT_LOG_INF("Cy_SysEnableCM4");
-
-    IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
-    BOOT_LOG_INF("TEST BIT SET !");
 
 #if(MCUBOOT_LOG_LEVEL != 0)
     while(!Cy_SCB_UART_IsTxComplete(SCB5))
@@ -208,10 +312,10 @@ void spm_hal_start_nspe(void)
     /* MCUBoot integration starts here */
     struct boot_rsp rsp;
     int rc = 0;
-   
+
     boot_flash_device = (struct device*)&psoc6_flash_device;
 
-#if(MCUBOOT_POLICY == MCUBOOT_POLICY_JWT)
+#if(MCUBOOT_POLICY == 1)
     /* Processing of policy in JWT format */
     uint32_t jwtLen;
     char *jwt;
@@ -227,23 +331,12 @@ void spm_hal_start_nspe(void)
     }
     if(0 == rc)
     {
-        rc = Cy_JWT_ParseProvisioningPacket(jwt, &bnu_policy,
+        rc = Cy_JWT_ParseProvisioningPacket(jwt, &bnu_policy, &debug_policy,
                   CY_BOOTLOADER_IMG_ID_SPE_CM0P); /* SPE IMG ID = 1*/
     }
     if(0 != rc)
     {
          BOOT_LOG_ERR("2: Policy parsing failed with code %i", rc);
-
-         part_map[0].area.fa_off     = MCUBOOT_POLICY_FLASH_AREA_0_START-FLASH_DEVICE_BASE;
-         part_map[0].area.fa_size    = MCUBOOT_POLICY_FLASH_AREA_SIZE;
-
-         part_map[1].area.fa_off     = MCUBOOT_POLICY_FLASH_AREA_1_START-FLASH_DEVICE_BASE;
-         part_map[1].area.fa_size    = MCUBOOT_POLICY_FLASH_AREA_SIZE;
-
-         bnu_policy.bnu_img_policy.boot_auth[0]      = MCUBOOT_POLICY_BOOT_AUTH;
-         bnu_policy.bnu_img_policy.upgrade_auth[0]   = MCUBOOT_POLICY_UPGRADE_AUTH;
-         bnu_policy.bnu_img_policy.id                = MCUBOOT_POLICY_IMG_ID;
-         bnu_policy.bnu_img_policy.upgrade           = MCUBOOT_POLICY_UPGRADE;
     }
     else
     {
@@ -267,12 +360,32 @@ void spm_hal_start_nspe(void)
     bnu_policy.bnu_img_policy.upgrade           = MCUBOOT_POLICY_UPGRADE;
 #endif
 
-    if((CY_GET_REG32(CY_SRSS_TST_MODE_ADDR) & TST_MODE_TEST_MODE_MASK) != 0UL)
+#ifdef MCUBOOT_USE_SMIF_STAGE
+    /* read smif_id from policy */
+    int32_t smif_id = bnu_policy.bnu_img_policy.smif_id;
+    if(smif_id != 0)
     {
-        IPC->STRUCT[CY_IPC_CHAN_SYSCALL_DAP].DATA = TST_MODE_ENTERED_MAGIC;
-        BOOT_LOG_INF("TEST MODE");
-        __disable_irq();
-    } 
+        /* reload one will be used with exact external memory module */
+        smifMemConfigs[0] = multi_smifMemConfigs[smif_id-1];
+        cy_en_smif_status_t qspi_status = CY_SMIF_CMD_NOT_FOUND;
+
+        qspi_status = Flash_SMIF_QSPI_Start();
+        if(0 != qspi_status)
+        {
+             BOOT_LOG_ERR("SMIF block failed to start with error code %i", qspi_status);
+        }
+        /* Set QE */
+        Flash_SMIF_EnableQuadMode(QSPI_HW, (cy_stc_smif_mem_config_t*)smifMemConfigs[0], &QSPIContext);
+#ifdef MCUBOOT_USE_SMIF_XIP
+        if(qspi_status == CY_SMIF_SUCCESS)
+        {
+            BOOT_LOG_INF("SMIF Memory/XIP Mode");
+            Cy_SMIF_SetMode(QSPI_HW, CY_SMIF_MEMORY);
+        }
+#endif
+    }
+#endif
+
     BOOT_LOG_INF("Processing available images");
     rc = boot_go(&rsp);
     if (rc != 0)
@@ -321,7 +434,7 @@ void spm_hal_memory_protection_init(void)
    status = ppu_prog_protect((cy_ppu_prog_cfg_t *)prog_spm_ppu_config, sizeof(prog_spm_ppu_config) / sizeof(prog_spm_ppu_config[0]));
    CY_ASSERT(status == CY_PROT_SUCCESS);  // TODO: Panic instead
 #endif /* INITIAL_PROTECTION_AVAILABLE */
-/* TODO: Temporary commented, because it is configured by FlashBoot to fix some silicon issues,
+/* TODO: Temporary commented, because it is configured by FlashBoot to fix some silicon issues*/
    /* fixed group ppu */
 /*#ifndef INITIAL_PROTECTION_AVAILABLE
    status = ppu_fixed_gr_protect((cy_ppu_fixed_gr_cfg_t *)fixed_gr_spm_ppu_config, sizeof(fixed_gr_spm_ppu_config) / sizeof(fixed_gr_spm_ppu_config[0]));

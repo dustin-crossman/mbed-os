@@ -6,8 +6,7 @@ from intelhex import IntelHex
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(os.path.dirname('../execute'))
 from test_utility import *
-#from execute.programmer.programmer import ProgrammingTool
-from programmer_override import ProgrammingTool
+from execute.programmer.programmer import ProgrammingTool
 from execute.programmer.exceptions import ExtendedTransferFaultError
 
 TOOL = 'pyocd'

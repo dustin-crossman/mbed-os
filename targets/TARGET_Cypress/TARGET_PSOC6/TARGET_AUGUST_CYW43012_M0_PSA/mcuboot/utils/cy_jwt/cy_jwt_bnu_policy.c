@@ -31,7 +31,7 @@
 * \return              Result of operation: 0 if success, errorcode otherwise.
 *******************************************************************************/
 int Cy_JWT_ParseProvisioningPacket(char *provPacket, bnu_policy_t *bnuPolicy,
-        uint8_t masterImageId)
+        debug_policy_t *debugPolicy, uint8_t masterImageId)
 {
     int rc = CY_JWT_SUCCESS;
     char *bodyStart = 0;
@@ -60,7 +60,7 @@ int Cy_JWT_ParseProvisioningPacket(char *provPacket, bnu_policy_t *bnuPolicy,
                     {
                         rc = Cy_JWT_ParseProvisioningRequest(
                                 provReq->valuestring, jsonStr,
-                                jsonLen, bnuPolicy,
+                                jsonLen, bnuPolicy, debugPolicy,
                                 masterImageId);
                     }
                     else
@@ -103,7 +103,8 @@ int Cy_JWT_ParseProvisioningPacket(char *provPacket, bnu_policy_t *bnuPolicy,
 * \return              Result of operation: 0 if success, errorcode otherwise.
 *******************************************************************************/
 int Cy_JWT_ParseProvisioningRequest(char *provReq, char *buff, uint32_t buffLen,
-        bnu_policy_t *bnuPolicy, uint8_t masterImageId)
+        bnu_policy_t *bnuPolicy, debug_policy_t *debugPolicy,
+        uint8_t masterImageId)
 {
     int rc = CY_JWT_SUCCESS;
     char *bodyStart = 0;
@@ -119,13 +120,37 @@ int Cy_JWT_ParseProvisioningRequest(char *provReq, char *buff, uint32_t buffLen,
             policy_set_t policy_set;
             char *template = 0;
             uint32_t templateLen = 0;
-            rc = Cy_JWT_GetProvisioningDetails(FB_POLICY_TEMPL_BOOT, &template, &templateLen);
+
+            /* Read BnU template and set default values for BnU policy */
+            rc = Cy_JWT_GetProvisioningDetails(FB_POLICY_TEMPL_BOOT, &template,
+                    &templateLen);
             if(CY_JWT_SUCCESS == rc)
             {
                 rc = Cy_JWT_BnUPolicySetDefault(template, bnuPolicy);
+            }
+            else
+            {
+                rc = CY_JWT_ERR_OTHER;
+            }
+
+            /* Read debug template and set default values for debug policy */
+            rc = Cy_JWT_GetProvisioningDetails(FB_POLICY_TEMPL_DEBUG, &template,
+                    &templateLen);
+            if(CY_JWT_SUCCESS == rc)
+            {
+                rc = Cy_JWT_DebugPolicySetDefault(template, debugPolicy);
+            }
+            else
+            {
+                rc = CY_JWT_ERR_OTHER;
+            }
+
+            if(CY_JWT_SUCCESS == rc)
+            {
+                rc = Cy_JWT_PolicyPackageSplit(buff, &policy_set);
                 if(CY_JWT_SUCCESS == rc)
                 {
-                    rc = Cy_JWT_PolicyPackageSplit(buff, &policy_set);
+                    rc = Cy_JWT_DebugPolicyParse(policy_set.boot, debugPolicy);
                     if(CY_JWT_SUCCESS == rc)
                     {
                         /* Look for "launch" inside Bootloader's policy image blob
@@ -135,10 +160,6 @@ int Cy_JWT_ParseProvisioningRequest(char *provReq, char *buff, uint32_t buffLen,
                         cJSON_Delete(policy_set.root);
                     }
                 }
-            }
-            else
-            {
-                rc = CY_JWT_ERR_OTHER;
             }
         }
         else

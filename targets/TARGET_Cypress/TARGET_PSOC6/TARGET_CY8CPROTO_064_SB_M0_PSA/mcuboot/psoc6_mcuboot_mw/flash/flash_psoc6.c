@@ -48,7 +48,11 @@
 #include "string.h"
 #include "stdlib.h"
 #include "stdbool.h"
+#ifdef MCUBOOT_HAVE_ASSERT_H
+#include "mcuboot_config/mcuboot_assert.h"
+#else
 #include <assert.h>
+#endif
 
 #include "cy_device_headers.h"
 
@@ -67,7 +71,7 @@
 #define PSOC6_WR_ERROR_FLASH_WRITE 2
 
 #define PSOC6_FLASH_ERASE_BLOCK_SIZE    CY_FLASH_SIZEOF_ROW /* PSoC6 Flash erases by Row */
-#define PSOC6_CONFIG_FLASH_SIZE         16384
+#define PSOC6_CONFIG_FLASH_SIZE         16384*16
 
 #if defined(CONFIG_FLASH_PAGE_LAYOUT)
 static const struct flash_pages_layout dev_layout = {

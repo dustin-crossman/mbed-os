@@ -5,7 +5,7 @@
  */
 
 #include <flash.h>
-#include <errno.h>	/* EINVAL */
+#include <mcuboot_errno.h>	/* EINVAL */
 
 void flash_page_foreach(struct device *dev, flash_page_cb cb, void *data)
 {

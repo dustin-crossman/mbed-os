@@ -19,6 +19,7 @@
 
 /**
  * \file     sha512_alt.h
+ * \version  1.0
  *
  * \brief    header file - wrapper for mbedtls SHA512 HW acceleration
  *

@@ -1,31 +1,16 @@
 {
-    "cm0p" : {
-                "boot0" : { 
-                    "VERSION" : "0.1",
-                    "ROLLBACK_COUNTER" : "0",
-                    "IMAGE_ID" : "1",
-                    "SLOT_SIZE" : "0x50000",
-                    "PAD" : "--pad"
-                },
-                "boot1" : {
-                    "VERSION" : "0.1",
-                    "ROLLBACK_COUNTER" : "0",
-                    "IMAGE_ID" : "1",
-                    "SLOT_SIZE" : "0x50000",
-                    "PAD" : "--pad"
-                }
-            },
-    
-    "cm4" : {
-                "boot0" : { 
-                    "VERSION" : "0.1",
-                    "ROLLBACK_COUNTER" : "0",
-                    "IMAGE_ID" : "16",
-                    "SLOT_SIZE" : "0x30000",
-                    "PAD" : "--pad"
-                }
-            },
+    "boot0" : { 
+        "VERSION" : "0.1",
+        "ROLLBACK_COUNTER" : "0"
+    },
+    "boot1" : {
+        "VERSION" : "0.1",
+        "ROLLBACK_COUNTER" : "0"
+    },
 
     "sdk_path" : "targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/",
-    "priv_key_file": "/keys/MCUBOOT_CM0P_KEY_PRIV.pem"
+    "priv_key_file": "keys/MCUBOOT_CM0P_KEY_PRIV.pem",
+    "aes_key_file": "keys/image-aes-128.key",
+    "dev_pub_key_file": "keys/dev_pub_key.pem",
+    "policy_file": "prepare/policy_dual_stage_CM0p_CM4.json"
 }

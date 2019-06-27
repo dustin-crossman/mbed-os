@@ -7,6 +7,7 @@
 #define __MCUBOOT_CONFIG_H__
 
 #include "cy_flash.h"
+#include "flash_map/flash_map.h"
 /*
  * Template configuration file for MCUboot.
  *
@@ -27,10 +28,10 @@
  */
 
 /* Uncomment for RSA signature support */
-//#define MCUBOOT_SIGN_RSA
+/* #define MCUBOOT_SIGN_RSA */
 
 /* Uncomment for ECDSA signatures using curve P-256. */
-#define MCUBOOT_SIGN_EC256
+/* #define MCUBOOT_SIGN_EC256 */
 
 
 /*
@@ -80,7 +81,10 @@
 
 /* Default maximum number of flash sectors per image slot; change
  * as desirable. */
-#define MCUBOOT_MAX_IMG_SECTORS (FLASH_AREA_IMAGE_SIZE/CY_FLASH_SIZEOF_ROW) /* 0x20000 image size / 512b sector WR/RD by FlashDriver */
+extern struct flash_map_entry part_map[];
+
+/* Image Size / 512b sector WR/RD by PSoC6 FlashDriver */
+inline size_t Cy_BootMaxImgSectors(void) {return ((part_map[0].area.fa_size)/CY_FLASH_SIZEOF_ROW);}
 
 /*
  * Logging
@@ -128,6 +132,6 @@
 /* Uncomment if your platform has its own mcuboot_config/mcuboot_assert.h.
  * If so, it must provide an ASSERT macro for use by bootutil. Otherwise,
  * "assert" is used. */
-#define MCUBOOT_HAVE_ASSERT_H
+/* #define MCUBOOT_HAVE_ASSERT_H */
 
 #endif /* __MCUBOOT_CONFIG_H__ */

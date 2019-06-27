@@ -148,10 +148,10 @@
 #define CY_CRYPTO_HW_REGS_WIDTH             (32UL)
 
 /* Calculates the actual size in bytes of the bits value */
-#define CY_CRYPTO_BYTE_SIZE_OF_BITS(x)     (uint32_t)(((x) + 7u) >> 3u)
+#define CY_CRYPTO_BYTE_SIZE_OF_BITS(x)      (uint32_t)(((uint32_t)(x) + 7u) >> 3u)
 
 /* Calculates the actual size in 32-bit words of the bits value */
-#define CY_CRYPTO_WORD_SIZE_OF_BITS(x)     (uint32_t)(((x) + 31u) >> 5u)
+#define CY_CRYPTO_WORD_SIZE_OF_BITS(x)      (uint32_t)(((uint32_t)(x) + 31u) >> 5u)
 
 /** \endcond */
 
@@ -274,7 +274,7 @@ typedef struct
 *
 * \note The <b>modulus</b> and <b>exponent</b> values in the
 * \ref cy_stc_crypto_rsa_pub_key_t must also be in little-endian order.<br>
-* Use \ref Cy_Crypto_Rsa_InvertEndianness function to convert to or from
+* Use \ref Cy_Crypto_InvertEndianness function to convert to or from
 * little-endian order.
 */
 typedef struct
