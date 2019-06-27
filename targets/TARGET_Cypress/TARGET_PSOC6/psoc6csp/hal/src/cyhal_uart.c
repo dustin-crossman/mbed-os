@@ -770,6 +770,20 @@ cy_rslt_t cyhal_uart_baud(cyhal_uart_t *obj, uint32_t baudrate, uint32_t *actual
     return status;
 }
 
+cy_rslt_t cyhal_uart_format(cyhal_uart_t *obj, const cyhal_uart_cfg_t *cfg)
+{
+    CY_ASSERT(NULL != obj);
+    CY_ASSERT(NULL != cfg);
+    Cy_SCB_UART_Disable(obj->base, NULL);
+    obj->config.dataWidth = cfg->data_bits;
+    obj->config.stopBits = convert_stopbits((uint8_t)cfg->stop_bits);
+    obj->config.parity = convert_parity(cfg->parity);
+    // Do not pass obj->context here because Cy_SCB_UART_Init will destroy it
+    Cy_SCB_UART_Init(obj->base, &(obj->config), NULL);
+    Cy_SCB_UART_Enable(obj->base);
+    return CY_RSLT_SUCCESS;
+}
+
 cy_rslt_t cyhal_uart_getc(cyhal_uart_t *obj, uint8_t *value, uint32_t timeout)
 {
     uint32_t read_value = Cy_SCB_UART_Get(obj->base);
