@@ -279,7 +279,7 @@ int flash_area_write(const struct flash_area *area, uint32_t off, const void *sr
         Flash_SMIF_GetAddrBuff(addr, addrBuf);
         rc = Flash_SMIF_WriteMemory(QSPI_HW    /* SMIF_Type *baseaddr */,
                                     &QSPIContext       /* cy_stc_smif_context_t *smifContext */,
-                                    src     /* uint8_t txBuffer[] */,
+                                    (uint8_t*)src     /* uint8_t txBuffer[] */,
                                     len     /* uint32_t txSize */,
                                     addrBuf   /* uint8_t *address */);
     }
