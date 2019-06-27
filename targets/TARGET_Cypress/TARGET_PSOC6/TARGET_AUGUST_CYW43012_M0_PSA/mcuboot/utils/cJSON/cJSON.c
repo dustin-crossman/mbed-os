@@ -98,7 +98,7 @@ static const char *parse_number(cJSON *item,const char *num)
 	long long n=0;
 	char num_chr[22];
 	uint32_t cpy_len;
-	char *term_ptr;
+	const char *term_ptr;
 
 	term_ptr = num;
 	/* seek for end of textual representation of number */
