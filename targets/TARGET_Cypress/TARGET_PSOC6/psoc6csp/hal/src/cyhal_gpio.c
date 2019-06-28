@@ -59,7 +59,19 @@ static void ioss_interrupts_dispatcher_IRQHandler(uint32_t port)
             if (hal_gpio_callbacks[port][cnt] != NULL)
             {
                 /* Call registered callbacks here */
-                (void)(hal_gpio_callbacks[port][cnt])(hal_gpio_callback_args[port][cnt], (cyhal_gpio_irq_event_t)Cy_GPIO_GetInterruptEdge(portAddr, cnt));
+                cyhal_gpio_irq_event_t event, edge = (cyhal_gpio_irq_event_t)Cy_GPIO_GetInterruptEdge(portAddr, cnt);
+                switch (edge)
+                {
+                    case CYHAL_GPIO_IRQ_NONE:
+                    case CYHAL_GPIO_IRQ_RISE:
+                    case CYHAL_GPIO_IRQ_FALL:
+                        event = edge;
+                        break;
+                    default:
+                        event = Cy_GPIO_Read(portAddr, cnt) != 0 ? CYHAL_GPIO_IRQ_RISE : CYHAL_GPIO_IRQ_FALL;
+                        break;
+                }
+                (void)(hal_gpio_callbacks[port][cnt])(hal_gpio_callback_args[port][cnt], event);
             }
             Cy_GPIO_ClearInterrupt(portAddr, cnt);
         }
