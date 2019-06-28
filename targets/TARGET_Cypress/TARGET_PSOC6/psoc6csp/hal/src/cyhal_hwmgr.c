@@ -217,6 +217,12 @@
     #define CY_BLOCK_COUNT_UDB      0
 #endif
 
+#ifdef CY_IP_MXUSBFS_INSTANCES
+    #define CY_BLOCK_COUNT_USB      CY_IP_MXUSBFS_INSTANCES
+#else
+    #define CY_BLOCK_COUNT_USB      0
+#endif
+
 #ifdef CY_IP_MXS40SRSS_MCWDT_INSTANCES
     #define CY_BLOCK_COUNT_WDT      CY_IP_MXS40SRSS_MCWDT_INSTANCES
 #else
@@ -280,8 +286,10 @@
 #define CY_SIZE_TCPWM      CY_CHANNEL_COUNT_TCPWM
 #define CY_OFFSET_UDB      (CY_OFFSET_TCPWM + CY_SIZE_TCPWM)
 #define CY_SIZE_UDB        CY_BLOCK_COUNT_UDB
+#define CY_OFFSET_USB      (CY_OFFSET_UDB + CY_SIZE_UDB)
+#define CY_SIZE_USB        CY_BLOCK_COUNT_USB
 
-#define CY_TOTAL_ALLOCATABLE_ITEMS     (CY_OFFSET_UDB + CY_SIZE_UDB)
+#define CY_TOTAL_ALLOCATABLE_ITEMS     (CY_OFFSET_USB + CY_SIZE_USB)
 
 #define CY_BYTE_NUM_SHIFT (3)
 #define CY_BIT_NUM_MASK (0x07)
@@ -423,6 +431,7 @@ static const uint16_t cyhal_resource_offsets[] =
     CY_OFFSET_SDHC,
     CY_OFFSET_TCPWM,
     CY_OFFSET_UDB,
+    CY_OFFSET_USB,
 };
 
 static const uint32_t cyhal_has_channels =
