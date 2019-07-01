@@ -1,10 +1,13 @@
 """
 Copyright (c) 2019, Arm Limited and affiliates.
 SPDX-License-Identifier: Apache-2.0
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
      http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,6 +47,7 @@ class PyusbMSDTest(BaseHostTest):
 
     def _callback_check_file_exist(self, key, value, timestamp):
         """Check if file exist.
+
         """
         folder_name, file_name, file_content = value.split(' ')
         msd_disk = MSDUtils.disk_path(self.serial_number)
@@ -63,6 +67,7 @@ class PyusbMSDTest(BaseHostTest):
 
     def _callback_delete_files(self, key, value, timestamp):
         """Delete test file.
+
         """
         dir_name, file_name = value.split(' ')
         msd_disk = MSDUtils.disk_path(self.serial_number)
@@ -76,6 +81,7 @@ class PyusbMSDTest(BaseHostTest):
 
     def _callback_check_if_mounted(self, key, value, timestamp):
         """Check if disk was mounted.
+
         """
         wait_time = self.MOUNT_WAIT_TIME
         while wait_time != 0:
@@ -91,6 +97,7 @@ class PyusbMSDTest(BaseHostTest):
 
     def _callback_check_if_not_mounted(self, key, value, timestamp):
         """Check if disk was unmouted.
+
         """
         wait_time = self.MOUNT_WAIT_TIME
         while wait_time != 0:
@@ -106,12 +113,14 @@ class PyusbMSDTest(BaseHostTest):
 
     def _callback_get_mounted_fs_size(self, key, value, timestamp):
         """Record visible filesystem size.
+
         """
         stats = psutil.disk_usage(MSDUtils.disk_path(self.serial_number))
         self.send_kv("{}".format(stats.total), "0")
 
     def _callback_unmount(self, key, value, timestamp):
         """Disk unmount.
+
         """
         if MSDUtils.unmount(serial=self.serial_number):
             self.report_success()
