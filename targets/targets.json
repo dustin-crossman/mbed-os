@@ -47,6 +47,10 @@
             "tickless-from-us-ticker": {
                 "help": "Run tickless from the microsecond ticker rather than the low power ticker. Running tickless off of the microsecond ticker improves interrupt latency on targets which use lpticker_delay_ticks",
                 "value": false
+            },
+            "init-us-ticker-at-boot": {
+                "help": "Initialize the microsecond ticker at boot rather than on first use, and leave it initialized. This speeds up wait_us in particular.",
+                "value": false
             }
         }
     },
@@ -1881,7 +1885,8 @@
         },
         "overrides": {
             "deep-sleep-latency": 3,
-            "tickless-from-us-ticker": true
+            "tickless-from-us-ticker": true,
+            "init-us-ticker-at-boot": true
         },
         "device_has": [
             "USTICKER",
@@ -2069,7 +2074,6 @@
             "MBED_FAULT_HANDLER_DISABLED",
             "CMSIS_NVIC_VIRTUAL",
             "MBED_MPU_CUSTOM",
-            "MBEDTLS_PSA_CRYPTO_C",
             "NXP_LPADC"
         ],
         "components_add": ["FLASHIAP"],
@@ -2120,8 +2124,7 @@
             "__STARTUP_COPY_MULTIPLE",
             "MBED_MPU_CUSTOM",
             "DAUTH_CHIP_DEFAULT",
-            "MBEDTLS_PSA_CRYPTO_SPM",
-            "MBEDTLS_PSA_CRYPTO_C"
+            "MBEDTLS_PSA_CRYPTO_SPM"
         ],
         "components_add": ["FLASHIAP"],
         "extra_labels_add": [
@@ -3235,7 +3238,7 @@
         },
         "components_add": ["SPIF"],
         "detect_code": ["9020"],
-        "device_has_add": ["ANALOGOUT", "CAN", "TRNG", "FLASH", "MPU"],
+        "device_has_add": ["ANALOGOUT", "CAN", "CRC", "TRNG", "FLASH", "MPU"],
         "device_has_remove": ["SERIAL_FC"],
         "features": ["LWIP"],
         "release_versions": ["5"],
@@ -4001,6 +4004,7 @@
         "detect_code": ["0833"],
         "device_has_add": [
             "ANALOGOUT",
+            "CRC",
             "SERIAL_ASYNCH",
             "TRNG",
             "FLASH",
@@ -4021,6 +4025,7 @@
         "detect_code": ["0456"],
         "device_has_add": [
             "ANALOGOUT",
+            "CRC",
             "SERIAL_ASYNCH",
             "TRNG",
             "FLASH",
@@ -4066,6 +4071,7 @@
         "device_has_add": [
             "ANALOGOUT",
             "CAN",
+            "CRC",
             "EMAC",
             "SERIAL_ASYNCH",
             "TRNG",
@@ -4118,6 +4124,7 @@
         "device_has_add": [
             "ANALOGOUT",
             "CAN",
+            "CRC",
             "EMAC",
             "SERIAL_ASYNCH",
             "TRNG",
@@ -4161,6 +4168,7 @@
         "device_has_add": [
             "ANALOGOUT",
             "CAN",
+            "CRC",
             "TRNG",
             "FLASH",
             "QSPI",
@@ -4191,6 +4199,7 @@
         "device_has_add": [
             "ANALOGOUT",
             "CAN",
+            "CRC",
             "SERIAL_FC",
             "TRNG",
             "FLASH",
@@ -4226,6 +4235,7 @@
         "device_has_add": [
             "ANALOGOUT",
             "CAN",
+            "CRC",
             "TRNG",
             "FLASH",
             "QSPI",
@@ -4262,6 +4272,7 @@
         "device_has_add": [
             "ANALOGOUT",
             "CAN",
+            "CRC",
             "SERIAL_FC",
             "TRNG",
             "FLASH",
@@ -4364,6 +4375,7 @@
         "device_has_add": [
             "ANALOGOUT",
             "CAN",
+            "CRC",
             "SERIAL_ASYNCH",
             "TRNG",
             "FLASH",
@@ -5446,8 +5458,7 @@
             "MBED_FAULT_HANDLER_DISABLED",
             "CMSIS_NVIC_VIRTUAL",
             "LPTICKER_DELAY_TICKS=1",
-            "MBED_MPU_CUSTOM",
-            "MBEDTLS_PSA_CRYPTO_C"
+            "MBED_MPU_CUSTOM"
         ],
         "extra_labels_add": ["MUSCA_A1_NS", "PSA", "TFM"],
         "post_binary_hook": {"function": "ArmMuscaA1Code.binary_hook"},
@@ -5470,7 +5481,6 @@
             "MBED_MPU_CUSTOM",
             "DAUTH_CHIP_DEFAULT",
             "MBEDTLS_PSA_CRYPTO_SPM",
-            "MBEDTLS_PSA_CRYPTO_C",
             "MBEDTLS_ENTROPY_NV_SEED"
         ],
         "components_add": ["FLASHIAP"],
@@ -8304,7 +8314,7 @@
                 "help": "Name of the H/W Kit",
                 "value": "\"CY8CKIT_062_WIFI_BT\"",
                 "macro_name": "BOARD_NAME"
-                 }
+            }
         },
         "program_cycle_s": 10
     },

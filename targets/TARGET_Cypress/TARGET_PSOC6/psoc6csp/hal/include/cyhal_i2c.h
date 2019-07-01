@@ -95,7 +95,7 @@ typedef enum
 
 
 /** Handler for I2C interrupts */
-typedef void (*cyhal_i2c_irq_handler)(void *handler_arg, cyhal_i2c_irq_event_t event);
+typedef void (*cyhal_i2c_irq_handler_t)(void *handler_arg, cyhal_i2c_irq_event_t event);
 
 /** Initial I2C configuration */
 typedef struct
@@ -245,7 +245,7 @@ cy_rslt_t cyhal_i2c_abort_async(cyhal_i2c_t *obj);
  * @param[in] handler     The callback handler which will be invoked when the interrupt fires
  * @param[in] handler_arg Generic argument that will be provided to the handler when called
  */
-void cyhal_i2c_register_irq(cyhal_i2c_t *obj, cyhal_i2c_irq_handler handler, void *handler_arg);
+void cyhal_i2c_register_irq(cyhal_i2c_t *obj, cyhal_i2c_irq_handler_t handler, void *handler_arg);
 
 /** Configure and Enable or Disable I2C Interrupt.
  *
