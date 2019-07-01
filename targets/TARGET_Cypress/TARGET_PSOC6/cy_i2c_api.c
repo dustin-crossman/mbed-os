@@ -119,7 +119,7 @@ int i2c_stop(i2c_t *obj)
 int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
-    if (CY_RSLT_SUCCESS != cyhal_i2c_master_recv(&(i2c->hal_i2c), address, (uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT)) {
+    if (CY_RSLT_SUCCESS != cyhal_i2c_master_recv(&(i2c->hal_i2c), address >> 1, (uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT)) {
         return (int)I2C_ERROR_NO_SLAVE;
     }
     return length;
@@ -128,7 +128,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
-    if (CY_RSLT_SUCCESS != cyhal_i2c_master_send(&(i2c->hal_i2c), address, (const uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT)) {
+    if (CY_RSLT_SUCCESS != cyhal_i2c_master_send(&(i2c->hal_i2c), address >> 1, (const uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT)) {
         return (int)I2C_ERROR_NO_SLAVE;
     }
     // NOTE: HAL does not report how many bytes were actually sent in case of early NAK

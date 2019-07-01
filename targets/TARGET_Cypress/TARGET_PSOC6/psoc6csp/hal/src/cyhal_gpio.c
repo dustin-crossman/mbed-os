@@ -233,12 +233,20 @@ static void (*ioss_interrupts_dispatcher_table[IOSS_GPIO_GPIO_PORT_NR])(void) =
 cy_rslt_t cyhal_gpio_init(cyhal_gpio_t pin, cyhal_gpio_direction_t direction, cyhal_gpio_drive_mode_t drvMode, bool initVal)
 {
     cyhal_resource_inst_t pinRsc = cyhal_utils_get_gpio_resource(pin);
+    /* Mbed creates GPIOs for pins that are dedicated to other peripherals in some cases. */
+#ifndef __MBED__
     cy_rslt_t status = cyhal_hwmgr_reserve(&pinRsc);
+#else
+    cy_rslt_t status = CY_RSLT_SUCCESS;
+#endif
 
     if (status == CY_RSLT_SUCCESS)
     {
+        /* Do not check for configured for resources we do not reserve. */
+#ifndef __MBED__
         bool configured = cyhal_hwmgr_is_configured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num);
         if (!configured)
+#endif
         {
             Cy_GPIO_Pin_FastInit(CYHAL_GET_PORTADDR(pin), CYHAL_GET_PIN(pin), drvMode, initVal, HSIOM_SEL_GPIO);
             cyhal_gpio_direction(pin, direction); //always returns success
@@ -256,7 +264,10 @@ void cyhal_gpio_free(cyhal_gpio_t pin)
         cyhal_resource_inst_t pinRsc = cyhal_utils_get_gpio_resource(pin);
         Cy_GPIO_Pin_FastInit(CYHAL_GET_PORTADDR(pin), CYHAL_GET_PIN(pin), CYHAL_GPIO_DRIVE_ANALOG, 0UL, HSIOM_SEL_GPIO);
         cyhal_hwmgr_set_unconfigured(pinRsc.type, pinRsc.block_num, pinRsc.channel_num);
+        /* Do not attempt to free the resource we don't reserve in mbed. */
+#ifndef __MBED__
         cyhal_hwmgr_free(&pinRsc);
+#endif
     }
 }
 
