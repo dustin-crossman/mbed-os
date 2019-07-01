@@ -32,7 +32,6 @@ extern "C" void whd_emac_wifi_link_state_changed(bool state_up, whd_interface_t 
 
 
 static const whd_event_num_t ap_client_events[] = { WLC_E_DEAUTH, WLC_E_DEAUTH_IND, WLC_E_DISASSOC, WLC_E_DISASSOC_IND, WLC_E_ASSOC_IND, WLC_E_REASSOC_IND, WLC_E_NONE };
-static whd_event_handler_t ap_event_handler;
 static uint16_t ap_event_entry = 2;
 
 WhdSoftAPInterface::WhdSoftAPInterface(WHD_EMAC &emac, OnboardNetworkStack &stack)
@@ -47,7 +46,6 @@ int WhdSoftAPInterface::start(const char *ssid, const char *pass, nsapi_security
     bool start_dhcp_server, const whd_custom_ie_info_t* ie_info)
 {
     nsapi_error_t        err;
-    nsapi_connection_status_t stat;
 
     /* set up our interface */
     if (!_interface) {
@@ -131,8 +129,7 @@ int WhdSoftAPInterface::get_associated_client_list(void* client_list_buffer, uin
 
 int WhdSoftAPInterface::register_event_handler(whd_event_handler_t softap_event_handler)
 {
-    ap_event_handler = softap_event_handler;
-    return whd_management_set_event_handler(_whd_emac.ifp, ap_client_events, ap_event_handler, NULL, &ap_event_entry);
+    return whd_management_set_event_handler(_whd_emac.ifp, ap_client_events, softap_event_handler, NULL, &ap_event_entry);
 }
 
 int WhdSoftAPInterface::unregister_event_handler(void)
