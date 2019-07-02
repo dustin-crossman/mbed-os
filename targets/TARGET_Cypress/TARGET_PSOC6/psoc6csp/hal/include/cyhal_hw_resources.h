@@ -45,6 +45,7 @@ extern "C" {
 * \{
 */
 
+/* NOTE: Any changes made to this enum must also be made to the hardware manager resource tracking */
 /** Resource types that the hardware manager supports */
 typedef enum
 {
