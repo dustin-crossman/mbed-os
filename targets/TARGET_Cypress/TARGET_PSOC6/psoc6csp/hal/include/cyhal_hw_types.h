@@ -150,11 +150,13 @@ typedef struct {
     cy_stc_scb_i2c_master_xfer_config_t rx_config;
     cy_stc_scb_i2c_master_xfer_config_t tx_config;
     bool                                is_slave;
+    bool                                async;
     uint32_t                            address;
     uint32_t                            irq_cause;
     uint16_t                            pending;
     uint16_t                            events;
     uint32_t                            handler;
+
 #else
     void *empty;
 #endif
