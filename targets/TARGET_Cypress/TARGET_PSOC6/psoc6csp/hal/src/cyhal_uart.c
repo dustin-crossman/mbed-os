@@ -427,8 +427,9 @@ static void (*cyhal_uart_interrupts_dispatcher_table[CY_IP_MXSCB_INSTANCES])(voi
 
 static cy_en_syspm_status_t cyhal_uart_pm_callback(cy_stc_syspm_callback_params_t *params, cy_en_syspm_callback_mode_t mode)
 {
-    cy_en_syspm_status_t rslt = Cy_SCB_UART_DeepSleepCallback(params, mode);
     cyhal_uart_t *obj = params->context;
+    cy_stc_syspm_callback_params_t pdl_params = { .base = obj->base, .context = &(obj->context) };
+    cy_en_syspm_status_t rslt = Cy_SCB_UART_DeepSleepCallback(&pdl_params, mode);
     GPIO_PRT_Type *txport = obj->pin_tx != NC ? CYHAL_GET_PORTADDR(obj->pin_tx) : NULL,
                   *rtsport = obj->pin_rts != NC ? CYHAL_GET_PORTADDR(obj->pin_rts) : NULL;
     uint8_t txpin = (uint8_t)CYHAL_GET_PIN(obj->pin_tx), rtspin = (uint8_t)CYHAL_GET_PIN(obj->pin_rts);
