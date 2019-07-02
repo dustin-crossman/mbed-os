@@ -175,7 +175,7 @@ static void *whd_handle_apsta_event(whd_interface_t ifp, const whd_event_header_
          (event_header->event_type == WLC_E_IF) )
     {
         whd_result_t result;
-        result = whd_rtos_set_semaphore(&whd_driver->ap_info.whd_wifi_sleep_flag, WHD_FALSE);
+        result = cy_rtos_set_semaphore(&whd_driver->ap_info.whd_wifi_sleep_flag, WHD_FALSE);
         whd_assert("failed to post AP link semaphore", result == WHD_SUCCESS);
         REFERENCE_DEBUG_ONLY_VARIABLE(result);
     }
@@ -324,7 +324,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
         }
     }
 
-    CHECK_RETURN(whd_rtos_init_semaphore(&ap->whd_wifi_sleep_flag) );
+    CHECK_RETURN(cy_rtos_init_semaphore(&ap->whd_wifi_sleep_flag, 1, 0) );
 
     /* Register for interested events */
     CHECK_RETURN_WITH_SEMAPHORE(whd_management_set_event_handler(ifp, apsta_events, whd_handle_apsta_event,
@@ -399,8 +399,8 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
         /* Check if we need to wait for interface to be created */
         if (wait_for_interface == WHD_TRUE)
         {
-            CHECK_RETURN_WITH_SEMAPHORE(whd_rtos_get_semaphore(&ap->whd_wifi_sleep_flag, (uint32_t)10000,
-                                                               WHD_FALSE), &ap->whd_wifi_sleep_flag);
+            CHECK_RETURN_WITH_SEMAPHORE(cy_rtos_get_semaphore(&ap->whd_wifi_sleep_flag, (uint32_t)10000,
+                                                              WHD_FALSE), &ap->whd_wifi_sleep_flag);
         }
     }
     /* Set the channel */
@@ -505,7 +505,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
             memcpy(psk->key, security_key, key_length);
             psk->key_len = htod16(key_length);
             psk->flags = htod16( (uint16_t)WSEC_PASSPHRASE );
-            CHECK_RETURN(whd_rtos_delay_milliseconds(1) );
+            CHECK_RETURN(cy_rtos_delay_milliseconds(1) );
             /* Delay required to allow radio firmware to be ready to receive PMK and avoid intermittent failure */
             CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_WSEC_PMK, buffer, 0),
                                         &ap->whd_wifi_sleep_flag);
@@ -549,7 +549,7 @@ uint32_t whd_wifi_init_ap(whd_interface_t ifp, whd_ssid_t *ssid, whd_security_t 
             memcpy(psk->key, security_key, key_length);
             psk->key_len = htod16(key_length);
             psk->flags = htod16( (uint16_t)WSEC_PASSPHRASE );
-            CHECK_RETURN(whd_rtos_delay_milliseconds(1) );
+            CHECK_RETURN(cy_rtos_delay_milliseconds(1) );
             /* Delay required to allow radio firmware to be ready to receive PMK and avoid intermittent failure */
             CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_ioctl(ifp, CDC_SET, WLC_SET_WSEC_PMK, buffer,
                                                            0), &ap->whd_wifi_sleep_flag);
@@ -615,8 +615,8 @@ uint32_t whd_wifi_start_ap(whd_interface_t ifp)
     CHECK_RETURN_WITH_SEMAPHORE(whd_cdc_send_iovar(prim_ifp, CDC_SET, buffer, 0), &ap->whd_wifi_sleep_flag);
 
     /* Wait until AP is brought up */
-    CHECK_RETURN_WITH_SEMAPHORE(whd_rtos_get_semaphore(&ap->whd_wifi_sleep_flag, (uint32_t)10000,
-                                                       WHD_FALSE), &ap->whd_wifi_sleep_flag);
+    CHECK_RETURN_WITH_SEMAPHORE(cy_rtos_get_semaphore(&ap->whd_wifi_sleep_flag, (uint32_t)10000,
+                                                      WHD_FALSE), &ap->whd_wifi_sleep_flag);
 
     whd_wifi_set_ap_is_up(whd_driver, WHD_TRUE);
     return WHD_SUCCESS;
@@ -701,8 +701,8 @@ uint32_t whd_wifi_stop_ap(whd_interface_t ifp)
     }
 
     /* Wait until AP is brought down */
-    result = whd_rtos_get_semaphore(&whd_driver->ap_info.whd_wifi_sleep_flag, (uint32_t)10000, WHD_FALSE);
-    result2 = whd_rtos_deinit_semaphore(&whd_driver->ap_info.whd_wifi_sleep_flag);
+    result = cy_rtos_get_semaphore(&whd_driver->ap_info.whd_wifi_sleep_flag, (uint32_t)10000, WHD_FALSE);
+    result2 = cy_rtos_deinit_semaphore(&whd_driver->ap_info.whd_wifi_sleep_flag);
     if (result != WHD_SUCCESS)
     {
         WPRINT_WHD_ERROR( ("Error getting a semaphore, %s failed at %d \n", __func__, __LINE__) );
@@ -722,7 +722,7 @@ uint32_t whd_wifi_stop_ap(whd_interface_t ifp)
                                 &whd_driver->ap_info.whd_wifi_sleep_flag);
 
     CHECK_RETURN(whd_wifi_deregister_event_handler(ifp, ifp->event_reg_list[WHD_AP_EVENT_ENTRY]) );
-    ifp->event_reg_list[WHD_AP_EVENT_ENTRY] = (uint16_t)0xFF;
+    ifp->event_reg_list[WHD_AP_EVENT_ENTRY] = WHD_EVENT_NOT_REGISTERED;
     whd_wifi_set_ap_is_up(whd_driver, WHD_FALSE);
 
     ifp->role = WHD_INVALID_ROLE;
