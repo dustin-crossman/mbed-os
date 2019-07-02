@@ -441,6 +441,27 @@ static const uint32_t cyhal_has_channels =
     (1 << CYHAL_RSC_GPIO)  |
     (1 << CYHAL_RSC_TCPWM) ;
 
+/*
+ * This function is designed to verify that the number of valid resources in the cyhal_resource_t
+ * enum and the number entries in the cyhal_resource_offsets array are identical. Any mismatch
+ * between the two will lead to runtime failures. This will produce a divide by 0 error if they
+ * get of of sync. 
+ * NOTE: This function should never be called, it is only for a compile time error check
+ * NOTE: The Supress is to temporaraly disable the IAR warning about an uncalled function 
+ */
+static inline void check_array_size() __attribute__ ((deprecated));
+#if __ICCARM__
+#pragma diag_suppress=Pe177
+#endif
+static inline void check_array_size()
+{
+    uint32_t dummy = 1 / (sizeof(cyhal_resource_offsets) == (sizeof(uint16_t) * CYHAL_RSC_INVALID));
+    (void)dummy;
+}
+#if __ICCARM__
+#pragma diag_default=Pe177
+#endif
+
 /*******************************************************************************
 *       Utility helper functions
 *******************************************************************************/
@@ -660,24 +681,24 @@ cy_rslt_t cyhal_hwmgr_allocate_clock(cyhal_clock_divider_t* obj, cyhal_clock_div
 {
     static uint8_t counts[] = { PERI_DIV_8_NR, PERI_DIV_16_NR, PERI_DIV_16_5_NR, PERI_DIV_24_5_NR };
 
-    uint8_t block = (uint8_t)div;
-    uint8_t count = counts[block];
-
+    cyhal_clock_divider_types_t max_div_type = (accept_larger) ? (cyhal_clock_divider_types_t)(sizeof(counts) - 1) : div;
     cy_rslt_t rslt = CYHAL_HWMGR_RSLT_ERR_NONE_FREE;
-    for (int i = 0; i < count; i++)
+    for(cyhal_clock_divider_types_t current_div = div; rslt != CY_RSLT_SUCCESS && current_div <= max_div_type; ++current_div)
     {
-        cyhal_resource_inst_t res = { CYHAL_RSC_CLOCK, block, i };
-        bool reserved = (CY_RSLT_SUCCESS == cyhal_hwmgr_reserve(&res));
-        if (reserved)
+        uint8_t block = (uint8_t)current_div;
+        uint8_t count = counts[block];
+
+        for (int i = 0; rslt != CY_RSLT_SUCCESS && i < count; i++)
         {
-            obj->div_type = div;
-            obj->div_num = i;
-            return CY_RSLT_SUCCESS;
+            cyhal_resource_inst_t res = { CYHAL_RSC_CLOCK, block, i };
+            bool reserved = (CY_RSLT_SUCCESS == cyhal_hwmgr_reserve(&res));
+            if (reserved)
+            {
+                obj->div_type = current_div;
+                obj->div_num = i;
+                rslt = CY_RSLT_SUCCESS;
+            }
         }
-    }
-    if (CY_RSLT_SUCCESS != rslt && accept_larger && (div + 1u) < sizeof(counts))
-    {
-        rslt = cyhal_hwmgr_allocate_clock(obj, (cyhal_clock_divider_types_t)(div + 1), accept_larger);
     }
 
     return rslt;

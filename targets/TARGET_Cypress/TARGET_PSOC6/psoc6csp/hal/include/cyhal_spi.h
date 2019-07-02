@@ -162,7 +162,7 @@ cy_rslt_t cyhal_spi_frequency(cyhal_spi_t *obj, uint32_t hz);
  * @param[in] obj   The SPI peripheral to read
  * @param[in] value The value received
  * @return The status of the read request
- * @note
+ * @note 
  * - In Master mode, MISO pin required to be non-NC for this API to operate
  * - In Slave mode, MOSI pin required to be non-NC for this API to operate
  */
