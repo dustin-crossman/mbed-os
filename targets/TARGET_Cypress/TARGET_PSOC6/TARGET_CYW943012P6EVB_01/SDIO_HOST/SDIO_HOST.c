@@ -3,7 +3,7 @@
 * \version 1.00
 *
 * \brief
-*  This file provides the source code to the API for the SDIO driver.
+*  This file provides the source code to the API for the UDB based SDIO driver.
 *
 *******************************************************************************
 * \copyright
@@ -12,6 +12,7 @@
 * disclaimers, and limitations in the end user license agreement accompanying
 * the software package with which this file was provided.
 *******************************************************************************/
+
 #include "SDIO_HOST.h"
 
 #if defined(__cplusplus)
@@ -19,7 +20,10 @@ extern "C" {
 #endif
 
 #ifdef SEMAPHORE
-#include "cmsis_os2.h"
+#include "cyabs_rtos.h"
+
+#define NEVER_TIMEOUT ( (uint32_t)0xffffffffUL )
+static cy_semaphore_t sdio_transfer_finished_semaphore;
 #endif
 
 
@@ -47,17 +51,6 @@ static uint8_t crcTable[256];
 /*Global values used for DMA interrupt*/
 static uint32_t yCountRemainder;
 static uint32_t yCounts;
-
-/* declare a semaphore*/
-#ifdef SEMAPHORE
-#define NEVER_TIMEOUT ( (uint32_t)0xffffffffUL )
-typedef osSemaphoreId_t cy_semaphore_t;
-static en_sdio_result_t cy_rtos_init_semaphore(/*@out@*/ cy_semaphore_t *semaphore);
-static en_sdio_result_t cy_rtos_get_semaphore(cy_semaphore_t *semaphore, uint32_t timeout_ms);
-static en_sdio_result_t cy_rtos_set_semaphore(cy_semaphore_t *semaphore );
-static en_sdio_result_t cy_rtos_deinit_semaphore(cy_semaphore_t *semaphore);
-static cy_semaphore_t   sdio_transfer_finished_semaphore;
-#endif
 
 static uint32_t udb_initialized = 0;
 
@@ -133,7 +126,7 @@ void SDIO_Init(stc_sdio_irq_cb_t* pfuCb)
 
      /*Initalize the semaphore*/
 #ifdef SEMAPHORE
-    cy_rtos_init_semaphore( &sdio_transfer_finished_semaphore );
+    cy_rtos_init_semaphore( &sdio_transfer_finished_semaphore, 1, 1 );
 #endif
 }
 
@@ -185,7 +178,6 @@ void SDIO_SendCommand(stc_sdio_cmd_config_t *pstcCmdConfig)
 
         /*Enable the channel*/
         Cy_DMA_Channel_Enable(SDIO_HOST_Resp_DMA_HW, SDIO_HOST_Resp_DMA_DW_CHANNEL);
-
     }
     else
     {
@@ -334,14 +326,12 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
         readDesr0.dst = (uint32_t)(pstcDataConfig->pu8Data);
         readDesr1.dst = (uint32_t)((pstcDataConfig->pu8Data) + 1024);
 
-
         /*Setup the X control to transfer two 16 bit elements per transfer for a total of 4 bytes
           Remember X increment is in terms of data element size which is 16, thus why it is 1*/
         readDesr0.xCtl = _VAL2FLD(CY_DMA_CTL_COUNT, 1) |
                                 _VAL2FLD(CY_DMA_CTL_DST_INCR, 1);
         readDesr1.xCtl = _VAL2FLD(CY_DMA_CTL_COUNT, 1) |
                                 _VAL2FLD(CY_DMA_CTL_DST_INCR, 1);
-
 
         /*The X Loop will always transfer 4 bytes. The FIFO will only trigger the
         DMA when it has 4 bytes to send (2 in each F0 and F1). There is a possibility
@@ -442,7 +432,6 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
 
         /*Set the flag in the control register to enable the read*/
         SDIO_CONTROL_REG |= SDIO_CTRL_ENABLE_READ;
-
     }
 
     /*Otherwise it is a write*/
@@ -653,14 +642,13 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
         u32CmdTimeout++;
         enRetTmp = SDIO_CheckForEvent(SdCmdEventCmdDone);
 
-    }while ((enRetTmp != Ok) && (u32CmdTimeout < SDIO_CMD_TIMEOUT));
+    } while ((enRetTmp != Ok) && (u32CmdTimeout < SDIO_CMD_TIMEOUT));
 
 
     if (u32CmdTimeout == SDIO_CMD_TIMEOUT)
     {
         enRet |= CMDTimeout;
     }
-
     else /*CMD Passed*/
     {
         /*If a response is expected check it*/
@@ -716,9 +704,8 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                         }
 
                         if (u32Timeout == SDIO_DAT_TIMEOUT)
-
 #else
-                         result = cy_rtos_get_semaphore( &sdio_transfer_finished_semaphore, 10 );
+                         result = cy_rtos_get_semaphore( &sdio_transfer_finished_semaphore, 10, false );
                          enRetTmp = SDIO_CheckForEvent(SdCmdEventTransferDone);
 
                          /* if it was a read it is possible there is still extra data hanging out, trigger the
@@ -1198,7 +1185,7 @@ void SDIO_IRQ(void)
         }
         /*set the done flag*/
 #ifdef SEMAPHORE
-        cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore );
+        cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore, true );
 #else
         gstcInternalData.stcEvents.u8TransComplete++;
 #endif
@@ -1218,7 +1205,7 @@ void SDIO_IRQ(void)
         }
         /*Okay we're done so set the done flag*/
 #ifdef SEMAPHORE
-        cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore );
+        cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore, true );
 #else
         gstcInternalData.stcEvents.u8TransComplete++;
 #endif
@@ -1351,125 +1338,6 @@ void SDIO_WRITE_DMA_IRQ(void)
     Cy_DMA_Channel_ClearInterrupt(SDIO_HOST_Write_DMA_HW, SDIO_HOST_Write_DMA_DW_CHANNEL);
     yCounts--;
 }
-
-#ifdef SEMAPHORE
-
-/**
- * Creates a semaphore
- *
- * @param semaphore         : pointer to variable which will receive handle of created semaphore
- *
- * @returns Ok on success, Error otherwise
- */
-static en_sdio_result_t cy_rtos_init_semaphore(/*@out@*/ cy_semaphore_t *semaphore)   /*@modifies *semaphore@*/
-{
-    *semaphore = osSemaphoreNew(1, 1, NULL);
-    if (*semaphore == NULL)
-    {
-        return Error;
-    }
-    return Ok;
-}
-
-/**
- * Gets a semaphore
- *
- * If value of semaphore is larger than zero, then the semaphore is decremented and function returns
- * Else If value of semaphore is zero, then current thread is suspended until semaphore is set.
- * Value of semaphore should never be below zero
- *
- * Must not be called from interrupt context, since it could block, and since an interrupt is not a
- * normal thread, so could cause RTOS problems if it tries to suspend it.
- *
- * @param semaphore   : Pointer to variable which will receive handle of created semaphore
- * @param timeout_ms  : Maximum period to block for. Can be passed NEVER_TIMEOUT to request no timeout
- */
-static en_sdio_result_t cy_rtos_get_semaphore(cy_semaphore_t *semaphore, uint32_t timeout_ms)
-{
-    osStatus_t result;
-
-    if (*semaphore == NULL)
-    {
-        return Error;
-    }
-
-    if (timeout_ms == NEVER_TIMEOUT)
-        result = osSemaphoreAcquire(*semaphore, osWaitForever);
-    else
-        result = osSemaphoreAcquire(*semaphore, timeout_ms );
-
-    if (result == osOK)
-    {
-        return Ok;
-    }
-    else if (result == osErrorTimeout)
-    {
-        return DataTimeout;
-    }
-
-    return Error;
-}
-
-/**
- * Sets a semaphore
- *
- * If any threads are waiting on the semaphore, the first thread is resumed
- * Else increment semaphore.
- *
- * Can be called from interrupt context, so must be able to handle resuming other
- * threads from interrupt context.
- *
- * @param semaphore       : Pointer to variable which will receive handle of created semaphore
- * @return en_sdio_result_t :Ok if semaphore was successfully set
- *                          : Error if an error occurred
- *
- */
-static en_sdio_result_t cy_rtos_set_semaphore(cy_semaphore_t *semaphore )
-{
-    osStatus_t result;
-
-    if (*semaphore == NULL)
-    {
-        return Error;
-    }
-
-    result = osSemaphoreRelease(*semaphore);
-
-    if ( (result == osOK) || (result == osErrorResource) )
-    {
-        return Ok;
-    }
-
-    return Error;
-}
-
-/**
- * Deletes a semaphore
- *
- * function to delete a semaphore.
- *
- * @param semaphore         : Pointer to the semaphore handle
- *
- * @return en_sdio_result_t : Ok if semaphore was successfully deleted
- *                        : Error if an error occurred
- *
- */
-static en_sdio_result_t cy_rtos_deinit_semaphore(cy_semaphore_t *semaphore)
-{
-    osStatus_t result;
-    if (*semaphore == NULL)
-    {
-        return Error;
-    }
-    result = osSemaphoreDelete(*semaphore);
-
-    if (result != osOK)
-        return Error;
-
-    return Ok;
-}
-
-#endif // SEMAPHORE
 
 #if defined(__cplusplus)
 }
