@@ -8272,7 +8272,7 @@
         ],
         "release_versions": ["5"],
         "extra_labels": ["Cypress", "PSOC6"],
-        "components_add": ["SOFTFP"],
+        "components_add": ["SOFTFP", "RTX"],
         "public": false
     },
     "MCU_PSOC6_M0": {
