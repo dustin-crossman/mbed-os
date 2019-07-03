@@ -23,7 +23,7 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "cybsp_retarget.h"
+//#include "cybsp_retarget.h"
 #include "cybsp_cy8cproto_064_sb.h"
 #include "cycfg.h"
 

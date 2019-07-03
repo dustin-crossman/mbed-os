@@ -8404,9 +8404,17 @@
             "PSOC6_01"
         ],
         "macros_add": ["CYB06447BZI_D54"],
+        "supported_form_factors": ["ARDUINO"],
+        "extra_labels_add": ["PSOC6_01"],
+        "macros_add": ["CY8C6247BZI_D54",
+                       "PSOC6_DYNSRM_DISABLE=1",
+                       "CY_CFG_SYSCLK_WCO_ENABLED=1",
+                       "SEMAPHORE"],
         "detect_code": ["1907"],
+        "forced_reset_timeout": 5,
+        "reset_method": "default",
         "post_binary_hook": {
-            "function": "PSOC6Code.complete"
+            "function": "PSOC6Code.sign_image"
         }
     },
     "CYW943012P6EVB_01": {

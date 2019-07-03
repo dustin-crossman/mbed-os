@@ -149,6 +149,15 @@ __STATIC_INLINE void Cy_SysClk_ClkSlowInit()
     Cy_SysClk_ClkSlowSetDivider(0U);
 }
 
+__STATIC_INLINE void Cy_SysClk_WcoInit()
+{
+    (void)Cy_GPIO_Pin_FastInit(GPIO_PRT0, 0U, 0x00U, 0x00U, HSIOM_SEL_GPIO);
+    (void)Cy_GPIO_Pin_FastInit(GPIO_PRT0, 1U, 0x00U, 0x00U, HSIOM_SEL_GPIO);
+    if (CY_SYSCLK_SUCCESS != Cy_SysClk_WcoEnable(1000000UL))
+    {
+        cycfg_ClockStartupError(CY_CFG_SYSCLK_WCO_ERROR);
+    }
+}
 
 void init_cycfg_system(void)
 {
