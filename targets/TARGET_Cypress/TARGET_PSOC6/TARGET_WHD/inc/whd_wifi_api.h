@@ -745,6 +745,16 @@ extern uint32_t whd_wifi_manage_custom_ie(whd_interface_t ifp, whd_custom_ie_act
  *  @return WHD_SUCCESS or Error code
  */
 extern uint32_t whd_wifi_send_action_frame(whd_interface_t ifp, whd_af_params_t *af_params);
+
+/** Set coex configuration
+ *
+ *  @param  ifp                  Pointer to handle instance of whd interface
+ *  @param  coex_config          Pointer to the structure whd_coex_config_t
+ *
+ *  @return WHD_SUCCESS or Error code
+ */
+extern uint32_t whd_wifi_set_coex_config(whd_interface_t ifp, whd_coex_config_t *coex_config);
+
 /* @} */
 
 /** @addtogroup wifiioctl   WHD Wi-Fi IOCTL Set/Get API
@@ -893,15 +903,6 @@ extern uint32_t whd_wifi_get_bss_info(whd_interface_t ifp, wl_bss_info_t *bi);
  *  @return WHD_SUCCESS or Error code
  */
 extern uint32_t whd_print_stats(whd_driver_t whd_drv, whd_bool_t reset_after_print);
-
-/** Set coex configuration
- *
- *  @param  whd_drv             : Pointer to handle instance of the driver
- *  @param  coex_config         : Pointer to the structure whd_coex_config_t
- *
- *  @return WHD_SUCCESS or Error code
- */
-extern uint32_t whd_wifi_set_coex_config(whd_interface_t ifp, whd_coex_config_t *coex_config);
 /* @} */
 /* @} */
 

@@ -998,12 +998,12 @@ typedef enum
  */
 typedef struct whd_btc_lescan_params
 {
-    uint16_t priority;      /* LE scan priority */
-    uint16_t duty_cycle;    /* LE scan duty cycle */
-    uint16_t max_win;       /* LE Max Scan window */
-    uint16_t int_grant;     /* LE Small Interval Grant */
-    uint16_t scan_int;      /* LE scan interval */
-    uint16_t scan_win;      /* LE scan Window */
+    uint16_t priority;      /**< LE scan priority */
+    uint16_t duty_cycle;    /**< LE scan duty cycle */
+    uint16_t max_win;       /**< LE Max Scan window */
+    uint16_t int_grant;     /**< LE Small Interval Grant */
+    uint16_t scan_int;      /**< LE scan interval */
+    uint16_t scan_win;      /**< LE scan Window */
 } whd_btc_lescan_params_t;
 
 /**
@@ -1011,7 +1011,7 @@ typedef struct whd_btc_lescan_params
  */
 typedef struct whd_coex_config
 {
-    whd_btc_lescan_params_t le_scan_params;  /* LE Scan Parameters */
+    whd_btc_lescan_params_t le_scan_params;  /**< LE Scan Parameters */
 } whd_coex_config_t;
 
 #ifdef __cplusplus

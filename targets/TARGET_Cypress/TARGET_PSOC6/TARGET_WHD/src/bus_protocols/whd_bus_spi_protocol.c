@@ -744,7 +744,7 @@ whd_result_t whd_bus_spi_wait_for_wlan_event(whd_driver_t whd_driver, cy_semapho
         result = cy_rtos_get_semaphore(transceive_semaphore, (uint32_t)MIN_OF(timeout_ms,
                                                                               WHD_THREAD_POLL_TIMEOUT), WHD_FALSE);
     }
-    whd_assert("Could not get whd sleep semaphore\n", (result == WHD_SUCCESS) || (result == WHD_TIMEOUT) );
+    whd_assert("Could not get whd sleep semaphore\n", (result == CY_RSLT_SUCCESS) || (result == CY_RTOS_TIMEOUT) );
 
     return result;
 }
