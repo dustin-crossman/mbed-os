@@ -19,7 +19,18 @@ Version of Python required is 3.7+
 **_NOTE_:** DO NOT COMMIT any new keys to repository. ---
 
 ## 2.   Create provisioning packets:
-Execute from ./prepare folder:
+Use *provisioning_packet.py* from ./prepare folder.
+
+Options:
+
+    --oem <filename>            OEM key file.
+    --hsm <filename>            HSM key file.
+    --cyboot <filename>         Cypress Bootloader image certificate.
+    --cyauth <filename>         Provisioning authorization certificate.
+    --policy <filename>         Policy file.
+    --out <directory_path>      Output directory.
+    --ckey <filename>           Customer key that will be used for image signing. Use the option multiple times to specify multiple keys.
+    --devcert <filename>        Chain of trust certificate. Use the option multiple times to specify multiple certificates.
 
 * To create packet for CY8CPROTO_064_SB target using single-stage policy (CM4 only):
     
@@ -53,10 +64,10 @@ The script will run with the default arguments if no arguments specified.
 
 Default arguments can be overridden with a custom:
 
-    --prov-jwt FILENAME     Path to provisioning JWT file (packet which contains all data necessary for provisioning, including policy, authorization packets and keys)
-    --hex FILENAME          Path to Cypress Bootloader HEX binary file
-    --pubkey-json FILENAME  File where to save public key in JSON format
-    --pubkey-pem FILENAME   File where to save public key in PEM format
+    --prov-jwt <filename>       Path to provisioning JWT file (packet which contains all data necessary for provisioning, including policy, authorization packets and keys)
+    --hex <filename>            Path to Cypress Bootloader HEX binary file
+    --pubkey-json <filename>    File where to save public key in JSON format
+    --pubkey-pem <filename>     File where to save public key in PEM format
 
 *Example:*
     
