@@ -310,17 +310,12 @@ nsapi_error_t LWIP::socket_open(nsapi_socket_t *handle, nsapi_protocol_t proto)
     }
 
     enum netconn_type netconntype;
-    if ( proto == NSAPI_TCP)
-    {
-    	netconntype = NETCONN_TCP;
-    }
-    else if ( proto == NSAPI_UDP )
-    {
-    	netconntype = NETCONN_UDP;
-    }
-    else
-    {
-    	netconntype = NETCONN_RAW;
+    if (proto == NSAPI_TCP) {
+        netconntype = NETCONN_TCP;
+    } else if (proto == NSAPI_UDP) {
+        netconntype = NETCONN_UDP;
+    } else {
+        netconntype = NETCONN_RAW;
     }
 
 
@@ -329,14 +324,11 @@ nsapi_error_t LWIP::socket_open(nsapi_socket_t *handle, nsapi_protocol_t proto)
     netconntype = (enum netconn_type)(netconntype | NETCONN_TYPE_IPV6);
 #endif
 
-    if (proto == NSAPI_RAW )
-    {
-      s->conn = netconn_new_with_proto_and_callback(NETCONN_RAW,
-    		   (u8_t)IP_PROTO_ICMP, &LWIP::socket_callback);
-    }
-    else
-    {
-      s->conn = netconn_new_with_callback(netconntype, &LWIP::socket_callback);
+    if (proto == NSAPI_RAW) {
+        s->conn = netconn_new_with_proto_and_callback(NETCONN_RAW,
+                                                      (u8_t)IP_PROTO_ICMP, &LWIP::socket_callback);
+    } else {
+        s->conn = netconn_new_with_callback(netconntype, &LWIP::socket_callback);
     }
 
     if (!s->conn) {
