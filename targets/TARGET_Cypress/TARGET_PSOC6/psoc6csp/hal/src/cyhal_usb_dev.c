@@ -26,7 +26,9 @@
 *******************************************************************************/
 
 #include "cyhal_usb_dev.h"
+#include "cyhal_gpio.h"
 #include "cyhal_interconnect.h"
+#include "cyhal_utils.h"
 
 #if defined(CY_IP_MXUSBFS)
 

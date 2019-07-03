@@ -204,7 +204,7 @@ struct whd_netif_funcs
 
 /** To send an ethernet frame to WHD (called by the Network Stack)
  *
- *  This function takes Ethernet data from the network stack and queues it for transmission over the wireless network.
+ *  This function takes ethernet data from the network stack and queues it for transmission over the wireless network.
  *  The function can be called from any thread context as it is thread safe, however
  *  it must not be called from interrupt context since it might get blocked while waiting
  *  for a lock on the transmit queue.
