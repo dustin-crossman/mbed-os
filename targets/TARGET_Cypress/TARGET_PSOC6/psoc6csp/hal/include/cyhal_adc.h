@@ -56,7 +56,7 @@ extern "C" {
 */
 
 /** Maximum value that the ADC can return */
-#define CYHAL_ADC_MAX_VALUE 0x0FFF
+#define CYHAL_ADC_MAX_VALUE 0xFFFF
 
 /** Bad argument */
 #define CYHAL_ADC_RSLT_BAD_ARGUMENT (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_ADC, 0))

@@ -60,9 +60,13 @@ void gpio_mode(gpio_t *obj, PinMode mode)
     }
 }
 
-void gpio_dir(MBED_UNUSED gpio_t *obj, MBED_UNUSED PinDirection direction)
+void gpio_dir(gpio_t *obj, PinDirection direction)
 {
-    // mbed reads from input buffer instead of DR even for output pins so always leave input buffer enabled
+    if (direction == PIN_INPUT) {
+        gpio_mode(obj, CYHAL_GPIO_DRIVE_ANALOG);
+    } else if (direction == PIN_OUTPUT) {
+        gpio_mode(obj, CYHAL_GPIO_DRIVE_STRONG);
+    }
 }
 
 #ifdef __cplusplus

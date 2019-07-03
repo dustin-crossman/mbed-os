@@ -48,6 +48,7 @@ void analogin_init(analogin_t *obj, PinName pin)
             MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_ANALOG, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_adc_channel_init");
         }
     }
+    cyhal_gpio_drivemode(pin, CYHAL_GPIO_DRIVE_ANALOG);
 }
 
 float analogin_read(analogin_t *obj)
