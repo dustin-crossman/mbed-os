@@ -20,7 +20,7 @@ public:
      *
      *  @note Must call open to initialize the socket on a network stack.
      */
-	RAWSocket();
+    RAWSocket();
 
     /** Create and open a socket on the network stack of the given
      *  network interface.
@@ -34,7 +34,7 @@ public:
                           "The RAWSocket(S *stack) constructor is deprecated"
                           "It discards the open() call return value."
                           "Use another constructor and call open() explicitly, instead.")
-	RAWSocket(S *stack)
+    RAWSocket(S *stack)
     {
         open(stack);
     }
@@ -59,7 +59,7 @@ public:
      *                  code on failure.
      */
     nsapi_size_or_error_t sendto(const char *host, uint16_t port,
-                                         const void *data, nsapi_size_t size);
+                                 const void *data, nsapi_size_t size);
 
     /** Send data to the specified address.
      *
@@ -73,8 +73,8 @@ public:
      *  @return         Number of sent bytes on success, negative error
      *                  code on failure.
      */
-     nsapi_size_or_error_t sendto(const SocketAddress &address,
-                                         const void *data, nsapi_size_t size);
+    nsapi_size_or_error_t sendto(const SocketAddress &address,
+                                 const void *data, nsapi_size_t size);
 
     /** Receive a datagram and store the source address in address if it's not NULL.
      *
@@ -96,7 +96,7 @@ public:
      *                  code on failure.
      */
     nsapi_size_or_error_t recvfrom(SocketAddress *address,
-                                           void *data, nsapi_size_t size);
+                                   void *data, nsapi_size_t size);
 
     /** Set the remote address for next send() call and filtering
      *  of incoming packets. To reset the address, zero initialized
@@ -105,7 +105,7 @@ public:
      *  @param address  The SocketAddress of the remote host.
      *  @return         0 on success, negative error code on failure.
      */
-     nsapi_error_t connect(const SocketAddress &address);
+    nsapi_error_t connect(const SocketAddress &address);
 
     /** Send a datagram to connected remote address.
      *
@@ -120,7 +120,7 @@ public:
      *  @return         Number of sent bytes on success, negative error
      *                  code on failure.
      */
-     nsapi_size_or_error_t send(const void *data, nsapi_size_t size);
+    nsapi_size_or_error_t send(const void *data, nsapi_size_t size);
 
     /** Receive data from a socket.
      *
@@ -140,26 +140,26 @@ public:
      *  @return         Number of received bytes on success, negative error
      *                  code on failure.
      */
-     nsapi_size_or_error_t recv(void *data, nsapi_size_t size);
+    nsapi_size_or_error_t recv(void *data, nsapi_size_t size);
 
     /** Not implemented for RAWSocket.
      *
      *  @param error      Not used.
      *  @return           NSAPI_ERROR_UNSUPPORTED
      */
-     Socket *accept(nsapi_error_t *error = NULL);
+    Socket *accept(nsapi_error_t *error = NULL);
 
     /** Not implemented for RAWSocket.
      *
      *  @param backlog    Not used.
      *  @return           NSAPI_ERROR_UNSUPPORTED
      */
-     nsapi_error_t listen(int backlog = 1);
+    nsapi_error_t listen(int backlog = 1);
 
 #if !defined(DOXYGEN_ONLY)
 
 protected:
-     nsapi_protocol_t get_proto();
+    nsapi_protocol_t get_proto();
 
 private:
     /** Create a socket out of a given socket
