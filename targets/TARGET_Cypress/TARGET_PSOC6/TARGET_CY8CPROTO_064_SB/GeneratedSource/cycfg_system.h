@@ -27,6 +27,7 @@
 
 #include "cycfg_notices.h"
 #include "cy_sysclk.h"
+#include "cy_gpio.h"
 #include "cy_syspm.h"
 
 #if defined(__cplusplus)
@@ -45,7 +46,7 @@ extern "C" {
 #define srss_0_clock_0_ilo_0_ENABLED 1U
 #define srss_0_clock_0_imo_0_ENABLED 1U
 #define srss_0_clock_0_lfclk_0_ENABLED 1U
-#define CY_CFG_SYSCLK_CLKLF_FREQ_HZ 32000
+#define CY_CFG_SYSCLK_CLKLF_FREQ_HZ 32768
 #define srss_0_clock_0_pathmux_0_ENABLED 1U
 #define srss_0_clock_0_pathmux_1_ENABLED 1U
 #define srss_0_clock_0_pathmux_2_ENABLED 1U
@@ -53,6 +54,7 @@ extern "C" {
 #define srss_0_clock_0_pathmux_4_ENABLED 1U
 #define srss_0_clock_0_periclk_0_ENABLED 1U
 #define srss_0_clock_0_slowclk_0_ENABLED 1U
+#define srss_0_clock_0_wco_0_ENABLED 1U
 #define srss_0_power_0_ENABLED 1U
 #define CY_CFG_PWR_VDDA_MV 3300
 #define CY_CFG_PWR_VDDD_MV 3300
