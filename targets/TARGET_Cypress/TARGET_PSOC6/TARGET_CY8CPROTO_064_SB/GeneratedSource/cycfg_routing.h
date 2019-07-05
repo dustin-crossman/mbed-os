@@ -32,6 +32,8 @@ extern "C" {
 #include "cycfg_notices.h"
 void init_cycfg_routing(void);
 #define init_cycfg_connectivity() init_cycfg_routing()
+#define ioss_0_port_0_pin_0_ANALOG P0_0_SRSS_WCO_IN
+#define ioss_0_port_0_pin_1_ANALOG P0_1_SRSS_WCO_OUT
 #define ioss_0_port_11_pin_2_HSIOM P11_2_SMIF_SPI_SELECT0
 #define ioss_0_port_11_pin_3_HSIOM P11_3_SMIF_SPI_DATA3
 #define ioss_0_port_11_pin_4_HSIOM P11_4_SMIF_SPI_DATA2
