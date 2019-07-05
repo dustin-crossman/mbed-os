@@ -372,9 +372,6 @@ def process_target(toolchain, target):
 
 # Sign binary image using imgtool
 def sign_image(toolchain, elf0, binf, hexf1=None):
-    
-    print("++++++++++++")
-    print(binf)
 
     target_sig_data = None
     # reserve name for separate NSPE image
