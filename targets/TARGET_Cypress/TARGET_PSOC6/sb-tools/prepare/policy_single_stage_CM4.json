@@ -48,7 +48,7 @@
         }
     },
     "wounding" :
-    {     
+    {
     },
     "boot_upgrade" :
     {
@@ -76,6 +76,11 @@
                         "type": "SRAM_SPM_PRIV",
                         "address": 134348800,
                         "size": 65536
+                    },
+                    {
+                        "type": "SRAM_DAP",
+                        "address": 134397952,
+                        "size": 16384
                     }
                 ]
             },
@@ -94,12 +99,12 @@
                 "resources": [
                     {
                         "type": "BOOT",
-                        "address": 268443648,
+                        "address": 268435456,
                         "size": 327680
                     },
                     {
                         "type": "UPGRADE",
-                        "address": 268771328,
+                        "address": 268763136,
                         "size": 327680
                     }
                 ]
