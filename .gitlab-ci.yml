@@ -46,7 +46,7 @@ pyocd_wrapper:
       - pyocd
 
 # Compile TARGET_PSOC6
-test_mbed_062_crypto:
+.test_mbed_062_crypto:
   stage: test
   tags:
     - MBED_TEST
