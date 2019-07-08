@@ -52,6 +52,7 @@
     },
     "boot_upgrade" :
     {
+        "title": "upgrade_policy",
         "firmware": [
             {
                 "boot_auth": [
@@ -59,13 +60,11 @@
                 ],
                 "id": 0,
                 "launch": 4,
-                "monotonic": 0,
-                "smif_id": 0,
+                "smif_id": 1,
                 "upgrade": false,
                 "upgrade_auth": [
                     3
                 ],
-                "backup": false,
                 "resources": [
                     {
                         "type": "FLASH_PC1_SPM",
@@ -90,12 +89,12 @@
                 ],
                 "id": 4,
                 "monotonic": 0,
-                "smif_id": 0,
+                "smif_id": 1,
                 "upgrade": true,
                 "upgrade_auth": [
                     8
                 ],
-                "backup": false,
+
                 "resources": [
                     {
                         "type": "BOOT",
@@ -109,21 +108,6 @@
                     }
                 ]
             }
-        ],
-        "reprogram": [
-            {
-                "size": 917504,
-                "start": 268435456
-            },
-            {
-                "size": 131072,
-                "start": 268828672
-            }
-        ],
-        "reprovision": {
-            "boot_loader": false,
-            "keys_and_policies": true
-        },
-        "title": "upgrade_policy"
+        ]
     }
 }
