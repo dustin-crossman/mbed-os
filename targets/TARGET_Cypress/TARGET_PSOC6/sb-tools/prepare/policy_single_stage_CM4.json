@@ -60,7 +60,7 @@
                 ],
                 "id": 0,
                 "launch": 4,
-                "smif_id": 1,
+                "smif_id": 0,
                 "upgrade": false,
                 "upgrade_auth": [
                     3
