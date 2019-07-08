@@ -8497,7 +8497,6 @@
             "WHD",
             "43012",
             "CYW43XXX",
-            "CYW43012",
             "CORDIO"
         ],
         "macros_add": ["CY8C6247BZI_D54", "CYHAL_UDB_SDIO", "SEMAPHORE"],
@@ -8518,7 +8517,6 @@
             "WHD",
             "43012",
             "CYW43XXX",
-            "CYW43012",
             "CORDIO"
         ],
         "macros_add": ["CY8C6247BZI_D54", "CYHAL_UDB_SDIO", "SEMAPHORE"],
