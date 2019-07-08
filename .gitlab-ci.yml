@@ -9,7 +9,7 @@ before_script:
 
 # Run pyocd wrapper functional tests
 
-pyocd_wrapper:
+.pyocd_wrapper:
   stage: test
   tags:
     - MBED_TEST_MAC1014
@@ -91,13 +91,12 @@ pyocd_wrapper:
     - echo "CY8CPROTO_062_4343W"
     - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
 
-# Compile TARGET_PSOC6_PSA
-test_mbed_064_psa:
+# Compile TARGET_PSOC6
+test_mbed_064:
   stage: test
   tags:
     - MBED_TEST
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
-    - mbed test --compile --build OUT/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t IAR -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -vv
-    - Add-Content OUT\.mbedignore "*"
-    - mbed test --compile --build OUT/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t IAR -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -v --run
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
+    
