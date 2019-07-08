@@ -92,11 +92,20 @@ before_script:
     - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
 
 # Compile TARGET_PSOC6
-test_mbed_064:
+.test_mbed_064_pinmap_GCC_ARM:
   stage: test
   tags:
     - MBED_TEST
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
+    
+test_mbed_064_pinmap_IAR:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t IAR -n *pinmap -v --run
+    
     
