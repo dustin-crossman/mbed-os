@@ -392,19 +392,21 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
 
     for slot in target_sig_data:
         # first check if image for slot under processing should be encrypted
-        try:        
+        try:
             if slot["slot_data"]["encrypt"] is True:
-                # call ecrypt_img to perform encryption
-                process = subprocess.Popen([sys.executable, str(slot["sdk_path"] / "encrypted_image_runner.py"),
-                                           "--sdk-path", str(slot["sdk_path"]), "--hex-file", os.getcwd() + '/' + mbed_hex,
-                                           "--key-priv", str(slot["sdk_path"] / slot["key_file"]),
-                                           "--key-pub", str(slot["sdk_path"] / slot["dev_pub_key"]),
-                                           "--key-aes", str(slot["sdk_path"] / slot["aes_key"]),
-                                           "--ver", str(slot["img_data"]["VERSION"]), "--img-id", str(slot["id"]),
-                                           "--rlb-count", str(slot["img_data"]["ROLLBACK_COUNTER"]),
-                                           "--slot-size", str(hex(slot["slot_data"]["size"])), "--pad", "1",
-                                           "--img-offset", str(slot["slot_data"]["address"])],
-                                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                # call encrypt_img to perform encryption
+                args = [sys.executable, str(slot["sdk_path"] / "encrypted_image_runner.py"),
+                                        "--sdk-path", str(slot["sdk_path"]), "--hex-file", os.getcwd() + '/' + mbed_hex,
+                                        "--key-priv", str(slot["sdk_path"] / slot["key_file"]),
+                                        "--key-pub", str(slot["sdk_path"] / slot["dev_pub_key"]),
+                                        "--key-aes", str(slot["sdk_path"] / slot["aes_key"]),
+                                        "--ver", str(slot["img_data"]["VERSION"]), "--img-id", str(slot["id"]),
+                                        "--rlb-count", str(slot["img_data"]["ROLLBACK_COUNTER"]),
+                                        "--slot-size", str(hex(slot["slot_data"]["size"])),
+                                        "--img-offset", str(slot["slot_data"]["address"])]
+                if slot["slot_data"]["type"] != "BOOT":
+                    args.append("--pad")
+                process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
                 # catch standard process pipes outputs
                 stderr = process.communicate()[1]
@@ -429,13 +431,16 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
                 out_bin_name = out_hex_name[:-4] + "_signed.bin"
 
             # call imgtool for signature
-            process = subprocess.Popen([sys.executable, str(slot["sdk_path"] / "imgtool/imgtool.py"),
-                                        "sign", "--key", str(slot["sdk_path"] / slot["key_file"]),
-                                        "--header-size", str(hex(MCUBOOT_HEADER_SIZE)), "--pad-header", "--align", "8",
-                                        "--version", str(slot["img_data"]["VERSION"]), "--image-id",
-                                        str(slot["id"]), "--rollback_counter", str(slot["img_data"]["ROLLBACK_COUNTER"]),
-                                        "--slot-size", str(hex(slot["slot_data"]["size"])), "--overwrite-only", "--pad",
-                                        mbed_hex, out_hex_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            args = [sys.executable, str(slot["sdk_path"] / "imgtool/imgtool.py"),
+                                    "sign", "--key", str(slot["sdk_path"] / slot["key_file"]),
+                                    "--header-size", str(hex(MCUBOOT_HEADER_SIZE)), "--pad-header", "--align", "8",
+                                    "--version", str(slot["img_data"]["VERSION"]), "--image-id",
+                                    str(slot["id"]), "--rollback_counter", str(slot["img_data"]["ROLLBACK_COUNTER"]),
+                                    "--slot-size", str(hex(slot["slot_data"]["size"])), "--overwrite-only",
+                                    mbed_hex, out_hex_name]
+            if slot["slot_data"]["type"] != "BOOT":
+                args.append("--pad")
+            process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             # catch stderr outputs
             stderr = process.communicate()[1]
