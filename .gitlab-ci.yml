@@ -18,6 +18,7 @@ pyocd_wrapper:
     - echo "[INFO] Getting latest pyocd"
     - if (-Not(Test-Path pyocd)) { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd; cd pyocd; git checkout tags/AH_SECURITY_RELEASE_2; git branch; cd .. }
     - echo "[INFO] Installing recquired python modules"
+    - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
     - pip install cmsis-pack-manager
     - pip install colorama
     - pip install intelhex
