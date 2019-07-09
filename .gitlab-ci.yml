@@ -91,8 +91,18 @@ before_script:
     - echo "CY8CPROTO_062_4343W"
     - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
 
-# Compile TARGET_PSOC6
-.test_mbed_064_pinmap_GCC_ARM:
+
+test_mbed_064_pinmap_IAR_WIN:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t IAR -n *pinmap -v --run
+
+
+
+test_mbed_064_pinmap_GCC_ARM_WIN:
   stage: test
   tags:
     - MBED_TEST
@@ -100,12 +110,23 @@ before_script:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
     
-test_mbed_064_pinmap_IAR:
+
+    
+test_mbed_064_pinmap_GCC_ARM_MAC:
   stage: test
   tags:
-    - MBED_TEST
+    - MBED_TEST_MAC1014
+  before_script:
+    - pwd
+    - curl --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/dev_default_keys.zip
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys
+    - unzip dev_default_keys.zip
+    - export https_proxy=http://proxy.ua.cypress.com:8080
+    - python3 --version 
+    - cd ../../../../../
+    - pwd     
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
-    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t IAR -n *pinmap -v --run
-    
+    - mbedls
+    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
     
