@@ -52,11 +52,11 @@
 
 #pragma once
 
-#ifdef MBED
+#ifdef __MBED__
 #include "cybsp_api_wifi.h"
 #else
 #include "cybsp_api_core.h"
-#endif /* MBED */
+#endif /* __MBED__ */
 
 #if defined(__cplusplus)
 extern "C" {

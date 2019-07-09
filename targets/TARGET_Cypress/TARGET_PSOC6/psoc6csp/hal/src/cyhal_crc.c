@@ -36,19 +36,15 @@
 cy_rslt_t cyhal_crc_init(cyhal_crc_t *obj)
 {
     CY_ASSERT(NULL != obj);
-
-    memset(obj, 0, sizeof(cyhal_crc_t));
-    obj->resource.type = CYHAL_RSC_CRC;
-    return cyhal_crypto_reserve(&(obj->base), &(obj->resource));
+    return cyhal_crypto_reserve(&(obj->base), &(obj->resource), CYHAL_CRYPTO_CRC);
 }
 
 void cyhal_crc_free(cyhal_crc_t *obj)
 {
-    CY_ASSERT(NULL != obj || obj->resource.type != CYHAL_RSC_CRC);
+    CY_ASSERT(NULL != obj || obj->resource.type != CYHAL_RSC_CRYPTO);
     if (obj->resource.type != CYHAL_RSC_INVALID)
     {
-        cyhal_crypto_free(obj->base, &(obj->resource));
-        obj->resource.type = CYHAL_RSC_INVALID;
+        cyhal_crypto_free(obj->base, &(obj->resource), CYHAL_CRYPTO_CRC);
     }
 }
 

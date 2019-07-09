@@ -27,7 +27,6 @@
 #include "cybsp_cy8ckit_062s2_43012.h"
 #include "cyhal_utils.h"
 #include "cyhal_implementation.h"
-#include "cybsp_retarget.h"
 #include "cycfg.h"
 
 #if defined(__cplusplus)

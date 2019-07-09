@@ -27,6 +27,7 @@
 
 #include "cycfg_notices.h"
 #include "cy_sysclk.h"
+#include "cy_csd.h"
 #include "cy_scb_uart.h"
 #include "cy_scb_ezi2c.h"
 #include "cy_sd_host.h"
@@ -39,6 +40,41 @@ extern "C" {
 #endif
 
 #define CYBSP_CAPSENSE_ENABLED 1U
+#define CY_CAPSENSE_CORE 4u
+#define CY_CAPSENSE_CPU_CLK 144000000u
+#define CY_CAPSENSE_PERI_CLK 72000000u
+#define CY_CAPSENSE_VDDA_MV 3300u
+#define CY_CAPSENSE_PERI_DIV_TYPE CY_SYSCLK_DIV_8_BIT
+#define CY_CAPSENSE_PERI_DIV_INDEX 0u
+#define Cmod_PORT GPIO_PRT7
+#define CintA_PORT GPIO_PRT7
+#define CintB_PORT GPIO_PRT7
+#define Button0_Rx0_PORT GPIO_PRT8
+#define Button0_Tx_PORT GPIO_PRT1
+#define Button1_Rx0_PORT GPIO_PRT8
+#define Button1_Tx_PORT GPIO_PRT1
+#define LinearSlider0_Sns0_PORT GPIO_PRT8
+#define LinearSlider0_Sns1_PORT GPIO_PRT8
+#define LinearSlider0_Sns2_PORT GPIO_PRT8
+#define LinearSlider0_Sns3_PORT GPIO_PRT8
+#define LinearSlider0_Sns4_PORT GPIO_PRT8
+#define Cmod_PIN 7u
+#define CintA_PIN 1u
+#define CintB_PIN 2u
+#define Button0_Rx0_PIN 1u
+#define Button0_Tx_PIN 0u
+#define Button1_Rx0_PIN 2u
+#define Button1_Tx_PIN 0u
+#define LinearSlider0_Sns0_PIN 3u
+#define LinearSlider0_Sns1_PIN 4u
+#define LinearSlider0_Sns2_PIN 5u
+#define LinearSlider0_Sns3_PIN 6u
+#define LinearSlider0_Sns4_PIN 7u
+#define Cmod_PORT_NUM 7u
+#define CintA_PORT_NUM 7u
+#define CintB_PORT_NUM 7u
+#define CYBSP_CAPSENSE_HW CSD0
+#define CYBSP_CAPSENSE_IRQ csd_interrupt_IRQn
 #define CYBSP_BT_UART_ENABLED 1U
 #define CYBSP_BT_UART_HW SCB2
 #define CYBSP_BT_UART_IRQ scb_2_interrupt_IRQn
@@ -81,6 +117,7 @@ extern "C" {
 #define CYBSP_RTC_10_YEAR_OFFSET (4U)
 #define CYBSP_RTC_YEAR_OFFSET (0U)
 
+extern cy_stc_csd_context_t cy_csd_0_context;
 extern const cy_stc_scb_uart_config_t CYBSP_BT_UART_config;
 extern const cy_stc_scb_ezi2c_config_t CYBSP_CSD_COMM_config;
 extern const cy_stc_scb_uart_config_t CYBSP_DEBUG_UART_config;

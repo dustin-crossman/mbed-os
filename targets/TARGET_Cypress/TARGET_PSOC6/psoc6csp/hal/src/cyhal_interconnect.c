@@ -39,8 +39,6 @@ typedef enum
 
 /** Number of muxes */
 #define MUX_COUNT
-/** Indicates that a mux output does not continue to another mux */
-#define NOT_CONTINUATION 0xFF
 /** Mux identiifer the one-to-one triggers */
 #define ONE_TO_ONE_IDENT 0x80
 /** Determines whether a mux is one-to-one */
@@ -48,15 +46,15 @@ typedef enum
 #define WRITE_REGISTER(muxIdx, sourceId, destId) /* TODO */
 
 /* Maps each cyhal_destination_t to a mux index                    ~100b */
-extern uint8_t* cyhal_dest_to_mux;
+extern uint8_t cyhal_dest_to_mux[];
 /* Maps each cyhal_destination_t to a specific output in its mux    ~100b */
-extern uint8_t* cyhal_mux_dest_index;
+extern uint8_t cyhal_mux_dest_index[];
 /* Number of sources for each mux                                ~30b */
-extern uint8_t* cyhal_source_count_per_mux;
+extern uint8_t cyhal_source_count_per_mux[];
 /* Mux index to a table of cyhal_source_t                             ~2400b (2b * 15muxes * 80sources_per_mux) (could be 1/2 the size if there are less than 255 sources) */
-extern cyhal_source_t** cyhal_mux_to_sources;
+extern cyhal_source_t* cyhal_mux_to_sources[];
 /* Mapping from cyhal_source_t to cyhal_destination_t for intra mux connections     ~80b*/
-extern cyhal_dest_t* cyhal_intra_trigger_source;
+extern cyhal_dest_t cyhal_intra_trigger_source[];
 /* Trigger type for each input                                    ~400b */
 cyhal_trigger_type_t cyhal_trigger_type_source;
 /* Trigger type for each output                                    ~100b */
@@ -95,9 +93,35 @@ cy_rslt_t cyhal_connect_trigger(cyhal_source_t source, cyhal_dest_t dest)
         else
         {
             cyhal_dest_t intraDest = cyhal_intra_trigger_source[foundSource];
-            if (NOT_CONTINUATION != intraDest)
+            if (CYHAL_INTERCONNECT_MUX_NOT_CONTINUATION != intraDest)
             {
-                cy_rslt_t result = cyhal_connect_trigger(source, intraDest);
+                // This destination can be driven by the output of another mux. 
+                uint8_t upstreamMuxIdx = cyhal_dest_to_mux[intraDest];
+                uint8_t intraDestId = intraDest - cyhal_mux_dest_index[intraDest];
+                uint8_t upstreamMuxSourceCount = cyhal_source_count_per_mux[upstreamMuxIdx];
+                cy_rslt_t result = CYHAL_CONNECT_RSLT_NO_CONNECTION;
+
+                if (cyhal_has_connection(upstreamMuxIdx, intraDestId))
+                {
+                    result = CYHAL_CONNECT_RSLT_ALREADY_CONNECTED;
+                }
+                
+                for (uint8_t upstreamSourceId = 0; upstreamSourceId < upstreamMuxSourceCount; upstreamSourceId++)
+                {
+                    cyhal_source_t upstreamSource = cyhal_mux_to_sources[upstreamMuxIdx][intraDestId];
+                    if (upstreamSource == source)
+                    {
+                        if (IS_1TO1(upstreamMuxIdx) && sourceId != intraDestId)
+                        {
+                            result = CYHAL_CONNECT_RSLT_INVALID_1TO1_CONNECTION;
+                        }
+                        
+                        WRITE_REGISTER (upstreamMuxIdx, sourceId, intraDestId);
+                        result = CY_RSLT_SUCCESS;
+                        break;
+                    }
+                }
+
                 if (result == CY_RSLT_SUCCESS)
                 {
                     WRITE_REGISTER (muxIdx, sourceId, destId);
