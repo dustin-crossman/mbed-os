@@ -63,8 +63,10 @@ void gpio_mode(gpio_t *obj, PinMode mode)
 void gpio_dir(gpio_t *obj, PinDirection direction)
 {
     if (direction == PIN_INPUT) {
+        cyhal_gpio_direction(obj->pin, CYHAL_GPIO_DIR_INPUT);
         gpio_mode(obj, CYHAL_GPIO_DRIVE_ANALOG);
     } else if (direction == PIN_OUTPUT) {
+        cyhal_gpio_direction(obj->pin, CYHAL_GPIO_DIR_BIDIRECTIONAL);
         gpio_mode(obj, CYHAL_GPIO_DRIVE_STRONG);
     }
 }
