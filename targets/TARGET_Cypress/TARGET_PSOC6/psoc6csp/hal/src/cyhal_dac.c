@@ -30,6 +30,7 @@
 #include "cyhal_analog_common.h"
 #include "cyhal_dac.h"
 #include "cyhal_gpio.h"
+#include "cyhal_interconnect.h"
 #include "cyhal_utils.h"
 #include "cy_pdl.h"
 
@@ -104,6 +105,9 @@ cy_rslt_t cyhal_dac_init(cyhal_dac_t *obj, cyhal_gpio_t pin)
     cyhal_resource_inst_t pinRsc = cyhal_utils_get_gpio_resource(pin);
     if (CY_RSLT_SUCCESS == (result = cyhal_hwmgr_reserve(&pinRsc)))
         obj->pin = pin;
+
+    if (CY_RSLT_SUCCESS == result)
+        result = cyhal_connect_pin(map);
 
     if (CY_RSLT_SUCCESS == result &&
         !cyhal_hwmgr_is_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num))
