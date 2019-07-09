@@ -110,7 +110,11 @@ mbed_064_pinmap_GCC_ARM_WIN:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
     
-
+    
+    
+# TESTS ON MAC OS X v 10.14
+    
+    
     
 mbed_064_pinmap_GCC_ARM_MAC:
   stage: test
@@ -130,3 +134,21 @@ mbed_064_pinmap_GCC_ARM_MAC:
     - mbedls
     - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
     
+
+mbed_064_pinmap_ARMC6_MAC:
+  stage: test
+  tags:
+    - MBED_TEST_MAC1014
+  before_script:
+    - pwd
+    - curl --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/dev_default_keys.zip
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys
+    - unzip dev_default_keys.zip
+    - export https_proxy=http://proxy.ua.cypress.com:8080
+    - python3 --version 
+    - cd ../../../../../
+    - pwd     
+  script:
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbedls
+    - mbed test --compile -m CY8CPROTO_064_SB -t ARMC6 -n *pinmap -v --run
