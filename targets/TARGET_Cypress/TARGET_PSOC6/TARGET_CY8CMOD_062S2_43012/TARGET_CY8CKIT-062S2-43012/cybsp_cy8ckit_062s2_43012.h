@@ -55,10 +55,12 @@
 #pragma once
 
 #include "cybsp_api_core.h"
-#ifdef MBED
+
+#ifdef __MBED__
 #include "cybsp_api_wifi.h"
-#endif /* MBED */
+#else 
 #include "cybsp_retarget.h"
+#endif /* __MBED__ */
 
 #if defined(__cplusplus)
 extern "C" {

@@ -42,7 +42,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "cy_result.h"
-#include "cyhal_implementation.h"
 #include "cyhal_hwmgr.h"
 
 #if defined(__cplusplus)

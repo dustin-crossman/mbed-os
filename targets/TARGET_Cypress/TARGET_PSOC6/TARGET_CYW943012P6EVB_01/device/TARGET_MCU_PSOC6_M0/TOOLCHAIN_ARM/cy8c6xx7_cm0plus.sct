@@ -3,7 +3,7 @@
 ; to pass a scatter file through a C preprocessor.
 
 ;*******************************************************************************
-;* \file cy8c6xx7_cm0plus.scat
+;* \file cy8c6xx7_cm0plus.sct
 ;* \version 2.50
 ;*
 ;* Linker file for the ARMCC.
@@ -187,15 +187,13 @@ LR_IROM1 FLASH_START (FLASH_SIZE - 0x8000)
     }
 
     ; Application heap area (HEAP)
-    ARM_LIB_HEAP  +0
+    ARM_LIB_HEAP  +0 EMPTY ((RAM_START+RAM_SIZE)-AlignExpr(ImageLimit(RW_IRAM1), 8)-STACK_SIZE)
     { 
-        * (HEAP) 
     }
     
     ; Stack region growing down
-    ARM_LIB_STACK RAM_START+RAM_SIZE -STACK_SIZE
+    ARM_LIB_STACK (RAM_START+RAM_SIZE) EMPTY -STACK_SIZE
     {
-        * (STACK)
     }
 }
 

@@ -25,7 +25,6 @@
 
 #include "cyhal_hwmgr.h"
 #include "cyhal_crypto_common.h"
-#include "cy_crypto_core_crc.h"
 #include "cyhal_trng_impl.h"
 
 #if defined(CY_IP_MXCRYPTO)
@@ -36,19 +35,15 @@
 cy_rslt_t cyhal_trng_init(cyhal_trng_t *obj)
 {
     CY_ASSERT(NULL != obj);
-
-    memset(obj, 0, sizeof(cyhal_trng_t));
-    obj->resource.type = CYHAL_RSC_TRNG;
-    return cyhal_crypto_reserve(&(obj->base), &(obj->resource));
+    return cyhal_crypto_reserve(&(obj->base), &(obj->resource), CYHAL_CRYPTO_TRNG);
 }
 
 void cyhal_trng_free(cyhal_trng_t *obj)
 {
-    CY_ASSERT(NULL != obj || obj->resource.type != CYHAL_RSC_TRNG);
+    CY_ASSERT(NULL != obj || obj->resource.type != CYHAL_RSC_CRYPTO);
     if (obj->resource.type != CYHAL_RSC_INVALID)
     {
-        cyhal_crypto_free(obj->base, &(obj->resource));
-        obj->resource.type = CYHAL_RSC_INVALID;
+        cyhal_crypto_free(obj->base, &(obj->resource), CYHAL_CRYPTO_TRNG);
     }
 }
 
