@@ -27,12 +27,57 @@
 #include "cyhal_adc.h"
 #include "cyhal_dac.h"
 #include "cyhal_dma.h"
+#include "cyhal_interconnect.h"
 
-uint8_t* cyhal_dest_to_mux;
-uint8_t* cyhal_mux_dest_index;
-uint8_t* cyhal_source_count_per_mux;
-cyhal_source_t** cyhal_mux_to_sources;
-cyhal_dest_t* cyhal_intra_trigger_source;
+typedef enum
+{
+    SRC0,
+    SRC1,
+    SRC2,
+    MUX_OUT0,
+} cyhal_trigger_src;
+
+typedef enum
+{
+    DEST0,
+    DEST1,
+    MUX_IN1,
+} cyhal_trigger_dest;
+
+// Two fake muxes.
+// Mux0
+//  Inputs: SRC0, SRC1
+//  Outputs: DEST0, MUX_IN1
+// Mux1:
+//  Inputs: SRC2, MUX_OUT0
+//  Outputs: DEST1
+
+const uint8_t cyhal_dest_to_mux[] =
+{
+    0, // DEST0
+    1, // DEST1
+    0, // MUX_IN1
+}; 
+
+const uint8_t cyhal_mux_dest_index[] =
+{
+    0, // DEST0
+    0, // DEST1
+    1, // MUX_IN1
+};
+
+const uint8_t cyhal_source_count_per_mux[] = {2, 2};
+static const cyhal_source_t cyhal_mux0_sources[] = { SRC0, SRC1, }; // MUX0
+static const cyhal_source_t cyhal_mux1_sources[] = { SRC2, MUX_OUT0, }; // MUX1
+const cyhal_source_t* cyhal_mux_to_sources[] = { cyhal_mux0_sources, cyhal_mux1_sources };
+
+const cyhal_dest_t cyhal_intra_trigger_source[] =
+{
+    CYHAL_INTERCONNECT_MUX_NOT_CONTINUATION, // SRC0
+    CYHAL_INTERCONNECT_MUX_NOT_CONTINUATION, // SRC1,
+    CYHAL_INTERCONNECT_MUX_NOT_CONTINUATION, // SRC2,
+    MUX_IN1 // MUX_OUT0
+};
 
 cy_rslt_t cyhal_dma_init(cyhal_dma_t *obj, uint8_t priority, cyhal_dma_direction_t direction)
 {

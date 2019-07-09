@@ -1305,7 +1305,7 @@ static uint32_t whd_wifi_join_wait_for_complete(whd_interface_t ifp, cy_semaphor
     while (!done)
     {
         result = cy_rtos_get_semaphore(semaphore, DEFAULT_JOIN_ATTEMPT_TIMEOUT / 10, WHD_FALSE);
-        whd_assert("Get semaphore failed", (result == WHD_SUCCESS) || (result == WHD_TIMEOUT) );
+        whd_assert("Get semaphore failed", (result == CY_RSLT_SUCCESS) || (result == CY_RTOS_TIMEOUT) );
         REFERENCE_DEBUG_ONLY_VARIABLE(result);
 
         result = whd_wifi_is_ready_to_transceive(ifp);
@@ -2115,7 +2115,7 @@ uint32_t whd_wifi_scan_synch(whd_interface_t ifp,
     DISABLE_COMPILER_WARNING(diag_suppress = Pa039)
     result = cy_rtos_get_semaphore(&scan_userdata.scan_semaphore, CY_RTOS_NEVER_TIMEOUT, WHD_FALSE);
     ENABLE_COMPILER_WARNING(diag_suppress = Pa039)
-    whd_assert("Get semaphore failed", (result == WHD_SUCCESS) || (result == WHD_TIMEOUT) );
+    whd_assert("Get semaphore failed", (result == CY_RSLT_SUCCESS) || (result == CY_RTOS_TIMEOUT) );
 
     DISABLE_COMPILER_WARNING(diag_suppress = Pa039)
     result = cy_rtos_deinit_semaphore(&scan_userdata.scan_semaphore);

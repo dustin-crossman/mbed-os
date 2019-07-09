@@ -19,7 +19,7 @@
  *  Prototypes of functions for providing external resources to the radio driver
  *
  *  This file provides prototypes for functions which allow
- *  WHD to download firmware, nvram on a particular hardware platform.
+ *  WHD to download firmware, NVRAM and CLM BLOB on a particular hardware platform.
  *
  */
 #include "whd.h"
@@ -48,7 +48,7 @@ typedef enum
 ******************************************************/
 
 /** @addtogroup res WHD Resource API
- *  @brief Functions that enable WHD to download WLAN firmware, nvram and clm_blob on a particular hardware platform.
+ *  @brief Functions that enable WHD to download WLAN firmware, NVRAM and CLM BLOB on a particular hardware platform.
  *  @{
  */
 

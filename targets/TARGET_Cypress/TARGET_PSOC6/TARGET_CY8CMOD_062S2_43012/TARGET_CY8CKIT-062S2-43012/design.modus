@@ -8,8 +8,8 @@
                     <Param id="dbgMode" value="SWD"/>
                     <Param id="traceEnable" value="false"/>
                 </Block>
-                <Block location="csd[0].csd[0]" alias="CYBSP_CAPSENSE" template="mxs40csd" version="1.1">
-                    <Param id="CapSenseEnable" value="false"/>
+                <Block location="csd[0].csd[0]" alias="CYBSP_CAPSENSE" template="mxs40csd" version="2.0">
+                    <Param id="CapSenseEnable" value="true"/>
                     <Param id="CapSenseCore" value="4"/>
                     <Param id="SensorCount" value="12"/>
                     <Param id="CapacitorCount" value="3"/>
@@ -39,10 +39,8 @@
                     <Param id="csdInitTime" value="25"/>
                     <Param id="inFlash" value="true"/>
                     <Param id="CsdIdacEnable" value="false"/>
-                    <Param id="CsdIdacAEnable" value="false"/>
-                    <Param id="IdacAbusOnly" value="false"/>
-                    <Param id="CsdIdacBEnable" value="false"/>
-                    <Param id="IdacBbusOnly" value="false"/>
+                    <Param id="CsdIdacAselect" value="CY_CSDIDAC_GPIO"/>
+                    <Param id="CsdIdacBselect" value="CY_CSDIDAC_DISABLED"/>
                     <Param id="csdIdacInitTime" value="25"/>
                     <Param id="idacInFlash" value="true"/>
                 </Block>
@@ -673,13 +671,17 @@
                 <Block location="srss[0].clock[0].fastclk[0]" alias="" template="mxs40fastclk" version="1.0">
                     <Param id="divider" value="1"/>
                 </Block>
+                <Block location="srss[0].clock[0].fll[0]" alias="" template="mxs40fll" version="1.0">
+                    <Param id="configuration" value="auto"/>
+                    <Param id="desiredFrequency" value="100.000"/>
+                </Block>
                 <Block location="srss[0].clock[0].hfclk[0]" alias="" template="mxs40hfclk" version="1.1">
                     <Param id="sourceClockNumber" value="1"/>
                     <Param id="divider" value="1"/>
                 </Block>
                 <Block location="srss[0].clock[0].hfclk[2]" alias="" template="mxs40hfclk" version="1.1">
                     <Param id="sourceClockNumber" value="0"/>
-                    <Param id="divider" value="1"/>
+                    <Param id="divider" value="2"/>
                 </Block>
                 <Block location="srss[0].clock[0].hfclk[4]" alias="" template="mxs40hfclk" version="1.1">
                     <Param id="sourceClockNumber" value="0"/>
@@ -900,6 +902,44 @@
                     <Port name="smif[0].clk_if[0]"/>
                     <Port name="srss[0].clock[0].hfclk[2].root_clk[0]"/>
                 </Net>
+                <Mux name="sense" location="csd[0].csd[0]">
+                    <Arm>
+                        <Port name="ioss[0].port[7].pin[7].analog[0]"/>
+                    </Arm>
+                    <Arm>
+                        <Port name="ioss[0].port[7].pin[1].analog[0]"/>
+                    </Arm>
+                    <Arm>
+                        <Port name="ioss[0].port[7].pin[2].analog[0]"/>
+                    </Arm>
+                    <Arm>
+                        <Port name="ioss[0].port[8].pin[1].analog[0]"/>
+                    </Arm>
+                    <Arm>
+                        <Port name="ioss[0].port[1].pin[0].analog[0]"/>
+                    </Arm>
+                    <Arm>
+                        <Port name="ioss[0].port[8].pin[2].analog[0]"/>
+                    </Arm>
+                    <Arm>
+                        <Port name="ioss[0].port[1].pin[0].analog[0]"/>
+                    </Arm>
+                    <Arm>
+                        <Port name="ioss[0].port[8].pin[3].analog[0]"/>
+                    </Arm>
+                    <Arm>
+                        <Port name="ioss[0].port[8].pin[4].analog[0]"/>
+                    </Arm>
+                    <Arm>
+                        <Port name="ioss[0].port[8].pin[5].analog[0]"/>
+                    </Arm>
+                    <Arm>
+                        <Port name="ioss[0].port[8].pin[6].analog[0]"/>
+                    </Arm>
+                    <Arm>
+                        <Port name="ioss[0].port[8].pin[7].analog[0]"/>
+                    </Arm>
+                </Mux>
             </Netlist>
         </Device>
     </Devices>

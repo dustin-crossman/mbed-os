@@ -29,46 +29,78 @@
 
 #if defined(CY_IP_MXCRYPTO)
 
-CRYPTO_Type* CYHAL_CRYPTO_BASE_ADDRESSES[CYHAL_CRYPTO_INST_COUNT] =
+static CRYPTO_Type* CYHAL_CRYPTO_BASE_ADDRESSES[CYHAL_CRYPTO_INST_COUNT] =
 {
 #ifdef CRYPTO
     CRYPTO,
 #endif
 };
 
-cy_rslt_t cyhal_crypto_reserve(CRYPTO_Type** base, cyhal_resource_inst_t *resource)
+static uint8_t cyhal_crypto_features[CYHAL_CRYPTO_INST_COUNT]= {0};
+
+cy_rslt_t cyhal_crypto_reserve(CRYPTO_Type** base, cyhal_resource_inst_t *resource, cyhal_crypto_feature_t feature)
 {
-    cy_rslt_t result = CYHAL_HWMGR_RSLT_ERR_NONE_FREE;
+    cy_rslt_t result = CYHAL_HWMGR_RSLT_ERR_INUSE;
     for (uint32_t i = 0u; i < CYHAL_CRYPTO_INST_COUNT; i++)
     {
-        resource->block_num = i;
-        result = cyhal_hwmgr_reserve(resource);
-        if (result == CY_RSLT_SUCCESS)
+        //Check for feature reservation on the crypto instance.
+        if ((cyhal_crypto_features[i] & feature) == 0)
         {
+            resource->type = CYHAL_RSC_CRYPTO;
+            resource->block_num = i;
+            resource->channel_num = 0;
             *base = CYHAL_CRYPTO_BASE_ADDRESSES[i];
-            Cy_Crypto_Core_Enable(*base);
-            result = cyhal_hwmgr_set_configured(resource->type, resource->block_num, resource->channel_num);
-            if (result == CY_RSLT_SUCCESS)
-            {
-                break;
+            //Reserve the feature on that crypto block.
+            cyhal_crypto_features[i] |= feature;
+
+            //Check if no other feature is enabled on the underlying crypto block if so then reserve and enable that block
+            if (cyhal_crypto_features[i] == feature)
+            {    
+                result = cyhal_hwmgr_reserve(resource);
+                if (result == CY_RSLT_SUCCESS)
+                {
+                    result = cyhal_hwmgr_set_configured(resource->type, resource->block_num, resource->channel_num);
+                    if (result == CY_RSLT_SUCCESS)
+                    {
+                        Cy_Crypto_Core_Enable(*base);      
+                    }
+                    else
+                    {
+                        cyhal_crypto_free(*base, resource, feature);
+                    }
+                }
             }
             else
             {
-                cyhal_hwmgr_free(resource);
+                // We were able to reserve the feature on an already enabled crypto block.
+                result = CY_RSLT_SUCCESS;
+            }
+
+            if (result == CY_RSLT_SUCCESS)
+            {
+                break;
             }
         }
     }
     return result;
 }
 
-void cyhal_crypto_free(CRYPTO_Type* base, const cyhal_resource_inst_t *resource)
+void cyhal_crypto_free(CRYPTO_Type* base, cyhal_resource_inst_t *resource, cyhal_crypto_feature_t feature)
 {
-    cyhal_hwmgr_set_unconfigured(resource->type, resource->block_num, resource->channel_num);
-    if (Cy_Crypto_Core_IsEnabled(base))
+    //Clear feature reservation
+    cyhal_crypto_features[resource->block_num] &= ~(feature);
+
+    //If this was the last feature then free the underlying crypto block as well.
+    if (cyhal_crypto_features[resource->block_num] == 0)
     {
-        Cy_Crypto_Core_Disable(base);
+        cyhal_hwmgr_set_unconfigured(resource->type, resource->block_num, resource->channel_num);
+        if (Cy_Crypto_Core_IsEnabled(base))
+        {
+            Cy_Crypto_Core_Disable(base);
+        }
+        cyhal_hwmgr_free(resource);
+        resource->type = CYHAL_RSC_INVALID;
     }
-    cyhal_hwmgr_free(resource);
 }
 
 #endif /* defined(CY_IP_MXCRYPTO) */

@@ -285,7 +285,7 @@ whd_result_t whd_bus_sdio_wait_for_wlan_event(whd_driver_t whd_driver, cy_semaph
         result = cy_rtos_get_semaphore(transceive_semaphore, (uint32_t)MIN_OF(timeout_ms,
                                                                               WHD_THREAD_POLL_TIMEOUT), WHD_FALSE);
     }
-    whd_assert("Could not get whd sleep semaphore\n", (result == WHD_SUCCESS) || (result == WHD_TIMEOUT) );
+    whd_assert("Could not get whd sleep semaphore\n", (result == CY_RSLT_SUCCESS) || (result == CY_RTOS_TIMEOUT) );
 
     return result;
 }
@@ -1108,20 +1108,20 @@ void whd_bus_sdio_init_stats(whd_driver_t whd_driver)
 
 whd_result_t whd_bus_sdio_print_stats(whd_driver_t whd_driver, whd_bool_t reset_after_print)
 {
-    WPRINT_WHD_DEBUG( ("Bus Stats.. \n"
-                       "cmd52:%" PRIu32 ", cmd53_read:%" PRIu32 ", cmd53_write:%" PRIu32 "\n"
-                       "cmd52_fail:%" PRIu32 ", cmd53_read_fail:%" PRIu32 ", cmd53_write_fail:%" PRIu32 "\n"
-                       "oob_intrs:%" PRIu32 ", sdio_intrs:%" PRIu32 ", error_intrs:%" PRIu32 ", read_aborts:%" PRIu32
-                       "\n",
-                       whd_driver->bus_priv->whd_bus_stats.cmd52, whd_driver->bus_priv->whd_bus_stats.cmd53_read,
-                       whd_driver->bus_priv->whd_bus_stats.cmd53_write,
-                       whd_driver->bus_priv->whd_bus_stats.cmd52_fail,
-                       whd_driver->bus_priv->whd_bus_stats.cmd53_read_fail,
-                       whd_driver->bus_priv->whd_bus_stats.cmd53_write_fail,
-                       whd_driver->bus_priv->whd_bus_stats.oob_intrs,
-                       whd_driver->bus_priv->whd_bus_stats.sdio_intrs,
-                       whd_driver->bus_priv->whd_bus_stats.error_intrs,
-                       whd_driver->bus_priv->whd_bus_stats.read_aborts) );
+    WPRINT_MACRO( ("Bus Stats.. \n"
+                   "cmd52:%" PRIu32 ", cmd53_read:%" PRIu32 ", cmd53_write:%" PRIu32 "\n"
+                   "cmd52_fail:%" PRIu32 ", cmd53_read_fail:%" PRIu32 ", cmd53_write_fail:%" PRIu32 "\n"
+                   "oob_intrs:%" PRIu32 ", sdio_intrs:%" PRIu32 ", error_intrs:%" PRIu32 ", read_aborts:%" PRIu32
+                   "\n",
+                   whd_driver->bus_priv->whd_bus_stats.cmd52, whd_driver->bus_priv->whd_bus_stats.cmd53_read,
+                   whd_driver->bus_priv->whd_bus_stats.cmd53_write,
+                   whd_driver->bus_priv->whd_bus_stats.cmd52_fail,
+                   whd_driver->bus_priv->whd_bus_stats.cmd53_read_fail,
+                   whd_driver->bus_priv->whd_bus_stats.cmd53_write_fail,
+                   whd_driver->bus_priv->whd_bus_stats.oob_intrs,
+                   whd_driver->bus_priv->whd_bus_stats.sdio_intrs,
+                   whd_driver->bus_priv->whd_bus_stats.error_intrs,
+                   whd_driver->bus_priv->whd_bus_stats.read_aborts) );
 
     if (reset_after_print == WHD_TRUE)
     {
