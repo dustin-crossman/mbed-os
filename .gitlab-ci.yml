@@ -1,68 +1,128 @@
 stages:
-  - build
-
+  - test
 before_script:
-  - bash -c pwd
-  - whoami
-  - set
-  - git clone git@git-ore.aus.cypress.com:devops/devops_scripts.git
+    - pwd
+    - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
+    - python -m pip install -r ./requirements.txt
+    - curl.exe --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip
+    - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
 
-astyle:
-  stage: build
-  tags:
-    - devops-linux
-  script:
-    - bash -ex cy-astyle.sh
+# Run pyocd wrapper functional tests
 
-##############################################################################
-# Win10 - ARM, GCC_ARM and IAR
-##############################################################################
-.win10-ARM:
-  stage: build
+.pyocd_wrapper:
+  stage: test
   tags:
-    - mti-win10
+    - MBED_TEST_MAC1014
+  before_script:
+    - pwd
+    - curl --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/dev_default_keys.zip
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys
+    - unzip dev_default_keys.zip
+    - export https_proxy=http://proxy.ua.cypress.com:8080
+    - python3 --version 
+    - cd ../../../../../
+    - pwd
   script:
-    - bash -ex cy-build.sh win ARM
+    - python3 --version
+    - virtualenv venv
+    - source venv/bin/activate
+    - pwd
+    - echo "[INFO] Getting latest pyocd"
+    - '[ -d pyocd ] && echo "[INFO] Directory pyocd exists." || echo "[INFO] Directory pyocd does not exists." && git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd && cd pyocd && git checkout tags/AH_FINAL_RELEASE_RC1 && git branch && cd ..'
+    - echo "[INFO] Installing recquired python modules"
+    - python3 -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
+    - echo "[INFO] Installing pyocd"
+    - cd pyocd
+    - python3 setup.py install
+    - cd ..
+    - echo "[INFO] Start tests"
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/test/
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - python3 -m unittest -v test_pyocd_wrapper.py
+    - deactivate
 
-.win10-GCC_ARM:
-  stage: build
-  tags:
-    - mti-win10
-  script:
-    - bash -ex cy-build.sh win GCC_ARM
 
-.win10-IAR:
-  stage: build
+.pyocd_wrapper:
+  stage: test
   tags:
-    - mti-win10
+    - MBED_TEST
   script:
-    - bash -ex cy-build.sh win IAR
+    - python -V
+    - virtualenv venv
+    - .\venv\Scripts\activate.ps1
+    - echo "[INFO] Getting latest pyocd"
+    - if (-Not(Test-Path pyocd)) { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd; cd pyocd; git checkout tags/AH_SECURITY_RELEASE_2; git branch; cd .. }
+    - echo "[INFO] Installing recquired python modules"
+    - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
+    - pip install cmsis-pack-manager
+    - pip install colorama
+    - pip install intelhex
+    - pip install intervaltree
+    - pip install prettytable
+    - pip install pyelftools
+    - pip install pyusb
+    - pip install pywinusb
+    - pip install pyyaml
+    - pip install six
+    - pip install setuptools_scm_git_archive
+    - pip install setuptools_scm
+    - echo "[INFO] Installing pyocd"
+    - cd pyocd
+    - python setup.py install
+    - cd ..
+    - echo "[INFO] Start tests"
+    - cd .\targets\TARGET_Cypress\TARGET_PSOC6\sb-tools\test\
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - python -m unittest -v test_pyocd_wrapper.py
+    - deactivate
+  cache:
+    paths:
+      - venv
+      - pyocd
 
-##############################################################################
-# Ubuntu18 - ARM and GCC_ARM
-##############################################################################
-ubuntu18-ARM:
-  stage: build
+# Compile TARGET_PSOC6
+.test_mbed_062_crypto:
+  stage: test
   tags:
-    # see DEVOPS-304 - devops-linux
-    - gitlab_runner-001
+    - MBED_TEST
   script:
-    - bash -ex cy-build.sh ubuntu ARM
+    - echo "CY8CKIT_062_WIFI_BT"
+    - mbed test -m CY8CKIT_062_WIFI_BT -t GCC_ARM -n tests-mbedtls* -vv
+    - echo "CY8CPROTO_062_4343W"
+    - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
 
-ubuntu18-GCC_ARM:
-  stage: build
+# Compile TARGET_PSOC6
+.test_mbed_064_pinmap_GCC_ARM:
+  stage: test
   tags:
-    # see DEVOPS-304 - devops-linux
-    - gitlab_runner-001
+    - MBED_TEST
   script:
-    - bash -ex cy-build.sh ubuntu GCC_ARM
-
-##############################################################################
-# Mac - GCC_ARM
-##############################################################################
-.mac10.14-GCC_ARM:
-  stage: build
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
+    
+.test_mbed_064_pinmap_IAR_WIN:
+  stage: test
   tags:
-    - mti-mac10.14
+    - MBED_TEST
   script:
-    - bash -ex cy-build.sh mac GCC_ARM
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t IAR -n *pinmap -v --run
+    
+test_mbed_064_pinmap_GCC_ARM_MAC:
+  stage: test
+  tags:
+    - MBED_TEST_MAC1014
+  before_script:
+    - pwd
+    - curl --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/dev_default_keys.zip
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys
+    - unzip dev_default_keys.zip
+    - export https_proxy=http://proxy.ua.cypress.com:8080
+    - python3 --version 
+    - cd ../../../../../
+    - pwd     
+  script:
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbedls
+    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
+    
