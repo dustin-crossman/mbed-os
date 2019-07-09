@@ -7,9 +7,9 @@ before_script:
     - curl.exe --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip
     - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
 
-# Run pyocd wrapper functional tests
 
-.pyocd_wrapper:
+
+.pyocd_wrapper_MAC:
   stage: test
   tags:
     - MBED_TEST_MAC1014
@@ -42,7 +42,7 @@ before_script:
     - deactivate
 
 
-.pyocd_wrapper:
+.pyocd_wrapper_WIN:
   stage: test
   tags:
     - MBED_TEST
@@ -80,8 +80,8 @@ before_script:
       - venv
       - pyocd
 
-# Compile TARGET_PSOC6
-.test_mbed_062_crypto:
+
+.mbed_062_crypto:
   stage: test
   tags:
     - MBED_TEST
@@ -92,7 +92,7 @@ before_script:
     - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
 
 
-test_mbed_064_pinmap_IAR_WIN:
+mbed_064_pinmap_IAR_WIN:
   stage: test
   tags:
     - MBED_TEST
@@ -102,7 +102,7 @@ test_mbed_064_pinmap_IAR_WIN:
 
 
 
-test_mbed_064_pinmap_GCC_ARM_WIN:
+mbed_064_pinmap_GCC_ARM_WIN:
   stage: test
   tags:
     - MBED_TEST
@@ -112,7 +112,7 @@ test_mbed_064_pinmap_GCC_ARM_WIN:
     
 
     
-test_mbed_064_pinmap_GCC_ARM_MAC:
+mbed_064_pinmap_GCC_ARM_MAC:
   stage: test
   tags:
     - MBED_TEST_MAC1014
