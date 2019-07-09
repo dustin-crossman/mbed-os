@@ -51,5 +51,5 @@ esac
 cd ..
 
 # See .travis-ci.yml, astyle job
-"$ASTYLE" -n --options=.astylerc targets/TARGET_Cypress/TARGET_PSOC6/*.*
+"$ASTYLE" -n --options=.astylerc targets/TARGET_Cypress/TARGET_PSOC6/*.* features/netsocket/emac-drivers/TARGET_WHD/*/*
 git diff --exit-code --diff-filter=d --color
