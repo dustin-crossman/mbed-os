@@ -108,7 +108,7 @@ before_script:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t IAR -n *pinmap -v --run
     
-test_mbed_064_pinmap_IAR_MAC:
+test_mbed_064_pinmap_GCC_ARM_MAC:
   stage: test
   tags:
     - MBED_TEST_MAC1014
@@ -124,5 +124,5 @@ test_mbed_064_pinmap_IAR_MAC:
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbedls
-    - mbed test --compile -m CY8CPROTO_064_SB -t IAR -n *pinmap -v --run
+    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
     
