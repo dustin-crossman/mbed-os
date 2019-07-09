@@ -307,7 +307,7 @@
                     <Param id="txTriggerLevel" value="0"/>
                     <Param id="inFlash" value="true"/>
                 </Block>
-                <Block location="srss[0].clock[0]" alias="" template="mxs40sysclocks" version="1.1"/>
+                <Block location="srss[0].clock[0]" alias="" template="mxs40sysclocks" version="1.2"/>
                 <Block location="srss[0].clock[0].bakclk[0]" alias="" template="mxs40bakclk" version="1.0">
                     <Param id="sourceClock" value="wco"/>
                 </Block>
@@ -364,10 +364,15 @@
                     <Param id="lossAction" value="CY_SYSCLK_CSV_ERROR_FAULT"/>
                     <Param id="accuracyPpm" value="150"/>
                 </Block>
-                <Block location="srss[0].power[0]" alias="" template="mxs40power" version="1.1">
+                <Block location="srss[0].power[0]" alias="" template="mxs40power" version="1.2">
+                    <Param id="pwrEstimator" value="0"/>
                     <Param id="pwrMode" value="LDO_1_1"/>
+                    <Param id="actPwrMode" value="LP"/>
+                    <Param id="coreRegulator" value="CY_SYSPM_LDO_MODE_NORMAL"/>
                     <Param id="pmicEnable" value="false"/>
                     <Param id="backupSrc" value="VDDD"/>
+                    <Param id="idlePwrMode" value="CY_CFG_PWR_MODE_DEEPSLEEP"/>
+                    <Param id="deepsleepLatency" value="0"/>
                     <Param id="vddaMv" value="3300"/>
                     <Param id="vdddMv" value="3300"/>
                     <Param id="vBackupMv" value="3300"/>
