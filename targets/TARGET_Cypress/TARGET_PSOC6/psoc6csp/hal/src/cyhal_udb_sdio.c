@@ -398,6 +398,7 @@ void cyhal_sdio_free(cyhal_sdio_t *obj)
     cyhal_free_pins(obj);
     cyhal_free_clocks(obj);
     cyhal_free_dmas(obj);
+    SDIO_Free();
 }
 
 cy_rslt_t cyhal_sdio_configure(cyhal_sdio_t *obj, const cyhal_sdio_cfg_t *config)

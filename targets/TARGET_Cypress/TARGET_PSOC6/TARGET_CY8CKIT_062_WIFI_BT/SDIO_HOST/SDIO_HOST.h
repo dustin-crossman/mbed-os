@@ -263,6 +263,7 @@ void                SDIO_SetSdClkFrequency(uint32_t u32SdClkFreqHz);
 void                SDIO_Reset(void);
 void                SDIO_EnableChipInt(void);
 void                SDIO_DisableChipInt(void);
+void                SDIO_Free(void);
 
 /*Low Level Functions*/
 void                SDIO_SendCommand(stc_sdio_cmd_config_t *pstcCmdConfig);

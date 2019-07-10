@@ -19,11 +19,12 @@
 extern "C" {
 #endif
 
-#ifdef SEMAPHORE
+#ifdef CY_RTOS_AWARE
 #include "cyabs_rtos.h"
 
 #define NEVER_TIMEOUT ( (uint32_t)0xffffffffUL )
 static cy_semaphore_t sdio_transfer_finished_semaphore;
+static bool sema_initialized = false;
 #endif
 
 
@@ -123,11 +124,6 @@ void SDIO_Init(stc_sdio_irq_cb_t* pfuCb)
     SDIO_SetSdClkFrequency(400000);
     SDIO_EnableIntClock();
     SDIO_EnableSdClk();
-
-     /*Initalize the semaphore*/
-#ifdef SEMAPHORE
-    cy_rtos_init_semaphore( &sdio_transfer_finished_semaphore, 1, 1 );
-#endif
 }
 
 
@@ -551,22 +547,29 @@ void SDIO_InitDataTransfer(stc_sdio_data_config_t *pstcDataConfig)
 *******************************************************************************/
 en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
 {
+    /*Initalize the semaphore*/
+#ifdef CY_RTOS_AWARE
+    if(!sema_initialized)
+    {
+        cy_rtos_init_semaphore( &sdio_transfer_finished_semaphore, 1, 0 );
+        sema_initialized = true;
+    }
+#endif
+
     /*Store the command and data configurations*/
     stc_sdio_cmd_config_t   stcCmdConfig;
     stc_sdio_data_config_t  stcDataConfig;
 
-#ifdef SEMAPHORE
+#ifdef CY_RTOS_AWARE
     en_sdio_result_t result;
 #endif
 
     /*variable used for holding timeout value*/
-#ifndef SEMAPHORE
+#ifndef CY_RTOS_AWARE
     uint32_t    u32Timeout = 0;
 #endif
 
-#ifndef SEMAPHORE_CMD
     uint32_t u32CmdTimeout = 0;
-#endif
 
     /*Returns from various function calls*/
     en_sdio_result_t enRet = Error;
@@ -685,41 +688,33 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
                             SDIO_CONTROL_REG |= SDIO_CTRL_ENABLE_WRITE;
                         }
 
-#ifndef SEMAPHORE
-                        /*Wait for the transfer to finish*/
+#ifdef CY_RTOS_AWARE
+                         /* Wait for the transfer to finish */
+                        result = cy_rtos_get_semaphore( &sdio_transfer_finished_semaphore, 10, false );
+                        enRetTmp = SDIO_CheckForEvent(SdCmdEventTransferDone);
+
+                        if (result != Ok)
+#else
+                         /* Wait for the transfer to finish */
                         do
                         {
-
                             u32Timeout++;
                             enRetTmp = SDIO_CheckForEvent(SdCmdEventTransferDone);
 
                         } while (!((enRetTmp == Ok) || (enRetTmp == DataCrcError) || (u32Timeout >= SDIO_DAT_TIMEOUT)));
 
-                        /*if it was a read it is possible there is still extra data hanging out, trigger the
-                          DMA again. This can result in extra data being transfered so the read buffer should be
-                          3 bytes bigger than needed*/
-                        if (pstcCmd->bRead == true)
+                        if (u32Timeout == SDIO_DAT_TIMEOUT)
+#endif
                         {
-                            Cy_TrigMux_SwTrigger((uint32_t)SDIO_HOST_Read_DMA_DW__TR_IN, 2);
+                            enRet |= DataTimeout;
                         }
 
-                        if (u32Timeout == SDIO_DAT_TIMEOUT)
-#else
-                         result = cy_rtos_get_semaphore( &sdio_transfer_finished_semaphore, 10, false );
-                         enRetTmp = SDIO_CheckForEvent(SdCmdEventTransferDone);
-
-                         /* if it was a read it is possible there is still extra data hanging out, trigger the
+                        /* if it was a read it is possible there is still extra data hanging out, trigger the
                            DMA again. This can result in extra data being transfered so the read buffer should be
                            3 bytes bigger than needed*/
                         if (pstcCmd->bRead == true)
                         {
                             Cy_TrigMux_SwTrigger((uint32_t)SDIO_HOST_Read_DMA_DW__TR_IN, 2);
-                        }
-
-                        if (result != Ok)
-#endif
-                        {
-                            enRet |= DataTimeout;
                         }
 
                         if (enRetTmp == DataCrcError)
@@ -733,7 +728,7 @@ en_sdio_result_t SDIO_SendCommandAndWait(stc_sdio_cmd_t *pstcCmd)
     } /*CMD Passed*/
 
 
-#ifndef SEMAPHORE
+#ifndef CY_RTOS_AWARE
      u32Timeout = 0;
 #endif
 
@@ -1184,7 +1179,7 @@ void SDIO_IRQ(void)
             gstcInternalData.stcEvents.u8CRCError++;
         }
         /*set the done flag*/
-#ifdef SEMAPHORE
+#ifdef CY_RTOS_AWARE
         cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore, true );
 #else
         gstcInternalData.stcEvents.u8TransComplete++;
@@ -1204,7 +1199,7 @@ void SDIO_IRQ(void)
             gstcInternalData.stcEvents.u8CRCError++;
         }
         /*Okay we're done so set the done flag*/
-#ifdef SEMAPHORE
+#ifdef CY_RTOS_AWARE
         cy_rtos_set_semaphore( &sdio_transfer_finished_semaphore, true );
 #else
         gstcInternalData.stcEvents.u8TransComplete++;
@@ -1277,7 +1272,6 @@ void SDIO_READ_DMA_IRQ(void)
     yCounts--;
 }
 
-
 void SDIO_WRITE_DMA_IRQ(void)
 {
     /*We shouldn't have to change anything unless it is the last descriptor*/
@@ -1337,6 +1331,13 @@ void SDIO_WRITE_DMA_IRQ(void)
     /*Clear the interrupt*/
     Cy_DMA_Channel_ClearInterrupt(SDIO_HOST_Write_DMA_HW, SDIO_HOST_Write_DMA_DW_CHANNEL);
     yCounts--;
+}
+
+void SDIO_Free(void)
+{
+#ifdef CY_RTOS_AWARE
+    cy_rtos_deinit_semaphore(&sdio_transfer_finished_semaphore);
+#endif
 }
 
 #if defined(__cplusplus)

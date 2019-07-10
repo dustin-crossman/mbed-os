@@ -34,9 +34,9 @@ extern "C" {
 
 cy_rslt_t cybsp_init(void)
 {
-	init_cycfg_system();
-
     cy_rslt_t result = CY_RSLT_SUCCESS;
+
+	init_cycfg_system();
 
 #ifndef __MBED__
     /* Initialize User LEDs */
@@ -44,9 +44,7 @@ cy_rslt_t cybsp_init(void)
     /* Initialize User Buttons */
     result |= cybsp_btn_init(CYBSP_USER_BTN1);
     CY_ASSERT(CY_RSLT_SUCCESS == result);
-#endif
 
-#if defined(CYBSP_RETARGET_ENABLED)
     /* Initialize retargetting stdio to 'DEBUG_UART' peripheral */
     if (CY_RSLT_SUCCESS == result)
     {

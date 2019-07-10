@@ -33,8 +33,12 @@
 #define PENDING_TX                      2
 #define PENDING_TX_RX                   3
 
-#define SCB_PERI_CLOCK_SLAVE      15000000
-#define SCB_PERI_CLOCK_MASTER     1800000
+#define SCB_PERI_CLOCK_SLAVE_STD      8000000  // must be between 1.55 MHz and 12.8 MHz for running i2c master at 100KHz
+#define SCB_PERI_CLOCK_SLAVE_FST      12500000 // must be between 7.82 MHz and 15.38 MHz for running i2c master at 400KHz
+#define SCB_PERI_CLOCK_SLAVE_FSTP     50000000 // must be between 15.84 MHz and 89.0 MHz for running i2c master at 1000KHz
+#define SCB_PERI_CLOCK_MASTER_STD     2000000  // must be between 1.55 Mhz and 3.2 MHz for running i2c slave at 100KHz
+#define SCB_PERI_CLOCK_MASTER_FST     8500000  // must be between 7.82 MHz and 10 Mhz for running i2c slave at 400KHz
+#define SCB_PERI_CLOCK_MASTER_FSTP    20000000 // must be between 14.32 MHz and 25.8 Mhz for running i2c slave at 1000KHz
 
 static const cy_stc_scb_i2c_config_t default_i2c_config = {
         .i2cMode   = CY_SCB_I2C_MASTER,
@@ -429,10 +433,35 @@ static void (*cyhal_i2c_interrupts_dispatcher_table[CY_IP_MXSCB_INSTANCES])(void
 #endif
 };
 
-static uint32_t cyhal_divider_value(uint32_t frequency, uint32_t frac_bits)
+static uint32_t cyhal_set_peri_divider(cyhal_i2c_t *obj, uint32_t freq, bool is_slave)
 {
-    /* I2C use peripheral clock */
-    return ((cy_PeriClkFreqHz * (1 << frac_bits)) + (frequency / 2)) / frequency;
+    // return the actual data rate on sucess, 0 otherwise
+    uint32_t peri_freq = 0;
+    if (freq == 0)
+    {
+        return 0;
+    }
+    if (freq <= CY_SCB_I2C_STD_DATA_RATE)
+    {
+        peri_freq = is_slave ? SCB_PERI_CLOCK_SLAVE_STD : SCB_PERI_CLOCK_MASTER_STD;
+    }
+    else if (freq <= CY_SCB_I2C_FST_DATA_RATE)
+    {
+        peri_freq = is_slave ? SCB_PERI_CLOCK_SLAVE_FST : SCB_PERI_CLOCK_MASTER_FST;
+    }
+    else if (freq <= CY_SCB_I2C_FSTP_DATA_RATE)
+    {
+        peri_freq = is_slave ? SCB_PERI_CLOCK_SLAVE_FSTP : SCB_PERI_CLOCK_MASTER_FSTP;
+    }
+    else
+    {
+        return 0;
+    }
+    Cy_SysClk_PeriphAssignDivider((en_clk_dst_t)get_scb_cls(obj->resource.block_num), obj->clock.div_type, obj->clock.div_num);
+    Cy_SysClk_PeriphDisableDivider(obj->clock.div_type, obj->clock.div_num);
+    Cy_SysClk_PeriphSetDivider(obj->clock.div_type, obj->clock.div_num, cyhal_divider_value(peri_freq, 0u));
+    Cy_SysClk_PeriphEnableDivider(obj->clock.div_type, obj->clock.div_num);
+    return Cy_SCB_I2C_SetDataRate(obj->base, freq, Cy_SysClk_PeriphGetFrequency(obj->clock.div_type, obj->clock.div_num));
 }
 
 /* Start API implementing */
@@ -454,13 +483,12 @@ cy_rslt_t cyhal_i2c_init(cyhal_i2c_t *obj, cyhal_gpio_t sda, cyhal_gpio_t scl, c
     {
         return CYHAL_I2C_RSLT_ERR_INVALID_PIN;
     }
-    const cyhal_resource_inst_t *rsc = scl_map->inst;
-    cy_rslt_t result = cyhal_hwmgr_reserve(rsc);
+    obj->resource = *(scl_map->inst);
+    cy_rslt_t result = cyhal_hwmgr_reserve(&(obj->resource));
     if (result != CY_RSLT_SUCCESS)
     {
         return result;
     }
-    obj->resource = *rsc;
 
     /* Reserve the SDA pin */
     cyhal_resource_inst_t pin_rsc = cyhal_utils_get_gpio_resource(sda);
@@ -504,18 +532,12 @@ cy_rslt_t cyhal_i2c_init(cyhal_i2c_t *obj, cyhal_gpio_t sda, cyhal_gpio_t scl, c
 
     if (result == CY_RSLT_SUCCESS)
     {
-        /* Connect assigned divider to be a clock source for I2C */
-        Cy_SysClk_PeriphAssignDivider((en_clk_dst_t)get_scb_cls(obj->resource.block_num), obj->clock.div_type, obj->clock.div_num);
-
-        /* I2C slave desired data rate is 400 kbps.
-         * To support this data rate the clk_scb frequency must be in range 7.82 – 15.38 MHz.
-         * Find clk_scb valid ranges in TRM section I2C sub-section Oversampling and Bit Rate.
-         * For clk_peri = 50 MHz, select divider value 4 and get clk_scb = (50 MHz / 4) = 12.5 MHz.
-         * This clock frequency meets requirements above.
-         */
-        Cy_SysClk_PeriphDisableDivider(obj->clock.div_type, obj->clock.div_num);
-        Cy_SysClk_PeriphSetDivider(obj->clock.div_type, obj->clock.div_num, cyhal_divider_value(SCB_PERI_CLOCK_SLAVE, 0u));
-        Cy_SysClk_PeriphEnableDivider(obj->clock.div_type, obj->clock.div_num);
+        uint32_t dataRate = cyhal_set_peri_divider(obj, CY_SCB_I2C_FST_DATA_RATE, false);
+        if (dataRate == 0)
+        {
+            /* Can not reach desired data rate */
+            result = CYHAL_I2C_RSLT_ERR_CAN_NOT_REACH_DR;
+        }
     }
 
     bool configured = cyhal_hwmgr_is_configured(obj->resource.type, obj->resource.block_num, obj->resource.channel_num);
@@ -570,7 +592,6 @@ void cyhal_i2c_free(cyhal_i2c_t *obj)
 cy_rslt_t cyhal_i2c_set_config(cyhal_i2c_t *obj, const cyhal_i2c_cfg_t *cfg)
 {
     (void) Cy_SCB_I2C_Disable(obj->base, &obj->context);
-    uint32_t dataRate;
 
     cy_stc_scb_i2c_config_t config_structure = default_i2c_config;    
     config_structure.i2cMode = (cfg->is_slave)
@@ -586,28 +607,13 @@ cy_rslt_t cyhal_i2c_set_config(cyhal_i2c_t *obj, const cyhal_i2c_cfg_t *cfg)
     }
 
     /* Set data rate */
-    if (!cfg->is_slave) 
+    uint32_t dataRate = cyhal_set_peri_divider(obj, CY_SCB_I2C_FST_DATA_RATE, cfg->is_slave);
+    if (dataRate == 0)
     {
-        Cy_SysClk_PeriphAssignDivider((en_clk_dst_t)get_scb_cls(obj->resource.block_num), obj->clock.div_type, obj->clock.div_num);
-
-        /* I2C master desired data rate is 100 kbps.
-         * To support this data rate the clk_scb frequency must be in range 1.55 - 3.2 MHz.
-         * Find clk_scb valid ranges in TRM section I2C sub-section Oversampling and Bit Rate.
-         * For clk_peri = 50 MHz, select divider value 32 and get clk_scb = (50 MHz / 32) = 1.563 MHz.
-         * This clock frequency meets requirements above.
-         */
-        Cy_SysClk_PeriphDisableDivider(obj->clock.div_type, obj->clock.div_num);
-        Cy_SysClk_PeriphSetDivider   (obj->clock.div_type, obj->clock.div_num, cyhal_divider_value(SCB_PERI_CLOCK_MASTER, 0u));
-        Cy_SysClk_PeriphEnableDivider(obj->clock.div_type, obj->clock.div_num);
-
-        dataRate = Cy_SCB_I2C_SetDataRate(obj->base, (uint32_t)cfg->frequencyhal_hz, Cy_SysClk_PeriphGetFrequency(obj->clock.div_type, obj->clock.div_num));
-
-        if ((dataRate > cfg->frequencyhal_hz) || (dataRate == 0U))
-        {
-            /* Can not reach desired data rate */
-            return CYHAL_I2C_RSLT_ERR_CAN_NOT_REACH_DR;
-        }
+        /* Can not reach desired data rate */
+        return CYHAL_I2C_RSLT_ERR_CAN_NOT_REACH_DR;
     }
+
     cy_rslt_t result = (cy_rslt_t)Cy_SCB_I2C_Init(obj->base, &config_structure, &(obj->context));
     (void) Cy_SCB_I2C_Enable(obj->base);
 
