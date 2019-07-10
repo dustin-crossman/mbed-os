@@ -226,7 +226,7 @@
                     <Param id="sioOutputBuffer" value="true"/>
                     <Param id="inFlash" value="true"/>
                 </Block>
-                <Block location="ioss[0].port[5].pin[0]" alias="CYBSP_UART_RX" template="mxs40pin" version="1.1">
+                <Block location="ioss[0].port[5].pin[0]" alias="CYBSP_DEBUG_UART_RX" template="mxs40pin" version="1.1">
                     <Param id="DriveModes" value="CY_GPIO_DM_HIGHZ"/>
                     <Param id="initialState" value="1"/>
                     <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
@@ -236,7 +236,7 @@
                     <Param id="sioOutputBuffer" value="true"/>
                     <Param id="inFlash" value="true"/>
                 </Block>
-                <Block location="ioss[0].port[5].pin[1]" alias="CYBSP_UART_TX" template="mxs40pin" version="1.1">
+                <Block location="ioss[0].port[5].pin[1]" alias="CYBSP_DEBUG_UART_TX" template="mxs40pin" version="1.1">
                     <Param id="DriveModes" value="CY_GPIO_DM_STRONG_IN_OFF"/>
                     <Param id="initialState" value="1"/>
                     <Param id="vtrip" value="CY_GPIO_VTRIP_CMOS"/>
@@ -266,17 +266,17 @@
                     <Param id="sioOutputBuffer" value="true"/>
                     <Param id="inFlash" value="true"/>
                 </Block>
-                <Block location="peri[0].div_8[0]" alias="" template="mxs40peripheralclock" version="1.0">
+                <Block location="peri[0].div_8[0]" alias="CYBSP_SDIO_DIV" template="mxs40peripheralclock" version="1.0">
                     <Param id="intDivider" value="1"/>
                     <Param id="fracDivider" value="0"/>
                     <Param id="startOnReset" value="true"/>
                 </Block>
-                <Block location="peri[0].div_8[1]" alias="" template="mxs40peripheralclock" version="1.0">
+                <Block location="peri[0].div_8[1]" alias="CYBSP_DEBUG_UART_CLK_DIV" template="mxs40peripheralclock" version="1.0">
                     <Param id="intDivider" value="109"/>
                     <Param id="fracDivider" value="0"/>
                     <Param id="startOnReset" value="true"/>
                 </Block>
-                <Block location="scb[5]" alias="CYBSP_UART" template="mxs40uart" version="1.0">
+                <Block location="scb[5]" alias="CYBSP_DEBUG_UART" template="mxs40uart" version="1.0">
                     <Param id="ComMode" value="CY_SCB_UART_STANDARD"/>
                     <Param id="IrdaLowPower" value="false"/>
                     <Param id="BaudRate" value="115200"/>

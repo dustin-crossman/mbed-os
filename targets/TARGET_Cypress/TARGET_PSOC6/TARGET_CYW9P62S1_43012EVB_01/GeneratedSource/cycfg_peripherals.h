@@ -33,12 +33,12 @@
 extern "C" {
 #endif
 
-#define CYBSP_UART_ENABLED 1U
-#define CYBSP_UART_HW SCB5
-#define CYBSP_UART_IRQ scb_5_interrupt_IRQn
+#define CYBSP_DEBUG_UART_ENABLED 1U
+#define CYBSP_DEBUG_UART_HW SCB5
+#define CYBSP_DEBUG_UART_IRQ scb_5_interrupt_IRQn
 #define CYBSP_SDIO_ENABLED 1U
 
-extern const cy_stc_scb_uart_config_t CYBSP_UART_config;
+extern const cy_stc_scb_uart_config_t CYBSP_DEBUG_UART_config;
 
 void init_cycfg_peripherals(void);
 

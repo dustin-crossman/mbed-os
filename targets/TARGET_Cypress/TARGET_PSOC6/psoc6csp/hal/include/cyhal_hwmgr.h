@@ -127,18 +127,10 @@ cy_rslt_t cyhal_hwmgr_reserve(const cyhal_resource_inst_t* obj);
  */
 void cyhal_hwmgr_free(const cyhal_resource_inst_t* obj);
 
-/** Reserve the specified resource.
- *
- * @param[in]  type The type of resource that should be reserved
- * @param[out] obj  The resource object that was be reserved
- * @return The status of the allocate request
- */
-cy_rslt_t cyhal_hwmgr_allocate(cyhal_resource_t type, cyhal_resource_inst_t* obj);
-
 /** Allocates a free block of the specified type if available
  *
  * @param[in]  type The type of resource to allocate
- * @param[out] obj  The resource object to free
+ * @param[out] obj  The resource object that was allocated
  * @return The status of the allocate request
  */
 cy_rslt_t cyhal_hwmgr_allocate(cyhal_resource_t type, cyhal_resource_inst_t* obj);

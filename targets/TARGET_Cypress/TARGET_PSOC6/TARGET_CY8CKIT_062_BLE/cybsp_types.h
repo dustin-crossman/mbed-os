@@ -27,13 +27,11 @@
 * \addtogroup group_bsp_cy8ckit_062_ble CY8CKIT-062-BLE
 * \ingroup group_bsp
 * \{
-* \defgroup group_bsp_cy8ckit_062_ble_macros Macros
-* \defgroup group_bsp_cy8ckit_062_ble_enums Enumerated Types
 */
 
 #pragma once
 
-#include "cyhal.h"
+#include "cyhal_pin_package.h"
 
 #if defined(__cplusplus)
 extern "C" {

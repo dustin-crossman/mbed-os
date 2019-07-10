@@ -1,5 +1,5 @@
 /***************************************************************************//**
-* \file cybsp_utils.c
+* \file cybsp_wifi.c
 *
 * \brief
 * Provides utility functions that are used by board support packages.
@@ -23,7 +23,8 @@
 *******************************************************************************/
 #if defined(TARGET_WHD)
 
-#include "cybsp_api_wifi.h"
+#include "cybsp_types.h"
+#include "cybsp_wifi.h"
 #include "cy_network_buffer.h"
 #include "cmsis_os2.h"
 #include "whd_bus_types.h"

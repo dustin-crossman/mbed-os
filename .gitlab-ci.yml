@@ -44,16 +44,14 @@ astyle:
 ubuntu18-ARM:
   stage: build
   tags:
-    # see DEVOPS-304 - devops-linux
-    - gitlab_runner-001
+    - devops-linux
   script:
     - bash -ex cy-build.sh ubuntu ARM
 
 ubuntu18-GCC_ARM:
   stage: build
   tags:
-    # see DEVOPS-304 - devops-linux
-    - gitlab_runner-001
+    - devops-linux
   script:
     - bash -ex cy-build.sh ubuntu GCC_ARM
 
