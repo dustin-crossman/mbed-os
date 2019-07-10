@@ -142,7 +142,7 @@ void cyhal_i2c_free(cyhal_i2c_t *obj);
 cy_rslt_t cyhal_i2c_set_config(cyhal_i2c_t *obj, const cyhal_i2c_cfg_t *cfg);
 
 /**
- * I2C master send
+ * I2C master write
  *
  * @param[in]  obj       The I2C object
  * @param[in]  dev_addr  device address (7-bit)
@@ -150,12 +150,12 @@ cy_rslt_t cyhal_i2c_set_config(cyhal_i2c_t *obj, const cyhal_i2c_cfg_t *cfg);
  * @param[in]  size      i2c send data size
  * @param[in]  timeout   timeout in milisecond, set this value to 0 if you want to wait forever
  *
- * @return The status of the master_send request
+ * @return The status of the master_write request
  */
-cy_rslt_t cyhal_i2c_master_send(cyhal_i2c_t *obj, uint16_t dev_addr, const uint8_t *data, uint16_t size, uint32_t timeout);
+cy_rslt_t cyhal_i2c_master_write(cyhal_i2c_t *obj, uint16_t dev_addr, const uint8_t *data, uint16_t size, uint32_t timeout);
 
 /**
- * I2C master recv
+ * I2C master read
  *
  * @param[in]   obj       The I2C object
  * @param[in]   dev_addr  device address (7-bit)
@@ -163,35 +163,33 @@ cy_rslt_t cyhal_i2c_master_send(cyhal_i2c_t *obj, uint16_t dev_addr, const uint8
  * @param[in]   size      i2c receive data size
  * @param[in]   timeout   timeout in milisecond, set this value to 0 if you want to wait forever
  *
- * @return The status of the master_recv request
+ * @return The status of the master_read request
  */
-cy_rslt_t cyhal_i2c_master_recv(cyhal_i2c_t *obj, uint16_t dev_addr, uint8_t *data, uint16_t size, uint32_t timeout);
+cy_rslt_t cyhal_i2c_master_read(cyhal_i2c_t *obj, uint16_t dev_addr, uint8_t *data, uint16_t size, uint32_t timeout);
 
 /**
- * I2C slave send
+ * I2C slave config write buffer
  * The user needs to setup a new buffer every time (i.e. call slave_send and slave_recv every time the buffer has been used up)
  *
  * @param[in]  obj      The I2C object
  * @param[in]  data     i2c slave send data
  * @param[in]  size     i2c slave send data size
- * @param[in]  timeout  timeout in milisecond, set this value to 0 if you want to wait forever
  *
- * @return The status of the slave_send request
+ * @return The status of the slave_config_write_buff request
  */
-cy_rslt_t cyhal_i2c_slave_send(cyhal_i2c_t *obj, const uint8_t *data, uint16_t size, uint32_t timeout);
+cy_rslt_t cyhal_i2c_slave_config_write_buff(cyhal_i2c_t *obj, const uint8_t *data, uint16_t size);
 
 /**
- * I2C slave receive
+ * I2C slave config read buffer
  * The user needs to setup a new buffer every time (i.e. call slave_send and slave_recv every time the buffer has been used up)
  *
  * @param[in]   obj      The I2C object
  * @param[out]  data     i2c slave receive data
  * @param[in]   size     i2c slave receive data size
- * @param[in]   timeout  timeout in milisecond, set this value to 0 if you want to wait forever
  *
- * @return The status of the slave_recv request
+ * @return The status of the slave_config_read_buff request
  */
-cy_rslt_t cyhal_i2c_slave_recv(cyhal_i2c_t *obj, uint8_t *data, uint16_t size, uint32_t timeout);
+cy_rslt_t cyhal_i2c_slave_config_read_buff(cyhal_i2c_t *obj, uint8_t *data, uint16_t size);
 
 /** Perform an i2c write using a block of data stored at the specified memory location
  *
@@ -204,7 +202,7 @@ cy_rslt_t cyhal_i2c_slave_recv(cyhal_i2c_t *obj, uint8_t *data, uint16_t size, u
  * @param[in]  timeout        timeout in milisecond, set this value to 0 if you want to wait forever
  * @return The status of the write request
  */
-cy_rslt_t cyhal_i2c_mem_write(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_addr, uint16_t mem_addr_size, const uint8_t *data, uint16_t size, uint32_t timeout);
+cy_rslt_t cyhal_i2c_master_mem_write(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_addr, uint16_t mem_addr_size, const uint8_t *data, uint16_t size, uint32_t timeout);
 
 /** Perform an i2c read using a block of data stored at the specified memory location
  *
@@ -217,19 +215,19 @@ cy_rslt_t cyhal_i2c_mem_write(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_a
  * @param[in]  timeout        timeout in milisecond, set this value to 0 if you want to wait forever
  * @return The status of the read request
  */
-cy_rslt_t cyhal_i2c_mem_read(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_addr, uint16_t mem_addr_size, uint8_t *data, uint16_t size, uint32_t timeout);
+cy_rslt_t cyhal_i2c_master_mem_read(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_addr, uint16_t mem_addr_size, uint8_t *data, uint16_t size, uint32_t timeout);
 
-/** Start I2C asynchronous transfer
+/** Start I2C master asynchronous transfer
  *
  * @param[in]  obj      The I2C object
+ * @param[in]  address  device address (7-bit)
  * @param[in]  tx       The transmit buffer
  * @param[in]  tx_size  The number of bytes to transmit
  * @param[out] rx       The receive buffer
  * @param[in]  rx_size  The number of bytes to receive
- * @param[in]  address  device address (7-bit)
- * @return The status of the transfer_async request
+ * @return The status of the master_transfer_async request
  */
-cy_rslt_t cyhal_i2c_transfer_async(cyhal_i2c_t *obj, const void *tx, size_t tx_size, void *rx, size_t rx_size, uint16_t address);
+cy_rslt_t cyhal_i2c_master_transfer_async(cyhal_i2c_t *obj, uint32_t address, const void *tx, size_t tx_size, void *rx, size_t rx_size);
 
 /** Abort asynchronous transfer
  *

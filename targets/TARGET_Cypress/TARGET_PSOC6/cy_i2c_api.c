@@ -135,7 +135,7 @@ int i2c_stop(i2c_t *obj)
 int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
-    if (CY_RSLT_SUCCESS != cyhal_i2c_master_recv(&(i2c->hal_i2c), address >> 1, (uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT)) {
+    if (CY_RSLT_SUCCESS != cyhal_i2c_master_read(&(i2c->hal_i2c), address >> 1, (uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT)) {
         return (int)I2C_ERROR_NO_SLAVE;
     }
     return length;
@@ -144,7 +144,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
-    if (CY_RSLT_SUCCESS != cyhal_i2c_master_send(&(i2c->hal_i2c), address >> 1, (const uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT)) {
+    if (CY_RSLT_SUCCESS != cyhal_i2c_master_write(&(i2c->hal_i2c), address >> 1, (const uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT)) {
         return (int)I2C_ERROR_NO_SLAVE;
     }
     // NOTE: HAL does not report how many bytes were actually sent in case of early NAK
@@ -222,7 +222,7 @@ int  i2c_slave_receive(i2c_t *obj)
 int  i2c_slave_read(i2c_t *obj, char *data, int length)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
-    if (CY_RSLT_SUCCESS != cyhal_i2c_slave_recv(&(i2c->hal_i2c), (uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT)) {
+    if (CY_RSLT_SUCCESS != cyhal_i2c_slave_config_read_buff(&(i2c->hal_i2c), (uint8_t *)data, (uint16_t)length)) {
         return 0;
     }
     return 1;
@@ -231,7 +231,7 @@ int  i2c_slave_read(i2c_t *obj, char *data, int length)
 int  i2c_slave_write(i2c_t *obj, const char *data, int length)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
-    if (CY_RSLT_SUCCESS != cyhal_i2c_slave_send(&(i2c->hal_i2c), (const uint8_t *)data, (uint16_t)length, CY_I2C_DEFAULT_TIMEOUT)) {
+    if (CY_RSLT_SUCCESS != cyhal_i2c_slave_config_write_buff(&(i2c->hal_i2c), (const uint8_t *)data, (uint16_t)length)) {
         return 0;
     }
     return 1;
@@ -258,8 +258,8 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
     i2c->async_rx_size = rx_length;
     i2c->async_handler = (void (*)(void))handler;
     core_util_critical_section_exit();
-    if (CY_RSLT_SUCCESS != cyhal_i2c_transfer_async(&(i2c->hal_i2c), tx, tx_length, rx, rx_length, address)) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_transfer_async");
+    if (CY_RSLT_SUCCESS != cyhal_i2c_master_transfer_async(&(i2c->hal_i2c), address, tx, tx_length, rx, rx_length)) {
+        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_master_transfer_async");
     }
 }
 
