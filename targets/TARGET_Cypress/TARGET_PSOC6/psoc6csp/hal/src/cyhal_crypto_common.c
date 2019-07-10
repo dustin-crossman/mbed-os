@@ -24,7 +24,6 @@
 *******************************************************************************/
 
 #include "cyhal_hwmgr.h"
-#include "cy_crypto_core_crc.h"
 #include "cyhal_crypto_common.h"
 
 #if defined(CY_IP_MXCRYPTO)
@@ -36,26 +35,49 @@ static CRYPTO_Type* CYHAL_CRYPTO_BASE_ADDRESSES[CYHAL_CRYPTO_INST_COUNT] =
 #endif
 };
 
-static uint8_t cyhal_crypto_features[CYHAL_CRYPTO_INST_COUNT]= {0};
+// Number of Crypto features
+#define CRYPTO_FEATURES_NUM         ((uint32_t)CYHAL_CRYPTO_COMMON + 1u)
+
+// Defines for maximum available features in Crypto block
+#define CRYPTO_FEATURE_CRC_MAX_VAL         (1u)
+#define CRYPTO_FEATURE_TRNG_MAX_VAL        (1u)
+#define CRYPTO_FEATURE_VU_MAX_VAL          (256u)
+#define CRYPTO_FEATURE_COMMON_MAX_VAL      (256u)
+
+static uint16_t cyhal_crypto_features[CYHAL_CRYPTO_INST_COUNT][CRYPTO_FEATURES_NUM] = {{0}};
+static uint16_t cyhal_crypto_features_max_val[CRYPTO_FEATURES_NUM] = {CRYPTO_FEATURE_CRC_MAX_VAL,
+                                                                     CRYPTO_FEATURE_TRNG_MAX_VAL,
+                                                                     CRYPTO_FEATURE_VU_MAX_VAL,
+                                                                     CRYPTO_FEATURE_COMMON_MAX_VAL};
+
+static bool cy_crypto_enabled(uint32_t instance_count)
+{
+    uint8_t reserved = (cyhal_crypto_features[instance_count][CYHAL_CRYPTO_CRC]  |
+                        cyhal_crypto_features[instance_count][CYHAL_CRYPTO_TRNG] |
+                        cyhal_crypto_features[instance_count][CYHAL_CRYPTO_VU]   |
+                        cyhal_crypto_features[instance_count][CYHAL_CRYPTO_COMMON]);
+                        
+    return (reserved != 0);
+}
 
 cy_rslt_t cyhal_crypto_reserve(CRYPTO_Type** base, cyhal_resource_inst_t *resource, cyhal_crypto_feature_t feature)
 {
     cy_rslt_t result = CYHAL_HWMGR_RSLT_ERR_INUSE;
+    
     for (uint32_t i = 0u; i < CYHAL_CRYPTO_INST_COUNT; i++)
     {
-        //Check for feature reservation on the crypto instance.
-        if ((cyhal_crypto_features[i] & feature) == 0)
+        if (cyhal_crypto_features[i][feature] < cyhal_crypto_features_max_val[feature])
         {
             resource->type = CYHAL_RSC_CRYPTO;
             resource->block_num = i;
             resource->channel_num = 0;
             *base = CYHAL_CRYPTO_BASE_ADDRESSES[i];
-            //Reserve the feature on that crypto block.
-            cyhal_crypto_features[i] |= feature;
 
-            //Check if no other feature is enabled on the underlying crypto block if so then reserve and enable that block
-            if (cyhal_crypto_features[i] == feature)
-            {    
+            result = CY_RSLT_SUCCESS;
+
+            //Enable block if this as this first feature that is reserved in block
+            if (!cy_crypto_enabled(i))
+            {
                 result = cyhal_hwmgr_reserve(resource);
                 if (result == CY_RSLT_SUCCESS)
                 {
@@ -70,14 +92,10 @@ cy_rslt_t cyhal_crypto_reserve(CRYPTO_Type** base, cyhal_resource_inst_t *resour
                     }
                 }
             }
-            else
-            {
-                // We were able to reserve the feature on an already enabled crypto block.
-                result = CY_RSLT_SUCCESS;
-            }
 
-            if (result == CY_RSLT_SUCCESS)
+            if(result == CY_RSLT_SUCCESS)
             {
+                ++cyhal_crypto_features[i][feature];
                 break;
             }
         }
@@ -87,11 +105,13 @@ cy_rslt_t cyhal_crypto_reserve(CRYPTO_Type** base, cyhal_resource_inst_t *resour
 
 void cyhal_crypto_free(CRYPTO_Type* base, cyhal_resource_inst_t *resource, cyhal_crypto_feature_t feature)
 {
-    //Clear feature reservation
-    cyhal_crypto_features[resource->block_num] &= ~(feature);
+    if (cyhal_crypto_features[resource->block_num][feature] != 0)
+    {
+        --cyhal_crypto_features[resource->block_num][feature];
+    }
 
     //If this was the last feature then free the underlying crypto block as well.
-    if (cyhal_crypto_features[resource->block_num] == 0)
+    if (!cy_crypto_enabled(resource->block_num))
     {
         cyhal_hwmgr_set_unconfigured(resource->type, resource->block_num, resource->channel_num);
         if (Cy_Crypto_Core_IsEnabled(base))
