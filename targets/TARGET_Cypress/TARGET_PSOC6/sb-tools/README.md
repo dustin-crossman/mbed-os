@@ -8,7 +8,6 @@ Version of Python required is 3.7+
 
     *Create keys for image signing:*
 
-    python keygen.py -k 6 --jwk MCUBOOT_CM0P_KEY.json --pem-priv MCUBOOT_CM0P_KEY_PRIV.pem
     python keygen.py -k 8 --jwk USERAPP_CM4_KEY.json --pem-priv USERAPP_CM4_KEY_PRIV.pem
 
     *Create key for image encryption:*
@@ -35,22 +34,16 @@ Options:
 * To create packet for CY8CPROTO_064_SB target using single-stage policy (CM4 only):
     
         python provisioning_packet.py --policy policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
-
-* To create packet for CY8CPROTO_064_SB_M0_PSA and CY8CPROTO_064_SB_PSA targets using dual-stage policy (CM0 and CM4):
-    
-        python provisioning_packet.py --policy policy_dual_stage_CM0p_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
         
 * To use external memory (via SMIF) as staging(upgrade) area (slot_1) of NSPE (CM4) image use policy file with corresponding name:
 
-        python provisioning_packet.py --policy policy_dual_stage_CM0p_CM4_smif.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/MCUBOOT_CM0P_KEY.json --ckey ../keys/USERAPP_CM4_KEY.json
-        
-* To enable SMIF make sure targets.json has following names defined: SMIF MCUBOOT_USE_SMIF_STAGE, MCUBOOT_USE_SMIF_XIP. This applies for AUGUST_CYW43012_M0_PSA and CY8CPROTO_064_SB_M0_PSA targets. smif_id = 0 if SMIF disabled or N/A; smif_id = 1 for CY8CPROTO_064_SB; smif_id = 2 for AUGUST_CYW43012.
+        python provisioning_packet.py --policy policy_single_stage_CM4_smif.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json
         
 Prebuild folder contains CyBootloader_WithLogs and CyBootloader_Release with corresponding *.hex and *.jwt files.
   * WithLogs prints execution results to terminal.
   * Release does not print to terminal and boots up silently.
 
-**_NOTE:_** CypressBootloader_CM0p.jwt and CypressBootloader_CM0p.hex must be used in pair from the same directory in provisioning packet generation (.packets/prov_cmd.jwt) and provisioning procedure itself. ---
+**_NOTE:_** CypressBootloader_CM0p.jwt and CypressBootloader_CM0p.hex must be used in pair from the same directory in provisioning packet generation (.packets/prov_cmd.jwt) and provisioning procedure itself.
 
 ## 3. Run entrance exam
 
@@ -96,12 +89,6 @@ For encrypted image:
 - secure_image_parameters.json file in the target directory must contain valid keys' paths
 
 Non encrypted UPGRADE image 
-**_Example policy for AUGUST_CYW43012:_**
-        
-        "smif_id": 2,
-        "upgrade": true,
-        "encrypt": false,
-        "encrypt_key_id": 1,
 **_Example policy for CY8CPROTO_064_SB:_**
         
         "smif_id": 1,
@@ -111,12 +98,6 @@ Non encrypted UPGRADE image
 
 Encrypted UPGRADE image:
 
-**_Example policy for AUGUST_CYW43012:_**
-        
-        "smif_id": 2,
-        "upgrade": true,
-        "encrypt": true,
-        "encrypt_key_id": 1,
 **_Example policy for CY8CPROTO_064_SB:_**
         
         "smif_id": 1,
@@ -150,40 +131,15 @@ The generic HEX file (for example one that is produced by mbed-os build system) 
 
 # TESTS
         
-1.  Build and run tests for PSA targets with these commands (valid for mbed-os starting from 5.12.2 and later):
+1.  Build and run tests for CY8CPROTO_064_SB target with command:
 
         Run commands:
-        mbed test --compile --build OUT/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n components-*psa* -v
-        cd mbed-os/OUT and create file witn name .mbedignore and with contents " * " (only asterix) 
-        mbed test --compile --build OUT/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n components-*psa* -v --run
-         
-        Run commands:
-        mbed test --compile --build OUT/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *spm_client* -DUSE_PSA_TEST_PARTITIONS -DUSE_CLIENT_TESTS_PART1 -v
-        mbed test --compile --build OUT/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *spm_client* -DUSE_PSA_TEST_PARTITIONS -DUSE_CLIENT_TESTS_PART1 -v --run
-         
-        Run commands:
-        mbed test --compile --build OUT/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *spm_server -DUSE_PSA_TEST_PARTITIONS -DUSE_SERVER_TESTS_PART1 -DUSE_SERVER_TESTS_PART2 -v
-        mbed test --compile --build OUT/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *spm_server -DUSE_PSA_TEST_PARTITIONS -DUSE_SERVER_TESTS_PART1 -DUSE_SERVER_TESTS_PART2 -v --run
-         
-        Run commands:
-        mbed test --compile --build OUT/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *spm_smoke -DUSE_PSA_TEST_PARTITIONS -DUSE_SMOKE_TESTS_PART1 -v
-        mbed test --compile --build OUT/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *spm_smoke -DUSE_PSA_TEST_PARTITIONS -DUSE_SMOKE_TESTS_PART1 -v --run
-         
-        Run commands:
-        mbed test --compile --build OUT/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -v
-        mbed test --compile --build OUT/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -v --run
-         
-        Run commands:
-        mbed test --build OUT/CY8CPROTO_064_SB_M0_PSA --compile -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n tests-psa-* -v
-        mbed test --build OUT/CY8CPROTO_064_SB_PSA --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n tests-psa-* -v
-        mbedgt -i tests-psa-spm*,tests-psa-crypto_access* -v
-
-**_NOTE:_** In case of using non Windows platform flag --build OUT/@TARGET_NAME@ can be omitted.
+        mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n tests-mbed* -v
 
 # TROUBLESHOOTING:
 
 1. In case of messages like "unable to find device" execute "mbedls -m 1907:CY8CPROTO_064_SB", then check with "mbedls" if device is detected as CY8CPROTO_064_SB with code 1907.
 2. Keys, from ./keys folder is used for signing images by default, these keys should be used for provisioning.
 3. Consider using CyBootloader from CyBootloader_WithLogs folder. It produces logs, which are useful to understand whether CyBootloader works correctly.
-4. When running application with SMIF and _smif.json policy the field "smif_id" should be set to 1 for CY8CPROTO_064_SB or 2 for AUGUST_CYW43012
+4. When running application with SMIF and _smif.json policy the field "smif_id" should be set to 1 for CY8CPROTO_064_SB.
 5. Low frequency quartz (32768 Hz) oscillator have to be soldered on CY8CPROTO_064_SB (not present in stock version of board).
