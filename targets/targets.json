@@ -8346,7 +8346,6 @@
             "SPISLAVE",
             "STDIO_MESSAGES",
             "TRNG",
-            "USBDEVICE",
             "USTICKER"
         ],
         "release_versions": ["5"],
@@ -8447,7 +8446,6 @@
     },
     "CY8CKIT_062_BLE": {
         "inherits": ["MCU_PSOC6_M4"],
-        "device_has_remove": ["USBDEVICE"],
         "supported_form_factors": ["ARDUINO"],
         "extra_labels_add": [
             "PSOC6_01",
@@ -8463,7 +8461,6 @@
     },
     "CY8CPROTO_063_BLE": {
         "inherits": ["MCU_PSOC6_M4"],
-        "device_has_remove": ["USBDEVICE"],
         "extra_labels_add": [
             "PSOC6_01",
             "CM0P_SLEEP"
@@ -8478,7 +8475,6 @@
     },
     "CY8CPROTO_064_SB": {
         "inherits": ["MCU_PSOC6_M4"],
-        "device_has_remove": ["USBDEVICE"],
         "supported_form_factors": ["ARDUINO"],
         "extra_labels_add": ["PSOC6_01"],
         "macros_add": ["CYB06447BZI_D54",
