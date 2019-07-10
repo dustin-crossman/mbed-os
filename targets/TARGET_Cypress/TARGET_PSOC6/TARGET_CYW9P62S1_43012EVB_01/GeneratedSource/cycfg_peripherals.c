@@ -24,7 +24,7 @@
 
 #include "cycfg_peripherals.h"
 
-const cy_stc_scb_uart_config_t CYBSP_UART_config = 
+const cy_stc_scb_uart_config_t CYBSP_DEBUG_UART_config = 
 {
 	.uartMode = CY_SCB_UART_STANDARD,
 	.enableMutliProcessorMode = false,
@@ -57,6 +57,4 @@ const cy_stc_scb_uart_config_t CYBSP_UART_config =
 void init_cycfg_peripherals(void)
 {
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB5_CLOCK, CY_SYSCLK_DIV_8_BIT, 1U);
-
-	Cy_SysClk_PeriphAssignDivider(PCLK_UDB_CLOCKS0, CY_SYSCLK_DIV_8_BIT, 0u);
 }

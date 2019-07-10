@@ -124,8 +124,8 @@ typedef void (*cy_thread_entry_fn_t)(cy_thread_arg_t arg) ;
  */
 typedef enum cy_timer_trigger_type
 {
-    cy_timer_type_periodic = osTimerPeriodic,     /**< called periodically until stopped */
-    cy_timer_type_once     = osTimerOnce,         /**< called once only */
+    cy_timer_type_periodic,     /**< called periodically until stopped */
+    cy_timer_type_once,         /**< called once only */
 } cy_timer_trigger_type_t ;
 
 /**

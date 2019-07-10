@@ -27,7 +27,7 @@
 #include "mbed_shared_queues.h"
 #include "whd_wlioctl.h"
 #include "whd_buffer_api.h"
-#include "cybsp_api_wifi.h"
+#include "cybsp_wifi.h"
 #include "emac_eapol.h"
 #include "cy_result.h"
 

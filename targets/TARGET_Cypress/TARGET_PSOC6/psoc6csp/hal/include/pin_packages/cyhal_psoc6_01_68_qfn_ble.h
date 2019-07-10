@@ -109,6 +109,7 @@ extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inp_comp1[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_oa0_out_10x[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_oa1_out_10x[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_pads[4];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctdac_voutsw[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_dsi_ctb_cmp0[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_dsi_ctb_cmp1[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_sarmux_pads[2];

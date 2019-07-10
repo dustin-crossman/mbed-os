@@ -805,6 +805,12 @@ void cyhal_spi_free(cyhal_spi_t *obj)
     }
 }
 
+static uint32_t cyhal_divider_value(uint32_t frequency)
+{
+    /* SPI use peripheral clock */
+    return cy_PeriClkFreqHz / frequency;
+}
+
 static inline uint32_t min(uint32_t lhs, uint32_t rhs)
 {
     return lhs > rhs ? rhs : lhs;
@@ -848,8 +854,8 @@ static cy_rslt_t cyhal_int_spi_frequency(cyhal_spi_t *obj, uint32_t hz, uint8_t 
                 continue;
             }
 
-            divider_value = cyhal_divider_value(hz * oversample_value, 0);
-            divided_freq = cy_PeriClkFreqHz /(divider_value + 1);
+            divider_value = cyhal_divider_value(hz * oversample_value);
+            divided_freq = cy_PeriClkFreqHz /divider_value;
             diff = max(oversampled_freq, divided_freq) - min(oversampled_freq, divided_freq);
 
             if (diff < last_diff)
