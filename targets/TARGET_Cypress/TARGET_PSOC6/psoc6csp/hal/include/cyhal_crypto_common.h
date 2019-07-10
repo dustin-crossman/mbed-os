@@ -41,14 +41,14 @@ extern "C" {
 
 typedef enum
 {
-    /** CRC hardware accelaration */
-    CYHAL_CRYPTO_CRC    = 0x01,
-    /** TRNG hardware accelaration */
-    CYHAL_CRYPTO_TRNG   = 0x02,
-    /** VU hardware accelaration */
-    CYHAL_CRYPTO_VU     = 0x04,
-    /** Common features of the crypto block  */
-    CYHAL_CRYPTO_COMMON = 0x08,
+    /** CRC hardware acceleration */
+    CYHAL_CRYPTO_CRC,
+    /** TRNG hardware acceleration */
+    CYHAL_CRYPTO_TRNG,
+    /** VU hardware acceleration */
+    CYHAL_CRYPTO_VU,
+    /** Common features of the Crypto block  */
+    CYHAL_CRYPTO_COMMON,
 } cyhal_crypto_feature_t;
 
 /** Reserve the Crypto block and enable it.
