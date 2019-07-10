@@ -621,7 +621,7 @@ cy_rslt_t cyhal_i2c_set_config(cyhal_i2c_t *obj, const cyhal_i2c_cfg_t *cfg)
     return result;
 }
 
-cy_rslt_t cyhal_i2c_master_send(cyhal_i2c_t *obj, uint16_t dev_addr, const uint8_t *data, uint16_t size, uint32_t timeout)
+cy_rslt_t cyhal_i2c_master_write(cyhal_i2c_t *obj, uint16_t dev_addr, const uint8_t *data, uint16_t size, uint32_t timeout)
 {
     cy_en_scb_i2c_status_t status = CY_SCB_I2C_SUCCESS;
 
@@ -655,7 +655,7 @@ cy_rslt_t cyhal_i2c_master_send(cyhal_i2c_t *obj, uint16_t dev_addr, const uint8
     return status;
 }
 
-cy_rslt_t cyhal_i2c_master_recv(cyhal_i2c_t *obj, uint16_t dev_addr, uint8_t *data, uint16_t size, uint32_t timeout)
+cy_rslt_t cyhal_i2c_master_read(cyhal_i2c_t *obj, uint16_t dev_addr, uint8_t *data, uint16_t size, uint32_t timeout)
 {
     cy_en_scb_i2c_status_t status = CY_SCB_I2C_SUCCESS;
     cy_en_scb_i2c_command_t ack = CY_SCB_I2C_ACK;
@@ -693,7 +693,7 @@ cy_rslt_t cyhal_i2c_master_recv(cyhal_i2c_t *obj, uint16_t dev_addr, uint8_t *da
     return status;
 }
 
-cy_rslt_t cyhal_i2c_slave_send(cyhal_i2c_t *obj, const uint8_t *data, uint16_t size, uint32_t timeout)
+cy_rslt_t cyhal_i2c_slave_config_write_buff(cyhal_i2c_t *obj, const uint8_t *data, uint16_t size)
 {
     if (obj->context.state == CY_SCB_I2C_IDLE) 
     {
@@ -702,7 +702,7 @@ cy_rslt_t cyhal_i2c_slave_send(cyhal_i2c_t *obj, const uint8_t *data, uint16_t s
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_i2c_slave_recv(cyhal_i2c_t *obj, uint8_t *data, uint16_t size, uint32_t timeout)
+cy_rslt_t cyhal_i2c_slave_config_read_buff(cyhal_i2c_t *obj, uint8_t *data, uint16_t size)
 {
     if (obj->context.state == CY_SCB_I2C_IDLE)
     {    
@@ -711,7 +711,7 @@ cy_rslt_t cyhal_i2c_slave_recv(cyhal_i2c_t *obj, uint8_t *data, uint16_t size, u
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t cyhal_i2c_mem_write(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_addr, uint16_t mem_addr_size, const uint8_t *data, uint16_t size, uint32_t timeout)
+cy_rslt_t cyhal_i2c_master_mem_write(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_addr, uint16_t mem_addr_size, const uint8_t *data, uint16_t size, uint32_t timeout)
 {
     cy_en_scb_i2c_status_t status = CY_SCB_I2C_SUCCESS;
 
@@ -759,7 +759,7 @@ cy_rslt_t cyhal_i2c_mem_write(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_a
     return status;
 }
 
-cy_rslt_t cyhal_i2c_mem_read(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_addr, uint16_t mem_addr_size, uint8_t *data, uint16_t size, uint32_t timeout)
+cy_rslt_t cyhal_i2c_master_mem_read(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_addr, uint16_t mem_addr_size, uint8_t *data, uint16_t size, uint32_t timeout)
 {
     cy_en_scb_i2c_status_t status = CY_SCB_I2C_SUCCESS;
     cy_en_scb_i2c_command_t ack = CY_SCB_I2C_ACK;
@@ -820,7 +820,7 @@ cy_rslt_t cyhal_i2c_mem_read(cyhal_i2c_t *obj, uint16_t address, uint16_t mem_ad
     return status;
 }
 
-cy_rslt_t cyhal_i2c_transfer_async(cyhal_i2c_t *obj, const void *tx, size_t tx_size, void *rx, size_t rx_size, uint16_t address)
+cy_rslt_t cyhal_i2c_master_transfer_async(cyhal_i2c_t *obj, uint32_t address, const void *tx, size_t tx_size, void *rx, size_t rx_size)
 {
     obj->rx_config.slaveAddress = address;
     obj->tx_config.slaveAddress = address;
