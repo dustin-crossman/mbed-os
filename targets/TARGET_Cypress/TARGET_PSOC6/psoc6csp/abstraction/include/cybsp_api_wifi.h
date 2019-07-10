@@ -49,9 +49,6 @@ extern "C" {
 * \{
 */
 
-/** Indicates that the wifi driver is available and can be used. */
-#define CYBSP_WIFI_CAPABLE 1
-
 /** Initialization of the wifi driver failed. */
 #define CYBSP_RSLT_WIFI_INIT_FAILED (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_BSP, 4))
 /** SDIO enumeration failed. */
