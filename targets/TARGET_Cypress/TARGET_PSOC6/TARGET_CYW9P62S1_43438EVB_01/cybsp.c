@@ -35,9 +35,10 @@ extern "C" {
 
 cy_rslt_t cybsp_init(void)
 {
+    cy_rslt_t result = CY_RSLT_SUCCESS;
+
     init_cycfg_system();
 
-    cy_rslt_t result = CY_RSLT_SUCCESS;
 #ifndef __MBED__
     /* Initialize User LEDs */
     result |= cybsp_led_init(CYBSP_USER_LED1);
@@ -50,6 +51,12 @@ cy_rslt_t cybsp_init(void)
     result |= cybsp_btn_init(CYBSP_USER_BTN2);
 
     CY_ASSERT(CY_RSLT_SUCCESS == result);
+
+    /* Initialize retargetting stdio to 'DEBUG_UART' peripheral */
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = cybsp_retarget_init();
+    }
 #endif
 
 #if defined(CYBSP_WIFI_CAPABLE)
@@ -60,14 +67,6 @@ cy_rslt_t cybsp_init(void)
     if (CY_RSLT_SUCCESS == result)
     {
         result = cybsp_sdio_init();
-    }
-#endif
-
-#if defined(CYBSP_RETARGET_ENABLED)
-    /* Initialize retargetting stdio to 'DEBUG_UART' peripheral */
-    if (CY_RSLT_SUCCESS == result)
-    {
-        result = cybsp_retarget_init();
     }
 #endif
 

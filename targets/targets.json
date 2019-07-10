@@ -8414,7 +8414,7 @@
             "CYW43XXX",
             "CORDIO"
         ],
-        "macros_add": ["CY8C6247BZI_D54", "CYHAL_UDB_SDIO", "SEMAPHORE"],
+        "macros_add": ["CY8C6247BZI_D54", "CYHAL_UDB_SDIO", "CY_RTOS_AWARE", "CYBSP_WIFI_CAPABLE"],
         "detect_code": ["1900"],
         "post_binary_hook": {
             "function": "PSOC6Code.complete"
@@ -8499,7 +8499,7 @@
             "CYW43XXX",
             "CORDIO"
         ],
-        "macros_add": ["CY8C6247BZI_D54", "CYHAL_UDB_SDIO", "SEMAPHORE"],
+        "macros_add": ["CY8C6247BZI_D54", "CYHAL_UDB_SDIO", "CY_RTOS_AWARE", "CYBSP_WIFI_CAPABLE"],
         "detect_code": ["1906"],
         "post_binary_hook": {
             "function": "PSOC6Code.complete"
@@ -8519,7 +8519,7 @@
             "CYW43XXX",
             "CORDIO"
         ],
-        "macros_add": ["CY8C6247BZI_D54", "CYHAL_UDB_SDIO", "SEMAPHORE"],
+        "macros_add": ["CY8C6247BZI_D54", "CYHAL_UDB_SDIO", "CY_RTOS_AWARE", "CYBSP_WIFI_CAPABLE"],
         "detect_code": ["0000"],
         "post_binary_hook": {
             "function": "PSOC6Code.complete"

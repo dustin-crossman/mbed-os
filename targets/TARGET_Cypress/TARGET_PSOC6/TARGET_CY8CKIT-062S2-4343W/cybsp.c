@@ -48,10 +48,8 @@ cy_rslt_t cybsp_init(void)
     result |= cybsp_led_init(CYBSP_USER_LED5);
     /* Initialize all the user buttons */
     result |= cybsp_btn_init(CYBSP_USER_BTN1);
-#endif
-        
-#if defined(CYBSP_RETARGET_ENABLED)
-    if(CY_RSLT_SUCCESS == result)
+
+    if (CY_RSLT_SUCCESS == result)
     {
         result = cybsp_retarget_init();
     }
