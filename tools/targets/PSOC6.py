@@ -158,10 +158,10 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
         if not (fw_cyb["launch"] == img_id):
             # may be PSA NSPE part
             if not fw_cyb["launch"] == SPE_IMAGE_ID:
-                toolchain.notify.debug("[PSOC6.sign_image] WARNING: ID of build image " + str(img_id) +
-                                       " does not correspond launch ID in CyBootloader - " + str(fw_cyb["launch"]))
+                toolchain.notify.debug("[PSOC6.sign_image] WARNING: Image ID = " + str(img_id) +
+                                       " does not correspond to CyBootloader launch ID = " + str(fw_cyb["launch"]))
             else:
-                toolchain.notify.info("[PSOC6.sign_image] INFO: NSPE image ID is " + str(img_id) +
+                toolchain.notify.info("[PSOC6.sign_image] INFO: NSPE image ID = " + str(img_id) +
                                       ". It will be launched by SPE part.")
 
         # check slots addresses and sizes if upgrade is set to True
@@ -171,63 +171,65 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
 
             if fw_nspe["upgrade"] and True:
                 slot1 = slot
+                smif_id = fw_nspe["smif_id"]
                 if slot["type"] == "UPGRADE":
                     try:
                         if fw_nspe["encrypt"] and True:
                             # mark slot1 image as one, that should be encrypted
                             slot1.update({'encrypt': True})
-                            toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE NSPE will"
-                                                " be ENCRYPTED per policy settings.")
+                            toolchain.notify.info("[PSOC6.sign_image] INFO: UPGRADE image for NSPE will"
+                                                  " be ENCRYPTED per policy settings.")
                     except KeyError:
                         None
             else:
-                toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
-                                    " be built per policy settings.")
+                toolchain.notify.info("[PSOC6.sign_image] INFO: UPGRADE image will not"
+                                      " be generated per policy settings.")
                 break
+            
         if slot0 is None:
-            toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section not found in policy resources")
-            raise Exception("imgtool finished execution with errors!")
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section was not found in policy resources.")
+            raise Exception("EXCEPTION: Imgtool execution finished with errors!")
 
     else:
-        # check if PSA targets flash map correspond to slots addresses and sizes in policy
+        # check if PSA targets flash map corresponds to slot's addresses and sizes in policy
         if not (int(target_data["overrides"]["secure-rom-start"], 16) - MCUBOOT_HEADER_SIZE) ==\
                 int(fw_spe["resources"][0]["address"]):
-            toolchain.notify.debug("[PSOC6.sign_image] WARNING: SPE start address "
-                                   "does not correspond BOOT slot start address defined in policy. "
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: SPE start_address = " + hex(int(target_data["overrides"]["secure-rom-start"],16)) +
+                                   " does not match BOOT slot start_address = " + hex(int(fw_spe["resources"][0]["address"])+MCUBOOT_HEADER_SIZE) + " defined in policy. "
                                    "Check if MCUboot header offset 0x400 is included in SPE flash start")
 
         if not (int(target_data["overrides"]["non-secure-rom-start"], 16) - MCUBOOT_HEADER_SIZE) ==\
                 int(fw_nspe["resources"][0]["address"]):
-            toolchain.notify.debug("[PSOC6.sign_image] WARNING: NSPE start address "
-                                   "does not correspond BOOT slot start address defined in policy. "
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: NSPE start_address = " + hex(int(target_data["overrides"]["non-secure-rom-start"],16)) +
+                                   " does not match BOOT slot start_address = " + hex(int(fw_spe["resources"][0]["address"])+MCUBOOT_HEADER_SIZE) + " defined in policy. "
                                    "Check if MCUboot header offset 0x400 is included in NSPE flash start")
 
         if (int(target_data["overrides"]["secure-rom-size"], 16) + MCUBOOT_HEADER_SIZE) >\
                 int(fw_spe["resources"][0]["size"]):
-            toolchain.notify.debug("[PSOC6.sign_image] WARNING: SPE flash size "
-                                   "does not fit in BOOT slot size defined in policy.")
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: SPE flash_size = " + hex(int(target_data["overrides"]["secure-rom-size"],16)) +
+                                   " does not fit in BOOT slot_size = " + hex(int(fw_spe["resources"][0]["size"])-MCUBOOT_HEADER_SIZE) + " defined in policy.")
 
         if (int(target_data["overrides"]["non-secure-rom-size"], 16) + MCUBOOT_HEADER_SIZE) >\
                 int(fw_nspe["resources"][0]["size"]):
-            toolchain.notify.debug("[PSOC6.sign_image] WARNING: NSPE flash size "
-                                   "does not fit in BOOT slot size defined in policy.")
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: NSPE flash_size = " + hex(int(target_data["overrides"]["non-secure-rom-size"],16)) +
+                                   " does not fit in BOOT slot_size = " + hex(int(fw_spe["resources"][0]["size"])-MCUBOOT_HEADER_SIZE) + " defined in policy.")
 
         img_id = fw_spe["id"]
         # check dual stage scheme
         if img_id != 1:
-            toolchain.notify.debug("[PSOC6.sign_image] ERROR: Image ID of SPE image"
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: SPE Image ID = " + str(img_id) +
                                    " is not equal to 1!")
-            raise Exception("imgtool finished execution with errors!")
+            raise Exception("EXCEPTION: Imgtool execution finished with errors!")
 
         if not (fw_cyb["launch"] == img_id):
-            toolchain.notify.debug("[PSOC6.sign_image] ERROR: ID of build image"
-                                   " does not correspond launch ID in CyBootloader!")
-            raise Exception("imgtool finished execution with errors!")
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: Image's ID = " + str(img_id) +
+                                   " does not correspond to CyBootloader launch ID = " + str(fw_cyb["launch"]))
+            raise Exception("EXCEPTION: Imgtool execution finished with errors!")
 
         if not (fw_spe["launch"] == fw_nspe["id"]):
-            toolchain.notify.debug("[PSOC6.sign_image] ERROR: ID of NSPE image"
-                                   " does not correspond launch ID in SPE part!")
-            raise Exception("imgtool finished execution with errors!")
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: NSPE image ID = " + str(fw_nspe["id"]) +
+                                   " does not correspond SPE launch_ID = " + str(fw_spe["launch"]))
+            raise Exception("EXCEPTION: Imgtool execution finished with errors!")
 
 
         # check slots addresses and sizes if upgrade is set to True
@@ -237,25 +239,39 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
             if fw_spe["upgrade"] and True:
                 if slot["type"] == "UPGRADE":
                     slot1 = slot
+                    smif_id = fw_spe["smif_id"]
                     try:
                         if fw_spe["encrypt"] and True:
                             # mark slot1 image as one, that should be encrypted
                             slot1.update({'encrypt': True})
                             toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE SPE will"
-                                              " be ENCRYPTED per policy settings.")
+                                                  " be ENCRYPTED per policy settings.")
                     except KeyError:
                         None                    
             else:
-                toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
-                                      " be produced per policy settings.")            
+                toolchain.notify.info("[PSOC6.sign_image] INFO: Upgrade is disabled. Image for UPGRADE will not"
+                                      " be generated per policy settings.")
+                break
+
     if slot0 is None:
-        toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section not found in policy resources")
-        raise Exception("imgtool finished execution with errors!")
+        toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section was not found in policy resources.")
+        raise Exception("EXCEPTION: Imgtool execution finished with errors!")
 
     if slot1 is not None:
         # bigger or equal to 0x18000000 in hex is a start of SMIF memory
-        if slot1["address"] >= SMIF_MEM_MAP_START:
-            toolchain.notify.info("[PSOC6.sign_image] INFO: UPGRADE slot will be resided in external flash")
+        if not(int(smif_id) == 0):
+            toolchain.notify.info("[PSOC6.sign_image] INFO: SMIF is enabled. UPGRADE slot can be placed in external flash.")
+            if(int(smif_id) > 2):
+                toolchain.notify.info("[PSOC6.sign_image] WARNING: SMIF ID is out of range [1, 2] supported by CypressBootloder."
+                                      "Either change it to 1, to 2 or make sure cycfg_qspi_memslot.c is updated respectively "
+                                      "in SPE for second-stage bootloading.")
+            if (slot1["address"] >= SMIF_MEM_MAP_START):
+                toolchain.notify.info("[PSOC6.sign_image] INFO: UPGRADE slot will reside in external flash at address = " + hex(int(slot1["address"])))
+        else:
+            if (slot1["address"] >= SMIF_MEM_MAP_START):
+                toolchain.notify.debug("[PSOC6.sign_image] ERROR: Slot_1 start_address = " + hex(int(slot1["address"])) +
+                                        " but SMIF is not initialized (smif_id = 0). UPGRADE image will not be generated.")
+                raise Exception("EXCEPTION: Imgtool execution finished with errors!")
 
         if slot0["size"] != slot1["size"]:
             toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT and UPGRADE slots sizes are not equal")
