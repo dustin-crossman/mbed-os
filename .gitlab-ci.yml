@@ -133,7 +133,8 @@ mac_GCC_ARM_064_pinmap:
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbedls 
-    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
+    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v 
+    - mbedgt -n *pinmap --use-tids 190713012101070b0221010700000000000000002e127069 -v
     
 
 mac_ARMC6_064_pinmap:
@@ -153,5 +154,6 @@ mac_ARMC6_064_pinmap:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbedls
     - export ARMLMD_LICENSE_FILE=/Library/Application\ Support/Mbed\ Studio/mbed-studio-tools/ac6-license.dat
-    - mbed test --compile -m CY8CPROTO_064_SB -t ARMC6 -n *pinmap -v --run
+    - mbed test --compile -m CY8CPROTO_064_SB -t ARMC6 -n *pinmap -v
+    - mbedgt -n *pinmap --use-tids 190713012101070b0221010700000000000000002e127069 -v
     
