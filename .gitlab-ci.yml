@@ -152,6 +152,6 @@ mbed_064_pinmap_ARMC6_MAC:
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbedls
-    - ARMLMD_LICENSE_FILE=/Library/Application\ Support/Mbed\ Studio/mbed-studio-tools/ac6-license.dat
+    - export ARMLMD_LICENSE_FILE=/Library/Application\ Support/Mbed\ Studio/mbed-studio-tools/ac6-license.dat
     - mbed test --compile -m CY8CPROTO_064_SB -t ARMC6 -n *pinmap -v --run
     
