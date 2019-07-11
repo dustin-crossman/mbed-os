@@ -92,7 +92,7 @@ before_script:
     - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
 
 
-mbed_064_pinmap_IAR_WIN:
+WIN_064_pinmap_IAR:
   stage: test
   tags:
     - MBED_TEST
@@ -102,7 +102,7 @@ mbed_064_pinmap_IAR_WIN:
     - mbedgt -n *pinmap --use-tids 19071301651316170365131600000000000000002e127069 --test-spec OUT/CY8CPROTO_064_SB/test_spec.json -v
 
 
-mbed_064_pinmap_GCC_ARM_WIN:
+WIN_064_pinmap_GCC_ARM:
   stage: test
   tags:
     - MBED_TEST
@@ -117,7 +117,7 @@ mbed_064_pinmap_GCC_ARM_WIN:
     
     
     
-mbed_064_pinmap_GCC_ARM_MAC:
+MAC_064_pinmap_GCC_ARM:
   stage: test
   tags:
     - MBED_TEST_MAC1014
@@ -136,7 +136,7 @@ mbed_064_pinmap_GCC_ARM_MAC:
     - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
     
 
-mbed_064_pinmap_ARMC6_MAC:
+MAC_064_pinmap_ARMC6:
   stage: test
   tags:
     - MBED_TEST_MAC1014
