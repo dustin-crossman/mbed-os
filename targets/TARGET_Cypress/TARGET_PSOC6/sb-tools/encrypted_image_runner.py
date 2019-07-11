@@ -98,8 +98,8 @@ def manage_output(process, input_f, output_f):
               type=click.STRING,
               help='Size of slot available for BOOT or UPGRADE image')
 @click.option('--pad', 'pad',
-              default=None,
-              type=click.STRING,
+              default=False,
+              is_flag=True,
               help='Add padding to image - required for UPGRADE image')
 @click.option('--img-offset', 'img_offset',
               default=None,

@@ -24,6 +24,10 @@
 
 #include "cycfg_peripherals.h"
 
+cy_stc_csd_context_t cy_csd_0_context = 
+{
+	.lockKey = CY_CSD_NONE_KEY,
+};
 const cy_stc_scb_uart_config_t CYBSP_BT_UART_config = 
 {
 	.uartMode = CY_SCB_UART_STANDARD,

@@ -180,9 +180,10 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
                                                 " be ENCRYPTED per policy settings.")
                     except KeyError:
                         None
-                else:
-                    toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
-                                      " be built per policy settings.")
+            else:
+                toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
+                                    " be built per policy settings.")
+                break
         if slot0 is None:
             toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section not found in policy resources")
             raise Exception("imgtool finished execution with errors!")

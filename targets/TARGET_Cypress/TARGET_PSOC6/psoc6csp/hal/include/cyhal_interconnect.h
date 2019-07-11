@@ -43,6 +43,7 @@
 #include <stdbool.h>
 #include "cy_result.h"
 #include "cyhal_hw_types.h"
+#include "cyhal_hwmgr.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -59,6 +60,9 @@ extern "C" {
 #define CYHAL_CONNECT_RSLT_ALREADY_CONNECTED (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_INTERCONNECT, 1))
 /** Invalid 1-to-1 trigger connection */
 #define CYHAL_CONNECT_RSLT_INVALID_1TO1_CONNECTION (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_INTERCONNECT, 2))
+
+/** Indicates that a mux output does not continue to another mux */
+#define CYHAL_INTERCONNECT_MUX_NOT_CONTINUATION 0xFF
 
 /** \} group_hal_interconnect_macros */
 

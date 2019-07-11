@@ -30,6 +30,7 @@
 #include "cyhal_adc.h"
 #include "cyhal_analog_common.h"
 #include "cyhal_gpio.h"
+#include "cyhal_interconnect.h"
 #include "cyhal_utils.h"
 
 #if defined(CY_IP_MXS40PASS_SAR_INSTANCES)
@@ -60,7 +61,7 @@ static const en_clk_dst_t cyhal_sar_clock[] =
 };
 
 #define CYHAL_SAR_DEFAULT_CTRL ((uint32_t)CY_SAR_VREF_PWR_100 | (uint32_t)CY_SAR_VREF_SEL_BGR \
-                                | (uint32_t)CY_SAR_BYPASS_CAP_DISABLE | (uint32_t)CY_SAR_NEG_SEL_VSSA_KELVIN \
+                                | (uint32_t)CY_SAR_BYPASS_CAP_DISABLE | (uint32_t)CY_SAR_NEG_SEL_VREF \
                                 | (uint32_t)CY_SAR_CTRL_NEGVREF_HW | (uint32_t)CY_SAR_CTRL_COMP_DLY_12 \
                                 | (uint32_t)CY_SAR_COMP_PWR_100 | (uint32_t)CY_SAR_DEEPSLEEP_SARMUX_OFF \
                                 | (uint32_t)CY_SAR_SARSEQ_SWITCH_ENABLE)
@@ -293,11 +294,13 @@ cy_rslt_t cyhal_adc_channel_init(cyhal_adc_channel_t *obj, cyhal_adc_t* adc, cyh
     memset(obj, 0, sizeof(cyhal_adc_channel_t));
     cy_rslt_t result;
 
-    // We don't need any special configuration of the pin, so just reserve it
     cyhal_resource_inst_t pinRsc = cyhal_utils_get_gpio_resource(pin);
     if (CY_RSLT_SUCCESS != (result = cyhal_hwmgr_reserve(&pinRsc)))
         return result;
     obj->pin = pin;
+    
+    if (CY_RSLT_SUCCESS == result)
+        result = cyhal_connect_pin(map);
 
     // Find the first available channel
     uint8_t chosen_channel = __CLZ(__RBIT(~adc->channel_used));
