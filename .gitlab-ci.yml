@@ -100,24 +100,24 @@ before_script:
 
 
 
-.win_IAR_064_pinmap:
+win_IAR_064_pinmap:
   stage: test
   tags:
     - MBED_TEST
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
-    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t IAR -n *pinmap -v 
-    - mbedgt -n *pinmap --use-tids 19071301651316170365131600000000000000002e127069 --test-spec OUT/CY8CPROTO_064_SB/test_spec.json -v
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t IAR -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v 
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 19071301651316170365131600000000000000002e127069 --test-spec OUT/CY8CPROTO_064_SB/test_spec.json -v
 
 
-.win_GCC_ARM_064_pinmap:
+win_GCC_ARM_064_pinmap:
   stage: test
   tags:
     - MBED_TEST
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
-    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v
-    - mbedgt -n *pinmap --use-tids 19071301651316170365131600000000000000002e127069 --test-spec OUT/CY8CPROTO_064_SB/test_spec.json -v
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t GCC_ARM -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 19071301651316170365131600000000000000002e127069 --test-spec OUT/CY8CPROTO_064_SB/test_spec.json -v
     
     
     
@@ -143,12 +143,12 @@ mac_GCC_ARM_064_tests:
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbedls 
-    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v 
-    - mbedgt -n *pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190713012101070b0221010700000000000000002e127069 -v
+    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v 
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190713012101070b0221010700000000000000002e127069 -v
     
     
 
-.mac_ARMC6_064_pinmap:
+mac_ARMC6_064_tests:
   stage: test
   tags:
     - MBED_TEST_MAC1014
@@ -165,6 +165,6 @@ mac_GCC_ARM_064_tests:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbedls
     - export ARMLMD_LICENSE_FILE=/Library/Application\ Support/Mbed\ Studio/mbed-studio-tools/ac6-license.dat
-    - mbed test --compile -m CY8CPROTO_064_SB -t ARMC6 -n *pinmap -v
-    - mbedgt -n *pinmap --use-tids 190713012101070b0221010700000000000000002e127069 -v
+    - mbed test --compile -m CY8CPROTO_064_SB -t ARMC6 -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190713012101070b0221010700000000000000002e127069 -v
     
