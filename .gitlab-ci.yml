@@ -98,8 +98,8 @@ mbed_064_pinmap_IAR_WIN:
     - MBED_TEST
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
-    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t IAR -n *pinmap -v --run
-
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t IAR -n *pinmap -v 
+    - mbedgt -n *pinmap --use-tids 19071301651316170365131600000000000000002e127069 --test-spec OUT/CY8CPROTO_064_SB/test_spec.json -v
 
 
 mbed_064_pinmap_GCC_ARM_WIN:
@@ -108,7 +108,8 @@ mbed_064_pinmap_GCC_ARM_WIN:
     - MBED_TEST
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
-    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v
+    - mbedgt -n *pinmap --use-tids 19071301651316170365131600000000000000002e127069 --test-spec OUT/CY8CPROTO_064_SB/test_spec.json -v
     
     
     
