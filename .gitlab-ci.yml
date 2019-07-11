@@ -7,9 +7,9 @@ before_script:
     - curl.exe --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip
     - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
 
-# Run pyocd wrapper functional tests
 
-.pyocd_wrapper:
+
+.pyocd_wrapper_MAC:
   stage: test
   tags:
     - MBED_TEST_MAC1014
@@ -42,7 +42,7 @@ before_script:
     - deactivate
 
 
-.pyocd_wrapper:
+.pyocd_wrapper_WIN:
   stage: test
   tags:
     - MBED_TEST
@@ -80,8 +80,8 @@ before_script:
       - venv
       - pyocd
 
-# Compile TARGET_PSOC6
-.test_mbed_062_crypto:
+
+.mbed_062_crypto:
   stage: test
   tags:
     - MBED_TEST
@@ -91,24 +91,66 @@ before_script:
     - echo "CY8CPROTO_062_4343W"
     - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
 
-# Compile TARGET_PSOC6
-.test_mbed_064_pinmap_GCC_ARM:
+
+
+
+
+
+# TESTS ON WINDOWS 
+
+
+
+win_IAR_064_tests:
   stage: test
   tags:
     - MBED_TEST
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
-    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
-    
-.test_mbed_064_pinmap_IAR_WIN:
+    - mbed test --compile -m CY8CPROTO_064_SB -t IAR -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v 
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 19071301651316170365131600000000000000002e127069 -vv
+
+
+.win_GCC_ARM_064_tests:
   stage: test
   tags:
     - MBED_TEST
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
-    - mbed test --compile --build OUT/CY8CPROTO_064_SB -m CY8CPROTO_064_SB -t IAR -n *pinmap -v --run
+    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 19071301651316170365131600000000000000002e127069 -vv
     
-test_mbed_064_pinmap_GCC_ARM_MAC:
+    
+    
+    
+    
+    
+# TESTS ON MAC OS X v 10.14
+    
+    
+mac_GCC_ARM_064_tests:
+  stage: test
+  tags:
+    - MBED_TEST_MAC1014
+  before_script:
+    - pwd
+    - curl --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/dev_default_keys.zip
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys
+    - unzip dev_default_keys.zip
+    - export https_proxy=http://proxy.ua.cypress.com:8080
+    - python3 --version 
+    - cd ../../../../../
+    - pwd     
+  script:
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbedls 
+    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190713012101070b0221010700000000000000002e127069 -vv
+    
+
+
+
+
+mac_ARMC6_064_tests:
   stage: test
   tags:
     - MBED_TEST_MAC1014
@@ -124,5 +166,7 @@ test_mbed_064_pinmap_GCC_ARM_MAC:
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbedls
-    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v --run
+    - export ARMLMD_LICENSE_FILE=/Library/Application\ Support/Mbed\ Studio/mbed-studio-tools/ac6-license.dat
+    - mbed test --compile -m CY8CPROTO_064_SB -t ARMC6 -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190713012101070b0221010700000000000000002e127069 -vv
     
