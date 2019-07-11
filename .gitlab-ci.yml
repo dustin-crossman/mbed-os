@@ -128,7 +128,7 @@ before_script:
     
     
     
-.mac_GCC_ARM_064_pinmap:
+.mac_GCC_ARM_064_tests:
   stage: test
   tags:
     - MBED_TEST_MAC1014
@@ -144,30 +144,9 @@ before_script:
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
     - mbedls 
-    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap -v 
-    - mbedgt -n *pinmap --use-tids 190713012101070b0221010700000000000000002e127069 -v
+    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n *pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v 
+    - mbedgt -n *pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190713012101070b0221010700000000000000002e127069 -v
     
-    
-
-
-mac_GCC_ARM_064_mbed_hal-rtc-reset:
-  stage: test
-  tags:
-    - MBED_TEST_MAC1014
-  before_script:
-    - pwd
-    - curl --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/dev_default_keys.zip
-    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys
-    - unzip dev_default_keys.zip
-    - export https_proxy=http://proxy.ua.cypress.com:8080
-    - python3 --version 
-    - cd ../../../../../
-    - pwd     
-  script:
-    - mbedls -m 1907:CY8CPROTO_064_SB
-    - mbedls 
-    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n TESTS-mbed_hal-rtc_reset -v 
-    - mbedgt -n TESTS-mbed_hal-rtc_reset --use-tids 190713012101070b0221010700000000000000002e127069 -v
     
 
 .mac_ARMC6_064_pinmap:
