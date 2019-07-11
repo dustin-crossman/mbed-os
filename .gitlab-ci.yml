@@ -100,7 +100,7 @@ before_script:
 
 
 
-win_IAR_064_pinmap:
+win_IAR_064_tests:
   stage: test
   tags:
     - MBED_TEST
