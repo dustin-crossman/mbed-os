@@ -110,7 +110,7 @@ win_IAR_064_pinmap:
     - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 19071301651316170365131600000000000000002e127069 --test-spec OUT/CY8CPROTO_064_SB/test_spec.json -v
 
 
-.win_GCC_ARM_064_pinmap:
+.win_GCC_ARM_064_tests:
   stage: test
   tags:
     - MBED_TEST
