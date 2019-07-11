@@ -127,8 +127,7 @@ before_script:
 # TESTS ON MAC OS X v 10.14
     
     
-    
-.mac_GCC_ARM_064_tests:
+mac_GCC_ARM_064_tests:
   stage: test
   tags:
     - MBED_TEST_MAC1014
