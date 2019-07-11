@@ -37,6 +37,10 @@
 #ifndef INITIAL_SP
 #define INITIAL_SP              (0x08002000 + 0x000FD800)  /* Ram origin + length */
 #endif
+#elif defined(TARGET_CY8CMOD_062S2_43012)
+#ifndef INITIAL_SP
+#define INITIAL_SP              (0x08002000 + 0x000FD800)  /* Ram origin + length */
+#endif
 #elif defined(TARGET_CYW943012P6EVB_01)
 #ifndef INITIAL_SP
 #define INITIAL_SP              (0x08002000 + 0x00045800)  /* Ram origin + length */
