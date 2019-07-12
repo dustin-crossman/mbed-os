@@ -100,7 +100,8 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
     ECDSA_VALIDATE_RET( buf   != NULL || blen == 0 );
 
     /* Fail cleanly on curves such as Curve25519 that can't be used for ECDSA */
-    ECDSA_VALIDATE_RET( grp->N.p != NULL );
+    if( grp->N.p == NULL )
+        return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
 
     key.curveID = cy_get_dp_idx(grp->id);
     ECDSA_VALIDATE_RET( key.curveID != CY_CRYPTO_ECC_ECP_NONE);
@@ -190,6 +191,10 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
     ECDSA_VALIDATE_RET( r   != NULL );
     ECDSA_VALIDATE_RET( s   != NULL );
     ECDSA_VALIDATE_RET( buf != NULL || blen == 0 );
+
+    /* Fail cleanly on curves such as Curve25519 that can't be used for ECDSA */
+    if( grp->N.p == NULL )
+        return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
 
     key.curveID = cy_get_dp_idx(grp->id);
     MBEDTLS_MPI_CHK( (key.curveID == CY_CRYPTO_ECC_ECP_NONE) ? MBEDTLS_ERR_ECP_BAD_INPUT_DATA : 0);
