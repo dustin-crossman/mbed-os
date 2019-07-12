@@ -58,9 +58,9 @@
  */
 typedef struct mbedtls_aes_context
 {
+    cy_hw_crypto_t obj;
     cy_stc_crypto_aes_state_t aes_state;
     cy_stc_crypto_aes_buffers_t aes_buffers;
-    cy_hw_crypto_t obj;
 }
 mbedtls_aes_context;
 
