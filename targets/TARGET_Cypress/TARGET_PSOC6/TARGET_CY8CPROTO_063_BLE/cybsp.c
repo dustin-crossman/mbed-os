@@ -24,10 +24,8 @@
 *******************************************************************************/
 
 #include <stdlib.h>
-#include "cybsp_retarget.h"
 #include "cybsp.h"
 #include "cycfg.h"
-
 
 #if defined(__cplusplus)
 extern "C" {
