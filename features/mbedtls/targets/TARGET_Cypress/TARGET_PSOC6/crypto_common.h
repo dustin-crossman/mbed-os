@@ -50,6 +50,7 @@ typedef struct {
 
 bool cy_hw_crypto_reserve(cy_hw_crypto_t *obj, cyhal_crypto_feature_t feature);
 void cy_hw_crypto_release(cy_hw_crypto_t *obj);
+void cy_hw_zeroize(void *data, uint32_t dataSize);
 
 void cy_hw_sha_init(void *ctx, uint32_t ctxSize);
 void cy_hw_sha_free(void *ctx, uint32_t ctxSize);
