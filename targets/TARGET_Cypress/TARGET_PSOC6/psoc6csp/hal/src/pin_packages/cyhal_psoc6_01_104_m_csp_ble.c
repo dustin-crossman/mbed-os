@@ -191,6 +191,11 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctb_pads[4] = {
     {P9_3, &CYHAL_OPAMP_0, CYHAL_PIN_ANALOG_FUNCTION(P9_3_PASS_CTB_PADS3)},
 };
 
+/* No legal connections for: pass_ctdac_voutsw */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_ctdac_voutsw[1] = {
+    {NC, NULL, 0},
+};
+
 /* Connections for: pass_dsi_ctb_cmp0 */
 const cyhal_resource_pin_mapping_t cyhal_pin_map_pass_dsi_ctb_cmp0[1] = {
     {P9_2, &CYHAL_OPAMP_0, CYHAL_PIN_OUT_FUNCTION(P9_2_PASS_DSI_CTB_CMP0)},

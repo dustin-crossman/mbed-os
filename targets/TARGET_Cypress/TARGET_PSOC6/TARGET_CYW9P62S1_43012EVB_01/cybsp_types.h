@@ -1,9 +1,9 @@
 /***************************************************************************//**
-* \file CY8CKIT-062-WIFI-BT/cybsp_types.h
+* \file CYW9P62S1-43012EVB-01/cybsp_types.h
 *
 * Description:
 * Provides APIs for interacting with the hardware contained on the Cypress
-* CY8CKIT-062-WIFI-BT pioneer kit.
+* CYW9P62S1-43012EVB-01 pioneer kit.
 *
 ********************************************************************************
 * \copyright
@@ -68,9 +68,9 @@ extern "C" {
 #define CYBSP_WIFI_HOST_WAKE   P2_7
 
 /** Pin: UART RX */
-#define CYBSP_UART_RX          P5_0
+#define CYBSP_DEBUG_UART_RX    P5_0
 /** Pin: UART TX */
-#define CYBSP_UART_TX          P5_1
+#define CYBSP_DEBUG_UART_TX    P5_1
 
 /** Host-wake GPIO drive mode */
 #define CYBSP_WIFI_HOST_WAKE_GPIO_DM CYHAL_GPIO_DRIVE_ANALOG
