@@ -66,7 +66,8 @@ void mbedtls_aes_init( mbedtls_aes_context *ctx )
 
 void mbedtls_aes_free( mbedtls_aes_context *ctx )
 {
-    AES_VALIDATE( ctx != NULL );
+    if( ctx == NULL )
+        return;
 
     if (ctx->aes_state.buffers != NULL) {
         Cy_Crypto_Core_Aes_Free(ctx->obj.base, &ctx->aes_state);
@@ -87,6 +88,9 @@ void mbedtls_aes_xts_init( mbedtls_aes_xts_context *ctx )
 
 void mbedtls_aes_xts_free( mbedtls_aes_xts_context *ctx )
 {
+    if( ctx == NULL )
+        return;
+
     mbedtls_aes_free( &ctx->crypt );
     mbedtls_aes_free( &ctx->tweak );
 }
