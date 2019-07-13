@@ -72,7 +72,7 @@ void mbedtls_aes_free( mbedtls_aes_context *ctx )
     if (ctx->aes_state.buffers != NULL) {
         Cy_Crypto_Core_Aes_Free(ctx->obj.base, &ctx->aes_state);
     }
-    cy_hw_crypto_release(&ctx->obj);
+    cy_hw_crypto_release((cy_hw_crypto_t *)ctx);
 
     cy_hw_zeroize(ctx, sizeof( mbedtls_aes_context ) );
 }
@@ -117,7 +117,7 @@ static int aes_set_keys( mbedtls_aes_context *ctx, const unsigned char *key,
         default : return( MBEDTLS_ERR_AES_INVALID_KEY_LENGTH );
     }
 
-    status = Cy_Crypto_Core_Aes_InitContext(CRYPTO, key, key_length, &ctx->aes_state, &ctx->aes_buffers);
+    status = Cy_Crypto_Core_Aes_InitContext(ctx->obj.base, key, key_length, &ctx->aes_state, &ctx->aes_buffers);
 
     if (CY_CRYPTO_SUCCESS != status)
     {
@@ -243,7 +243,7 @@ int mbedtls_internal_aes_encrypt( mbedtls_aes_context *ctx,
     AES_VALIDATE_RET( ctx != NULL );
     AES_VALIDATE_RET( ctx->aes_state.buffers != NULL );
 
-    status = Cy_Crypto_Core_Aes_Ecb(CRYPTO, CY_CRYPTO_ENCRYPT, output, input, &ctx->aes_state);
+    status = Cy_Crypto_Core_Aes_Ecb(ctx->obj.base, CY_CRYPTO_ENCRYPT, output, input, &ctx->aes_state);
 
     if (CY_CRYPTO_SUCCESS != status)
     {
@@ -275,7 +275,7 @@ int mbedtls_internal_aes_decrypt( mbedtls_aes_context *ctx,
     AES_VALIDATE_RET( ctx != NULL );
     AES_VALIDATE_RET( ctx->aes_state.buffers != NULL );
 
-    status = Cy_Crypto_Core_Aes_Ecb(CRYPTO, CY_CRYPTO_DECRYPT, output, input, &ctx->aes_state);
+    status = Cy_Crypto_Core_Aes_Ecb(ctx->obj.base, CY_CRYPTO_DECRYPT, output, input, &ctx->aes_state);
 
     if (CY_CRYPTO_SUCCESS != status)
     {
@@ -346,12 +346,12 @@ int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
     {
         while(( length > 0 ) && (ret == 0))
         {
-            Cy_Crypto_Core_MemCpy(CRYPTO, temp, input, CY_CRYPTO_AES_BLOCK_SIZE);
+            Cy_Crypto_Core_MemCpy(ctx->obj.base, temp, input, CY_CRYPTO_AES_BLOCK_SIZE);
 
-            status = Cy_Crypto_Core_Aes_Ecb(CRYPTO, CY_CRYPTO_DECRYPT, output, input, &ctx->aes_state);
+            status = Cy_Crypto_Core_Aes_Ecb(ctx->obj.base, CY_CRYPTO_DECRYPT, output, input, &ctx->aes_state);
 
-            Cy_Crypto_Core_MemXor(CRYPTO, output, output, iv, CY_CRYPTO_AES_BLOCK_SIZE);
-            Cy_Crypto_Core_MemCpy(CRYPTO, iv, temp, CY_CRYPTO_AES_BLOCK_SIZE);
+            Cy_Crypto_Core_MemXor(ctx->obj.base, output, output, iv, CY_CRYPTO_AES_BLOCK_SIZE);
+            Cy_Crypto_Core_MemCpy(ctx->obj.base, iv, temp, CY_CRYPTO_AES_BLOCK_SIZE);
 
             input  += CY_CRYPTO_AES_BLOCK_SIZE;
             output += CY_CRYPTO_AES_BLOCK_SIZE;
@@ -367,11 +367,11 @@ int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
     {
         while(( length > 0 ) && (ret == 0))
         {
-            Cy_Crypto_Core_MemXor(CRYPTO, output, input, iv, CY_CRYPTO_AES_BLOCK_SIZE);
+            Cy_Crypto_Core_MemXor(ctx->obj.base, output, input, iv, CY_CRYPTO_AES_BLOCK_SIZE);
 
-            status = Cy_Crypto_Core_Aes_Ecb(CRYPTO, CY_CRYPTO_ENCRYPT, output, output, &ctx->aes_state);
+            status = Cy_Crypto_Core_Aes_Ecb(ctx->obj.base, CY_CRYPTO_ENCRYPT, output, output, &ctx->aes_state);
 
-            Cy_Crypto_Core_MemCpy(CRYPTO, iv, output, CY_CRYPTO_AES_BLOCK_SIZE);
+            Cy_Crypto_Core_MemCpy(ctx->obj.base, iv, output, CY_CRYPTO_AES_BLOCK_SIZE);
 
             input  += CY_CRYPTO_AES_BLOCK_SIZE;
             output += CY_CRYPTO_AES_BLOCK_SIZE;

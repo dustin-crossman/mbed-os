@@ -75,7 +75,7 @@ int mbedtls_sha512_starts_ret( mbedtls_sha512_context *ctx, int is384)
     SHA512_VALIDATE_RET( ctx != NULL );
     SHA512_VALIDATE_RET( is384 == 0 || is384 == 1 );
 
-    return cy_hw_sha_start(&ctx->hashState,
+    return cy_hw_sha_start(&ctx->obj, &ctx->hashState,
                            ( is384 == 0 ) ? CY_CRYPTO_MODE_SHA512 : CY_CRYPTO_MODE_SHA384,
                            &ctx->shaBuffers);
 }
@@ -88,7 +88,7 @@ int mbedtls_sha512_update_ret( mbedtls_sha512_context *ctx, const unsigned char 
     SHA512_VALIDATE_RET( ctx != NULL );
     SHA512_VALIDATE_RET( ilen == 0 || input != NULL );
 
-    return cy_hw_sha_update(&ctx->hashState, input, ilen);
+    return cy_hw_sha_update(&ctx->obj, &ctx->hashState, input, ilen);
 }
 
 /*
@@ -99,7 +99,7 @@ int mbedtls_sha512_finish_ret( mbedtls_sha512_context *ctx, unsigned char output
     SHA512_VALIDATE_RET( ctx != NULL );
     SHA512_VALIDATE_RET( (unsigned char *)output != NULL );
 
-    return cy_hw_sha_finish(&ctx->hashState, output);
+    return cy_hw_sha_finish(&ctx->obj, &ctx->hashState, output);
 }
 
 int mbedtls_internal_sha512_process( mbedtls_sha512_context *ctx, const unsigned char data[128] )
@@ -107,7 +107,7 @@ int mbedtls_internal_sha512_process( mbedtls_sha512_context *ctx, const unsigned
     SHA512_VALIDATE_RET( ctx != NULL );
     SHA512_VALIDATE_RET( (const unsigned char *)data != NULL );
 
-    return cy_hw_sha_process(&ctx->hashState, data);
+    return cy_hw_sha_process(&ctx->obj, &ctx->hashState, data);
 }
 
 #endif /* MBEDTLS_SHA512_ALT */

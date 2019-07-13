@@ -75,7 +75,7 @@ int mbedtls_sha1_starts_ret( mbedtls_sha1_context *ctx )
 {
     SHA1_VALIDATE_RET( ctx != NULL );
 
-    return cy_hw_sha_start(&ctx->hashState, CY_CRYPTO_MODE_SHA1, &ctx->shaBuffers);
+    return cy_hw_sha_start(&ctx->obj, &ctx->hashState, CY_CRYPTO_MODE_SHA1, &ctx->shaBuffers);
 }
 
 /*
@@ -88,7 +88,7 @@ int mbedtls_sha1_update_ret( mbedtls_sha1_context *ctx,
     SHA1_VALIDATE_RET( ctx != NULL );
     SHA1_VALIDATE_RET( ilen == 0 || input != NULL );
 
-    return cy_hw_sha_update(&ctx->hashState, input, ilen);
+    return cy_hw_sha_update(&ctx->obj, &ctx->hashState, input, ilen);
 }
 
 /*
@@ -99,7 +99,7 @@ int mbedtls_sha1_finish_ret( mbedtls_sha1_context *ctx, unsigned char output[20]
     SHA1_VALIDATE_RET( ctx != NULL );
     SHA1_VALIDATE_RET( (unsigned char *)output != NULL );
 
-    return cy_hw_sha_finish(&ctx->hashState, output);
+    return cy_hw_sha_finish(&ctx->obj, &ctx->hashState, output);
 }
 
 int mbedtls_internal_sha1_process( mbedtls_sha1_context *ctx, const unsigned char data[64] )
@@ -107,7 +107,7 @@ int mbedtls_internal_sha1_process( mbedtls_sha1_context *ctx, const unsigned cha
     SHA1_VALIDATE_RET( ctx != NULL );
     SHA1_VALIDATE_RET( (const unsigned char *)data != NULL );
 
-    return cy_hw_sha_process(&ctx->hashState, data);
+    return cy_hw_sha_process(&ctx->obj, &ctx->hashState, data);
 }
 
 #endif /* MBEDTLS_SHA1_ALT */
