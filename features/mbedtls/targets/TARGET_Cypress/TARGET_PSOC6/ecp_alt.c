@@ -576,7 +576,7 @@ int mbedtls_ecp_point_read_binary( const mbedtls_ecp_group *grp,
         mbedtls_mpi_free( &pt->Y );
 
         if( grp->id == MBEDTLS_ECP_DP_CURVE25519 )
-            /* Set most significant bit to 0 as prescribed in RFC7748 §5 */
+            /* Set most significant bit to 0 as prescribed in RFC7748 ï¿½5 */
             MBEDTLS_MPI_CHK( mbedtls_mpi_set_bit( &pt->X, plen * 8 - 1, 0 ) );
 
         MBEDTLS_MPI_CHK( mbedtls_mpi_lset( &pt->Z, 1 ) );
@@ -1834,7 +1834,7 @@ static int ecp_mul_comb( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
     MBEDTLS_MPI_CHK( mbedtls_mpi_grow(&R->X, data_size) );
     MBEDTLS_MPI_CHK( mbedtls_mpi_grow(&R->Y, data_size) );
 
-    Cy_Crypto_Core_EC_NistP_PointMultiplication (CRYPTO,
+    Cy_Crypto_Core_EC_NistP_PointMultiplication (crypto_obj.base,
     		curveId,
 			(uint8_t *)Pi.X.p, (uint8_t *)Pi.Y.p,
 			(uint8_t *)di.p,

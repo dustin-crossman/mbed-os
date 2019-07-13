@@ -55,18 +55,19 @@ void cy_hw_zeroize(void *data, uint32_t dataSize);
 void cy_hw_sha_init(void *ctx, uint32_t ctxSize);
 void cy_hw_sha_free(void *ctx, uint32_t ctxSize);
 
-int cy_hw_sha_start (cy_stc_crypto_sha_state_t *hashState,
-                     cy_en_crypto_sha_mode_t shaMode,
-                     void *shaBuffers);
+int cy_hw_sha_start (cy_hw_crypto_t *obj, cy_stc_crypto_sha_state_t *hashState,
+                     cy_en_crypto_sha_mode_t shaMode, void *shaBuffers);
 
-int cy_hw_sha_update(cy_stc_crypto_sha_state_t *hashState,
+int cy_hw_sha_update(cy_hw_crypto_t *obj, cy_stc_crypto_sha_state_t *hashState,
 				     const uint8_t *in, uint32_t inlen);
 
-int cy_hw_sha_finish(cy_stc_crypto_sha_state_t *hashState, uint8_t *output);
+int cy_hw_sha_finish(cy_hw_crypto_t *obj, cy_stc_crypto_sha_state_t *hashState, 
+                     uint8_t *output);
 
 void cy_hw_sha_clone(void *ctxDst, const void *ctxSrc, uint32_t ctxSize,
                      cy_stc_crypto_sha_state_t *hashStateDst, void *shaBuffersDst);
 
-int cy_hw_sha_process(cy_stc_crypto_sha_state_t *hashState, const uint8_t *in);
+int cy_hw_sha_process(cy_hw_crypto_t *obj, cy_stc_crypto_sha_state_t *hashState, 
+                     const uint8_t *in);
 
 #endif /* (CRYPTO_COMMON_H) */

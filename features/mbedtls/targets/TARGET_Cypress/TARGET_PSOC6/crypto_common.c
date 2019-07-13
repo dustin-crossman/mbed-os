@@ -31,7 +31,7 @@
 #include "cy_crypto_core_hw.h"
 #include "cy_crypto_core_mem.h"
 
-#define CY_CRYPTO_CMN_VALIDATE(cond)        do {                \
+#define CY_CRYPTO_CHECK_PARAM(cond)         do {                \
                                                 if( !(cond) )   \
                                                     return;     \
                                             } while( 0 )
@@ -56,9 +56,7 @@ bool cy_hw_crypto_reserve(cy_hw_crypto_t *obj, cyhal_crypto_feature_t feature)
 void cy_hw_crypto_release(cy_hw_crypto_t *obj)
 {
     CY_ASSERT( obj != NULL );
-    CY_ASSERT( obj->resource.type == CYHAL_RSC_CRYPTO );
-
-    if (obj->resource.type != CYHAL_RSC_INVALID)
+    if (obj->resource.type == CYHAL_RSC_CRYPTO)
     {
         cyhal_crypto_free(obj->base, &(obj->resource), obj->feature);
     }
@@ -67,8 +65,8 @@ void cy_hw_crypto_release(cy_hw_crypto_t *obj)
 void cy_hw_zeroize(void *data, uint32_t dataSize)
 {
     cy_hw_crypto_t obj;
-    CY_CRYPTO_CMN_VALIDATE( data != NULL );
-    CY_CRYPTO_CMN_VALIDATE( dataSize > 0u );
+    CY_CRYPTO_CHECK_PARAM( data != NULL );
+    CY_CRYPTO_CHECK_PARAM( dataSize > 0u );
 
     if (cy_hw_crypto_reserve(&obj, CYHAL_CRYPTO_COMMON))
     {
@@ -79,8 +77,8 @@ void cy_hw_zeroize(void *data, uint32_t dataSize)
 
 void cy_hw_sha_init(void *ctx, uint32_t ctxSize)
 {
-    CY_CRYPTO_CMN_VALIDATE( ctx != NULL );
-    CY_CRYPTO_CMN_VALIDATE( ctxSize > 0u );
+    CY_CRYPTO_CHECK_PARAM( ctx != NULL );
+    CY_CRYPTO_CHECK_PARAM( ctxSize > 0u );
 
     cy_hw_zeroize(ctx, ctxSize);
 
@@ -89,14 +87,14 @@ void cy_hw_sha_init(void *ctx, uint32_t ctxSize)
 
 void cy_hw_sha_free(void *ctx, uint32_t ctxSize)
 {
-    CY_CRYPTO_CMN_VALIDATE( ctx != NULL );
-    CY_CRYPTO_CMN_VALIDATE( ctxSize > 0u);
+    CY_CRYPTO_CHECK_PARAM( ctx != NULL );
+    CY_CRYPTO_CHECK_PARAM( ctxSize > 0u);
          
     cy_hw_crypto_release((cy_hw_crypto_t *)ctx);
     cy_hw_zeroize(ctx, ctxSize);
 }
 
-int cy_hw_sha_start(cy_stc_crypto_sha_state_t *hashState,
+int cy_hw_sha_start(cy_hw_crypto_t *obj, cy_stc_crypto_sha_state_t *hashState,
                     cy_en_crypto_sha_mode_t shaMode, void *shaBuffers)
 {
     cy_en_crypto_status_t status;
@@ -104,18 +102,18 @@ int cy_hw_sha_start(cy_stc_crypto_sha_state_t *hashState,
     if ((hashState == NULL) || (shaBuffers == NULL))
         return (-1);
 
-    status = Cy_Crypto_Core_Sha_Init(CRYPTO, hashState, shaMode, shaBuffers);
+    status = Cy_Crypto_Core_Sha_Init(obj->base, hashState, shaMode, shaBuffers);
     if (CY_CRYPTO_SUCCESS != status)
         return (-1);
 
-    status = Cy_Crypto_Core_Sha_Start(CRYPTO, hashState);
+    status = Cy_Crypto_Core_Sha_Start(obj->base, hashState);
     if (CY_CRYPTO_SUCCESS != status)
         return (-1);
 
     return (0);
 }
 
-int cy_hw_sha_update(cy_stc_crypto_sha_state_t *hashState,
+int cy_hw_sha_update(cy_hw_crypto_t *obj, cy_stc_crypto_sha_state_t *hashState,
                      const uint8_t *in, uint32_t inlen)
 {
     cy_en_crypto_status_t status;
@@ -126,14 +124,14 @@ int cy_hw_sha_update(cy_stc_crypto_sha_state_t *hashState,
     if (hashState->blockSize == 0)
         return (-1);
 
-    status = Cy_Crypto_Core_Sha_Update(CRYPTO, hashState, in, inlen);
+    status = Cy_Crypto_Core_Sha_Update(obj->base, hashState, in, inlen);
     if (CY_CRYPTO_SUCCESS != status)
         return (-1);
 
     return (0);
 }
 
-int cy_hw_sha_finish(cy_stc_crypto_sha_state_t *hashState, uint8_t *output)
+int cy_hw_sha_finish(cy_hw_crypto_t *obj, cy_stc_crypto_sha_state_t *hashState, uint8_t *output)
 {
     cy_en_crypto_status_t status;
 
@@ -143,18 +141,18 @@ int cy_hw_sha_finish(cy_stc_crypto_sha_state_t *hashState, uint8_t *output)
     if (hashState->blockSize == 0)
         return (-1);
 
-    status = Cy_Crypto_Core_Sha_Finish(CRYPTO, hashState, output);
+    status = Cy_Crypto_Core_Sha_Finish(obj->base, hashState, output);
     if (CY_CRYPTO_SUCCESS != status)
         return (-1);
 
     return (0);
 }
 
-int cy_hw_sha_process(cy_stc_crypto_sha_state_t *hashState, const uint8_t *in)
+int cy_hw_sha_process(cy_hw_crypto_t *obj, cy_stc_crypto_sha_state_t *hashState, const uint8_t *in)
 {
     cy_en_crypto_status_t status;
 
-	status = Cy_Crypto_Core_Sha_Update(CRYPTO, hashState, in, hashState->blockSize);
+	status = Cy_Crypto_Core_Sha_Update(obj->base, hashState, in, hashState->blockSize);
     if (CY_CRYPTO_SUCCESS != status)
         return (-1);
 
@@ -164,11 +162,11 @@ int cy_hw_sha_process(cy_stc_crypto_sha_state_t *hashState, const uint8_t *in)
 void cy_hw_sha_clone( void *ctxDst, const void *ctxSrc, uint32_t ctxSize,
                      cy_stc_crypto_sha_state_t *hashStateDst, void *shaBuffersDst)
 {
-    CY_CRYPTO_CMN_VALIDATE( ctxDst != NULL );
-    CY_CRYPTO_CMN_VALIDATE( ctxSrc != NULL );
-    CY_CRYPTO_CMN_VALIDATE( hashStateDst != NULL );
-    CY_CRYPTO_CMN_VALIDATE( shaBuffersDst != NULL );
+    CY_CRYPTO_CHECK_PARAM( ctxDst != NULL );
+    CY_CRYPTO_CHECK_PARAM( ctxSrc != NULL );
+    CY_CRYPTO_CHECK_PARAM( hashStateDst != NULL );
+    CY_CRYPTO_CHECK_PARAM( shaBuffersDst != NULL );
 
-    Cy_Crypto_Core_MemCpy(CRYPTO, ctxDst, ctxSrc, (uint16_t)ctxSize);
-    Cy_Crypto_Core_Sha_Init(CRYPTO, hashStateDst, hashStateDst->mode, shaBuffersDst);
+    Cy_Crypto_Core_MemCpy(((cy_hw_crypto_t *)ctxSrc)->base, ctxDst, ctxSrc, (uint16_t)ctxSize);
+    Cy_Crypto_Core_Sha_Init(((cy_hw_crypto_t *)ctxSrc)->base, hashStateDst, hashStateDst->mode, shaBuffersDst);
 }

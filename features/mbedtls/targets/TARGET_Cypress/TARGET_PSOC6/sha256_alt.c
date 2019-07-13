@@ -75,7 +75,7 @@ int mbedtls_sha256_starts_ret( mbedtls_sha256_context *ctx, int is224)
     SHA256_VALIDATE_RET( ctx != NULL );
     SHA256_VALIDATE_RET( is224 == 0 || is224 == 1 );
 
-    return cy_hw_sha_start(&ctx->hashState,
+    return cy_hw_sha_start(&ctx->obj, &ctx->hashState,
                              ( is224 == 0 ) ? CY_CRYPTO_MODE_SHA256 : CY_CRYPTO_MODE_SHA224,
                              &ctx->shaBuffers);
 }
@@ -88,7 +88,7 @@ int mbedtls_sha256_update_ret( mbedtls_sha256_context *ctx, const unsigned char 
     SHA256_VALIDATE_RET( ctx != NULL );
     SHA256_VALIDATE_RET( ilen == 0 || input != NULL );
 
-    return cy_hw_sha_update(&ctx->hashState, (uint8_t *)input, ilen);
+    return cy_hw_sha_update(&ctx->obj, &ctx->hashState, (uint8_t *)input, ilen);
 }
 
 /*
@@ -99,7 +99,7 @@ int mbedtls_sha256_finish_ret( mbedtls_sha256_context *ctx, unsigned char output
     SHA256_VALIDATE_RET( ctx != NULL );
     SHA256_VALIDATE_RET( (unsigned char *)output != NULL );
 
-    return cy_hw_sha_finish(&ctx->hashState, output);
+    return cy_hw_sha_finish(&ctx->obj, &ctx->hashState, output);
 }
 
 int mbedtls_internal_sha256_process( mbedtls_sha256_context *ctx, const unsigned char data[64] )
@@ -107,7 +107,7 @@ int mbedtls_internal_sha256_process( mbedtls_sha256_context *ctx, const unsigned
     SHA256_VALIDATE_RET( ctx != NULL );
     SHA256_VALIDATE_RET( (const unsigned char *)data != NULL );
 
-    return cy_hw_sha_process(&ctx->hashState, (unsigned char *)data);
+    return cy_hw_sha_process(&ctx->obj, &ctx->hashState, (unsigned char *)data);
 }
 
 #endif /* MBEDTLS_SHA256_ALT */

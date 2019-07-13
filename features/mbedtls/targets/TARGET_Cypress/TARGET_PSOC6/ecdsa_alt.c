@@ -129,10 +129,10 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
     tmp_k = malloc(bytesize);
     MBEDTLS_MPI_CHK((tmp_k == NULL) ? MBEDTLS_ERR_ECP_ALLOC_FAILED : 0);
 
-    ecdsa_status = Cy_Crypto_Core_ECC_MakePrivateKey(CRYPTO, key.curveID, tmp_k, f_rng, p_rng);
+    ecdsa_status = Cy_Crypto_Core_ECC_MakePrivateKey(crypto_obj.base, key.curveID, tmp_k, f_rng, p_rng);
     MBEDTLS_MPI_CHK((ecdsa_status == CY_CRYPTO_SUCCESS) ? 0 : MBEDTLS_ERR_ECP_HW_ACCEL_FAILED);
 
-    ecdsa_status = Cy_Crypto_Core_ECC_SignHash(CRYPTO, buf, blen, sig, &key, tmp_k);
+    ecdsa_status = Cy_Crypto_Core_ECC_SignHash(crypto_obj.base, buf, blen, sig, &key, tmp_k);
     MBEDTLS_MPI_CHK((ecdsa_status == CY_CRYPTO_SUCCESS) ? 0 : MBEDTLS_ERR_ECP_HW_ACCEL_FAILED);
 
     /* Prepare a signature to load into an mpi format */
@@ -225,7 +225,7 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
     Cy_Crypto_Core_InvertEndianness(key.pubkey.x, bytesize);
     Cy_Crypto_Core_InvertEndianness(key.pubkey.y, bytesize);
 
-    ecdsa_ver_status = Cy_Crypto_Core_ECC_VerifyHash(CRYPTO, sig, buf, blen, &stat, &key);
+    ecdsa_ver_status = Cy_Crypto_Core_ECC_VerifyHash(crypto_obj.base, sig, buf, blen, &stat, &key);
     MBEDTLS_MPI_CHK((ecdsa_ver_status != CY_CRYPTO_SUCCESS) ? MBEDTLS_ERR_ECP_HW_ACCEL_FAILED : 0);
 
     MBEDTLS_MPI_CHK((stat == 1) ? 0 : MBEDTLS_ERR_ECP_VERIFY_FAILED);
