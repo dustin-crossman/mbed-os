@@ -65,11 +65,11 @@ ENTRY(Reset_Handler)
 #endif
 
 #if !defined(MBED_RAM_START)
-  #define MBED_RAM_START    0x08000000
+  #define MBED_RAM_START    0x08002000
 #endif
 
 #if !defined(MBED_RAM_SIZE)
-  #define MBED_RAM_SIZE     0x00020000
+  #define MBED_RAM_SIZE     0x0001E000
 #endif
 
 #if !defined(MBED_BOOT_STACK_SIZE)
@@ -119,6 +119,7 @@ MEMORY
 }
 
 /* Size and start address of the Cortex-M0+ application image */
+FLASH_CM0P_SIZE  = 0x40000;
 FLASH_CM0P_START = ORIGIN(flash) + LENGTH(flash) - FLASH_CM0P_SIZE;
 /* Size and start address of the Cortex-M4 application image */
 FLASH_CM4_SIZE   = LENGTH(flash) - FLASH_CM0P_SIZE;
