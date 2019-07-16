@@ -2,6 +2,8 @@ This directory contains tools and scripts for generating keys, preparing provisi
 These files are relevant to CY8CPROTO_064_SB or CY8CPROTO_064_SB_M0_PSA, CY8CPROTO_064_SB_PSA targets.
 Version of Python required is 3.7+
 
+**_NOTE_:** Detailed description about Secure Boot tools availabe on this link https://www.cypress.com/secureboot-sdk-user-guide
+
 # DEVICE PROVISIONING
 
 ## 1.   Generate new keys by executing the following commands from ./keys:
@@ -15,7 +17,7 @@ Version of Python required is 3.7+
     python keygen.py --aes aes.key
 
         
-**_NOTE_:** DO NOT COMMIT any new keys to repository. ---
+**_NOTE_:** DO NOT COMMIT any new keys to repository.
 
 ## 2.   Create provisioning packets:
 Use *provisioning_packet.py* from ./prepare folder.
