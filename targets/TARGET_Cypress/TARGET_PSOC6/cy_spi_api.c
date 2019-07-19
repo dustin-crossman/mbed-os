@@ -128,7 +128,7 @@ int spi_master_write(spi_t *obj, int value)
 {
     struct spi_s *spi = cy_get_spi(obj);
     uint8_t received;
-    if (CY_RSLT_SUCCESS != cyhal_spi_transfer(&(spi->hal_spi), (const uint8_t *)value, 1, &received, 1, 0)) {
+    if (CY_RSLT_SUCCESS != cyhal_spi_transfer(&(spi->hal_spi), &value, 1, &received, 1, 0)) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_spi_transfer");
     }
     return received;
