@@ -1,0 +1,172 @@
+stages:
+  - test
+before_script:
+    - pwd
+    - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
+    - python -m pip install -r ./requirements.txt
+    - curl.exe --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip
+    - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
+
+
+
+.pyocd_wrapper_MAC:
+  stage: test
+  tags:
+    - MBED_TEST_MAC1014
+  before_script:
+    - pwd
+    - curl --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/dev_default_keys.zip
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys
+    - unzip dev_default_keys.zip
+    - export https_proxy=http://proxy.ua.cypress.com:8080
+    - python3 --version 
+    - cd ../../../../../
+    - pwd
+  script:
+    - python3 --version
+    - virtualenv venv
+    - source venv/bin/activate
+    - pwd
+    - echo "[INFO] Getting latest pyocd"
+    - '[ -d pyocd ] && echo "[INFO] Directory pyocd exists." || echo "[INFO] Directory pyocd does not exists." && git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd && cd pyocd && git checkout tags/AH_FINAL_RELEASE_RC1 && git branch && cd ..'
+    - echo "[INFO] Installing recquired python modules"
+    - python3 -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
+    - echo "[INFO] Installing pyocd"
+    - cd pyocd
+    - python3 setup.py install
+    - cd ..
+    - echo "[INFO] Start tests"
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/test/
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - python3 -m unittest -v test_pyocd_wrapper.py
+    - deactivate
+
+
+.pyocd_wrapper_WIN:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - python -V
+    - virtualenv venv
+    - .\venv\Scripts\activate.ps1
+    - echo "[INFO] Getting latest pyocd"
+    - if (-Not(Test-Path pyocd)) { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd; cd pyocd; git checkout tags/AH_SECURITY_RELEASE_2; git branch; cd .. }
+    - echo "[INFO] Installing recquired python modules"
+    - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
+    - pip install cmsis-pack-manager
+    - pip install colorama
+    - pip install intelhex
+    - pip install intervaltree
+    - pip install prettytable
+    - pip install pyelftools
+    - pip install pyusb
+    - pip install pywinusb
+    - pip install pyyaml
+    - pip install six
+    - pip install setuptools_scm_git_archive
+    - pip install setuptools_scm
+    - echo "[INFO] Installing pyocd"
+    - cd pyocd
+    - python setup.py install
+    - cd ..
+    - echo "[INFO] Start tests"
+    - cd .\targets\TARGET_Cypress\TARGET_PSOC6\sb-tools\test\
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - python -m unittest -v test_pyocd_wrapper.py
+    - deactivate
+  cache:
+    paths:
+      - venv
+      - pyocd
+
+
+.mbed_062_crypto:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - echo "CY8CKIT_062_WIFI_BT"
+    - mbed test -m CY8CKIT_062_WIFI_BT -t GCC_ARM -n tests-mbedtls* -vv
+    - echo "CY8CPROTO_062_4343W"
+    - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
+
+
+
+
+
+
+# TESTS ON WINDOWS 
+
+
+
+win_IAR_064_tests:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbed test --compile -m CY8CPROTO_064_SB -t IAR -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v 
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 19071301651316170365131600000000000000002e127069 -vv
+
+
+.win_GCC_ARM_064_tests:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 19071301651316170365131600000000000000002e127069 -vv
+    
+    
+    
+    
+    
+    
+# TESTS ON MAC OS X v 10.14
+    
+    
+mac_GCC_ARM_064_tests:
+  stage: test
+  tags:
+    - MBED_TEST_MAC1014
+  before_script:
+    - pwd
+    - curl --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/dev_default_keys.zip
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys
+    - unzip dev_default_keys.zip
+    - export https_proxy=http://proxy.ua.cypress.com:8080
+    - python3 --version 
+    - cd ../../../../../
+    - pwd     
+  script:
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbedls 
+    - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190713012101070b0221010700000000000000002e127069 -vv
+    
+
+
+
+
+mac_ARMC6_064_tests:
+  stage: test
+  tags:
+    - MBED_TEST_MAC1014
+  before_script:
+    - pwd
+    - curl --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/dev_default_keys.zip
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys
+    - unzip dev_default_keys.zip
+    - export https_proxy=http://proxy.ua.cypress.com:8080
+    - python3 --version 
+    - cd ../../../../../
+    - pwd     
+  script:
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - mbedls
+    - export ARMLMD_LICENSE_FILE=/Library/Application\ Support/Mbed\ Studio/mbed-studio-tools/ac6-license.dat
+    - mbed test --compile -m CY8CPROTO_064_SB -t ARMC6 -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190713012101070b0221010700000000000000002e127069 -vv
+    
