@@ -57,7 +57,7 @@ extern "C" {
 typedef enum {
     /** TODO: Fill in */
     CYHAL_I2S_TBD,
-} cyhal_i2s_irq_t;
+} cyhal_i2s_event_t;
 
 /** \} group_hal_i2s_enums */
 
@@ -67,8 +67,8 @@ typedef enum {
 * \{
 */
 
-/** Handler for SPI interrupts */
-typedef void (*cyhal_i2s_irq_handler_t)(void *handler_arg, cyhal_i2s_irq_t event);
+/** Handler for SPI event callbacks */
+typedef void (*cyhal_i2s_event_callback_t)(void *callback_arg, cyhal_i2s_event_t event);
 
 /** \} group_hal_i2s_data_structures */
 
@@ -102,16 +102,16 @@ void cyhal_i2s_free(cyhal_i2s_t *obj);
  *
  * @param[in] obj The I2S object
  * @param[in] hz  Frequency in Hz
- * @return The status of the frequency request
+ * @return The status of the set_frequency request
  */
-cy_rslt_t cyhal_i2s_frequency(cyhal_i2s_t *obj, int hz);
+cy_rslt_t cyhal_i2s_set_frequency(cyhal_i2s_t *obj, int hz);
 
 /** Configure I2S as slave or master.
  * @param[in] obj The I2S object
  * @param[in] is_slave Enable hardware as a slave (true) or master (false)
- * @return The status of the mode request
+ * @return The status of the set_mode request
  */
-cy_rslt_t cyhal_i2s_mode(cyhal_i2s_t *obj, int is_slave);
+cy_rslt_t cyhal_i2s_set_mode(cyhal_i2s_t *obj, int is_slave);
 
 /** Blocking reading data
  *
@@ -151,26 +151,31 @@ cy_rslt_t cyhal_i2s_transfer_async(cyhal_i2s_t *obj, const void *tx, size_t *tx_
  */
 cy_rslt_t cyhal_i2s_abort_async(cyhal_i2s_t *obj);
 
-/** The I2S interrupt handler registration
+/** The I2S callback handler registration
  *
- * @param[in] obj         The I2S object
- * @param[in] handler     The callback handler which will be invoked when the interrupt fires
- * @param[in] handler_arg Generic argument that will be provided to the handler when called
+ * @param[in] obj          The I2S object
+ * @param[in] callback     The callback handler which will be invoked when the interrupt fires
+ * @param[in] callback_arg Generic argument that will be provided to the callback when called
  */
-void cyhal_i2s_register_irq(cyhal_i2s_t *obj, cyhal_i2s_irq_handler_t handler, void *handler_arg);
+void cyhal_i2s_register_callback(cyhal_i2s_t *obj, cyhal_i2s_event_callback_t callback, void *callback_arg);
 
 /** Configure I2S interrupt. This function is used for word-approach
  *
- * @param[in] obj      The I2S object
- * @param[in] event    The I2S IRQ type
- * @param[in] enable   True to turn on interrupts, False to turn off
+ * @param[in] obj           The I2S object
+ * @param[in] event         The I2S event type
+ * @param[in] intrPriority  The priority for NVIC interrupt events
+ * @param[in] enable        True to turn on specified events, False to turn off
  */
-void cyhal_i2s_irq_enable(cyhal_i2s_t *obj, cyhal_i2s_irq_t event, bool enable);
+void cyhal_i2s_enable_event(cyhal_i2s_t *obj, cyhal_i2s_event_t event, uint8_t intrPriority, bool enable);
 
 /** \} group_hal_i2s_functions */
 
 #if defined(__cplusplus)
 }
 #endif
+
+#ifdef CYHAL_I2S_IMPL_HEADER
+#include CYHAL_I2S_IMPL_HEADER
+#endif /* CYHAL_I2S_IMPL_HEADER */
 
 /** \} group_hal_i2s */

@@ -65,7 +65,7 @@ typedef enum
 typedef enum {
     /** TODO: Fill in */
     CYHAL_DMA_TBD,
-} cyhal_dma_irq_event_t;
+} cyhal_dma_event_t;
 
 /** \} group_hal_dma_enums */
 
@@ -88,7 +88,7 @@ typedef struct
 } cyhal_dma_cfg_t;
 
 /** Handler for DMA interrupts */
-typedef void (*cyhal_dma_irq_handler_t)(void *handler_arg, cyhal_dma_irq_event_t event);
+typedef void (*cyhal_dma_event_callback_t)(void *callback_arg, cyhal_dma_event_t event);
 
 /** \} group_hal_dma_data_structures */
 
@@ -137,26 +137,31 @@ cy_rslt_t cyhal_dma_start_transfer(cyhal_dma_t *obj);
  */
 bool cyhal_dma_busy(cyhal_dma_t *obj);
 
-/** The DMA interrupt handler registration
+/** The DMA callback handler registration
  *
- * @param[in] obj         The DMA object
- * @param[in] handler     The callback handler which will be invoked when the interrupt fires
- * @param[in] handler_arg Generic argument that will be provided to the handler when called
+ * @param[in] obj          The DMA object
+ * @param[in] callback     The callback handler which will be invoked when an event triggers
+ * @param[in] callback_arg Generic argument that will be provided to the callback when called
  */
-void cyhal_dma_register_irq(cyhal_dma_t *obj, cyhal_dma_irq_handler_t handler, void *handler_arg);
+void cyhal_dma_register_callback(cyhal_dma_t *obj, cyhal_dma_event_callback_t callback, void *callback_arg);
 
-/** Configure DMA interrupt enablement.
+/** Configure DMA event enablement.
  *
- * @param[in] obj      The DMA object
- * @param[in] event    The DMA IRQ type
- * @param[in] enable   True to turn on interrupts, False to turn off
+ * @param[in] obj           The DMA object
+ * @param[in] event         The DMA event type
+ * @param[in] intrPriority  The priority for NVIC interrupt events
+ * @param[in] enable        True to turn on interrupts, False to turn off
  */
-void cyhal_dma_irq_enable(cyhal_dma_t *obj, cyhal_dma_irq_event_t event, bool enable);
+void cyhal_dma_enable_event(cyhal_dma_t *obj, cyhal_dma_event_t event, uint8_t intrPriority, bool enable);
 
 /** \} group_hal_dma_functions */
 
 #if defined(__cplusplus)
 }
 #endif
+
+#ifdef CYHAL_DMA_IMPL_HEADER
+#include CYHAL_DMA_IMPL_HEADER
+#endif /* CYHAL_DMA_IMPL_HEADER */
 
 /** \} group_hal_dma */

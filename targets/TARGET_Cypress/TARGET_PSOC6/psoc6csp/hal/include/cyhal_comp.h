@@ -54,10 +54,9 @@ extern "C" {
 
 /** Comparator interrupt triggers */
 typedef enum {
-    CYHAL_COMP_IRQ_NONE, //!< Interrupts disabled
-    CYHAL_COMP_IRQ_RISE, //!< Rising edge
-    CYHAL_COMP_IRQ_FALL,  //!< Falling edge
-} cyhal_comp_irq_event_t;
+    CYHAL_COMP_IRQ_RISE,   //!< Rising edge
+    CYHAL_COMP_IRQ_FALL,   //!< Falling edge
+} cyhal_comp_event_t;
 
 /** Comparator power options */
 typedef enum {
@@ -91,8 +90,8 @@ typedef struct
     bool deepsleep;          //!< Does this need to operate in deepsleep
 } cyhal_comp_config_t;
 
-/** Handler for comparator interrupts */
-typedef void (*cyhal_comp_irq_handler_t)(void *handler_arg, cyhal_comp_irq_event_t event);
+/** Handler for comparator events */
+typedef void (*cyhal_comp_event_callback_t)(void *callback_arg, cyhal_comp_event_t event);
 
 /** \} group_hal_comp_data_structures */
 
@@ -133,26 +132,31 @@ cy_rslt_t cyhal_comp_configure(cyhal_comp_t *obj, const cyhal_comp_config_t cfg)
  */
 bool cyhal_comp_output(cyhal_comp_t *obj);
 
-/** Register/clear an interrupt handler for the comparator toggle IRQ event
+/** Register/clear an interrupt callback handler for the comparator events
  *
- * @param[in] obj         The comparator object
- * @param[in] handler     The function to call when the specified event happens
- * @param[in] handler_arg Generic argument that will be provided to the handler when called
+ * @param[in] obj          The comparator object
+ * @param[in] callback     The function to call when the specified event happens
+ * @param[in] callback_arg Generic argument that will be provided to the handler when called
  */
-void cyhal_comp_register_irq(cyhal_comp_t *obj, cyhal_comp_irq_handler_t handler, void *handler_arg);
+void cyhal_comp_register_callback(cyhal_comp_t *obj, cyhal_comp_event_callback_t callback, void *callback_arg);
 
-/** Enable or Disable the comparator IRQ
+/** Enable or Disable the comparator event
  *
  * @param[in] obj    The comparator object
- * @param[in] event  The comparator IRQ event
- * @param[in] enable True to turn on interrupts, False to turn off
+ * @param[in] event  The comparator event
+ * @param[in] intrPriority  The priority for NVIC interrupt events
+ * @param[in] enable True to turn on event, False to turn off
  */
-void cyhal_cyhal_comp_irq_enable(cyhal_comp_t *obj, cyhal_comp_irq_event_t event, bool enable);
+void cyhal_comp_enable_event(cyhal_comp_t *obj, cyhal_comp_event_t event, uint8_t intrPriority, bool enable);
 
 /** \} group_hal_comp_functions */
 
 #if defined(__cplusplus)
 }
 #endif
+
+#ifdef CYHAL_COMP_IMPL_HEADER
+#include CYHAL_COMP_IMPL_HEADER
+#endif /* CYHAL_COMP_IMPL_HEADER */
 
 /** \} group_hal_comp */

@@ -57,7 +57,7 @@ extern "C" {
 typedef enum {
     /** TODO: Fill in */
     CY_PDM_PCM_TBD,
-} cyhal_pdm_pcm_irq_event_t;
+} cyhal_pdm_pcm_event_t;
 
 /** \} group_hal_pdmpcm_enums */
 
@@ -74,7 +74,7 @@ typedef struct
 } cyhal_pdm_pcm_cfg_t;
 
 /** Handler for PDM/PCM interrupts */
-typedef void (*cyhal_pdm_pcm_irq_handler_t)(void *handler_arg, cyhal_pdm_pcm_irq_event_t event);
+typedef void (*cyhal_pdm_pcm_event_callback_t)(void *handler_arg, cyhal_pdm_pcm_event_t event);
 
 /** \} group_hal_pdmpcm_data_structures */
 
@@ -105,9 +105,9 @@ void cyhal_pdm_pcm_free(cyhal_pdm_pcm_t *obj);
  *
  * @param[inout] obj   The PDM/PCM object to configure
  * @param[in] cfg  The configuration of the PDM/PCM
- * @return The status of the format request
+ * @return The status of the configure request
  */
-cy_rslt_t cyhal_pdm_pcm_config(cyhal_pdm_pcm_t *obj, const cyhal_pdm_pcm_cfg_t *cfg);
+cy_rslt_t cyhal_pdm_pcm_configure(cyhal_pdm_pcm_t *obj, const cyhal_pdm_pcm_cfg_t *cfg);
 
 /** Clears the FIFO
  *
@@ -148,26 +148,31 @@ bool cyhal_pdm_pcm_is_busy(cyhal_pdm_pcm_t *obj);
  */
 cy_rslt_t cyhal_pdm_pcm_abort_async(cyhal_pdm_pcm_t *obj);
 
-/** The PDM/PCM interrupt handler registration
+/** The PDM/PCM event handler registration
  *
- * @param[in] obj         The PDM/PCM object
- * @param[in] handler     The callback handler which will be invoked when the interrupt fires
- * @param[in] handler_arg Generic argument that will be provided to the handler when called
+ * @param[in] obj          The PDM/PCM object
+ * @param[in] callback     The callback handler which will be invoked when the interrupt fires
+ * @param[in] callback_arg Generic argument that will be provided to the callback when called
  */
-void cyhal_pdm_pcm_register_irq(cyhal_pdm_pcm_t *obj, cyhal_pdm_pcm_irq_handler_t handler, void *handler_arg);
+void cyhal_pdm_pcm_register_callback(cyhal_pdm_pcm_t *obj, cyhal_pdm_pcm_event_callback_t callback, void *callback_arg);
 
-/** Configure PDM/PCM interrupt enablement.
+/** Configure PDM/PCM event enablement.
  *
- * @param[in] obj      The PDM/PCM object
- * @param[in] event    The PDM/PCM IRQ type
- * @param[in] enable   True to turn on interrupts, False to turn off
+ * @param[in] obj           The PDM/PCM object
+ * @param[in] event         The PDM/PCM event type
+ * @param[in] intrPriority  The priority for NVIC interrupt events
+ * @param[in] enable        True to turn on events, False to turn off
  */
-void cyhal_pdm_pcm_irq_enable(cyhal_pdm_pcm_t *obj, cyhal_pdm_pcm_irq_event_t event, bool enable);
+void cyhal_pdm_pcm_enable_event(cyhal_pdm_pcm_t *obj, cyhal_pdm_pcm_event_t event, uint8_t intrPriority, bool enable);
 
 /** \} group_hal_pdmpcm_functions */
 
 #if defined(__cplusplus)
 }
 #endif
+
+#ifdef CYHAL_PDMPCM_IMPL_HEADER
+#include CYHAL_PDMPCM_IMPL_HEADER
+#endif /* CYHAL_PDMPCM_IMPL_HEADER */
 
 /** \} group_hal_pdmpcm */

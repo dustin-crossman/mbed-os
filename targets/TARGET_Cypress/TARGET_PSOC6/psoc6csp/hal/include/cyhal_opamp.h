@@ -75,14 +75,18 @@ void cyhal_opamp_free(cyhal_opamp_t *obj);
  * @param[in,out] obj       The opamp object
  * @param[in]     power     Power mode to operate in (0=off, 1=low, 2=medium, 3=high)
  * @param[in]     deepsleep Does this need to operate in deepsleep
- * @return The status of the power request
+ * @return The status of the set_power request
  */
-cy_rslt_t cyhal_opamp_power(cyhal_opamp_t *obj, uint8_t power, bool deepsleep);
+cy_rslt_t cyhal_opamp_set_power(cyhal_opamp_t *obj, uint8_t power, bool deepsleep);
 
 /** \} group_hal_opamp_functions */
 
 #if defined(__cplusplus)
 }
 #endif
+
+#ifdef CYHAL_OPAMP_IMPL_HEADER
+#include CYHAL_OPAMP_IMPL_HEADER
+#endif /* CYHAL_OPAMP_IMPL_HEADER */
 
 /** \} group_hal_opamp */
