@@ -98,9 +98,14 @@ before_script:
 
 # TESTS ON WINDOWS 
 
-
-
-win_IAR_064_tests:
+win_IAR_062S2_tests:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - mbed test --compile -m CY8CKIT_062S2_4343W -t IAR -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v 
+    
+.win_IAR_064_tests:
   stage: test
   tags:
     - MBED_TEST
@@ -127,7 +132,7 @@ win_IAR_064_tests:
 # TESTS ON MAC OS X v 10.14
     
     
-mac_GCC_ARM_064_tests:
+.mac_GCC_ARM_064_tests:
   stage: test
   tags:
     - MBED_TEST_MAC1014
@@ -146,11 +151,24 @@ mac_GCC_ARM_064_tests:
     - mbed test --compile -m CY8CPROTO_064_SB -t GCC_ARM -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv
     - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190713012101070b0221010700000000000000002e127069 -vv
     
+mac_GCC_ARM_062S2_tests:
+  stage: test
+  tags:
+    - MBED_TEST_MAC1014
+  before_script:
+    - pwd
+    - curl --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/dev_default_keys.zip
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys
+    - unzip dev_default_keys.zip
+    - export https_proxy=http://proxy.ua.cypress.com:8080
+    - python3 --version 
+    - cd ../../../../../
+    - pwd     
+  script: 
+    - mbed test --compile -m CY8CKIT_062S2_4343W -t GCC_ARM -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv
 
 
-
-
-mac_ARMC6_064_tests:
+.mac_ARMC6_064_tests:
   stage: test
   tags:
     - MBED_TEST_MAC1014
@@ -170,3 +188,19 @@ mac_ARMC6_064_tests:
     - mbed test --compile -m CY8CPROTO_064_SB -t ARMC6 -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv
     - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190713012101070b0221010700000000000000002e127069 -vv
     
+mac_ARMC6_062S2_tests:
+  stage: test
+  tags:
+    - MBED_TEST_MAC1014
+  before_script:
+    - pwd
+    - curl --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/dev_default_keys.zip
+    - cd ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys
+    - unzip dev_default_keys.zip
+    - export https_proxy=http://proxy.ua.cypress.com:8080
+    - python3 --version 
+    - cd ../../../../../
+    - pwd     
+  script:
+    - export ARMLMD_LICENSE_FILE=/Library/Application\ Support/Mbed\ Studio/mbed-studio-tools/ac6-license.dat
+    - mbed test --compile -m CY8CPROTO_064_SB -t ARMC6 -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv    
