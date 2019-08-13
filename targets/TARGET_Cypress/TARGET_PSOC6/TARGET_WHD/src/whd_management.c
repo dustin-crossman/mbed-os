@@ -191,6 +191,7 @@ uint32_t whd_deinit(whd_interface_t ifp)
     whd_bus_spi_detach(whd_driver);
 #endif
     free(whd_driver);
+    whd_driver = NULL;
 
     return WHD_SUCCESS;
 }
