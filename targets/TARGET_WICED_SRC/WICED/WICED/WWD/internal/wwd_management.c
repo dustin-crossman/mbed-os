@@ -184,7 +184,8 @@ wwd_result_t wwd_management_wifi_on( wiced_country_code_t country )
     }
 
     /* Download blob file if exists */
-#ifdef TARGET_CYW4343X
+/*enabling CLM download for 43012 and 4343x*/
+#if defined(TARGET_CYW4343X) || defined(TARGET_CYW43012)
     retval = wwd_process_clm_data();
     if ( retval != WWD_SUCCESS )
     {
