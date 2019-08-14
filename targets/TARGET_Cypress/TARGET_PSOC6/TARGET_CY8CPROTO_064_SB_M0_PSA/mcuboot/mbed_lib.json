@@ -1,0 +1,27 @@
+{
+    "name": "mcuboot",
+    "config": {
+        "flash_page_layout": {
+            "help": "Use CONFIG_FLASH_PAGE_LAYOUT macro",
+            "macro_name": "CONFIG_FLASH_PAGE_LAYOUT",
+            "value": false
+        },
+        "mcuboot_sign_ec256": {
+            "help": "Use MCUBOOT_SIGN_EC256 macro",
+            "macro_name": "MCUBOOT_SIGN_EC256",
+            "value": false
+        },
+        "mcuboot_use_flashboot_crypto": {
+            "help": "Use MCUBOOT_USE_FLASHBOOT_CRYPTO macro",
+            "macro_name": "MCUBOOT_USE_FLASHBOOT_CRYPTO",
+            "value": false
+        }
+    },
+    "target_overrides": {
+        "CY8CPROTO_064_SB_M0_PSA": {
+            "flash_page_layout": true,
+            "mcuboot_sign_ec256": true,
+            "mcuboot_use_flashboot_crypto": true
+        }
+    }
+}

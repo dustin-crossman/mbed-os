@@ -15,11 +15,12 @@ class Pyocd(ProgrammerBase):
         self.target = None
         self.probe = None
 
-    def connect(self, target_name=None, interface=None):
+    def connect(self, target_name=None, interface=None, probe_id=None):
         """
         Connects to target using default debug interface.
         :param target_name: The target name.
         :param interface: Debug interface.
+        :param probe_id: Probe serial number.
         :return: True if connected successfully, otherwise False.
         """
         if interface:
@@ -31,7 +32,7 @@ class Pyocd(ProgrammerBase):
                 }
             else:
                 options = {}
-            self.session = ConnectHelper.session_with_chosen_probe(blocking=True, options=options)
+            self.session = ConnectHelper.session_with_chosen_probe(blocking=True, options=options, board_id=probe_id, unique_id=probe_id)
             if self.session is None:
                 return False
             self.board = self.session.board
@@ -110,18 +111,6 @@ class Pyocd(ProgrammerBase):
         if self.target is None:
             raise ValueError('Target is not initialized.')
         self.target.reset_and_halt(reset_type=reset_type)
-
-    def set_core(self, core_number):
-        """
-        Selects CPU core by number.
-        :param core_number: The core number.
-        """
-        if self.target is None:
-            raise ValueError('Target is not initialized.')
-        # self.target.selected_core = core_number
-        if core_number not in self.target.cores:
-            raise ValueError("Invalid core number")
-        self.target._selected_core = core_number
 
     def read8(self, address):
         """
@@ -264,5 +253,5 @@ class Pyocd(ProgrammerBase):
         """
         if self.session is None:
             raise ValueError('Debug session is not initialized.')
-        programmer = loader.FileProgrammer(self.session, chip_erase=False)
+        programmer = loader.FileProgrammer(self.session, chip_erase='sector')
         programmer.program(filename, base_address=address, file_format=file_format)

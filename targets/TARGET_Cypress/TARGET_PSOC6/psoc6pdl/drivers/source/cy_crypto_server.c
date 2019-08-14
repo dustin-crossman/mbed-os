@@ -146,7 +146,7 @@ cy_en_crypto_status_t Cy_Crypto_Server_Start_Base(cy_stc_crypto_config_t const *
         NULL, /* Cy_Crypto_Core_RsaVerify, */
     };
 
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_V1)
     {
         cy_CryptoFunctionTable = &cryptoV1BaseFuncs;
     }
@@ -212,7 +212,7 @@ cy_en_crypto_status_t Cy_Crypto_Server_Start_Extra(cy_stc_crypto_config_t const 
         NULL, /* Cy_Crypto_Core_RsaVerify, */
     };
 
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_V1)
     {
         cy_CryptoFunctionTable = &cryptoV1ExtraFuncs;
     }
@@ -278,7 +278,7 @@ cy_en_crypto_status_t Cy_Crypto_Server_Start_Full(cy_stc_crypto_config_t const *
         &Cy_Crypto_Core_Rsa_Verify,
     };
 
-    if (cy_device->cryptoVersion == 1u)
+    if (CY_CRYPTO_V1)
     {
         cy_CryptoFunctionTable = &cryptoV1FullFuncs;
     }

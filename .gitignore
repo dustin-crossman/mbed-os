@@ -15,6 +15,7 @@ mbed_settings.py
 BUILD/
 .mbed
 venv/
+OUT/
 
 # Mbedls
 .mbedls-mock.lock

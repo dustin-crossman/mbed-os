@@ -1,3 +1,4 @@
+import os
 import click
 import json
 from jwcrypto import jwk
@@ -10,36 +11,48 @@ kid_help = 'Key ID to define key slot number in the key storage. Key ID must be 
 @click.command()
 @click.option('-k', '--kid', 'kId',
               type=click.IntRange(CUSTOMER_KEY_ID_MIN, CUSTOMER_KEY_ID_MAX),
-              default=CUSTOMER_KEY_ID_MIN, 
+              default=CUSTOMER_KEY_ID_MIN,
               help=kid_help.format(str(list(range(CUSTOMER_KEY_ID_MIN, CUSTOMER_KEY_ID_MAX+1)))))
 @click.option('--jwk', 'jwKey',
-              type=click.File('w'), 
+              type=click.File('w'),
               default='key.json',
               help='Name of the key in JWK format to create.')
 @click.option('--pem-priv', 'pemPriv',
-              type=click.File('wb'), 
+              type=click.File('wb'),
               default=None,
               help='Name of the private key in PEM format to create. If it is not given PEM file will not be created.')
 @click.option('--pem-pub', 'pemPub',
-              type=click.File('wb'), 
+              type=click.File('wb'),
               default=None,
               help='Name of the public key in PEM format to create. If it is not given PEM file will not be created.')
-def main(kId, jwKey, pemPriv, pemPub):
-    key = jwk.JWK.generate(kty='EC', crv='P-256', use='sig')
-    
-    keyJson = json.loads(key.export(private_key=True))
-    keyJson['kid'] = str(kId)
-    
-    keyStr = json.dumps(keyJson, indent=4)
-    jwKey.write(keyStr)
+@click.option('--aes', 'aes',
+              type=click.File('w'),
+              default=None,
+              help='Name of the AES-128 key to create. If it is given only AES key wiil be created and JWK will not.')
+def main(kId, jwKey, pemPriv, pemPub, aes):
+    if aes == None:
+        key = jwk.JWK.generate(kty='EC', crv='P-256', use='sig')
 
-    if pemPriv != None:
-        pemPriv.write(key.export_to_pem(private_key=True, password=None))
+        keyJson = json.loads(key.export(private_key=True))
+        keyJson['kid'] = str(kId)
 
-    if pemPub != None:
-        pemPub.write(key.export_to_pem(private_key=False, password=None))
-    
-    print(keyStr)
+        keyStr = json.dumps(keyJson, indent=4)
+        jwKey.write(keyStr)
+
+        if pemPriv != None:
+            pemPriv.write(key.export_to_pem(private_key=True, password=None))
+
+        if pemPub != None:
+            pemPub.write(key.export_to_pem(private_key=False, password=None))
+
+        print(keyStr)
+    else:
+        key = os.urandom(16)
+        iv = os.urandom(16)
+        file = key.hex() + '\n' + iv.hex()
+        aes.write(file)
+        print('AES-128 KEY: ', key.hex(), sep='\t')
+        print('AES-128 IV:', iv.hex(), sep='\t')
 
 if __name__ == "__main__":
     main()

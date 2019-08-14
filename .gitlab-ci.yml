@@ -6,6 +6,44 @@ before_script:
     - curl.exe --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip
     - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
 
+# Run pyocd wrapper functional tests
+.pyocd_wrapper:
+  stage: test
+  tags:
+    - MBED_TEST
+  script:
+    - python -V
+    - virtualenv venv
+    - .\venv\Scripts\activate.ps1
+    - echo "[INFO] Getting latest pyocd"
+    - if (-Not(Test-Path pyocd)) { git clone http://git-ore.aus.cypress.com/repo/pyocd.git pyocd; cd pyocd; git checkout tags/AH_SECURITY_RELEASE_2; git branch; cd .. }
+    - echo "[INFO] Installing recquired python modules"
+    - pip install cmsis-pack-manager
+    - pip install colorama
+    - pip install intelhex
+    - pip install intervaltree
+    - pip install prettytable
+    - pip install pyelftools
+    - pip install pyusb
+    - pip install pywinusb
+    - pip install pyyaml
+    - pip install six
+    - pip install setuptools_scm_git_archive
+    - pip install setuptools_scm
+    - echo "[INFO] Installing pyocd"
+    - cd pyocd
+    - python setup.py install
+    - cd ..
+    - echo "[INFO] Start tests"
+    - cd .\targets\TARGET_Cypress\TARGET_PSOC6\sb-tools\test\
+    - mbedls -m 1907:CY8CPROTO_064_SB
+    - python -m unittest -v test_pyocd_wrapper.py
+    - deactivate
+  cache:
+    paths:
+      - venv
+      - pyocd
+
 # Compile TARGET_PSOC6
 test_mbed_062_crypto:
   stage: test
@@ -18,12 +56,12 @@ test_mbed_062_crypto:
     - mbed test -m CY8CPROTO_062_4343W -t GCC_ARM -n tests-mbedtls* -vv
 
 # Compile TARGET_PSOC6_PSA
-.test_mbed_064_psa:
+test_mbed_064_psa:
   stage: test
   tags:
     - MBED_TEST
   script:
     - mbedls -m 1907:CY8CPROTO_064_SB
-    - mbed test --compile -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n *psa* -vv
-    - mbed test --compile -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
-    - mbed test --run -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n *psa* -vv
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB_M0_PSA -m CY8CPROTO_064_SB_M0_PSA -t GCC_ARM -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -vv
+    - Add-Content OUT\.mbedignore "*"
+    - mbed test --compile --build OUT/CY8CPROTO_064_SB_PSA -m CY8CPROTO_064_SB_PSA -t GCC_ARM -n tests-psa-crypto_access* -DUSE_PSA_TEST_PARTITIONS -DUSE_CRYPTO_ACL_TEST -v --run

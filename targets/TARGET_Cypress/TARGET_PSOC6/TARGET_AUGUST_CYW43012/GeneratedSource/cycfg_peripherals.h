@@ -60,23 +60,23 @@ extern "C" {
 #define UART_IRQ scb_6_interrupt_IRQn
 #define I2C_HW SCB7
 #define I2C_IRQ scb_7_interrupt_IRQn
-#define SMIF_HW SMIF0
-#define SMIF_IRQ smif_interrupt_IRQn
-#define SMIF_MEMORY_MODE_ALIGMENT_ERROR (0UL)
-#define SMIF_RX_DATA_FIFO_UNDERFLOW (0UL)
-#define SMIF_TX_COMMAND_FIFO_OVERFLOW (0UL)
-#define SMIF_TX_DATA_FIFO_OVERFLOW (0UL)
-#define SMIF_RX_FIFO_TRIGEER_LEVEL (0UL)
-#define SMIF_TX_FIFO_TRIGEER_LEVEL (0UL)
-#define SMIF_DATALINES0_1 (1UL)
-#define SMIF_DATALINES2_3 (1UL)
-#define SMIF_DATALINES4_5 (0UL)
-#define SMIF_DATALINES6_7 (0UL)
-#define SMIF_SS0 (1UL)
-#define SMIF_SS1 (0UL)
-#define SMIF_SS2 (0UL)
-#define SMIF_SS3 (0UL)
-#define SMIF_DESELECT_DELAY 7
+#define QSPI_HW SMIF0
+#define QSPI_IRQ smif_interrupt_IRQn
+#define QSPI_MEMORY_MODE_ALIGMENT_ERROR (0UL)
+#define QSPI_RX_DATA_FIFO_UNDERFLOW (0UL)
+#define QSPI_TX_COMMAND_FIFO_OVERFLOW (0UL)
+#define QSPI_TX_DATA_FIFO_OVERFLOW (0UL)
+#define QSPI_RX_FIFO_TRIGEER_LEVEL (0UL)
+#define QSPI_TX_FIFO_TRIGEER_LEVEL (0UL)
+#define QSPI_DATALINES0_1 (1UL)
+#define QSPI_DATALINES2_3 (1UL)
+#define QSPI_DATALINES4_5 (0UL)
+#define QSPI_DATALINES6_7 (0UL)
+#define QSPI_SS0 (1UL)
+#define QSPI_SS1 (0UL)
+#define QSPI_SS2 (0UL)
+#define QSPI_SS3 (0UL)
+#define QSPI_DESELECT_DELAY 7
 #define MOT_PWM_1_HW TCPWM1
 #define MOT_PWM_1_NUM 16UL
 #define MOT_PWM_1_MASK (1UL << 16)
@@ -92,7 +92,7 @@ extern const cy_stc_sar_config_t ADC_config;
 extern const cy_stc_scb_uart_config_t BT_UART_config;
 extern const cy_stc_scb_uart_config_t UART_config;
 extern const cy_stc_scb_i2c_config_t I2C_config;
-extern const cy_stc_smif_config_t SMIF_config;
+extern const cy_stc_smif_config_t QSPI_config;
 extern const cy_stc_tcpwm_pwm_config_t MOT_PWM_1_config;
 extern const cy_stc_tcpwm_pwm_config_t MOT_PWM_2_config;
 

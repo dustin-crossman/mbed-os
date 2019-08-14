@@ -19,6 +19,11 @@
  */
 
 /*
+ * \file aes_alt.h
+ * \ version 1.0
+ *
+ * \brief This file contains AES functions implementation.
+ *
  *  The AES block cipher was designed by Vincent Rijmen and Joan Daemen.
  *
  *  http://csrc.nist.gov/encryption/aes/rijndael/Rijndael.pdf
@@ -39,6 +44,12 @@
 #include "mbedtls/platform.h"
 #include "mbedtls/platform_util.h"
 
+/* Parameter validation macros based on platform_util.h */
+#define AES_VALIDATE_RET( cond )    \
+    MBEDTLS_INTERNAL_VALIDATE_RET( cond, MBEDTLS_ERR_AES_BAD_INPUT_DATA )
+#define AES_VALIDATE( cond )        \
+    MBEDTLS_INTERNAL_VALIDATE( cond )
+
 #if defined(MBEDTLS_AES_ALT)
 
 #include "psoc6_utils.h"
@@ -46,6 +57,8 @@
 
 void mbedtls_aes_init( mbedtls_aes_context *ctx )
 {
+    AES_VALIDATE( ctx != NULL );
+
     cy_reserve_crypto(CY_CRYPTO_COMMON_HW);
 
     Cy_Crypto_Core_MemSet(CRYPTO, ctx, 0u, sizeof( mbedtls_aes_context ) );
@@ -66,6 +79,8 @@ void mbedtls_aes_free( mbedtls_aes_context *ctx )
 #if defined(MBEDTLS_CIPHER_MODE_XTS)
 void mbedtls_aes_xts_init( mbedtls_aes_xts_context *ctx )
 {
+    AES_VALIDATE( ctx != NULL );
+
     mbedtls_aes_init( &ctx->crypt );
     mbedtls_aes_init( &ctx->tweak );
 }
@@ -117,6 +132,9 @@ exit:
 int mbedtls_aes_setkey_enc( mbedtls_aes_context *ctx, const unsigned char *key,
                     unsigned int keybits )
 {
+    AES_VALIDATE_RET( ctx != NULL );
+    AES_VALIDATE_RET( key != NULL );
+
     return aes_set_keys( ctx, key, keybits );
 }
 
@@ -126,6 +144,9 @@ int mbedtls_aes_setkey_enc( mbedtls_aes_context *ctx, const unsigned char *key,
 int mbedtls_aes_setkey_dec( mbedtls_aes_context *ctx, const unsigned char *key,
                     unsigned int keybits )
 {
+    AES_VALIDATE_RET( ctx != NULL );
+    AES_VALIDATE_RET( key != NULL );
+
     return aes_set_keys( ctx, key, keybits );
 }
 
@@ -163,6 +184,9 @@ int mbedtls_aes_xts_setkey_enc( mbedtls_aes_xts_context *ctx,
     const unsigned char *key1, *key2;
     unsigned int key1bits, key2bits;
 
+    AES_VALIDATE_RET( ctx != NULL );
+    AES_VALIDATE_RET( key != NULL );
+
     ret = mbedtls_aes_xts_decode_keys( key, keybits, &key1, &key1bits,
                                        &key2, &key2bits );
     if( ret != 0 )
@@ -184,6 +208,9 @@ int mbedtls_aes_xts_setkey_dec( mbedtls_aes_xts_context *ctx,
     int ret;
     const unsigned char *key1, *key2;
     unsigned int key1bits, key2bits;
+
+    AES_VALIDATE_RET( ctx != NULL );
+    AES_VALIDATE_RET( key != NULL );
 
     ret = mbedtls_aes_xts_decode_keys( key, keybits, &key1, &key1bits,
                                        &key2, &key2bits );
@@ -272,6 +299,12 @@ int mbedtls_aes_crypt_ecb( mbedtls_aes_context *ctx,
                     const unsigned char input[16],
                     unsigned char output[16] )
 {
+    AES_VALIDATE_RET( ctx != NULL );
+    AES_VALIDATE_RET( input != NULL );
+    AES_VALIDATE_RET( output != NULL );
+    AES_VALIDATE_RET( mode == MBEDTLS_AES_ENCRYPT ||
+                      mode == MBEDTLS_AES_DECRYPT );
+
     if( mode == MBEDTLS_AES_ENCRYPT )
         return( mbedtls_internal_aes_encrypt( ctx, input, output ) );
     else
@@ -293,6 +326,13 @@ int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
 
     int ret = 0;
     cy_en_crypto_status_t status;
+
+    AES_VALIDATE_RET( ctx != NULL );
+    AES_VALIDATE_RET( mode == MBEDTLS_AES_ENCRYPT ||
+                      mode == MBEDTLS_AES_DECRYPT );
+    AES_VALIDATE_RET( iv != NULL );
+    AES_VALIDATE_RET( input != NULL );
+    AES_VALIDATE_RET( output != NULL );
 
     if( length % CY_CRYPTO_AES_BLOCK_SIZE )
         return( MBEDTLS_ERR_AES_INVALID_INPUT_LENGTH );
@@ -420,6 +460,13 @@ int mbedtls_aes_crypt_xts( mbedtls_aes_xts_context *ctx,
     unsigned char prev_tweak[16];
     unsigned char tmp[16];
 
+    AES_VALIDATE_RET( ctx != NULL );
+    AES_VALIDATE_RET( mode == MBEDTLS_AES_ENCRYPT ||
+                      mode == MBEDTLS_AES_DECRYPT );
+    AES_VALIDATE_RET( data_unit != NULL );
+    AES_VALIDATE_RET( input != NULL );
+    AES_VALIDATE_RET( output != NULL );
+
     /* Data units must be at least 16 bytes long. */
     if( length < 16 )
         return MBEDTLS_ERR_AES_INVALID_INPUT_LENGTH;
@@ -521,6 +568,17 @@ int mbedtls_aes_crypt_cfb128( mbedtls_aes_context *ctx,
     int c;
     size_t n = *iv_off;
 
+    AES_VALIDATE_RET( ctx != NULL );
+    AES_VALIDATE_RET( mode == MBEDTLS_AES_ENCRYPT ||
+                      mode == MBEDTLS_AES_DECRYPT );
+    AES_VALIDATE_RET( iv_off != NULL );
+    AES_VALIDATE_RET( iv != NULL );
+    AES_VALIDATE_RET( input != NULL );
+    AES_VALIDATE_RET( output != NULL );
+
+    if( n > 15 )
+        return (MBEDTLS_ERR_AES_BAD_INPUT_DATA);
+
     if( mode == MBEDTLS_AES_DECRYPT )
     {
         while( length-- )
@@ -566,6 +624,13 @@ int mbedtls_aes_crypt_cfb8( mbedtls_aes_context *ctx,
     unsigned char c;
     unsigned char ov[17];
 
+    AES_VALIDATE_RET( ctx != NULL );
+    AES_VALIDATE_RET( mode == MBEDTLS_AES_ENCRYPT ||
+                      mode == MBEDTLS_AES_DECRYPT );
+    AES_VALIDATE_RET( iv != NULL );
+    AES_VALIDATE_RET( input != NULL );
+    AES_VALIDATE_RET( output != NULL );
+
     while( length-- )
     {
         memcpy( ov, iv, 16 );
@@ -599,6 +664,15 @@ int mbedtls_aes_crypt_ofb( mbedtls_aes_context *ctx,
 {
     int ret = 0;
     size_t n = *iv_off;
+
+    AES_VALIDATE_RET( ctx != NULL );
+    AES_VALIDATE_RET( iv_off != NULL );
+    AES_VALIDATE_RET( iv != NULL );
+    AES_VALIDATE_RET( input != NULL );
+    AES_VALIDATE_RET( output != NULL );
+
+    if( n > 15 )
+        return (MBEDTLS_ERR_AES_BAD_INPUT_DATA);
 
     while( length-- )
     {
@@ -634,6 +708,13 @@ int mbedtls_aes_crypt_ctr( mbedtls_aes_context *ctx,
 {
     int c, i;
     size_t n = *nc_off;
+
+    AES_VALIDATE_RET( ctx != NULL );
+    AES_VALIDATE_RET( nc_off != NULL );
+    AES_VALIDATE_RET( nonce_counter != NULL );
+    AES_VALIDATE_RET( stream_block != NULL );
+    AES_VALIDATE_RET( input != NULL );
+    AES_VALIDATE_RET( output != NULL );
 
     if ( n > 0x0F )
         return( MBEDTLS_ERR_AES_BAD_INPUT_DATA );
