@@ -25,12 +25,13 @@ CyH4TransportDriver::CyH4TransportDriver(PinName tx, PinName rx, PinName cts, Pi
 
 void CyH4TransportDriver::bt_host_wake_irq_handler(void)
 {
+    /* On host wake ISR, enable UART Rx interrupt. Any incoming UART Rx data will trigger
+     * on_controller_irq handler and we don't need to explicitly call on_controller_irq from
+     * this host wake handler */
     uart.attach(
         callback(this, &CyH4TransportDriver::on_controller_irq),
         SerialBase::RxIrq
     );
-
-    CyH4TransportDriver::on_controller_irq();
 }
 
 void CyH4TransportDriver::initialize()
