@@ -68,7 +68,7 @@ typedef SemaphoreHandle_t cy_mutex_t;
 typedef TaskHandle_t cy_thread_t;
 typedef EventGroupHandle_t cy_event_t;
 typedef TimerHandle_t cy_timer_t;
-typedef TimerHandle_t cy_timer_callback_arg_t;
+typedef uint32_t cy_timer_callback_arg_t;
 typedef void *cy_thread_arg_t;
 typedef uint32_t cy_time_t;
 typedef BaseType_t cy_rtos_error_t;
