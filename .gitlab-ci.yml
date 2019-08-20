@@ -112,7 +112,7 @@ win_IAR_064S2_tests:
   script:
     - mbed test --compile -m CY8CKIT_064S2_4343W -t IAR -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v 
 
-.win_IAR_064_tests:
+win_IAR_064_tests:
   stage: test
   tags:
     - MBED_TEST
@@ -139,7 +139,7 @@ win_IAR_064S2_tests:
 # TESTS ON MAC OS X v 10.14
     
     
-.mac_GCC_ARM_064_tests:
+mac_GCC_ARM_064_tests:
   stage: test
   tags:
     - MBED_TEST_MAC1014
@@ -190,7 +190,7 @@ mac_GCC_ARM_064S2_tests:
   script: 
     - mbed test --compile -m CY8CKIT_064S2_4343W -t GCC_ARM -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv
 
-.mac_ARMC6_064_tests:
+mac_ARMC6_064_tests:
   stage: test
   tags:
     - MBED_TEST_MAC1014
