@@ -274,10 +274,10 @@ __STATIC_INLINE void init_cycfg_power(void)
 
      /* Configure core regulator */
      #if CY_CFG_PWR_USING_LDO
-     Cy_SysPm_LdoSetVoltage(CY_SYSPM_LDO_VOLTAGE_LP);
-     Cy_SysPm_LdoSetMode(CY_SYSPM_LDO_MODE_NORMAL);
+     //Cy_SysPm_LdoSetVoltage(CY_SYSPM_LDO_VOLTAGE_LP);
+     //Cy_SysPm_LdoSetMode(CY_SYSPM_LDO_MODE_NORMAL);
      #else
-     Cy_SysPm_BuckEnable(CY_SYSPM_BUCK_OUT1_VOLTAGE_LP);
+     //Cy_SysPm_BuckEnable(CY_SYSPM_BUCK_OUT1_VOLTAGE_LP);
      #endif /* CY_CFG_PWR_USING_LDO */
      /* Configure PMIC */
      Cy_SysPm_UnlockPmic();
