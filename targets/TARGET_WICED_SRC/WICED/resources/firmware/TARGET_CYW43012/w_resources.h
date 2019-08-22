@@ -2,7 +2,7 @@
 #define INCLUDED_RESOURCES_H_
 #include "wiced_resource.h"
 extern const resource_hnd_t wifi_firmware_image;
-extern const char wifi_firmware_image_data[428868];
+extern const char wifi_firmware_image_data[493334];
 extern const resource_hnd_t wifi_firmware_clm_blob;
 extern const char wifi_firmware_clm_blob_image_data[1104];
 #endif
