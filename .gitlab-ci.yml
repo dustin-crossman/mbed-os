@@ -2,8 +2,8 @@ stages:
   - test
 before_script:
     - pwd
-    - python -m pip install -r ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/requirements.txt
     - python -m pip install -r ./requirements.txt
+    - mkdir ./targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
     - curl.exe --insecure --connect-time 10 --show-error https://confluence.cypress.com/download/attachments/71434156/dev_default_keys.zip?api=v2 -o targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip
     - Expand-Archive targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/def_keys.zip -DestinationPath targets/TARGET_Cypress/TARGET_PSOC6/sb-tools/keys/
 
