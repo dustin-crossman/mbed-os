@@ -7,6 +7,9 @@ These files are relevant to CY8CPROTO_064_SB target.
 
 # DEVICE PROVISIONING
 
+## Prerequsites:
+Download provisionig scripts from Cypress Git repository and place them in ./sb-tools.
+
 ## 1.   Generate new keys by executing the following commands from ./keys:
 
     *Create keys for image signing:*
@@ -36,11 +39,11 @@ Options:
 
 * To create packet for CY8CPROTO_064_SB target using single-stage policy (CM4 only):
     
-        python provisioning_packet.py --policy ../policy/policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json --devcert example_cert.pem
+        python provisioning_packet.py --policy ../policy/policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json --devcert ../policy/example_cert.pem
         
 * To use external memory (via SMIF) as staging(upgrade) area (slot_1) of NSPE (CM4) image use policy file with corresponding name:
 
-        python provisioning_packet.py --policy ../policy/policy_single_stage_CM4_smif.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json --devcert example_cert.pem
+        python provisioning_packet.py --policy ../policy/policy_single_stage_CM4_smif.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json --devcert ../policy/example_cert.pem
         
     The certificate in above examples is signed with OEM key from ./prebuild folder.
         
