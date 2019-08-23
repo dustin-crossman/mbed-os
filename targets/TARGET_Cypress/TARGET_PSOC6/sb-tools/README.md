@@ -36,11 +36,11 @@ Options:
 
 * To create packet for CY8CPROTO_064_SB target using single-stage policy (CM4 only):
     
-        python provisioning_packet.py --policy policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json --devcert example_cert.pem
+        python provisioning_packet.py --policy ../policy/policy_single_stage_CM4.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json --devcert example_cert.pem
         
 * To use external memory (via SMIF) as staging(upgrade) area (slot_1) of NSPE (CM4) image use policy file with corresponding name:
 
-        python provisioning_packet.py --policy policy_single_stage_CM4_smif.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json --devcert example_cert.pem
+        python provisioning_packet.py --policy ../policy/policy_single_stage_CM4_smif.json --out ../packet --cyboot ../prebuild/CyBootloader_Release/CypressBootloader_CM0p.jwt --ckey ../keys/USERAPP_CM4_KEY.json --devcert example_cert.pem
         
     The certificate in above examples is signed with OEM key from ./prebuild folder.
         
@@ -87,7 +87,7 @@ The upgrade images types are determined by the following policy setting (firmwar
 - **_"encrypt_key_id":_** 1, - should remain unchanged, means that Device Key will be used in ECDH/HKDF protocol
 
 Requirements:
-- Policy with **_smif.json** from prepare/ folder should be used.
+- Policy with **_smif.json** from policy/ folder should be used.
 For encrypted image:
 - aes.key generated, as described in **DEVICE_PROVISIONING - 1**
 - dev_pub_key.pem must be placed in keys/ folder (this key is generated in provisioning procedure)
