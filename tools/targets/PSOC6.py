@@ -55,6 +55,10 @@ SPE_IMAGE_ID = 1
 NSPE_IMAGE_ID = 16
 SMIF_MEM_MAP_START = 0x18000000
 
+class AddSignatureError(Exception):
+    """ A simple class that represents all the exceptions associated with
+    adding signature to Secure Boot image
+    """
 
 # Patch Cypress hex file:
 # - update checksum
@@ -130,6 +134,8 @@ def complete_func(message_func, elf0, hexf0, hexf1=None, dest=None):
 
 # Find Cortex M0 image.
 def find_cm0_image(toolchain, resources, elf, hexf, hex_filename):
+    if hex_filename is None:
+        return None
     # Locate user-specified image
     from tools.resources import FileType
     hex_files = resources.get_file_paths(FileType.HEX)
@@ -148,6 +154,17 @@ def find_cm0_image(toolchain, resources, elf, hexf, hex_filename):
 
 # check if policy parameters are consistent
 def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=None):
+    """
+    Function checks consistency of parameters presented in
+    policy file used for build of Secure Boot enabled target.
+    :param toolchain: Toolchain object of current build session
+    :param fw_cyb: CyBootloader firmware description from policy
+    :param target_data: Object contains description of
+                        processing target from target.json
+    :param fw_spe: CM0p firmware descpription object from policy
+    :param fw_nspe: CM4 firmware descpription object from policy
+    :return: List of slots and image id corresponding to them
+    """
     slot0 = None
     slot1 = None
 
@@ -158,10 +175,10 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
         if not (fw_cyb["launch"] == img_id):
             # may be PSA NSPE part
             if not fw_cyb["launch"] == SPE_IMAGE_ID:
-                toolchain.notify.debug("[PSOC6.sign_image] WARNING: Image ID = " + str(img_id) +
-                                       " does not correspond to CyBootloader launch ID = " + str(fw_cyb["launch"]))
+                toolchain.notify.debug("[PSOC6.sign_image] WARNING: ID of build image " + str(img_id) +
+                                       " does not correspond launch ID in CyBootloader - " + str(fw_cyb["launch"]))
             else:
-                toolchain.notify.info("[PSOC6.sign_image] INFO: NSPE image ID = " + str(img_id) +
+                toolchain.notify.info("[PSOC6.sign_image] INFO: NSPE image ID is " + str(img_id) +
                                       ". It will be launched by SPE part.")
 
         # check slots addresses and sizes if upgrade is set to True
@@ -169,121 +186,106 @@ def check_slots_integrity(toolchain, fw_cyb, target_data, fw_spe=None, fw_nspe=N
             if slot["type"] == "BOOT":
                 slot0 = slot
 
-            if fw_nspe["upgrade"] and True:
+            if fw_nspe["upgrade"] is True:
                 slot1 = slot
-                smif_id = fw_nspe["smif_id"]
                 if slot["type"] == "UPGRADE":
-                    try:
-                        if fw_nspe["encrypt"] and True:
-                            # mark slot1 image as one, that should be encrypted
-                            slot1.update({'encrypt': True})
-                            toolchain.notify.info("[PSOC6.sign_image] INFO: UPGRADE image for NSPE will"
-                                                  " be ENCRYPTED per policy settings.")
-                    except KeyError:
-                        None
+                    if fw_nspe.get("encrypt") is True:
+                        # mark slot1 image as one, that should be encrypted
+                        slot1.update({'encrypt': True})
+                        toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE NSPE will"
+                                              " be ENCRYPTED per policy settings.")
+                    else:
+                        pass
             else:
-                toolchain.notify.info("[PSOC6.sign_image] INFO: UPGRADE image will not"
-                                      " be generated per policy settings.")
+                toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
+                                    " be built per policy settings.")
                 break
-            
         if slot0 is None:
-            toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section was not found in policy resources.")
-            raise Exception("EXCEPTION: Imgtool execution finished with errors!")
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section not found in policy resources")
+            raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
 
     else:
-        # check if PSA targets flash map corresponds to slot's addresses and sizes in policy
+        # check if PSA targets flash map correspond to slots addresses and sizes in policy
         if not (int(target_data["overrides"]["secure-rom-start"], 16) - MCUBOOT_HEADER_SIZE) ==\
                 int(fw_spe["resources"][0]["address"]):
-            toolchain.notify.debug("[PSOC6.sign_image] WARNING: SPE start_address = " + hex(int(target_data["overrides"]["secure-rom-start"],16)) +
-                                   " does not match BOOT slot start_address = " + hex(int(fw_spe["resources"][0]["address"])+MCUBOOT_HEADER_SIZE) + " defined in policy. "
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: SPE start address "
+                                   "does not correspond BOOT slot start address defined in policy. "
                                    "Check if MCUboot header offset 0x400 is included in SPE flash start")
 
         if not (int(target_data["overrides"]["non-secure-rom-start"], 16) - MCUBOOT_HEADER_SIZE) ==\
                 int(fw_nspe["resources"][0]["address"]):
-            toolchain.notify.debug("[PSOC6.sign_image] WARNING: NSPE start_address = " + hex(int(target_data["overrides"]["non-secure-rom-start"],16)) +
-                                   " does not match BOOT slot start_address = " + hex(int(fw_spe["resources"][0]["address"])+MCUBOOT_HEADER_SIZE) + " defined in policy. "
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: NSPE start address "
+                                   "does not correspond BOOT slot start address defined in policy. "
                                    "Check if MCUboot header offset 0x400 is included in NSPE flash start")
 
         if (int(target_data["overrides"]["secure-rom-size"], 16) + MCUBOOT_HEADER_SIZE) >\
                 int(fw_spe["resources"][0]["size"]):
-            toolchain.notify.debug("[PSOC6.sign_image] WARNING: SPE flash_size = " + hex(int(target_data["overrides"]["secure-rom-size"],16)) +
-                                   " does not fit in BOOT slot_size = " + hex(int(fw_spe["resources"][0]["size"])-MCUBOOT_HEADER_SIZE) + " defined in policy.")
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: SPE flash size "
+                                   "does not fit in BOOT slot size defined in policy.")
 
         if (int(target_data["overrides"]["non-secure-rom-size"], 16) + MCUBOOT_HEADER_SIZE) >\
                 int(fw_nspe["resources"][0]["size"]):
-            toolchain.notify.debug("[PSOC6.sign_image] WARNING: NSPE flash_size = " + hex(int(target_data["overrides"]["non-secure-rom-size"],16)) +
-                                   " does not fit in BOOT slot_size = " + hex(int(fw_spe["resources"][0]["size"])-MCUBOOT_HEADER_SIZE) + " defined in policy.")
+            toolchain.notify.debug("[PSOC6.sign_image] WARNING: NSPE flash size "
+                                   "does not fit in BOOT slot size defined in policy.")
 
         img_id = fw_spe["id"]
         # check dual stage scheme
         if img_id != 1:
-            toolchain.notify.debug("[PSOC6.sign_image] ERROR: SPE Image ID = " + str(img_id) +
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: Image ID of SPE image"
                                    " is not equal to 1!")
-            raise Exception("EXCEPTION: Imgtool execution finished with errors!")
+            raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
 
         if not (fw_cyb["launch"] == img_id):
-            toolchain.notify.debug("[PSOC6.sign_image] WARNING: Image's ID = " + str(img_id) +
-                                   " does not correspond to CyBootloader launch ID = " + str(fw_cyb["launch"]))
-            raise Exception("EXCEPTION: Imgtool execution finished with errors!")
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: ID of build image"
+                                   " does not correspond launch ID in CyBootloader!")
+            raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
 
         if not (fw_spe["launch"] == fw_nspe["id"]):
-            toolchain.notify.debug("[PSOC6.sign_image] ERROR: NSPE image ID = " + str(fw_nspe["id"]) +
-                                   " does not correspond SPE launch_ID = " + str(fw_spe["launch"]))
-            raise Exception("EXCEPTION: Imgtool execution finished with errors!")
-
+            toolchain.notify.debug("[PSOC6.sign_image] ERROR: ID of NSPE image"
+                                   " does not correspond launch ID in SPE part!")
+            raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
 
         # check slots addresses and sizes if upgrade is set to True
         for slot in fw_spe["resources"]:
             if slot["type"] == "BOOT":
                 slot0 = slot
-            if fw_spe["upgrade"] and True:
+            if fw_spe["upgrade"] is True:
                 if slot["type"] == "UPGRADE":
                     slot1 = slot
-                    smif_id = fw_spe["smif_id"]
-                    try:
-                        if fw_spe["encrypt"] and True:
-                            # mark slot1 image as one, that should be encrypted
-                            slot1.update({'encrypt': True})
-                            toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE SPE will"
-                                                  " be ENCRYPTED per policy settings.")
-                    except KeyError:
-                        None                    
+                    if fw_spe.get("encrypt") is True:
+                        # mark slot1 image as one, that should be encrypted
+                        slot1.update({'encrypt': True})
+                        toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE SPE will"
+                                            " be ENCRYPTED per policy settings.")
+                    else:
+                        pass
             else:
-                toolchain.notify.info("[PSOC6.sign_image] INFO: Upgrade is disabled. Image for UPGRADE will not"
-                                      " be generated per policy settings.")
-                break
-
+                toolchain.notify.info("[PSOC6.sign_image] INFO: Image for UPGRADE will not"
+                                      " be produced per policy settings.")
     if slot0 is None:
-        toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section was not found in policy resources.")
-        raise Exception("EXCEPTION: Imgtool execution finished with errors!")
+        toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT section not found in policy resources")
+        raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
 
     if slot1 is not None:
         # bigger or equal to 0x18000000 in hex is a start of SMIF memory
-        if not(int(smif_id) == 0):
-            toolchain.notify.info("[PSOC6.sign_image] INFO: SMIF is enabled. UPGRADE slot can be placed in external flash.")
-            if(int(smif_id) > 2):
-                toolchain.notify.info("[PSOC6.sign_image] WARNING: SMIF ID is out of range [1, 2] supported by CypressBootloder."
-                                      "Either change it to 1, to 2 or make sure cycfg_qspi_memslot.c is updated respectively "
-                                      "in SPE for second-stage bootloading.")
-            if (slot1["address"] >= SMIF_MEM_MAP_START):
-                toolchain.notify.info("[PSOC6.sign_image] INFO: UPGRADE slot will reside in external flash at address = " + hex(int(slot1["address"])))
-        else:
-            if (slot1["address"] >= SMIF_MEM_MAP_START):
-                toolchain.notify.debug("[PSOC6.sign_image] ERROR: Slot_1 start_address = " + hex(int(slot1["address"])) +
-                                        " but SMIF is not initialized (smif_id = 0). UPGRADE image will not be generated.")
-                raise Exception("EXCEPTION: Imgtool execution finished with errors!")
+        if slot1["address"] >= SMIF_MEM_MAP_START:
+            toolchain.notify.info("[PSOC6.sign_image] INFO: UPGRADE slot will be resided in external flash")
 
         if slot0["size"] != slot1["size"]:
             toolchain.notify.debug("[PSOC6.sign_image] WARNING: BOOT and UPGRADE slots sizes are not equal")
 
-        return [slot0, slot1, img_id]
+        return (slot0, slot1, img_id)
     else:
-        return [slot0, None, img_id]
+        return (slot0, None, img_id)
 
 
-# Resolve Secure Boot policy sections considering target
 def process_target(toolchain, target):
-
+    """
+    Gathers and process information about target being built
+    :param toolchain: Toolchain object of current build session
+    :param target: Name of target being built
+    :return: List with all data needed for adding signature
+    """
     targets_json = Path("targets/targets.json")
     cy_targets = Path("targets/TARGET_Cypress/TARGET_PSOC6/")
     sb_params_file_name = Path("secure_image_parameters.json")
@@ -297,7 +299,7 @@ def process_target(toolchain, target):
         root_dir = root_dir / 'mbed-os'
         if not os.path.isfile(str(mbed_os_targets)):
             toolchain.notify.debug("[PSOC6.sign_image] ERROR: targets.json not found!")
-            raise Exception("imgtool finished execution with errors!")
+            raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
 
     with open(str(mbed_os_targets)) as j:
         json_str = j.read()
@@ -314,7 +316,7 @@ def process_target(toolchain, target):
             f.close()
     else:
         toolchain.notify.debug("[PSOC6.sign_image] ERROR: secure_image_parametest.json not found!")
-        raise Exception("imgtool finished execution with errors!")
+        raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
 
     sdk_path = root_dir / sb_config["sdk_path"]
 
@@ -322,7 +324,7 @@ def process_target(toolchain, target):
 
     if not os.path.isfile(str(priv_key_path)):
         toolchain.notify.debug("[PSOC6.sign_image] ERROR: Private key file not found in " + str(priv_key_path))
-        raise Exception("imgtool finished execution with errors!")
+        raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
 
     if "_PSA" in target:
         # assume dual stage bootloading scheme
@@ -361,35 +363,38 @@ def process_target(toolchain, target):
 
     target_sig_data = [{"img_data": sb_config["boot0"], "slot_data": slots[0],
                         "key_file": sb_config["priv_key_file"], "sdk_path": sdk_path, "id": slots[2]}]
-    
-    if slots[1] is not None:        
+
+    if slots[1] is not None:
         target_sig_data.append({"img_data": sb_config["boot1"], "slot_data": slots[1],
                                 "key_file": sb_config["priv_key_file"], "sdk_path": sdk_path, "id": slots[2]})
         # check if slot1 image sould be encrypted
-        try:                                
-            if slots[1]["encrypt"] is True:
-            
-                dev_pub_key = sdk_path / Path(sb_config["dev_pub_key_file"])
-                if not os.path.isfile(str(dev_pub_key)):
-                    toolchain.notify.debug("[PSOC6.sign_image] ERROR: Device public key file not found in " + str(dev_pub_key))
-                    raise Exception("imgtool finished execution with errors!")            
+        if slots[1].get("encrypt") is True:
 
-                aes_key_file = sdk_path / Path(sb_config["aes_key_file"])
-                if not os.path.isfile(str(aes_key_file)):
-                    toolchain.notify.debug("[PSOC6.sign_image] ERROR: AES-128 key file not found in " + str(aes_key_file))
-                    raise Exception("imgtool finished execution with errors!")   
+            dev_pub_key = sdk_path / Path(sb_config["dev_pub_key_file"])
+            if not os.path.isfile(str(dev_pub_key)):
+                toolchain.notify.debug("[PSOC6.sign_image] ERROR: Device public key file not found in " + str(dev_pub_key))
+                raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
 
-                target_sig_data[1].update({"aes_key": sb_config["aes_key_file"], "dev_pub_key": sb_config["dev_pub_key_file"]})
+            aes_key_file = sdk_path / Path(sb_config["aes_key_file"])
+            if not os.path.isfile(str(aes_key_file)):
+                toolchain.notify.debug("[PSOC6.sign_image] ERROR: AES-128 key file not found in " + str(aes_key_file))
+                raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
 
-        except KeyError:
-            toolchain.notify.info("[PSOC6.sign_image] INFO: Image for slot UPGRADE would not be encrypted per policy settings")
+            target_sig_data[1].update({"aes_key": sb_config["aes_key_file"], "dev_pub_key": sb_config["dev_pub_key_file"]})
+
+        else:
+            toolchain.notify.info("[PSOC6.sign_image] bal balalalal INFO: Image for slot UPGRADE would not be encrypted per policy settings")
 
     return target_sig_data
 
 
-# Sign binary image using imgtool
-def sign_image(toolchain, elf0, binf, hexf1=None):
-
+def sign_image(toolchain, binf):
+    """
+    Adds signature to a binary file being built,
+    prepares some intermediate binary artifacts.
+    :param toolchain: Toolchain object of current build session
+    :param binf: Binary file created for target
+    """
     target_sig_data = None
     # reserve name for separate NSPE image
     out_cm4_hex = binf[:-4] + "_cm4.hex"
@@ -405,41 +410,41 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
 
     if target_sig_data is None:
         toolchain.notify.debug("[PSOC6.sign_image] ERROR: Target not found!")
-        raise Exception("imgtool finished execution with errors!")
+        raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
 
     for slot in target_sig_data:
         # first check if image for slot under processing should be encrypted
-        try:
-            if slot["slot_data"]["encrypt"] is True:
-                # call encrypt_img to perform encryption
-                args = [sys.executable, str(slot["sdk_path"] / "encrypted_image_runner.py"),
-                                        "--sdk-path", str(slot["sdk_path"]), "--hex-file", os.getcwd() + '/' + mbed_hex,
-                                        "--key-priv", str(slot["sdk_path"] / slot["key_file"]),
-                                        "--key-pub", str(slot["sdk_path"] / slot["dev_pub_key"]),
-                                        "--key-aes", str(slot["sdk_path"] / slot["aes_key"]),
-                                        "--ver", str(slot["img_data"]["VERSION"]), "--img-id", str(slot["id"]),
-                                        "--rlb-count", str(slot["img_data"]["ROLLBACK_COUNTER"]),
-                                        "--slot-size", str(hex(slot["slot_data"]["size"])),
-                                        "--img-offset", str(slot["slot_data"]["address"])]
-                if slot["slot_data"]["type"] != "BOOT":
-                    args.append("--pad")
-                process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if slot["slot_data"].get("encrypt") is True:
+            print("WE ARE IN ECTRYPTION BLOCK")
+            # call encrypt_img to perform encryption
+            args = [sys.executable, str(slot["sdk_path"] / "encrypted_image_runner.py"),
+                                    "--sdk-path", str(slot["sdk_path"]), "--hex-file", os.getcwd() + '/' + mbed_hex,
+                                    "--key-priv", str(slot["sdk_path"] / slot["key_file"]),
+                                    "--key-pub", str(slot["sdk_path"] / slot["dev_pub_key"]),
+                                    "--key-aes", str(slot["sdk_path"] / slot["aes_key"]),
+                                    "--ver", str(slot["img_data"]["VERSION"]), "--img-id", str(slot["id"]),
+                                    "--rlb-count", str(slot["img_data"]["ROLLBACK_COUNTER"]),
+                                    "--slot-size", str(hex(slot["slot_data"]["size"])),
+                                    "--img-offset", str(slot["slot_data"]["address"])]
+            if slot["slot_data"]["type"] != "BOOT":
+                args.append("--pad")
+            process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-                # catch standard process pipes outputs
-                stderr = process.communicate()[1]
-                stdout = process.communicate()[0]
-                rc = process.wait()
-                print(stdout.decode("utf-8"))
+            # catch standard process pipes outputs
+            stderr = process.communicate()[1]
+            stdout = process.communicate()[0]
+            rc = process.wait()
+            toolchain.notify.info(stdout.decode("utf-8"))
 
-                if rc != 0:
-                    toolchain.notify.debug("[PSOC6.sign_image] ERROR: Encryption script ended with error!")
-                    toolchain.notify.debug("[PSOC6.sign_image] Message from encryption script: " + stderr.decode("utf-8"))
-                    raise Exception("imgtool finished execution with errors!")
-                else:
-                    toolchain.notify.info("[PSOC6.sign_image] SUCCESS: Image for slot " +
-                                        slot["slot_data"]["type"] + " is signed and encrypted with no errors!")
+            if rc != 0:
+                toolchain.notify.debug("[PSOC6.sign_image] ERROR: Encryption script ended with error!")
+                toolchain.notify.debug("[PSOC6.sign_image] Message from encryption script: " + stderr.decode("utf-8"))
+                raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
+            else:
+                toolchain.notify.info("[PSOC6.sign_image] SUCCESS: Image for slot " +
+                                    slot["slot_data"]["type"] + " is signed and encrypted with no errors!")
         # all non ecrypted images take this path
-        except KeyError:
+        else:
             if slot["slot_data"]["type"] == "UPGRADE":
                 out_hex_name = binf[:-4] + "_upgrade.hex"
                 out_bin_name = out_hex_name[:-4] + "_signed.bin"
@@ -466,7 +471,7 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
             if rc != 0:
                 toolchain.notify.debug("[PSOC6.sign_image] ERROR: Signature is not added!")
                 toolchain.notify.debug("[PSOC6.sign_image] Message from imgtool: " + stderr.decode("utf-8"))
-                raise Exception("imgtool finished execution with errors!")
+                raise AddSignatureError("PSOC6.sign_image finished execution with errors! Signature is not added.")
             else:
                 toolchain.notify.info("[PSOC6.sign_image] SUCCESS: Image for slot " +
                                     slot["slot_data"]["type"] + " is signed with no errors!")
@@ -481,13 +486,11 @@ def sign_image(toolchain, elf0, binf, hexf1=None):
             # produce hex file for slot1
             if slot["slot_data"]["type"] == "UPGRADE":
                 bin2hex(out_bin_name, out_hex_name, offset=int(slot["slot_data"]["address"]))
-                print("Image UPGRADE: " + out_hex_name + "\n")
+                toolchain.notify.info("Image UPGRADE: " + out_hex_name + "\n")
+
 
 def complete(toolchain, elf0, hexf0, hexf1=None):
-    if os.path.isfile(str(hexf0)) and os.path.isfile(str(hexf1)):
-        complete_func(toolchain.notify.debug, elf0, hexf0, hexf1)
-
-
-def sign_complete(toolchain, elf0, binf, m0hex):
-    sign_image(toolchain, elf0, binf, None)
-    complete_func(toolchain.notify.debug, None, binf, m0hex)
+    """
+    Merge CM4 and CM0 images to a single binary
+    """
+    complete_func(toolchain.notify.debug, elf0, hexf0, hexf1)
