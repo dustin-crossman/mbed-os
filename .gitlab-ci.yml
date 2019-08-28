@@ -103,7 +103,8 @@ win_IAR_064S2_tests:
   tags:
     - MBED_TEST
   script:
-    - mbed test --compile -m CY8CKIT_064S2_4343W -t IAR -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v 
+    - mbed test --compile -m CY8CKIT_064S2_4343W -t IAR -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v
+    
 
 win_IAR_064_tests:
   stage: test
@@ -164,8 +165,11 @@ mac_GCC_ARM_064S2_tests:
     - python3 --version 
     - cd ../../../../../
     - pwd     
-  script: 
+  script:
+    - mbedls -m 190A:CY8CKIT_064S2_4343W
+    - mbedls
     - mbed test --compile -m CY8CKIT_064S2_4343W -t GCC_ARM -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190A13016c131c0b036c131c00000000000000002e127069 -vv
 
 mac_ARMC6_064_tests:
   stage: test
@@ -201,6 +205,9 @@ mac_ARMC6_064S2_tests:
     - cd ../../../../../
     - pwd     
   script:
+    - mbedls -m 190A:CY8CKIT_064S2_4343W
+    - mbedls
     - export ARMLMD_LICENSE_FILE=/Library/Application\ Support/Mbed\ Studio/mbed-studio-tools/ac6-license.dat
     - mbed test --compile -m CY8CKIT_064S2_4343W -t ARMC6 -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv    
+    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190A13016c131c0b036c131c00000000000000002e127069 -vv
     
