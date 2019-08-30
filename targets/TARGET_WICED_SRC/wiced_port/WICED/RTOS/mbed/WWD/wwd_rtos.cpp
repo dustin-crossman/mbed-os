@@ -45,7 +45,7 @@ extern "C" wwd_result_t host_rtos_create_thread_with_arg(
 {
     MBED_STATIC_ASSERT(sizeof(host_thread_type_t) >= sizeof(Thread),
             "host_thread_type_t must fit Thread type");
-    Thread *thread = new (p) Thread(osPriorityNormal,
+    Thread *thread = new (p) Thread((osPriority)priority,
             stack_size, (unsigned char*)stack);
     int err = thread->start(mbed::callback(
             reinterpret_cast<void (*)(void*)>(entry_function),

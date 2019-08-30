@@ -100,6 +100,10 @@
             "help": "Maximum number of retransmissions of SYN segments. Current default (used if null here) is set to 6 in opt.h",
             "value": null
         },
+        "tcpip-thread-priority": {
+            "help": "Priority of lwip TCPIP thread",
+            "value": "osPriorityNormal"
+        },
         "pbuf-pool-size": {
             "help": "Number of pbufs in pool - usually used for received packets, so this determines how much data can be buffered between reception and the application reading. If a driver uses PBUF_RAM for reception, less pool may be needed. Current default (used if null here) is set to 5 in lwipopts.h, unless overridden by target Ethernet drivers.",
             "value": null
@@ -172,15 +176,30 @@
             "mem-size": 51200
         },
         "CYW943012P6EVB_01": {
-            "tcpip-thread-stacksize": 8192,
+          "tcpip-thread-stacksize": 8192,
             "default-thread-stacksize": 640,
-            "ppp-thread-stacksize": 896,
-            "memp-num-tcp-seg": 32,
-            "tcp-mss": 1440,
-            "tcp-snd-buf": "(8 * TCP_MSS)",
-            "tcp-wnd": "(TCP_MSS * 8)",
-            "pbuf-pool-size": 16,
-            "mem-size": 51200
+            "memp-num-tcp-seg": 24,
+            "tcp-socket-max": 10,
+            "udp-socket-max":10,
+            "socket-max":18,
+            "tcp-mss": 1540,
+            "tcp-snd-buf": "(6 * TCP_MSS)",
+            "tcp-wnd": "(TCP_MSS * 6)",
+            "pbuf-pool-size": 48,
+            "mem-size": 65536
+        },
+        "CY8CKIT_062_WIFI_BT": {
+          "tcpip-thread-stacksize": 8192,
+            "default-thread-stacksize": 640,
+            "memp-num-tcp-seg": 24,
+            "tcp-socket-max": 10,
+            "udp-socket-max":10,
+            "socket-max":18,
+            "tcp-mss": 1540,
+            "tcp-snd-buf": "(6 * TCP_MSS)",
+            "tcp-wnd": "(TCP_MSS * 6)",
+            "pbuf-pool-size": 48,
+            "mem-size": 65536
         },
         "MIMXRT1050_EVK": {
             "mem-size": 36560

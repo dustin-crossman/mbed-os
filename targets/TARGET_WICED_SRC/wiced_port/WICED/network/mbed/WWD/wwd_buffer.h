@@ -31,16 +31,7 @@ extern "C"
 /******************************************************
  *             Structures
  ******************************************************/
-
-typedef struct
-{
-    uint16_t size;
-    uint16_t offset;
-    uint8_t *ptr;
-    uint8_t *parent;
-} wiced_buffer_impl_t;
-
-typedef wiced_buffer_impl_t *wiced_buffer_t;
+typedef void *wiced_buffer_t;
 
 typedef void wiced_buffer_fifo_t;
 

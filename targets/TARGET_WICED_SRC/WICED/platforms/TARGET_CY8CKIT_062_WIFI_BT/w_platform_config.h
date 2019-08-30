@@ -27,7 +27,7 @@ extern "C" {
 //#define WICED_WIFI_USE_GPIO_FOR_BOOTSTRAP_1    /* WiFi chip is configured for SDIO mode in CY8CKIT_062 board */
 
 /*  WiFi GPIO pin used for out-of-band interrupt */
-//#define WICED_WIFI_OOB_IRQ_GPIO_PIN  ( 0 )    /* WiFi chip is not configured for GPIO OOB IRQ in CY8CKIT_062 board */
+#define WICED_WIFI_OOB_IRQ_GPIO_PIN  ( 0 )    /* WiFi chip is not configured for GPIO OOB IRQ in CY8CKIT_062 board */
 
 /* The wifi power and reset pin are configured in wwd_sdio.c */
 /* WiFi power pin is present */
