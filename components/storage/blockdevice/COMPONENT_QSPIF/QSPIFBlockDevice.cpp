@@ -43,6 +43,7 @@ using namespace mbed;
 
 /* SFDP Header Parsing */
 /***********************/
+#define QSPIF_RSFDP_DUMMY_CYCLES 8
 #define QSPIF_SFDP_HEADER_SIZE 8
 #define QSPIF_PARAM_HEADER_SIZE 8
 
@@ -190,6 +191,10 @@ int QSPIFBlockDevice::init()
 
     _mutex.lock();
 
+    // All commands other than Read and RSFDP use default 1-1-1 bus mode (Program/Erase are constrained by flash memory performance more than bus performance)
+    _qspi.configure_format(QSPI_CFG_BUS_SINGLE, QSPI_CFG_BUS_SINGLE, _address_size, QSPI_CFG_BUS_SINGLE,
+                           0, QSPI_CFG_BUS_SINGLE, 0);
+
     if (!_is_initialized) {
         _init_ref_count = 0;
     }
@@ -254,10 +259,6 @@ int QSPIFBlockDevice::init()
         }
     }
 
-    // Configure  BUS Mode to 1_1_1 for all commands other than Read
-    _qspi_configure_format(QSPI_CFG_BUS_SINGLE, QSPI_CFG_BUS_SINGLE, QSPI_CFG_ADDR_SIZE_24, QSPI_CFG_BUS_SINGLE,
-                           0, QSPI_CFG_BUS_SINGLE, 0);
-
     if (0 != _clear_block_protection()) {
         tr_error("Init - clearing block protection failed");
         status = QSPIF_BD_ERROR_PARSING_FAILED;
@@ -316,18 +317,10 @@ int QSPIFBlockDevice::read(void *buffer, bd_addr_t addr, bd_size_t size)
 
     _mutex.lock();
 
-    // Configure Bus for Reading
-    _qspi_configure_format(_inst_width, _address_width, _address_size, _address_width, // Alt width == address width
-                           _alt_size, _data_width, _dummy_cycles);
-
     if (QSPI_STATUS_OK != _qspi_send_read_command(_read_instruction, buffer, addr, size)) {
         status = QSPIF_BD_ERROR_DEVICE_ERROR;
         tr_error("Read Command failed");
     }
-
-    // All commands other than Read use default 1-1-1 Bus mode (Program/Erase are constrained by flash memory performance more than bus performance)
-    _qspi_configure_format(QSPI_CFG_BUS_SINGLE, QSPI_CFG_BUS_SINGLE, QSPI_CFG_ADDR_SIZE_24, QSPI_CFG_BUS_SINGLE,
-                           0, QSPI_CFG_BUS_SINGLE, 0);
 
     _mutex.unlock();
     return status;
@@ -611,11 +604,7 @@ int QSPIFBlockDevice::_sfdp_parse_sfdp_headers(uint32_t &basic_table_addr, size_
     size_t data_length = QSPIF_SFDP_HEADER_SIZE;
     bd_addr_t addr = 0x0;
 
-    // Set 1-1-1 bus mode for SFDP header parsing
-    _qspi_configure_format(QSPI_CFG_BUS_SINGLE, QSPI_CFG_BUS_SINGLE, QSPI_CFG_ADDR_SIZE_24, QSPI_CFG_BUS_SINGLE,
-                           0, QSPI_CFG_BUS_SINGLE, 8);
-
-    qspi_status_t status = _qspi_send_read_command(QSPIF_SFDP, (char *)sfdp_header, addr /*address*/, data_length);
+    qspi_status_t status = _qspi_send_read_sfdp_command(addr, (char*) sfdp_header, data_length);
     if (status != QSPI_STATUS_OK) {
         tr_error("Init - Read SFDP Failed");
         return -1;
@@ -640,8 +629,7 @@ int QSPIFBlockDevice::_sfdp_parse_sfdp_headers(uint32_t &basic_table_addr, size_
 
     // Loop over Param Headers and parse them (currently supported Basic Param Table and Sector Region Map Table)
     for (int i_ind = 0; i_ind < number_of_param_headers; i_ind++) {
-
-        status = _qspi_send_read_command(QSPIF_SFDP, (char *)param_header, addr, data_length);
+        status = _qspi_send_read_sfdp_command(addr, (char *) param_header, data_length);
         if (status != QSPI_STATUS_OK) {
             tr_error("Init - Read Param Table %d Failed", i_ind + 1);
             return -1;
@@ -679,8 +667,7 @@ int QSPIFBlockDevice::_sfdp_parse_basic_param_table(uint32_t basic_table_addr, s
 {
     uint8_t param_table[SFDP_DEFAULT_BASIC_PARAMS_TABLE_SIZE_BYTES]; /* Up To 16 DWORDS = 64 Bytes */
 
-    qspi_status_t status = _qspi_send_read_command(QSPIF_SFDP, (char *)param_table, basic_table_addr /*address*/,
-                                                   basic_table_size);
+    qspi_status_t status = _qspi_send_read_sfdp_command(basic_table_addr, (char*) param_table, basic_table_size);
     if (status != QSPI_STATUS_OK) {
         tr_error("Init - Read SFDP First Table Failed");
         return -1;
@@ -786,10 +773,6 @@ int QSPIFBlockDevice::_sfdp_set_quad_enabled(uint8_t *basic_param_table_ptr)
             tr_warning("Unsuported QER configuration");
             return 0;
     }
-
-    // Configure  BUS Mode to 1_1_1 for all commands other than Read
-    _qspi_configure_format(QSPI_CFG_BUS_SINGLE, QSPI_CFG_BUS_SINGLE, QSPI_CFG_ADDR_SIZE_24, QSPI_CFG_BUS_SINGLE,
-                           0, QSPI_CFG_BUS_SINGLE, 0);
 
     // Read existing status register values
     _qspi_read_status_registers(status_regs);
@@ -1156,9 +1139,7 @@ int QSPIFBlockDevice::_sfdp_parse_sector_map_table(uint32_t sector_map_table_add
     // Default set to all type bits 1-4 are common
     int min_common_erase_type_bits = ERASE_BITMASK_ALL;
 
-
-    qspi_status_t status = _qspi_send_read_command(QSPIF_SFDP, (char *)sector_map_table, sector_map_table_addr /*address*/,
-                                                   sector_map_table_size);
+    qspi_status_t status = _qspi_send_read_sfdp_command(sector_map_table_addr, (char *) sector_map_table, sector_map_table_size);
     if (status != QSPI_STATUS_OK) {
         tr_error("Init - Read SFDP First Table Failed");
         return -1;
@@ -1415,7 +1396,13 @@ qspi_status_t QSPIFBlockDevice::_qspi_send_read_command(qspi_inst_t read_inst, v
     }
 
     // Send read command to device driver
-    status = _qspi.read(read_inst, -1, (unsigned int)addr, (char *)buffer, &buf_len);
+    // Read commands use the best bus mode supported by the part
+    _qspi.configure_format(_inst_width, _address_width, _address_size, _address_width, // Alt width should be the same as address width
+                           _alt_size, _data_width, _dummy_cycles);
+    status = _qspi.read(read_inst, (_alt_size == 0) ? -1 : QSPI_ALT_DEFAULT_VALUE, (unsigned int)addr, (char *)buffer, &buf_len);
+    // All commands other than Read and RSFDP use default 1-1-1 bus mode (Program/Erase are constrained by flash memory performance more than bus performance)
+    _qspi.configure_format(QSPI_CFG_BUS_SINGLE, QSPI_CFG_BUS_SINGLE, _address_size, QSPI_CFG_BUS_SINGLE,
+                           0, QSPI_CFG_BUS_SINGLE, 0);
     if (QSPI_STATUS_OK != status) {
         tr_error("QSPI Read failed");
         return status;
@@ -1487,15 +1474,23 @@ qspi_status_t QSPIFBlockDevice::_qspi_send_general_command(qspi_inst_t instructi
     return QSPI_STATUS_OK;
 }
 
-qspi_status_t QSPIFBlockDevice::_qspi_configure_format(qspi_bus_width_t inst_width, qspi_bus_width_t address_width,
-                                                       qspi_address_size_t address_size, qspi_bus_width_t alt_width, qspi_alt_size_t alt_size, qspi_bus_width_t data_width,
-                                                       int dummy_cycles)
+qspi_status_t QSPIFBlockDevice::_qspi_send_read_sfdp_command(bd_addr_t addr, void *rx_buffer, bd_size_t rx_length)
 {
-    // Configure QSPI driver Bus format
-    qspi_status_t status = _qspi.configure_format(inst_width, address_width, address_size, alt_width, alt_size, data_width,
-                                                  dummy_cycles);
+    size_t rx_len = rx_length;
 
-    return status;
+    // SFDP read instruction requires 1-1-1 bus mode with 8 dummy cycles and a 3-byte address
+    _qspi.configure_format(QSPI_CFG_BUS_SINGLE, QSPI_CFG_BUS_SINGLE, QSPI_CFG_ADDR_SIZE_24, QSPI_CFG_BUS_SINGLE,
+                           0, QSPI_CFG_BUS_SINGLE, QSPIF_RSFDP_DUMMY_CYCLES);
+    qspi_status_t status = _qspi.read(QSPIF_INST_RSFDP, -1, (unsigned int) addr, (char*) rx_buffer, &rx_len);
+    // All commands other than Read and RSFDP use default 1-1-1 bus mode (Program/Erase are constrained by flash memory performance more than bus performance)
+    _qspi.configure_format(QSPI_CFG_BUS_SINGLE, QSPI_CFG_BUS_SINGLE, _address_size, QSPI_CFG_BUS_SINGLE,
+                           0, QSPI_CFG_BUS_SINGLE, 0);
+    if (QSPI_STATUS_OK != status) {
+        tr_error("Sending SFDP read instruction");
+        return status;
+    }
+
+    return QSPI_STATUS_OK;
 }
 
 qspi_status_t QSPIFBlockDevice::_qspi_read_status_registers(uint8_t *reg_buffer)
