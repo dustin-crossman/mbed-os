@@ -132,6 +132,11 @@ bool WICED_EMAC::link_out(emac_mem_buf_t *buf)
     uint16_t size = memory_manager->get_total_len(buf);
 
     wwd_result_t res = host_buffer_get(&buffer, WWD_NETWORK_TX, size+offset, WICED_TRUE);
+    if (res != WWD_SUCCESS) {
+        memory_manager->free(buf);
+        return true;
+    }
+
     MBED_ASSERT(res == WWD_SUCCESS);
 
     host_buffer_add_remove_at_front(&buffer, offset);
@@ -169,9 +174,7 @@ void host_network_process_ethernet_data(wiced_buffer_t buffer, wwd_interface_t i
     uint16_t size = host_buffer_get_current_piece_size(buffer);
 
     if (size > 0) {
-    	mem_buf = buffer->parent;
-    	pbuffer = (struct pbuf *)buffer->parent;
-    	pbuffer->payload = data;
+    	mem_buf = buffer;
     	emac.emac_link_input_cb(mem_buf);
     }
 }
