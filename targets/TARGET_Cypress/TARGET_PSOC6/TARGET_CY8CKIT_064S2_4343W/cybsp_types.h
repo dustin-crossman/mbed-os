@@ -23,14 +23,6 @@
 * limitations under the License.
 *******************************************************************************/
 
-/**
-* \addtogroup group_bsp_cy8ckit_064s2_4343w CY8CKIT-064S2-4343W
-* \ingroup group_bsp
-* \{
-* \defgroup group_bsp_cy8ckit_064s2_4343w_macros Macros
-* \defgroup group_bsp_cy8ckit_064s2_4343w_enums Enumerated Types
-*/
-
 #pragma once
 
 #include "cyhal.h"
@@ -40,7 +32,7 @@ extern "C" {
 #endif
 
 /**
-* \addtogroup group_bsp_cy8ckit_064s2_4343w_macros
+* \addtogroup group_bsp_pins Pin Mappings
 * \{
 */
 
@@ -97,18 +89,25 @@ extern "C" {
 #define CYBSP_WCO_OUT          P0_1
 
 /** Pin: WIFI SDIO D0 */
+/* Corresponds to: ioss[0].port[2].pin[0], sdhc[0] */
 #define CYBSP_WIFI_SDIO_D0     P2_0
 /** Pin: WIFI SDIO D1 */
+/* Corresponds to: ioss[0].port[2].pin[1], sdhc[0] */
 #define CYBSP_WIFI_SDIO_D1     P2_1
 /** Pin: WIFI SDIO D2 */
+/* Corresponds to: ioss[0].port[2].pin[2], sdhc[0] */
 #define CYBSP_WIFI_SDIO_D2     P2_2
 /** Pin: WIFI SDIO D3 */
+/* Corresponds to: ioss[0].port[2].pin[3], sdhc[0] */
 #define CYBSP_WIFI_SDIO_D3     P2_3
 /** Pin: WIFI SDIO CMD */
+/* Corresponds to: ioss[0].port[2].pin[4], sdhc[0] */
 #define CYBSP_WIFI_SDIO_CMD    P2_4
 /** Pin: WIFI SDIO CLK */
+/* Corresponds to: ioss[0].port[2].pin[5], sdhc[0] */
 #define CYBSP_WIFI_SDIO_CLK    P2_5
 /** Pin: WIFI ON */
+/* Corresponds to: ioss[0].port[2].pin[6], sdhc[0] */
 #define CYBSP_WIFI_WL_REG_ON   P2_6
 /** Pin: WIFI Host Wakeup */
 #define CYBSP_WIFI_HOST_WAKE   P2_7
@@ -130,8 +129,10 @@ extern "C" {
 #define CYBSP_BT_DEVICE_WAKE   P4_0
 
 /** Pin: UART RX */
+/* Corresponds to: ioss[0].port[5].pin[0], scb[5] */
 #define CYBSP_DEBUG_UART_RX    P5_0
 /** Pin: UART TX */
+/* Corresponds to: ioss[0].port[5].pin[1], scb[5] */
 #define CYBSP_DEBUG_UART_TX    P5_1
 
 /** Pin: I2C SCL */
@@ -187,25 +188,25 @@ extern "C" {
 /** Host-wake IRQ event */
 #define CYBSP_WIFI_HOST_WAKE_IRQ_EVENT CYHAL_GPIO_IRQ_RISE
 
-/** \} group_bsp_cy8ckit_064s2_4343w_macros */
+/** \} group_bsp_pins */
 
 /**
-* \addtogroup group_bsp_cy8ckit_064s2_4343w_enums
+* \addtogroup group_bsp_enums Enumerated Types
 * \{
 */
 
 /** Enum defining the different states for the LED. */
 typedef enum
 {
-	CYBSP_LED_STATE_ON        	= 0,
-	CYBSP_LED_STATE_OFF        	= 1,
+    CYBSP_LED_STATE_ON          = 0,
+    CYBSP_LED_STATE_OFF         = 1,
 } cybsp_led_state_t;
 
 /** Enum defining the different states for a button. */
 typedef enum
 {
-	CYBSP_BTN_PRESSED  	      	= 0,
-	CYBSP_BTN_OFF	          	= 1,
+    CYBSP_BTN_PRESSED           = 0,
+    CYBSP_BTN_OFF               = 1,
 } cybsp_btn_state_t;
 
 /** Enum defining the different LED pins on the board. */
@@ -217,10 +218,15 @@ typedef enum
     CYBSP_LED_RGB_GREEN = P1_1,
     CYBSP_LED_RGB_BLUE = P11_1,
 
+    /* Corresponds to: ioss[0].port[1].pin[5] */
     CYBSP_USER_LED1 = CYBSP_LED8,
+    /* Corresponds to: ioss[0].port[13].pin[7] */
     CYBSP_USER_LED2 = CYBSP_LED9,
+    /* Corresponds to: ioss[0].port[0].pin[3] */
     CYBSP_USER_LED3 = CYBSP_LED_RGB_RED,
+    /* Corresponds to: ioss[0].port[1].pin[1] */
     CYBSP_USER_LED4 = CYBSP_LED_RGB_GREEN,
+    /* Corresponds to: ioss[0].port[11].pin[1] */
     CYBSP_USER_LED5 = CYBSP_LED_RGB_BLUE,
     CYBSP_USER_LED = CYBSP_USER_LED1,
 } cybsp_led_t;
@@ -230,14 +236,13 @@ typedef enum
 {
     CYBSP_SW2 = P0_4,
 
+    /* Corresponds to: ioss[0].port[0].pin[4] */
     CYBSP_USER_BTN1 = CYBSP_SW2,
     CYBSP_USER_BTN = CYBSP_USER_BTN1,
 } cybsp_btn_t;
 
-/** \} group_bsp_cy8ckit_064s2_4343w_enums */
+/** \} group_bsp_enums */
 
 #if defined(__cplusplus)
 }
 #endif
-
-/** \} group_bsp_cy8ckit_064s2_4343w */

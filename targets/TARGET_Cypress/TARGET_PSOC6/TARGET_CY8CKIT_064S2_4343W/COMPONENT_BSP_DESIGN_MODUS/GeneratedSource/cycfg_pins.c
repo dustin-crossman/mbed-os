@@ -72,78 +72,6 @@ const cy_stc_gpio_pin_config_t CYBSP_WCO_OUT_config =
 		.channel_num = CYBSP_WCO_OUT_PIN,
 	};
 #endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_LED_RED_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = CYBSP_LED_RED_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_LED_RED_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_LED_RED_PORT_NUM,
-		.channel_num = CYBSP_LED_RED_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_BTN2_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_PULLUP,
-	.hsiom = CYBSP_BTN2_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_BTN2_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_BTN2_PORT_NUM,
-		.channel_num = CYBSP_BTN2_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_LED_BLUE_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = CYBSP_LED_BLUE_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_LED_BLUE_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_LED_BLUE_PORT_NUM,
-		.channel_num = CYBSP_LED_BLUE_PIN,
-	};
-#endif //defined (CY_USING_HAL)
 const cy_stc_gpio_pin_config_t CYBSP_QSPI_SS_config = 
 {
 	.outVal = 1,
@@ -288,30 +216,6 @@ const cy_stc_gpio_pin_config_t CYBSP_QSPI_SCK_config =
 		.channel_num = CYBSP_QSPI_SCK_PIN,
 	};
 #endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_LED9_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = CYBSP_LED9_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_LED9_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_LED9_PORT_NUM,
-		.channel_num = CYBSP_LED9_PIN,
-	};
-#endif //defined (CY_USING_HAL)
 const cy_stc_gpio_pin_config_t ioss_0_port_14_pin_0_config = 
 {
 	.outVal = 1,
@@ -382,222 +286,6 @@ const cy_stc_gpio_pin_config_t CYBSP_CSD_TX_config =
 		.type = CYHAL_RSC_GPIO,
 		.block_num = CYBSP_CSD_TX_PORT_NUM,
 		.channel_num = CYBSP_CSD_TX_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_LED_GREEN_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = CYBSP_LED_GREEN_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_LED_GREEN_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_LED_GREEN_PORT_NUM,
-		.channel_num = CYBSP_LED_GREEN_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_LED8_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = CYBSP_LED8_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_LED8_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_LED8_PORT_NUM,
-		.channel_num = CYBSP_LED8_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D0_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG,
-	.hsiom = CYBSP_WIFI_SDIO_D0_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_WIFI_SDIO_D0_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_WIFI_SDIO_D0_PORT_NUM,
-		.channel_num = CYBSP_WIFI_SDIO_D0_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D1_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG,
-	.hsiom = CYBSP_WIFI_SDIO_D1_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_WIFI_SDIO_D1_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_WIFI_SDIO_D1_PORT_NUM,
-		.channel_num = CYBSP_WIFI_SDIO_D1_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D2_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG,
-	.hsiom = CYBSP_WIFI_SDIO_D2_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_WIFI_SDIO_D2_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_WIFI_SDIO_D2_PORT_NUM,
-		.channel_num = CYBSP_WIFI_SDIO_D2_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D3_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG,
-	.hsiom = CYBSP_WIFI_SDIO_D3_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_WIFI_SDIO_D3_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_WIFI_SDIO_D3_PORT_NUM,
-		.channel_num = CYBSP_WIFI_SDIO_D3_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_CMD_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG,
-	.hsiom = CYBSP_WIFI_SDIO_CMD_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_WIFI_SDIO_CMD_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_WIFI_SDIO_CMD_PORT_NUM,
-		.channel_num = CYBSP_WIFI_SDIO_CMD_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_CLK_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = CYBSP_WIFI_SDIO_CLK_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_WIFI_SDIO_CLK_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_WIFI_SDIO_CLK_PORT_NUM,
-		.channel_num = CYBSP_WIFI_SDIO_CLK_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_WIFI_WL_REG_ON_config = 
-{
-	.outVal = 0,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = CYBSP_WIFI_WL_REG_ON_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_WIFI_WL_REG_ON_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_WIFI_WL_REG_ON_PORT_NUM,
-		.channel_num = CYBSP_WIFI_WL_REG_ON_PIN,
 	};
 #endif //defined (CY_USING_HAL)
 const cy_stc_gpio_pin_config_t CYBSP_WIFI_HOST_WAKE_config = 
@@ -790,54 +478,6 @@ const cy_stc_gpio_pin_config_t CYBSP_BT_DEVICE_WAKE_config =
 		.type = CYHAL_RSC_GPIO,
 		.block_num = CYBSP_BT_DEVICE_WAKE_PORT_NUM,
 		.channel_num = CYBSP_BT_DEVICE_WAKE_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_RX_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_HIGHZ,
-	.hsiom = CYBSP_DEBUG_UART_RX_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_DEBUG_UART_RX_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_DEBUG_UART_RX_PORT_NUM,
-		.channel_num = CYBSP_DEBUG_UART_RX_PIN,
-	};
-#endif //defined (CY_USING_HAL)
-const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_TX_config = 
-{
-	.outVal = 1,
-	.driveMode = CY_GPIO_DM_STRONG_IN_OFF,
-	.hsiom = CYBSP_DEBUG_UART_TX_HSIOM,
-	.intEdge = CY_GPIO_INTR_DISABLE,
-	.intMask = 0UL,
-	.vtrip = CY_GPIO_VTRIP_CMOS,
-	.slewRate = CY_GPIO_SLEW_FAST,
-	.driveSel = CY_GPIO_DRIVE_1_2,
-	.vregEn = 0UL,
-	.ibufMode = 0UL,
-	.vtripSel = 0UL,
-	.vrefSel = 0UL,
-	.vohSel = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_DEBUG_UART_TX_obj = 
-	{
-		.type = CYHAL_RSC_GPIO,
-		.block_num = CYBSP_DEBUG_UART_TX_PORT_NUM,
-		.channel_num = CYBSP_DEBUG_UART_TX_PIN,
 	};
 #endif //defined (CY_USING_HAL)
 const cy_stc_gpio_pin_config_t CYBSP_EZI2C_SCL_config = 
@@ -1214,21 +854,6 @@ void init_cycfg_pins(void)
 		cyhal_hwmgr_reserve(&CYBSP_WCO_OUT_obj);
 #endif //defined (CY_USING_HAL)
 
-	Cy_GPIO_Pin_Init(CYBSP_LED_RED_PORT, CYBSP_LED_RED_PIN, &CYBSP_LED_RED_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_LED_RED_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_BTN2_PORT, CYBSP_BTN2_PIN, &CYBSP_BTN2_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_BTN2_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_LED_BLUE_PORT, CYBSP_LED_BLUE_PIN, &CYBSP_LED_BLUE_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_LED_BLUE_obj);
-#endif //defined (CY_USING_HAL)
-
 	Cy_GPIO_Pin_Init(CYBSP_QSPI_SS_PORT, CYBSP_QSPI_SS_PIN, &CYBSP_QSPI_SS_config);
 #if defined (CY_USING_HAL)
 		cyhal_hwmgr_reserve(&CYBSP_QSPI_SS_obj);
@@ -1259,11 +884,6 @@ void init_cycfg_pins(void)
 		cyhal_hwmgr_reserve(&CYBSP_QSPI_SCK_obj);
 #endif //defined (CY_USING_HAL)
 
-	Cy_GPIO_Pin_Init(CYBSP_LED9_PORT, CYBSP_LED9_PIN, &CYBSP_LED9_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_LED9_obj);
-#endif //defined (CY_USING_HAL)
-
 	Cy_GPIO_Pin_Init(ioss_0_port_14_pin_0_PORT, ioss_0_port_14_pin_0_PIN, &ioss_0_port_14_pin_0_config);
 #if defined (CY_USING_HAL)
 		cyhal_hwmgr_reserve(&ioss_0_port_14_pin_0_obj);
@@ -1276,51 +896,6 @@ void init_cycfg_pins(void)
 
 #if defined (CY_USING_HAL)
 		cyhal_hwmgr_reserve(&CYBSP_CSD_TX_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_LED_GREEN_PORT, CYBSP_LED_GREEN_PIN, &CYBSP_LED_GREEN_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_LED_GREEN_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_LED8_PORT, CYBSP_LED8_PIN, &CYBSP_LED8_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_LED8_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_WIFI_SDIO_D0_PORT, CYBSP_WIFI_SDIO_D0_PIN, &CYBSP_WIFI_SDIO_D0_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_WIFI_SDIO_D0_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_WIFI_SDIO_D1_PORT, CYBSP_WIFI_SDIO_D1_PIN, &CYBSP_WIFI_SDIO_D1_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_WIFI_SDIO_D1_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_WIFI_SDIO_D2_PORT, CYBSP_WIFI_SDIO_D2_PIN, &CYBSP_WIFI_SDIO_D2_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_WIFI_SDIO_D2_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_WIFI_SDIO_D3_PORT, CYBSP_WIFI_SDIO_D3_PIN, &CYBSP_WIFI_SDIO_D3_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_WIFI_SDIO_D3_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_WIFI_SDIO_CMD_PORT, CYBSP_WIFI_SDIO_CMD_PIN, &CYBSP_WIFI_SDIO_CMD_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_WIFI_SDIO_CMD_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_WIFI_SDIO_CLK_PORT, CYBSP_WIFI_SDIO_CLK_PIN, &CYBSP_WIFI_SDIO_CLK_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_WIFI_SDIO_CLK_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_WIFI_WL_REG_ON_PORT, CYBSP_WIFI_WL_REG_ON_PIN, &CYBSP_WIFI_WL_REG_ON_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_WIFI_WL_REG_ON_obj);
 #endif //defined (CY_USING_HAL)
 
 	Cy_GPIO_Pin_Init(CYBSP_WIFI_HOST_WAKE_PORT, CYBSP_WIFI_HOST_WAKE_PIN, &CYBSP_WIFI_HOST_WAKE_config);
@@ -1361,16 +936,6 @@ void init_cycfg_pins(void)
 	Cy_GPIO_Pin_Init(CYBSP_BT_DEVICE_WAKE_PORT, CYBSP_BT_DEVICE_WAKE_PIN, &CYBSP_BT_DEVICE_WAKE_config);
 #if defined (CY_USING_HAL)
 		cyhal_hwmgr_reserve(&CYBSP_BT_DEVICE_WAKE_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_DEBUG_UART_RX_PORT, CYBSP_DEBUG_UART_RX_PIN, &CYBSP_DEBUG_UART_RX_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_DEBUG_UART_RX_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_GPIO_Pin_Init(CYBSP_DEBUG_UART_TX_PORT, CYBSP_DEBUG_UART_TX_PIN, &CYBSP_DEBUG_UART_TX_config);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_DEBUG_UART_TX_obj);
 #endif //defined (CY_USING_HAL)
 
 	Cy_GPIO_Pin_Init(CYBSP_EZI2C_SCL_PORT, CYBSP_EZI2C_SCL_PIN, &CYBSP_EZI2C_SCL_config);

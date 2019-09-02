@@ -84,78 +84,6 @@ extern "C" {
 #if defined (CY_USING_HAL)
 	#define CYBSP_WCO_OUT_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_ANALOG
 #endif //defined (CY_USING_HAL)
-#define CYBSP_LED_RED_ENABLED 1U
-#define CYBSP_LED_RED_PORT GPIO_PRT0
-#define CYBSP_LED_RED_PORT_NUM 0U
-#define CYBSP_LED_RED_PIN 3U
-#define CYBSP_LED_RED_NUM 3U
-#define CYBSP_LED_RED_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
-#define CYBSP_LED_RED_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_0_pin_3_HSIOM
-	#define ioss_0_port_0_pin_3_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_LED_RED_HSIOM ioss_0_port_0_pin_3_HSIOM
-#define CYBSP_LED_RED_IRQ ioss_interrupts_gpio_0_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_RED_HAL_PORT_PIN P0_3
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_RED_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_RED_HAL_DIR CYHAL_GPIO_DIR_OUTPUT 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_RED_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
-#define CYBSP_BTN2_ENABLED 1U
-#define CYBSP_BTN2_PORT GPIO_PRT0
-#define CYBSP_BTN2_PORT_NUM 0U
-#define CYBSP_BTN2_PIN 4U
-#define CYBSP_BTN2_NUM 4U
-#define CYBSP_BTN2_DRIVEMODE CY_GPIO_DM_PULLUP
-#define CYBSP_BTN2_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_0_pin_4_HSIOM
-	#define ioss_0_port_0_pin_4_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_BTN2_HSIOM ioss_0_port_0_pin_4_HSIOM
-#define CYBSP_BTN2_IRQ ioss_interrupts_gpio_0_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_BTN2_HAL_PORT_PIN P0_4
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_BTN2_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_BTN2_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_BTN2_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_PULLUP
-#endif //defined (CY_USING_HAL)
-#define CYBSP_LED_BLUE_ENABLED 1U
-#define CYBSP_LED_BLUE_PORT GPIO_PRT11
-#define CYBSP_LED_BLUE_PORT_NUM 11U
-#define CYBSP_LED_BLUE_PIN 1U
-#define CYBSP_LED_BLUE_NUM 1U
-#define CYBSP_LED_BLUE_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
-#define CYBSP_LED_BLUE_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_11_pin_1_HSIOM
-	#define ioss_0_port_11_pin_1_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_LED_BLUE_HSIOM ioss_0_port_11_pin_1_HSIOM
-#define CYBSP_LED_BLUE_IRQ ioss_interrupts_gpio_11_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_BLUE_HAL_PORT_PIN P11_1
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_BLUE_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_BLUE_HAL_DIR CYHAL_GPIO_DIR_OUTPUT 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_BLUE_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
 #define CYBSP_QSPI_SS_ENABLED 1U
 #define CYBSP_QSPI_SS_PORT GPIO_PRT11
 #define CYBSP_QSPI_SS_PORT_NUM 11U
@@ -300,30 +228,6 @@ extern "C" {
 #if defined (CY_USING_HAL)
 	#define CYBSP_QSPI_SCK_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
 #endif //defined (CY_USING_HAL)
-#define CYBSP_LED9_ENABLED 1U
-#define CYBSP_LED9_PORT GPIO_PRT13
-#define CYBSP_LED9_PORT_NUM 13U
-#define CYBSP_LED9_PIN 7U
-#define CYBSP_LED9_NUM 7U
-#define CYBSP_LED9_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
-#define CYBSP_LED9_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_13_pin_7_HSIOM
-	#define ioss_0_port_13_pin_7_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_LED9_HSIOM ioss_0_port_13_pin_7_HSIOM
-#define CYBSP_LED9_IRQ ioss_interrupts_gpio_13_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED9_HAL_PORT_PIN P13_7
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED9_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED9_HAL_DIR CYHAL_GPIO_DIR_OUTPUT 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED9_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
 #define ioss_0_port_14_pin_0_ENABLED 1U
 #define ioss_0_port_14_pin_0_PORT GPIO_PRT14
 #define ioss_0_port_14_pin_0_PORT_NUM 14U
@@ -393,222 +297,6 @@ extern "C" {
 #endif //defined (CY_USING_HAL)
 #if defined (CY_USING_HAL)
 	#define CYBSP_CSD_TX_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_ANALOG
-#endif //defined (CY_USING_HAL)
-#define CYBSP_LED_GREEN_ENABLED 1U
-#define CYBSP_LED_GREEN_PORT GPIO_PRT1
-#define CYBSP_LED_GREEN_PORT_NUM 1U
-#define CYBSP_LED_GREEN_PIN 1U
-#define CYBSP_LED_GREEN_NUM 1U
-#define CYBSP_LED_GREEN_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
-#define CYBSP_LED_GREEN_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_1_pin_1_HSIOM
-	#define ioss_0_port_1_pin_1_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_LED_GREEN_HSIOM ioss_0_port_1_pin_1_HSIOM
-#define CYBSP_LED_GREEN_IRQ ioss_interrupts_gpio_1_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_GREEN_HAL_PORT_PIN P1_1
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_GREEN_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_GREEN_HAL_DIR CYHAL_GPIO_DIR_OUTPUT 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED_GREEN_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
-#define CYBSP_LED8_ENABLED 1U
-#define CYBSP_LED8_PORT GPIO_PRT1
-#define CYBSP_LED8_PORT_NUM 1U
-#define CYBSP_LED8_PIN 5U
-#define CYBSP_LED8_NUM 5U
-#define CYBSP_LED8_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
-#define CYBSP_LED8_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_1_pin_5_HSIOM
-	#define ioss_0_port_1_pin_5_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_LED8_HSIOM ioss_0_port_1_pin_5_HSIOM
-#define CYBSP_LED8_IRQ ioss_interrupts_gpio_1_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED8_HAL_PORT_PIN P1_5
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED8_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED8_HAL_DIR CYHAL_GPIO_DIR_OUTPUT 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_LED8_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
-#define CYBSP_WIFI_SDIO_D0_ENABLED 1U
-#define CYBSP_WIFI_SDIO_D0_PORT GPIO_PRT2
-#define CYBSP_WIFI_SDIO_D0_PORT_NUM 2U
-#define CYBSP_WIFI_SDIO_D0_PIN 0U
-#define CYBSP_WIFI_SDIO_D0_NUM 0U
-#define CYBSP_WIFI_SDIO_D0_DRIVEMODE CY_GPIO_DM_STRONG
-#define CYBSP_WIFI_SDIO_D0_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_2_pin_0_HSIOM
-	#define ioss_0_port_2_pin_0_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_WIFI_SDIO_D0_HSIOM ioss_0_port_2_pin_0_HSIOM
-#define CYBSP_WIFI_SDIO_D0_IRQ ioss_interrupts_gpio_2_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D0_HAL_PORT_PIN P2_0
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D0_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D0_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D0_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
-#define CYBSP_WIFI_SDIO_D1_ENABLED 1U
-#define CYBSP_WIFI_SDIO_D1_PORT GPIO_PRT2
-#define CYBSP_WIFI_SDIO_D1_PORT_NUM 2U
-#define CYBSP_WIFI_SDIO_D1_PIN 1U
-#define CYBSP_WIFI_SDIO_D1_NUM 1U
-#define CYBSP_WIFI_SDIO_D1_DRIVEMODE CY_GPIO_DM_STRONG
-#define CYBSP_WIFI_SDIO_D1_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_2_pin_1_HSIOM
-	#define ioss_0_port_2_pin_1_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_WIFI_SDIO_D1_HSIOM ioss_0_port_2_pin_1_HSIOM
-#define CYBSP_WIFI_SDIO_D1_IRQ ioss_interrupts_gpio_2_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D1_HAL_PORT_PIN P2_1
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D1_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D1_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D1_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
-#define CYBSP_WIFI_SDIO_D2_ENABLED 1U
-#define CYBSP_WIFI_SDIO_D2_PORT GPIO_PRT2
-#define CYBSP_WIFI_SDIO_D2_PORT_NUM 2U
-#define CYBSP_WIFI_SDIO_D2_PIN 2U
-#define CYBSP_WIFI_SDIO_D2_NUM 2U
-#define CYBSP_WIFI_SDIO_D2_DRIVEMODE CY_GPIO_DM_STRONG
-#define CYBSP_WIFI_SDIO_D2_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_2_pin_2_HSIOM
-	#define ioss_0_port_2_pin_2_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_WIFI_SDIO_D2_HSIOM ioss_0_port_2_pin_2_HSIOM
-#define CYBSP_WIFI_SDIO_D2_IRQ ioss_interrupts_gpio_2_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D2_HAL_PORT_PIN P2_2
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D2_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D2_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D2_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
-#define CYBSP_WIFI_SDIO_D3_ENABLED 1U
-#define CYBSP_WIFI_SDIO_D3_PORT GPIO_PRT2
-#define CYBSP_WIFI_SDIO_D3_PORT_NUM 2U
-#define CYBSP_WIFI_SDIO_D3_PIN 3U
-#define CYBSP_WIFI_SDIO_D3_NUM 3U
-#define CYBSP_WIFI_SDIO_D3_DRIVEMODE CY_GPIO_DM_STRONG
-#define CYBSP_WIFI_SDIO_D3_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_2_pin_3_HSIOM
-	#define ioss_0_port_2_pin_3_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_WIFI_SDIO_D3_HSIOM ioss_0_port_2_pin_3_HSIOM
-#define CYBSP_WIFI_SDIO_D3_IRQ ioss_interrupts_gpio_2_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D3_HAL_PORT_PIN P2_3
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D3_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D3_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_D3_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
-#define CYBSP_WIFI_SDIO_CMD_ENABLED 1U
-#define CYBSP_WIFI_SDIO_CMD_PORT GPIO_PRT2
-#define CYBSP_WIFI_SDIO_CMD_PORT_NUM 2U
-#define CYBSP_WIFI_SDIO_CMD_PIN 4U
-#define CYBSP_WIFI_SDIO_CMD_NUM 4U
-#define CYBSP_WIFI_SDIO_CMD_DRIVEMODE CY_GPIO_DM_STRONG
-#define CYBSP_WIFI_SDIO_CMD_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_2_pin_4_HSIOM
-	#define ioss_0_port_2_pin_4_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_WIFI_SDIO_CMD_HSIOM ioss_0_port_2_pin_4_HSIOM
-#define CYBSP_WIFI_SDIO_CMD_IRQ ioss_interrupts_gpio_2_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_CMD_HAL_PORT_PIN P2_4
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_CMD_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_CMD_HAL_DIR CYHAL_GPIO_DIR_BIDIRECTIONAL 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_CMD_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
-#define CYBSP_WIFI_SDIO_CLK_ENABLED 1U
-#define CYBSP_WIFI_SDIO_CLK_PORT GPIO_PRT2
-#define CYBSP_WIFI_SDIO_CLK_PORT_NUM 2U
-#define CYBSP_WIFI_SDIO_CLK_PIN 5U
-#define CYBSP_WIFI_SDIO_CLK_NUM 5U
-#define CYBSP_WIFI_SDIO_CLK_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
-#define CYBSP_WIFI_SDIO_CLK_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_2_pin_5_HSIOM
-	#define ioss_0_port_2_pin_5_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_WIFI_SDIO_CLK_HSIOM ioss_0_port_2_pin_5_HSIOM
-#define CYBSP_WIFI_SDIO_CLK_IRQ ioss_interrupts_gpio_2_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_CLK_HAL_PORT_PIN P2_5
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_CLK_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_CLK_HAL_DIR CYHAL_GPIO_DIR_OUTPUT 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_SDIO_CLK_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
-#define CYBSP_WIFI_WL_REG_ON_ENABLED 1U
-#define CYBSP_WIFI_WL_REG_ON_PORT GPIO_PRT2
-#define CYBSP_WIFI_WL_REG_ON_PORT_NUM 2U
-#define CYBSP_WIFI_WL_REG_ON_PIN 6U
-#define CYBSP_WIFI_WL_REG_ON_NUM 6U
-#define CYBSP_WIFI_WL_REG_ON_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
-#define CYBSP_WIFI_WL_REG_ON_INIT_DRIVESTATE 0
-#ifndef ioss_0_port_2_pin_6_HSIOM
-	#define ioss_0_port_2_pin_6_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_WIFI_WL_REG_ON_HSIOM ioss_0_port_2_pin_6_HSIOM
-#define CYBSP_WIFI_WL_REG_ON_IRQ ioss_interrupts_gpio_2_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_WL_REG_ON_HAL_PORT_PIN P2_6
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_WL_REG_ON_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_WL_REG_ON_HAL_DIR CYHAL_GPIO_DIR_OUTPUT 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_WIFI_WL_REG_ON_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
 #endif //defined (CY_USING_HAL)
 #define CYBSP_WIFI_HOST_WAKE_ENABLED 1U
 #define CYBSP_WIFI_HOST_WAKE_PORT GPIO_PRT2
@@ -801,54 +489,6 @@ extern "C" {
 #endif //defined (CY_USING_HAL)
 #if defined (CY_USING_HAL)
 	#define CYBSP_BT_DEVICE_WAKE_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
-#endif //defined (CY_USING_HAL)
-#define CYBSP_DEBUG_UART_RX_ENABLED 1U
-#define CYBSP_DEBUG_UART_RX_PORT GPIO_PRT5
-#define CYBSP_DEBUG_UART_RX_PORT_NUM 5U
-#define CYBSP_DEBUG_UART_RX_PIN 0U
-#define CYBSP_DEBUG_UART_RX_NUM 0U
-#define CYBSP_DEBUG_UART_RX_DRIVEMODE CY_GPIO_DM_HIGHZ
-#define CYBSP_DEBUG_UART_RX_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_5_pin_0_HSIOM
-	#define ioss_0_port_5_pin_0_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_DEBUG_UART_RX_HSIOM ioss_0_port_5_pin_0_HSIOM
-#define CYBSP_DEBUG_UART_RX_IRQ ioss_interrupts_gpio_5_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_DEBUG_UART_RX_HAL_PORT_PIN P5_0
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_DEBUG_UART_RX_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_DEBUG_UART_RX_HAL_DIR CYHAL_GPIO_DIR_INPUT 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_DEBUG_UART_RX_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_NONE
-#endif //defined (CY_USING_HAL)
-#define CYBSP_DEBUG_UART_TX_ENABLED 1U
-#define CYBSP_DEBUG_UART_TX_PORT GPIO_PRT5
-#define CYBSP_DEBUG_UART_TX_PORT_NUM 5U
-#define CYBSP_DEBUG_UART_TX_PIN 1U
-#define CYBSP_DEBUG_UART_TX_NUM 1U
-#define CYBSP_DEBUG_UART_TX_DRIVEMODE CY_GPIO_DM_STRONG_IN_OFF
-#define CYBSP_DEBUG_UART_TX_INIT_DRIVESTATE 1
-#ifndef ioss_0_port_5_pin_1_HSIOM
-	#define ioss_0_port_5_pin_1_HSIOM HSIOM_SEL_GPIO
-#endif
-#define CYBSP_DEBUG_UART_TX_HSIOM ioss_0_port_5_pin_1_HSIOM
-#define CYBSP_DEBUG_UART_TX_IRQ ioss_interrupts_gpio_5_IRQn
-#if defined (CY_USING_HAL)
-	#define CYBSP_DEBUG_UART_TX_HAL_PORT_PIN P5_1
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_DEBUG_UART_TX_HAL_IRQ CYHAL_GPIO_IRQ_NONE
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_DEBUG_UART_TX_HAL_DIR CYHAL_GPIO_DIR_OUTPUT 
-#endif //defined (CY_USING_HAL)
-#if defined (CY_USING_HAL)
-	#define CYBSP_DEBUG_UART_TX_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_STRONG
 #endif //defined (CY_USING_HAL)
 #define CYBSP_EZI2C_SCL_ENABLED 1U
 #define CYBSP_EZI2C_SCL_PORT GPIO_PRT6
@@ -1219,18 +859,6 @@ extern const cy_stc_gpio_pin_config_t CYBSP_WCO_OUT_config;
 #if defined (CY_USING_HAL)
 	extern const cyhal_resource_inst_t CYBSP_WCO_OUT_obj;
 #endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_LED_RED_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_LED_RED_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_BTN2_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_BTN2_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_LED_BLUE_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_LED_BLUE_obj;
-#endif //defined (CY_USING_HAL)
 extern const cy_stc_gpio_pin_config_t CYBSP_QSPI_SS_config;
 #if defined (CY_USING_HAL)
 	extern const cyhal_resource_inst_t CYBSP_QSPI_SS_obj;
@@ -1255,10 +883,6 @@ extern const cy_stc_gpio_pin_config_t CYBSP_QSPI_SCK_config;
 #if defined (CY_USING_HAL)
 	extern const cyhal_resource_inst_t CYBSP_QSPI_SCK_obj;
 #endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_LED9_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_LED9_obj;
-#endif //defined (CY_USING_HAL)
 extern const cy_stc_gpio_pin_config_t ioss_0_port_14_pin_0_config;
 #if defined (CY_USING_HAL)
 	extern const cyhal_resource_inst_t ioss_0_port_14_pin_0_obj;
@@ -1270,42 +894,6 @@ extern const cy_stc_gpio_pin_config_t ioss_0_port_14_pin_1_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_CSD_TX_config;
 #if defined (CY_USING_HAL)
 	extern const cyhal_resource_inst_t CYBSP_CSD_TX_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_LED_GREEN_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_LED_GREEN_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_LED8_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_LED8_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D0_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_WIFI_SDIO_D0_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D1_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_WIFI_SDIO_D1_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D2_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_WIFI_SDIO_D2_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_D3_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_WIFI_SDIO_D3_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_CMD_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_WIFI_SDIO_CMD_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_SDIO_CLK_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_WIFI_SDIO_CLK_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_WL_REG_ON_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_WIFI_WL_REG_ON_obj;
 #endif //defined (CY_USING_HAL)
 extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_HOST_WAKE_config;
 #if defined (CY_USING_HAL)
@@ -1338,14 +926,6 @@ extern const cy_stc_gpio_pin_config_t CYBSP_BT_HOST_WAKE_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_BT_DEVICE_WAKE_config;
 #if defined (CY_USING_HAL)
 	extern const cyhal_resource_inst_t CYBSP_BT_DEVICE_WAKE_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_RX_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_DEBUG_UART_RX_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_gpio_pin_config_t CYBSP_DEBUG_UART_TX_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_DEBUG_UART_TX_obj;
 #endif //defined (CY_USING_HAL)
 extern const cy_stc_gpio_pin_config_t CYBSP_EZI2C_SCL_config;
 #if defined (CY_USING_HAL)

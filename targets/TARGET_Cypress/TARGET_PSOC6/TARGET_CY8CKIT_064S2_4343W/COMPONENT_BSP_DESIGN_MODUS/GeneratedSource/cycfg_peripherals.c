@@ -94,67 +94,6 @@ const cy_stc_scb_ezi2c_config_t CYBSP_CSD_COMM_config =
 		.channel_num = 0U,
 	};
 #endif //defined (CY_USING_HAL)
-const cy_stc_scb_uart_config_t CYBSP_DEBUG_UART_config = 
-{
-	.uartMode = CY_SCB_UART_STANDARD,
-	.enableMutliProcessorMode = false,
-	.smartCardRetryOnNack = false,
-	.irdaInvertRx = false,
-	.irdaEnableLowPowerReceiver = false,
-	.oversample = 8,
-	.enableMsbFirst = false,
-	.dataWidth = 8UL,
-	.parity = CY_SCB_UART_PARITY_NONE,
-	.stopBits = CY_SCB_UART_STOP_BITS_1,
-	.enableInputFilter = false,
-	.breakWidth = 11UL,
-	.dropOnFrameError = false,
-	.dropOnParityError = false,
-	.receiverAddress = 0x0UL,
-	.receiverAddressMask = 0x0UL,
-	.acceptAddrInFifo = false,
-	.enableCts = false,
-	.ctsPolarity = CY_SCB_UART_ACTIVE_LOW,
-	.rtsRxFifoLevel = 0UL,
-	.rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
-	.rxFifoTriggerLevel = 63UL,
-	.rxFifoIntEnableMask = 0UL,
-	.txFifoTriggerLevel = 63UL,
-	.txFifoIntEnableMask = 0UL,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_DEBUG_UART_obj = 
-	{
-		.type = CYHAL_RSC_SCB,
-		.block_num = 5U,
-		.channel_num = 0U,
-	};
-#endif //defined (CY_USING_HAL)
-cy_en_sd_host_card_capacity_t CYBSP_SDIO_cardCapacity = CY_SD_HOST_SDSC;
-cy_en_sd_host_card_type_t CYBSP_SDIO_cardType = CY_SD_HOST_EMMC;
-uint32_t CYBSP_SDIO_rca = 0u;
-const cy_stc_sd_host_init_config_t CYBSP_SDIO_config = 
-{
-	.emmc = true,
-	.dmaType = CY_SD_HOST_DMA_SDMA,
-	.enableLedControl = false,
-};
-cy_stc_sd_host_sd_card_config_t CYBSP_SDIO_card_cfg = 
-{
-	.lowVoltageSignaling = false,
-	.busWidth = CY_SD_HOST_BUS_WIDTH_4_BIT,
-	.cardType = &CYBSP_SDIO_cardType,
-	.rca = &CYBSP_SDIO_rca,
-	.cardCapacity = &CYBSP_SDIO_cardCapacity,
-};
-#if defined (CY_USING_HAL)
-	const cyhal_resource_inst_t CYBSP_SDIO_obj = 
-	{
-		.type = CYHAL_RSC_SDHC,
-		.block_num = 0U,
-		.channel_num = 0U,
-	};
-#endif //defined (CY_USING_HAL)
 const cy_stc_smif_config_t CYBSP_QSPI_config = 
 {
 	.mode = (uint32_t)CY_SMIF_NORMAL,
@@ -242,7 +181,7 @@ void init_cycfg_peripherals(void)
 {
 	Cy_SysClk_PeriphAssignDivider(PCLK_CSD_CLOCK, CY_SYSCLK_DIV_8_BIT, 3U);
 
-	Cy_SysClk_PeriphAssignDivider(PCLK_SCB2_CLOCK, CY_SYSCLK_DIV_8_BIT, 2U);
+	Cy_SysClk_PeriphAssignDivider(PCLK_SCB2_CLOCK, CY_SYSCLK_DIV_8_BIT, 4U);
 #if defined (CY_USING_HAL)
 		cyhal_hwmgr_reserve(&CYBSP_BT_UART_obj);
 #endif //defined (CY_USING_HAL)
@@ -250,15 +189,6 @@ void init_cycfg_peripherals(void)
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB3_CLOCK, CY_SYSCLK_DIV_8_BIT, 1U);
 #if defined (CY_USING_HAL)
 		cyhal_hwmgr_reserve(&CYBSP_CSD_COMM_obj);
-#endif //defined (CY_USING_HAL)
-
-	Cy_SysClk_PeriphAssignDivider(PCLK_SCB5_CLOCK, CY_SYSCLK_DIV_8_BIT, 2U);
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_DEBUG_UART_obj);
-#endif //defined (CY_USING_HAL)
-
-#if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&CYBSP_SDIO_obj);
 #endif //defined (CY_USING_HAL)
 
 #if defined (CY_USING_HAL)

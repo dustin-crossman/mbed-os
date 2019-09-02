@@ -44,12 +44,12 @@ extern "C" {
 #define CYBSP_CSD_COMM_CLK_DIV_ENABLED 1U
 #define CYBSP_CSD_COMM_CLK_DIV_HW CY_SYSCLK_DIV_8_BIT
 #define CYBSP_CSD_COMM_CLK_DIV_NUM 1U
-#define CYBSP_DEBUG_UART_CLK_DIV_ENABLED 1U
-#define CYBSP_DEBUG_UART_CLK_DIV_HW CY_SYSCLK_DIV_8_BIT
-#define CYBSP_DEBUG_UART_CLK_DIV_NUM 2U
 #define CYBSP_CSD_CLK_DIV_ENABLED 1U
 #define CYBSP_CSD_CLK_DIV_HW CY_SYSCLK_DIV_8_BIT
 #define CYBSP_CSD_CLK_DIV_NUM 3U
+#define peri_0_div_8_4_ENABLED 1U
+#define peri_0_div_8_4_HW CY_SYSCLK_DIV_8_BIT
+#define peri_0_div_8_4_NUM 4U
 
 #if defined (CY_USING_HAL)
 	extern const cyhal_resource_inst_t CYBSP_USB_CLK_DIV_obj;
@@ -61,10 +61,10 @@ extern "C" {
 	extern const cyhal_resource_inst_t CYBSP_CSD_COMM_CLK_DIV_obj;
 #endif //defined (CY_USING_HAL)
 #if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_DEBUG_UART_CLK_DIV_obj;
+	extern const cyhal_resource_inst_t CYBSP_CSD_CLK_DIV_obj;
 #endif //defined (CY_USING_HAL)
 #if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_CSD_CLK_DIV_obj;
+	extern const cyhal_resource_inst_t peri_0_div_8_4_obj;
 #endif //defined (CY_USING_HAL)
 
 void init_cycfg_clocks(void);

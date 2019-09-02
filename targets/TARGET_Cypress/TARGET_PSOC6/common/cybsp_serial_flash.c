@@ -36,7 +36,7 @@
 extern "C" {
 #endif
 
-#if defined(CYBSP_QSPI_SCK)
+#if defined(CYBSP_QSPI_SCK) && (DEVICE_QSPI)
 #include "cycfg_qspi_memslot.h"
 
 /** \cond internal */
@@ -173,7 +173,7 @@ cy_rslt_t cybsp_serial_flash_enable_xip(bool enable)
     return CY_RSLT_SUCCESS;
 }
 
-#endif /* defined(CYBSP_QSPI_SCK) */
+#endif /* defined(CYBSP_QSPI_SCK) && (DEVICE_QSPI) */
 
 #if defined(__cplusplus)
 }

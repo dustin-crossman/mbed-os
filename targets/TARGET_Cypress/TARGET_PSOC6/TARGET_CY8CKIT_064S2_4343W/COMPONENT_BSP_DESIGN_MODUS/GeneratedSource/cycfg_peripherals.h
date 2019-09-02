@@ -33,7 +33,6 @@
 	#include "cyhal_hwmgr.h"
 #endif //defined (CY_USING_HAL)
 #include "cy_scb_ezi2c.h"
-#include "cy_sd_host.h"
 #include "cy_smif.h"
 #include "cycfg_qspi_memslot.h"
 #include "cy_mcwdt.h"
@@ -86,12 +85,6 @@ extern "C" {
 #define CYBSP_CSD_COMM_ENABLED 1U
 #define CYBSP_CSD_COMM_HW SCB3
 #define CYBSP_CSD_COMM_IRQ scb_3_interrupt_IRQn
-#define CYBSP_DEBUG_UART_ENABLED 1U
-#define CYBSP_DEBUG_UART_HW SCB5
-#define CYBSP_DEBUG_UART_IRQ scb_5_interrupt_IRQn
-#define CYBSP_SDIO_ENABLED 1U
-#define CYBSP_SDIO_HW SDHC0
-#define CYBSP_SDIO_IRQ sdhc_0_interrupt_general_IRQn
 #define CYBSP_QSPI_ENABLED 1U
 #define CYBSP_QSPI_HW SMIF0
 #define CYBSP_QSPI_IRQ smif_interrupt_IRQn
@@ -139,18 +132,6 @@ extern const cy_stc_scb_uart_config_t CYBSP_BT_UART_config;
 extern const cy_stc_scb_ezi2c_config_t CYBSP_CSD_COMM_config;
 #if defined (CY_USING_HAL)
 	extern const cyhal_resource_inst_t CYBSP_CSD_COMM_obj;
-#endif //defined (CY_USING_HAL)
-extern const cy_stc_scb_uart_config_t CYBSP_DEBUG_UART_config;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_DEBUG_UART_obj;
-#endif //defined (CY_USING_HAL)
-extern cy_en_sd_host_card_capacity_t CYBSP_SDIO_cardCapacity;
-extern cy_en_sd_host_card_type_t CYBSP_SDIO_cardType;
-extern uint32_t CYBSP_SDIO_rca;
-extern const cy_stc_sd_host_init_config_t CYBSP_SDIO_config;
-extern cy_stc_sd_host_sd_card_config_t CYBSP_SDIO_card_cfg;
-#if defined (CY_USING_HAL)
-	extern const cyhal_resource_inst_t CYBSP_SDIO_obj;
 #endif //defined (CY_USING_HAL)
 extern const cy_stc_smif_config_t CYBSP_QSPI_config;
 #if defined (CY_USING_HAL)
