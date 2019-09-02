@@ -8708,7 +8708,7 @@
     "CY8CPROTO_064_SB": {
         "inherits": ["MCU_PSOC6_M4"],
         "components_remove": ["QSPIF"],
-        "device_has_remove": ["QSPI"],
+        "device_has_remove": ["QSPI", "WATCHDOG"],
         "supported_form_factors": ["ARDUINO"],
         "extra_labels_add": ["PSOC6_01"],
         "macros_add": ["CYB06447BZI_D54",
