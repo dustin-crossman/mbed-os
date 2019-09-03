@@ -103,7 +103,7 @@ win_IAR_064S2_tests:
   tags:
     - MBED_TEST
   script:
-    - mbed test --compile -m CY8CKIT_064S2_4343W -t IAR -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v
+    - mbed test --compile -m CY8CKIT_064S2_4343W -t IAR -n TESTS-mbed_hal-common_tickers_freq,TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -v
     
 
 win_IAR_064_tests:
@@ -168,8 +168,8 @@ mac_GCC_ARM_064S2_tests:
   script:
     - mbedls -m 190A:CY8CKIT_064S2_4343W
     - mbedls
-    - mbed test --compile -m CY8CKIT_064S2_4343W -t GCC_ARM -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv
-    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190A13016c131c0b036c131c00000000000000002e127069 -vv
+    - mbed test --compile --build OUT/CY8CKIT_064S2_4343W -m CY8CKIT_064S2_4343W -t GCC_ARM -n TESTS-mbed_hal-common_tickers_freq,TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv
+    - mbedgt --test-spec OUT/CY8CKIT_064S2_4343W/test_spec.json -e "TESTS/host_tests" -n TESTS-mbed_hal-common_tickers_freq,TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190A13016c131c0b036c131c00000000000000002e127069 -vv
 
 mac_ARMC6_064_tests:
   stage: test
@@ -208,6 +208,5 @@ mac_ARMC6_064S2_tests:
     - mbedls -m 190A:CY8CKIT_064S2_4343W
     - mbedls
     - export ARMLMD_LICENSE_FILE=/Library/Application\ Support/Mbed\ Studio/mbed-studio-tools/ac6-license.dat
-    - mbed test --compile -m CY8CKIT_064S2_4343W -t ARMC6 -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv    
-    - mbedgt -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190A13016c131c0b036c131c00000000000000002e127069 -vv
-    
+    - mbed test --compile --build OUT/CY8CKIT_064S2_4343W/ -m CY8CKIT_064S2_4343W -t ARMC6 -n TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc -vv    
+    - mbedgt --test-spec OUT/CY8CKIT_064S2_4343W/test_spec.json -e "TESTS/host_tests" -n TESTS-mbed_hal-common_tickers_freq,TESTS-mbed_hal-pinmap,TESTS-mbed_hal-rtc_reset,TESTS-mbed_hal-flash,TESTS-mbed_hal-common_tickers,TESTS-mbed_hal-lp_ticker,TESTS-mbed_drivers-lp_ticker,TESTS-mbed_drivers-rtc --use-tids 190A13016c131c0b036c131c00000000000000002e127069 -vv
