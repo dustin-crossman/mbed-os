@@ -112,7 +112,7 @@ public:
     virtual nsapi_error_t wifi_get_pm_mode( uint8_t *pm_mode ) = 0;
 
     /** Wifi Set PM Mode
-     * @param pm_mode: PM Mod to set
+     * @param pm_mode: PM Mode to set
      * @param pm2_sleep_return_delay  in milli-seconds
      * @return NSAPI_ERROR_OK on success, negative error code on failure.
      */
