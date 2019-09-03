@@ -394,7 +394,7 @@ nsapi_error_t WicedInterface::wifi_set_pm_mode( uint8_t pm_mode, uint16_t pm2_sl
     if ( res != WWD_SUCCESS )
     {
        return wiced_toerror((wiced_result_t)res);
-	}
+    }
     else
     {
        return NSAPI_ERROR_OK;
