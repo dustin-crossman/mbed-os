@@ -103,6 +103,23 @@ public:
      */
     int scan(WiFiAccessPoint *res, unsigned count);
 
+    /** Wifi Get Current PM Mode
+     *  @param   pm_mode : get current PMMode
+     *  @return  NSAPI_ERROR_OK on success, negative error code on failure.
+     *
+     */
+    nsapi_error_t wifi_get_pm_mode( uint8_t *pm_mode );
+
+    /** Wifi Set PM Mode
+     * @param pm_mode : PM Mode to set
+     *    NO_POWERSAVE_MODE           ( 0 )
+     *    PM1_POWERSAVE_MODE          ( 1 )
+     *    PM2_POWERSAVE_MODE          ( 2 )
+     * @param pm2_sleep_delay  in milli-seconds
+     * @return NSAPI_ERROR_OK on success, negative error code on failure.
+     */
+    nsapi_error_t wifi_set_pm_mode( uint8_t pm_mode , uint16_t pm2_sleep_delay);
+
 private:
 
     char _ssid[33]; /* The longest possible name (defined in 802.11) +1 for the \0 */

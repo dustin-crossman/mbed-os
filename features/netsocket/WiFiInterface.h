@@ -104,6 +104,20 @@ public:
      */
     virtual nsapi_size_or_error_t scan(WiFiAccessPoint *res, nsapi_size_t count) = 0;
 
+    /** Wifi Get Current PM Mode
+     *  @param   pm_mode : get current PMMode
+     *  @return  NSAPI_ERROR_OK on success, negative error code on failure.
+     *
+     */
+    virtual nsapi_error_t wifi_get_pm_mode( uint8_t *pm_mode ) = 0;
+
+    /** Wifi Set PM Mode
+     * @param pm_mode: PM Mod to set
+     * @param pm2_sleep_return_delay  in milli-seconds
+     * @return NSAPI_ERROR_OK on success, negative error code on failure.
+     */
+    virtual  nsapi_error_t wifi_set_pm_mode( uint8_t pm_mode , uint16_t pm2_sleep_delay) = 0 ;
+
     /** @copydoc NetworkInterface::wifiInterface
      */
     virtual WiFiInterface *wifiInterface()
