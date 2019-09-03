@@ -367,13 +367,13 @@ int WicedInterface::scan(WiFiAccessPoint *aps, unsigned count)
 
 nsapi_error_t WicedInterface::wifi_get_pm_mode( uint8_t *pm_mode )
 {
-	*pm_mode = wiced_wifi_get_powersave_mode();
-	return NSAPI_ERROR_OK;
+    *pm_mode = wiced_wifi_get_powersave_mode();
+    return NSAPI_ERROR_OK;
 }
 
 nsapi_error_t WicedInterface::wifi_set_pm_mode( uint8_t pm_mode, uint16_t pm2_sleep_delay )
 {
-	wwd_result_t res = WWD_SUCCESS;
+    wwd_result_t res = WWD_SUCCESS;
     switch ( pm_mode )
     {
        case NO_POWERSAVE_MODE:
