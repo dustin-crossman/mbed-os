@@ -365,3 +365,38 @@ int WicedInterface::scan(WiFiAccessPoint *aps, unsigned count)
     return data.offset;
 }
 
+nsapi_error_t WicedInterface::wifi_get_pm_mode( uint8_t *pm_mode )
+{
+    *pm_mode = wiced_wifi_get_powersave_mode();
+    return NSAPI_ERROR_OK;
+}
+
+nsapi_error_t WicedInterface::wifi_set_pm_mode( uint8_t pm_mode, uint16_t pm2_sleep_delay )
+{
+    wwd_result_t res = WWD_SUCCESS;
+    switch ( pm_mode )
+    {
+       case NO_POWERSAVE_MODE:
+            res = wwd_wifi_disable_powersave();
+            break;
+
+       case PM1_POWERSAVE_MODE:
+            res = wwd_wifi_enable_powersave();
+            break;
+
+       case PM2_POWERSAVE_MODE:
+            res = wwd_wifi_enable_powersave_with_throughput(pm2_sleep_delay);
+            break;
+
+       default:
+            break;
+    }
+    if ( res != WWD_SUCCESS )
+    {
+       return wiced_toerror((wiced_result_t)res);
+    }
+    else
+    {
+       return NSAPI_ERROR_OK;
+    }
+}
