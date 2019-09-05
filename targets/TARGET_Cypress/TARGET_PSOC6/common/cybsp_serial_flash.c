@@ -36,7 +36,7 @@
 extern "C" {
 #endif
 
-#if defined(CYBSP_QSPI_SCK) && (DEVICE_QSPI)
+#if defined(CYBSP_QSPI_SCK)
 #include "cycfg_qspi_memslot.h"
 
 /** \cond internal */
