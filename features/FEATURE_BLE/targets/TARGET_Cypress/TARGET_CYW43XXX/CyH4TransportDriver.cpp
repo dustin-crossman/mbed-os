@@ -23,8 +23,17 @@ CyH4TransportDriver::CyH4TransportDriver(PinName tx, PinName rx, PinName cts, Pi
 {
 }
 
-void CyH4TransportDriver::bt_host_wake_irq_handler(void)
+void CyH4TransportDriver::bt_host_wake_rise_irq_handler(void)
 {
+    /* lock PSoC 6 DeepSleep entry as long as host_wake is asserted */
+    sleep_manager_unlock_deep_sleep();
+}
+
+void CyH4TransportDriver::bt_host_wake_fall_irq_handler(void)
+{
+    /* lock PSoC 6 DeepSleep entry as long as host_wake is asserted */
+    sleep_manager_lock_deep_sleep();
+
     /* On host wake ISR, enable UART Rx interrupt. Any incoming UART Rx data will trigger
      * on_controller_irq handler and we don't need to explicitly call on_controller_irq from
      * this host wake handler */
@@ -59,7 +68,8 @@ void CyH4TransportDriver::initialize()
 
     //Register IRQ for Host WAKE
     host_wake_pin = new InterruptIn(bt_host_wake_name);
-    host_wake_pin->fall(callback(this, &CyH4TransportDriver::bt_host_wake_irq_handler));
+    host_wake_pin->fall(callback(this, &CyH4TransportDriver::bt_host_wake_fall_irq_handler));
+    host_wake_pin->rise(callback(this, &CyH4TransportDriver::bt_host_wake_rise_irq_handler));
 
     bt_device_wake = 0;
     sleep_manager_unlock_deep_sleep();

@@ -51,7 +51,8 @@ public:
      */
     virtual uint16_t write(uint8_t type, uint16_t len, uint8_t *pData);
 
-    void bt_host_wake_irq_handler();
+    void bt_host_wake_rise_irq_handler();
+    void bt_host_wake_fall_irq_handler();
 
     void on_host_stack_inactivity();
 
