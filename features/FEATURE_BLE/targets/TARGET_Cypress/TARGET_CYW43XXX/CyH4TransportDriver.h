@@ -74,6 +74,7 @@ private:
     PinName bt_device_wake_name;
     DigitalInOut bt_host_wake;
     DigitalInOut bt_device_wake;
+    bool bt_host_wake_active;
 };
 
 } // namespace cypress
