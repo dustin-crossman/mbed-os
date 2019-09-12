@@ -21,12 +21,17 @@ CyH4TransportDriver::CyH4TransportDriver(PinName tx, PinName rx, PinName cts, Pi
     bt_host_wake(bt_host_wake_name, PIN_INPUT, PullNone, 0),
     bt_device_wake(bt_device_wake_name, PIN_OUTPUT, PullDefault, 1)
 {
+    bt_host_wake_active = false;
 }
 
 void CyH4TransportDriver::bt_host_wake_rise_irq_handler(void)
 {
-    /* lock PSoC 6 DeepSleep entry as long as host_wake is asserted */
-    sleep_manager_unlock_deep_sleep();
+    if(bt_host_wake_active == true)
+    {
+        /* lock PSoC 6 DeepSleep entry as long as host_wake is asserted */
+        sleep_manager_unlock_deep_sleep();
+        bt_host_wake_active = false;
+    }
 }
 
 void CyH4TransportDriver::bt_host_wake_fall_irq_handler(void)
@@ -41,6 +46,7 @@ void CyH4TransportDriver::bt_host_wake_fall_irq_handler(void)
         callback(this, &CyH4TransportDriver::on_controller_irq),
         SerialBase::RxIrq
     );
+    bt_host_wake_active = true;
 }
 
 void CyH4TransportDriver::initialize()
