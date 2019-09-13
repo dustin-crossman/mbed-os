@@ -420,6 +420,30 @@ extern "C" {
 #if defined (CY_USING_HAL)
 	#define CYBSP_BT_HOST_WAKE_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_ANALOG
 #endif //defined (CY_USING_HAL)
+#define CYBSP_WIFI_HOST_WAKE_ENABLED 1U
+#define CYBSP_WIFI_HOST_WAKE_PORT GPIO_PRT4
+#define CYBSP_WIFI_HOST_WAKE_PORT_NUM 4U
+#define CYBSP_WIFI_HOST_WAKE_PIN 1U
+#define CYBSP_WIFI_HOST_WAKE_NUM 1U
+#define CYBSP_WIFI_HOST_WAKE_DRIVEMODE CY_GPIO_DM_ANALOG
+#define CYBSP_WIFI_HOST_WAKE_INIT_DRIVESTATE 1
+#ifndef ioss_0_port_4_pin_1_HSIOM
+	#define ioss_0_port_4_pin_1_HSIOM HSIOM_SEL_GPIO
+#endif
+#define CYBSP_WIFI_HOST_WAKE_HSIOM ioss_0_port_4_pin_1_HSIOM
+#define CYBSP_WIFI_HOST_WAKE_IRQ ioss_interrupts_gpio_4_IRQn
+#if defined (CY_USING_HAL)
+	#define CYBSP_WIFI_HOST_WAKE_HAL_PORT_PIN P4_1
+#endif //defined (CY_USING_HAL)
+#if defined (CY_USING_HAL)
+	#define CYBSP_WIFI_HOST_WAKE_HAL_IRQ CYHAL_GPIO_IRQ_RISE
+#endif //defined (CY_USING_HAL)
+#if defined (CY_USING_HAL)
+	#define CYBSP_WIFI_HOST_WAKE_HAL_DIR CYHAL_GPIO_DIR_INPUT 
+#endif //defined (CY_USING_HAL)
+#if defined (CY_USING_HAL)
+	#define CYBSP_WIFI_HOST_WAKE_HAL_DRIVEMODE CYHAL_GPIO_DRIVE_ANALOG
+#endif //defined (CY_USING_HAL)
 #define CYBSP_EZI2C_SCL_ENABLED 1U
 #define CYBSP_EZI2C_SCL_PORT GPIO_PRT6
 #define CYBSP_EZI2C_SCL_PORT_NUM 6U
@@ -844,6 +868,10 @@ extern const cy_stc_gpio_pin_config_t CYBSP_BT_DEVICE_WAKE_config;
 extern const cy_stc_gpio_pin_config_t CYBSP_BT_HOST_WAKE_config;
 #if defined (CY_USING_HAL)
 	extern const cyhal_resource_inst_t CYBSP_BT_HOST_WAKE_obj;
+#endif //defined (CY_USING_HAL)
+extern const cy_stc_gpio_pin_config_t CYBSP_WIFI_HOST_WAKE_config;
+#if defined (CY_USING_HAL)
+	extern const cyhal_resource_inst_t CYBSP_WIFI_HOST_WAKE_obj;
 #endif //defined (CY_USING_HAL)
 extern const cy_stc_gpio_pin_config_t CYBSP_EZI2C_SCL_config;
 #if defined (CY_USING_HAL)

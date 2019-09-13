@@ -32,34 +32,14 @@ const cy_stc_scb_ezi2c_config_t CYBSP_I2C_config =
 	.subAddressSize = CY_SCB_EZI2C_SUB_ADDR8_BITS,
 	.enableWakeFromSleep = false,
 };
-const cy_stc_scb_uart_config_t CYBSP_DEBUG_UART_config = 
-{
-	.uartMode = CY_SCB_UART_STANDARD,
-	.enableMutliProcessorMode = false,
-	.smartCardRetryOnNack = false,
-	.irdaInvertRx = false,
-	.irdaEnableLowPowerReceiver = false,
-	.oversample = 12,
-	.enableMsbFirst = false,
-	.dataWidth = 8UL,
-	.parity = CY_SCB_UART_PARITY_NONE,
-	.stopBits = CY_SCB_UART_STOP_BITS_1,
-	.enableInputFilter = false,
-	.breakWidth = 11UL,
-	.dropOnFrameError = false,
-	.dropOnParityError = false,
-	.receiverAddress = 0x0UL,
-	.receiverAddressMask = 0x0UL,
-	.acceptAddrInFifo = false,
-	.enableCts = false,
-	.ctsPolarity = CY_SCB_UART_ACTIVE_LOW,
-	.rtsRxFifoLevel = 0UL,
-	.rtsPolarity = CY_SCB_UART_ACTIVE_LOW,
-	.rxFifoTriggerLevel = 63UL,
-	.rxFifoIntEnableMask = 0UL,
-	.txFifoTriggerLevel = 63UL,
-	.txFifoIntEnableMask = 0UL,
-};
+#if defined (CY_USING_HAL)
+	const cyhal_resource_inst_t CYBSP_I2C_obj = 
+	{
+		.type = CYHAL_RSC_SCB,
+		.block_num = 3U,
+		.channel_num = 0U,
+	};
+#endif //defined (CY_USING_HAL)
 const cy_stc_smif_config_t CYBSP_QSPI_config = 
 {
 	.mode = (uint32_t)CY_SMIF_NORMAL,
@@ -67,11 +47,24 @@ const cy_stc_smif_config_t CYBSP_QSPI_config =
 	.rxClockSel = (uint32_t)CY_SMIF_SEL_INV_INTERNAL_CLK,
 	.blockEvent = (uint32_t)CY_SMIF_BUS_ERROR,
 };
+#if defined (CY_USING_HAL)
+	const cyhal_resource_inst_t CYBSP_QSPI_obj = 
+	{
+		.type = CYHAL_RSC_SMIF,
+		.block_num = 0U,
+		.channel_num = 0U,
+	};
+#endif //defined (CY_USING_HAL)
 
 
 void init_cycfg_peripherals(void)
 {
 	Cy_SysClk_PeriphAssignDivider(PCLK_SCB3_CLOCK, CY_SYSCLK_DIV_8_BIT, 1U);
+#if defined (CY_USING_HAL)
+		cyhal_hwmgr_reserve(&CYBSP_I2C_obj);
+#endif //defined (CY_USING_HAL)
 
-	Cy_SysClk_PeriphAssignDivider(PCLK_SCB5_CLOCK, CY_SYSCLK_DIV_8_BIT, 0U);
+#if defined (CY_USING_HAL)
+		cyhal_hwmgr_reserve(&CYBSP_QSPI_obj);
+#endif //defined (CY_USING_HAL)
 }
