@@ -612,7 +612,7 @@ int QSPIFBlockDevice::_sfdp_parse_sfdp_headers(uint32_t &basic_table_addr, size_
     size_t data_length = QSPIF_SFDP_HEADER_SIZE;
     bd_addr_t addr = 0x0;
 
-    qspi_status_t status = _qspi_send_read_sfdp_command(addr, (char*) sfdp_header, data_length);
+    qspi_status_t status = _qspi_send_read_sfdp_command(addr, (char *) sfdp_header, data_length);
     if (status != QSPI_STATUS_OK) {
         tr_error("Init - Read SFDP Failed");
         return -1;
@@ -672,7 +672,7 @@ int QSPIFBlockDevice::_sfdp_parse_basic_param_table(uint32_t basic_table_addr, s
 {
     uint8_t param_table[SFDP_DEFAULT_BASIC_PARAMS_TABLE_SIZE_BYTES]; /* Up To 16 DWORDS = 64 Bytes */
 
-    qspi_status_t status = _qspi_send_read_sfdp_command(basic_table_addr, (char*) param_table, basic_table_size);
+    qspi_status_t status = _qspi_send_read_sfdp_command(basic_table_addr, (char *) param_table, basic_table_size);
     if (status != QSPI_STATUS_OK) {
         tr_error("Init - Read SFDP First Table Failed");
         return -1;
@@ -688,7 +688,7 @@ int QSPIFBlockDevice::_sfdp_parse_basic_param_table(uint32_t basic_table_addr, s
     uint32_t density_bits = ((param_table[7] << 24) |
                              (param_table[6] << 16) |
                              (param_table[5] << 8)  |
-                              param_table[4]);
+                             param_table[4]);
     _device_size_bytes = (density_bits + 1) / 8;
 
     // Set Page Size (QSPI write must be done on Page limits)
@@ -1100,7 +1100,7 @@ int QSPIFBlockDevice::_sfdp_detect_reset_protocol_and_reset(uint8_t *basic_param
         // Issue instruction 66h to enable resets on the device
         // Then issue instruction 99h to reset the device
         qspi_status_t qspi_status = _qspi_send_general_command(0x66, QSPI_NO_ADDRESS_COMMAND, // Send reset enable instruction
-                                                                NULL, 0, NULL, 0);
+                                                               NULL, 0, NULL, 0);
         if (qspi_status == QSPI_STATUS_OK) {
             qspi_status = _qspi_send_general_command(0x99, QSPI_NO_ADDRESS_COMMAND, // Send reset instruction
                                                      NULL, 0, NULL, 0);
@@ -1111,7 +1111,7 @@ int QSPIFBlockDevice::_sfdp_detect_reset_protocol_and_reset(uint8_t *basic_param
         status = QSPIF_BD_ERROR_PARSING_FAILED;
     }
 
-    if (status == QSPIF_BD_ERROR_OK){
+    if (status == QSPIF_BD_ERROR_OK) {
         if (false == _is_mem_ready()) {
             tr_error("Device not ready, reset failed");
             status = QSPIF_BD_ERROR_READY_FAILED;
@@ -1190,8 +1190,8 @@ int QSPIFBlockDevice::_clear_block_protection()
 
     /* Read Manufacturer ID (1byte), and Device ID (2bytes) */
     qspi_status_t status = _qspi_send_general_command(QSPIF_INST_RDID, QSPI_NO_ADDRESS_COMMAND,
-                                             NULL, 0,
-                                             (char *) vendor_device_ids, QSPI_RDID_DATA_LENGTH);
+                                                      NULL, 0,
+                                                      (char *) vendor_device_ids, QSPI_RDID_DATA_LENGTH);
     if (QSPI_STATUS_OK != status) {
         tr_error("Read Vendor ID Failed");
         return -1;
@@ -1476,7 +1476,7 @@ qspi_status_t QSPIFBlockDevice::_qspi_send_read_sfdp_command(bd_addr_t addr, voi
     // SFDP read instruction requires 1-1-1 bus mode with 8 dummy cycles and a 3-byte address
     _qspi.configure_format(QSPI_CFG_BUS_SINGLE, QSPI_CFG_BUS_SINGLE, QSPI_CFG_ADDR_SIZE_24, QSPI_CFG_BUS_SINGLE,
                            0, QSPI_CFG_BUS_SINGLE, QSPIF_RSFDP_DUMMY_CYCLES);
-    qspi_status_t status = _qspi.read(QSPIF_INST_RSFDP, -1, (unsigned int) addr, (char*) rx_buffer, &rx_len);
+    qspi_status_t status = _qspi.read(QSPIF_INST_RSFDP, -1, (unsigned int) addr, (char *) rx_buffer, &rx_len);
     // All commands other than Read and RSFDP use default 1-1-1 bus mode (Program/Erase are constrained by flash memory performance more than bus performance)
     _qspi.configure_format(QSPI_CFG_BUS_SINGLE, QSPI_CFG_BUS_SINGLE, _address_size, QSPI_CFG_BUS_SINGLE,
                            0, QSPI_CFG_BUS_SINGLE, 0);
@@ -1492,8 +1492,8 @@ qspi_status_t QSPIFBlockDevice::_qspi_read_status_registers(uint8_t *reg_buffer)
 {
     // Read Status Register 1
     qspi_status_t status = _qspi_send_general_command(QSPIF_INST_RSR1, QSPI_NO_ADDRESS_COMMAND,
-                                        NULL, 0,
-                                        (char *) &reg_buffer[0], 1);
+                                                      NULL, 0,
+                                                      (char *) &reg_buffer[0], 1);
     if (QSPI_STATUS_OK == status) {
         tr_debug("Reading Status Register 1 Success: value = 0x%x", (int) reg_buffer[0]);
     } else {
