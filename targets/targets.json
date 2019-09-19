@@ -8945,13 +8945,14 @@
         "device_has_remove": ["ANALOGOUT", "WATCHDOG", "QSPI"],
         "extra_labels_add": [
             "PSOC6_02",
+            "MXCRYPTO_02",
             "CM0P_SLEEP",
             "WHD",
             "4343W",
             "CYW43XXX",
             "CORDIO"
         ],
-        "macros_add": ["CYB0644ABZI_D44", "CYBSP_WIFI_CAPABLE"],
+        "macros_add": ["CYB0644ABZI_S2D44", "CYBSP_WIFI_CAPABLE"],
         "detect_code": ["190A"],
         "post_binary_hook": {
             "function": "PSOC6Code.sign_image"
