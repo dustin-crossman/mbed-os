@@ -8942,7 +8942,7 @@
         "features": ["BLE"],
         "components_remove": ["QSPIF"],
         "supported_form_factors": ["ARDUINO"],
-        "device_has_remove": ["ANALOGOUT", "WATCHDOG", "QSPI"],
+        "device_has_remove": ["ANALOGOUT", "QSPI"],
         "extra_labels_add": [
             "PSOC6_02",
             "MXCRYPTO_02",
