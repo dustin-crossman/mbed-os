@@ -156,6 +156,7 @@ public:
                 // Note: Reset is handled by ack_service_pack.
                 case HCI_VS_CMD_SET_SLEEP_MODE:
                     HciWriteLeHostSupport();
+                    sleep_manager_unlock_deep_sleep();
                     break;
 
                 case HCI_OPCODE_WRITE_LE_HOST_SUPPORT:
@@ -303,11 +304,6 @@ public:
         }
     }
 
-    virtual void on_host_stack_inactivity(void)
-    {
-        cy_transport_driver.on_host_stack_inactivity();
-    }
-
 private:
 
     // send pre_brcm_patchram_buf issue hci reset and update baud rate on 43012
@@ -321,7 +317,7 @@ private:
         send_service_pack_command();
     }
 
-    // Called one pre_brcm_patchram_buf has been transferred; send pre_brcm_patchram_buf2 update uart baudrate 
+    // Called one pre_brcm_patchram_buf has been transferred; send pre_brcm_patchram_buf2 update uart baudrate
 	// on PSoC6 to send hci download minidriver
     void prepare_service_pack_transfert2(void)
     {
@@ -366,7 +362,6 @@ private:
         service_pack_index = 0;
         service_pack_transfered = true;
 		HciUpdateUartBaudRate();
-        sleep_manager_unlock_deep_sleep();
     }
 
     void send_service_pack_command(void)

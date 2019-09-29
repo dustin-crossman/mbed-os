@@ -38,14 +38,6 @@ void CyH4TransportDriver::bt_host_wake_fall_irq_handler(void)
 {
     /* lock PSoC 6 DeepSleep entry as long as host_wake is asserted */
     sleep_manager_lock_deep_sleep();
-
-    /* On host wake ISR, enable UART Rx interrupt. Any incoming UART Rx data will trigger
-     * on_controller_irq handler and we don't need to explicitly call on_controller_irq from
-     * this host wake handler */
-    uart.attach(
-        callback(this, &CyH4TransportDriver::on_controller_irq),
-        SerialBase::RxIrq
-    );
     bt_host_wake_active = true;
 }
 
@@ -71,6 +63,9 @@ void CyH4TransportDriver::initialize()
         callback(this, &CyH4TransportDriver::on_controller_irq),
         SerialBase::RxIrq
     );
+
+    /* Deep sleep unlock to revert the deepsleep lock taken by HCI UART on attaching the RxIrq */
+    sleep_manager_unlock_deep_sleep();
 
     //Register IRQ for Host WAKE
     host_wake_pin = new InterruptIn(bt_host_wake_name);
@@ -102,22 +97,15 @@ uint16_t CyH4TransportDriver::write(uint8_t type, uint16_t len, uint8_t *pData)
     return len;
 }
 
-void CyH4TransportDriver::on_host_stack_inactivity()
-{
-    uart.attach(NULL, SerialBase::RxIrq);
-}
-
 void CyH4TransportDriver::on_controller_irq()
 {
     sleep_manager_lock_deep_sleep();
-	assert_bt_dev_wake();
 
 	while (uart.readable()) {
         uint8_t char_received = uart.getc();
         hci_cy_TrSerialRxIncoming(&char_received, 1);
     }
 
-	deassert_bt_dev_wake();
     sleep_manager_unlock_deep_sleep();
 }
 
