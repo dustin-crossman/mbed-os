@@ -292,6 +292,38 @@ cy_rslt_t cyhal_system_clock_set_divider(cyhal_system_clock_t clock, cyhal_syste
     return CY_RSLT_SUCCESS;
 }
 
+static inline cyhal_reset_reason_t cyhal_system_translate_reset_reason(uint32_t pdl_reason)
+{
+    cyhal_reset_reason_t reason = CYHAL_SYSTEM_RESET_NONE;
+
+    if(CY_SYSLIB_RESET_HWWDT & pdl_reason)        reason |= CYHAL_SYSTEM_RESET_WDT;
+    if(CY_SYSLIB_RESET_ACT_FAULT & pdl_reason)    reason |= CYHAL_SYSTEM_RESET_ACTIVE_FAULT;
+    if(CY_SYSLIB_RESET_DPSLP_FAULT & pdl_reason)  reason |= CYHAL_SYSTEM_RESET_DEEPSLEEP_FAULT;
+    if(CY_SYSLIB_RESET_SOFT & pdl_reason)         reason |= CYHAL_SYSTEM_RESET_SOFT;
+    if(CY_SYSLIB_RESET_SWWDT0 & pdl_reason)       reason |= CYHAL_SYSTEM_RESET_WDT;
+    if(CY_SYSLIB_RESET_SWWDT1 & pdl_reason)       reason |= CYHAL_SYSTEM_RESET_WDT;
+    if(CY_SYSLIB_RESET_SWWDT2 & pdl_reason)       reason |= CYHAL_SYSTEM_RESET_WDT;
+    if(CY_SYSLIB_RESET_SWWDT3 & pdl_reason)       reason |= CYHAL_SYSTEM_RESET_WDT;
+    if(CY_SYSLIB_RESET_HIB_WAKEUP & pdl_reason)   reason |= CYHAL_SYSTEM_RESET_HIB_WAKEUP;
+#if (SRSS_WCOCSV_PRESENT != 0U)
+    if(CY_SYSLIB_RESET_WCO_LOSS & pdl_reason)     reason |= CYHAL_SYSTEM_RESET_WCO_LOSS
+    if(CY_SYSLIB_RESET_HFCLK_LOSS & pdl_reason)   reason |= CYHAL_SYSTEM_RESET_SYS_CLK_ERR;
+    if(CY_SYSLIB_RESET_HFCLK_ERR & pdl_reason)    reason |= CYHAL_SYSTEM_RESET_SYS_CLK_ERR;
+#endif
+
+    return reason;
+}
+
+cyhal_reset_reason_t cyhal_system_get_reset_reason(void)
+{
+    return cyhal_system_translate_reset_reason(Cy_SysLib_GetResetReason());
+}
+
+void cyhal_system_clear_reset_reason(void)
+{
+    Cy_SysLib_ClearResetReason();
+}
+
 #if defined(__cplusplus)
 }
 #endif

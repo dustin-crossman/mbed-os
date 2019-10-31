@@ -56,6 +56,19 @@ extern "C" {
 /** An error occurred in System module */
 #define CYHAL_SYSTEM_RSLT_NO_VALID_DIVIDER (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CYHAL_RSLT_MODULE_SYSTEM , 4))
 
+/** Flags enum of possible system reset causes */
+typedef enum
+{
+    CYHAL_SYSTEM_RESET_NONE            = 0,      /** No cause */
+    CYHAL_SYSTEM_RESET_WDT             = 1 << 0, /** A watchdog timer (WDT) reset has occurred */
+    CYHAL_SYSTEM_RESET_ACTIVE_FAULT    = 1 << 1, /** The fault logging system requested a reset from its Active logic. */
+    CYHAL_SYSTEM_RESET_DEEPSLEEP_FAULT = 1 << 2, /** The fault logging system requested a reset from its Deep-Sleep logic. */
+    CYHAL_SYSTEM_RESET_SOFT            = 1 << 3, /** The CPU requested a system reset through it's SYSRESETREQ. */
+    CYHAL_SYSTEM_RESET_HIB_WAKEUP      = 1 << 4, /** A reset has occurred due to a a wakeup from hibernate power mode. */
+    CYHAL_SYSTEM_RESET_WCO_ERR         = 1 << 5, /** A reset has occurred due to a watch-crystal clock error */
+    CYHAL_SYSTEM_RESET_SYS_CLK_ERR     = 1 << 6, /** A reset has occurred due to a system clock error */
+} cyhal_reset_reason_t;
+
 /** Enter a critical section
  *
  * Disables interrupts and returns a value indicating whether the interrupts were previously
@@ -137,6 +150,15 @@ cy_rslt_t cyhal_system_clock_set_frequency(uint8_t clock, uint32_t frequency_hz)
  * @return The status of the set_divider request
  */
 cy_rslt_t cyhal_system_clock_set_divider(cyhal_system_clock_t clock, cyhal_system_divider_t divider);
+
+/** Gets the cause of the latest reset or resets that occured in the system.
+ *
+ * @return Returns an enum of flags with the cause of the last reset(s)
+ */
+cyhal_reset_reason_t cyhal_system_get_reset_reason(void);
+
+/** Clears the reset cause registers */
+void cyhal_system_clear_reset_reason(void);
 
 #if defined(__cplusplus)
 }
