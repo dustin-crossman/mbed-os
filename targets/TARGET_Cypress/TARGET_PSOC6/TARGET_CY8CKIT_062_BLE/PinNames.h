@@ -47,25 +47,16 @@
 #define LED_BLUE LED3
 #define LED_GREEN LED2
 
-#define SWITCH2 P0_4
-#define USER_BUTTON SWITCH2
+#define USER_BUTTON P0_4
 #define BUTTON1 USER_BUTTON
 
-#define QSPI_CLK P11_7
-#define QSPI_IO_0 P11_6
-#define QSPI_IO_1 P11_5
-#define QSPI_IO_2 P11_4
-#define QSPI_IO_3 P11_3
-#define QSPI_SEL P11_2
+#define QSPI_FLASH1_IO0 P11_6
+#define QSPI_FLASH1_IO1 P11_5
+#define QSPI_FLASH1_IO2 P11_4
+#define QSPI_FLASH1_IO3 P11_3
+#define QSPI_FLASH1_SCK P11_7
+#define QSPI_FLASH1_CSN P11_2
 
-#define QSPI_FLASH1_IO0 QSPI_IO_0
-#define QSPI_FLASH1_IO1 QSPI_IO_1
-#define QSPI_FLASH1_IO2 QSPI_IO_2
-#define QSPI_FLASH1_IO3 QSPI_IO_3
-#define QSPI_FLASH1_SCK QSPI_CLK
-#define QSPI_FLASH1_CSN QSPI_SEL
-
-// Standardized interfaces names
 #define STDIO_UART_TX UART_TX
 #define STDIO_UART_RX UART_RX
 #define STDIO_UART_CTS UART_CTS
@@ -73,7 +64,5 @@
 
 #define USBTX UART_TX
 #define USBRX UART_RX
-
-#define AOUT P9_6
 
 #endif

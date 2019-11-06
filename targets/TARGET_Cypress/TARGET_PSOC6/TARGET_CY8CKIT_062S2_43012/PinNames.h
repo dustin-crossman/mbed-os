@@ -43,34 +43,16 @@
 #define LED_BLUE LED3
 
 // Reset pin unavailable
-#define SWITCH2 P0_4
-#define SWITCH4 P1_4
-#define USER_BUTTON SWITCH2
+#define USER_BUTTON P0_4
 #define BUTTON1 USER_BUTTON
-#define BUTTON2 SWITCH4
+#define BUTTON2 P1_4
 
-#define CARD_DETECT_1 P13_7
-#define CARD_DETECT CARD_DETECT_1
-#define SD_CMD P12_4
-#define SD_CLK P12_5
-#define SD_IO_0 P13_0
-#define SD_IO_1 P13_1
-#define SD_IO_2 P13_2
-#define SD_IO_3 P13_3
-
-#define QSPI_CLK P11_7
-#define QSPI_IO_0 P11_6
-#define QSPI_IO_1 P11_5
-#define QSPI_IO_2 P11_4
-#define QSPI_IO_3 P11_3
-#define QSPI_SEL P11_2
-
-#define QSPI_FLASH1_IO0 QSPI_IO_0
-#define QSPI_FLASH1_IO1 QSPI_IO_1
-#define QSPI_FLASH1_IO2 QSPI_IO_2
-#define QSPI_FLASH1_IO3 QSPI_IO_3
-#define QSPI_FLASH1_SCK QSPI_CLK
-#define QSPI_FLASH1_CSN QSPI_SEL
+#define QSPI_FLASH1_IO0 P11_6
+#define QSPI_FLASH1_IO1 P11_5
+#define QSPI_FLASH1_IO2 P11_4
+#define QSPI_FLASH1_IO3 P11_3
+#define QSPI_FLASH1_SCK P11_7
+#define QSPI_FLASH1_CSN P11_2
 
 // Standardized interfaces names
 #define STDIO_UART_TX UART_TX

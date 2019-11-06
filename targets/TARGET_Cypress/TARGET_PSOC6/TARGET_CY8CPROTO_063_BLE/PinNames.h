@@ -33,8 +33,7 @@
 #define LED1 P6_3
 #define LED2 P7_1
 
-#define SWITCH2 P0_4
-#define USER_BUTTON SWITCH2
+#define USER_BUTTON P0_4
 #define BUTTON1 USER_BUTTON
 
 // Standardized interfaces names
