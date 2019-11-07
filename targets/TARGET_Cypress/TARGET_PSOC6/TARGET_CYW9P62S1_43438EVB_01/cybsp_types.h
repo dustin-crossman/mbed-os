@@ -158,13 +158,13 @@ extern "C" {
 #define CYBSP_WIFI_HOST_WAKE        (P4_1)
 
 /** Pin: BT UART RX */
-#define CYBSP_BT_UART_RX            (P3_1)
+#define CYBSP_BT_UART_RX            (P3_0)
 /** Pin: BT UART TX */
-#define CYBSP_BT_UART_TX            (P3_0)
+#define CYBSP_BT_UART_TX            (P3_1)
 /** Pin: BT UART RTS */
-#define CYBSP_BT_UART_RTS           (P3_3)
+#define CYBSP_BT_UART_RTS           (P3_2)
 /** Pin: BT UART CTS */
-#define CYBSP_BT_UART_CTS           (P3_2)
+#define CYBSP_BT_UART_CTS           (P3_3)
 
 /** Pin: BT Power */
 #define CYBSP_BT_POWER              (P3_4)
