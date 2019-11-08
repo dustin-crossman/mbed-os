@@ -45,7 +45,7 @@
 
 // Reset pin unavailable
 #define SWITCH2 CYBSP_SW2
-#define SWITCH2 CYBSP_SW4
+#define SWITCH4 CYBSP_SW4
 #define USER_BUTTON SWITCH2
 #define BUTTON1 USER_BUTTON
 #define BUTTON2 CYBSP_SW4
