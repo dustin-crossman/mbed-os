@@ -9221,6 +9221,32 @@
         "bootloader_supported": true,
         "sectors": [[268435456, 512]]
     },
+    "CY8CPROTO_064S3_4343W": {
+        "inherits": ["MCU_PSOC6_M4"],
+        "features": ["BLE"],
+        "components_add": ["CM4"],
+        "components_remove": ["QSPIF"],
+        "device_has_remove": ["ANALOGOUT"],
+        "extra_labels_add": [
+            "PSOC6_03",
+            "MXCRYPTO_02",
+            "WHD",
+            "4343W",
+            "CYW43XXX",
+            "CORDIO"
+        ],
+        "detect_code": ["190C"],
+        "macros_add": ["CYB06445LQI_S3D42", "CYBSP_WIFI_CAPABLE", "CORE=CM4"],
+        "public": true,
+        "overrides": {
+            "network-default-interface-type": "WIFI"
+        },
+        "post_binary_hook": {
+            "function": "PSOC6Code.sign_image"
+        },
+        "bootloader_supported": true,
+        "sectors": [[268435456, 512]]
+    },
     "CY8CKIT_062S2_43012": {
         "inherits": ["CY8CMOD_062S2_43012"],
         "supported_form_factors": ["ARDUINO"],
