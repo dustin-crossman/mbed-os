@@ -53,7 +53,7 @@ ENTRY(Reset_Handler)
 #endif
 
 #if !defined(MBED_ROM_SIZE)
-  #define MBED_ROM_SIZE     0x000CFC00
+  #define MBED_ROM_SIZE     0x0005DC00
 #endif
 
 /* MBED_APP_SIZE is being  used by the bootloader build script and

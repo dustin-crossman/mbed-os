@@ -148,6 +148,9 @@
         }
     },
     "target_overrides": {
+        "CY8CPROTO_064S3_4343W": {
+            "stdio-baud-rate": 115200
+        },
         "ARM_MUSCA_A1_NS": {
             "stdio-baud-rate": 115200
         },

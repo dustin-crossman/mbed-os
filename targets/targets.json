@@ -9226,7 +9226,7 @@
         "features": ["BLE"],
         "components_add": ["CM4"],
         "components_remove": ["QSPIF"],
-        "device_has_remove": ["ANALOGOUT"],
+        "device_has_remove": ["ANALOGOUT", "QSPI"],
         "extra_labels_add": [
             "PSOC6_03",
             "MXCRYPTO_02",
@@ -9236,6 +9236,7 @@
             "CORDIO"
         ],
         "detect_code": ["190C"],
+		"forced_reset_timeout": 5,
         "macros_add": ["CYB06445LQI_S3D42", "CYBSP_WIFI_CAPABLE", "CORE=CM4"],
         "public": true,
         "overrides": {

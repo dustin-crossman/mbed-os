@@ -39,6 +39,7 @@
 #define UART_CTS P5_3
 
 #define LED1 P11_1
+#define LED2 LED1
 #define LED_RED LED1
 
 // Reset pin unavailable
