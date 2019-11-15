@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file system_psoc6.h
-* \version 2.60
+* \version 2.70
 *
 * \brief Device system header file.
 *
@@ -320,6 +320,11 @@
 *       <th>Reason for Change</th>
 *   </tr>
 *   <tr>
+*       <td>2.70</td>
+*       <td>Updated \ref SystemCoreClockUpdate() implementation - the SysClk API is reused.</td>
+*       <td>Code optimization.</td>
+*   </tr>
+*   <tr>
 *       <td>2.60</td>
 *       <td>Updated linker scripts.</td>
 *       <td>Provided support for new devices, updated usage of CM0p prebuilt image.</td>
@@ -581,7 +586,6 @@ void Cy_SysIpcPipeIsrCm4(void);
 extern void     Cy_SystemInit(void);
 extern void     Cy_SystemInitFpuEnable(void);
 
-extern uint32_t cy_delayFreqHz;
 extern uint32_t cy_delayFreqKhz;
 extern uint8_t  cy_delayFreqMhz;
 extern uint32_t cy_delay32kMs;
@@ -634,11 +638,11 @@ extern uint32_t cy_delay32kMs;
 #define CY_SYS_CYPIPE_INTR_MASK   ( CY_SYS_CYPIPE_CHAN_MASK_EP0 | CY_SYS_CYPIPE_CHAN_MASK_EP1 )
 
 #define CY_SYS_CYPIPE_CONFIG_EP0  ( (CY_SYS_CYPIPE_INTR_MASK << CY_IPC_PIPE_CFG_IMASK_Pos) \
-                                            | (CY_IPC_INTR_CYPIPE_EP0 << CY_IPC_PIPE_CFG_INTR_Pos) \
-                                            | CY_IPC_CHAN_CYPIPE_EP0)
+                                   | (CY_IPC_INTR_CYPIPE_EP0 << CY_IPC_PIPE_CFG_INTR_Pos) \
+                                    | CY_IPC_CHAN_CYPIPE_EP0)
 #define CY_SYS_CYPIPE_CONFIG_EP1  ( (CY_SYS_CYPIPE_INTR_MASK << CY_IPC_PIPE_CFG_IMASK_Pos) \
-                                            | (CY_IPC_INTR_CYPIPE_EP1 << CY_IPC_PIPE_CFG_INTR_Pos) \
-                                            | CY_IPC_CHAN_CYPIPE_EP1)
+                                   | (CY_IPC_INTR_CYPIPE_EP1 << CY_IPC_PIPE_CFG_INTR_Pos) \
+                                    | CY_IPC_CHAN_CYPIPE_EP1)
 
 /******************************************************************************/
 
@@ -658,7 +662,7 @@ extern uint32_t cy_PeriClkFreqHz;
 
 /** \cond INTERNAL */
 /*******************************************************************************
-* Backward compatibility macro. The following code is DEPRECATED and must
+* Backward compatibility macros. The following code is DEPRECATED and must
 * not be used in new projects
 *******************************************************************************/
 
@@ -667,6 +671,7 @@ extern uint32_t cy_PeriClkFreqHz;
 #define Cy_RestoreIRQ   Cy_SysLib_ExitCriticalSection
 #define CY_SYS_INTR_CYPIPE_EP0          (CY_IPC_INTR_CYPIPE_EP0)
 #define CY_SYS_INTR_CYPIPE_EP1          (CY_IPC_INTR_CYPIPE_EP1)
+#define cy_delayFreqHz                  (SystemCoreClock)
 
 /** \endcond */
 
