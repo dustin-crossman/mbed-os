@@ -1,6 +1,6 @@
 /***************************************************************************//**
-* \file cy8c6xx5_cm4_dual.ld
-* \version 2.60
+* \file cy8c6xx5_cm0plus.ld
+* \version 2.70
 *
 * Linker file for the GNU C compiler.
 *
@@ -40,47 +40,52 @@ SEARCH_DIR(.)
 GROUP(-lgcc -lc -lnosys)
 ENTRY(Reset_Handler)
 
-/* Size of the Cortex-M0+ application image at the start of FLASH */
-FLASH_CM0P_SIZE = 0x2000;
-
 #if !defined(MBED_ROM_START)
   #define MBED_ROM_START    0x10000000
 #endif
 
-/* MBED_APP_START is being used by the bootloader build script and
-* will be calculate by the system. In case if MBED_APP_START address is
-* customized by the bootloader config, the application image should not
-* include CM0p prebuilt image.
+/* MBED_APP_START is being  used by the bootloader build script and
+* will be calculate by the system. Without bootloader the MBED_APP_START
+* is equal to MBED_ROM_START
 */
 #if !defined(MBED_APP_START)
-  #define MBED_APP_START (MBED_ROM_START + FLASH_CM0P_SIZE)
+  #define MBED_APP_START MBED_ROM_START
 #endif
 
 #if !defined(MBED_ROM_SIZE)
-  #define MBED_ROM_SIZE     0x00080000
+  #define MBED_ROM_SIZE     0x80000
 #endif
 
 /* MBED_APP_SIZE is being  used by the bootloader build script and
-* will be calculate by the system.
+* will be calculate by the system. Without bootloader the MBED_APP_SIZE
+* is equal to MBED_ROM_SIZE
 */
 #if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE (MBED_ROM_SIZE - FLASH_CM0P_SIZE)
+  #define MBED_APP_SIZE MBED_ROM_SIZE
 #endif
 
 #if !defined(MBED_RAM_START)
-  #define MBED_RAM_START    0x08002000
+  #define MBED_RAM_START    0x08000000
 #endif
 
 #if !defined(MBED_RAM_SIZE)
-  #define MBED_RAM_SIZE     0x0003D800
+  #define MBED_RAM_SIZE     0x00010000
 #endif
 
+#if !defined(MBED_PUBLIC_RAM_SIZE)
+  #define MBED_PUBLIC_RAM_SIZE     0x200
+#endif
+
+/* The size of the stack section at the end of CM0+ SRAM */
 #if !defined(MBED_BOOT_STACK_SIZE)
     #define MBED_BOOT_STACK_SIZE 0x400
 #endif
 
-/* Size of the stack section at the end of CM4 SRAM */
 STACK_SIZE = MBED_BOOT_STACK_SIZE;
+
+#if !defined(MBED_PUBLIC_RAM_START)
+  #define MBED_PUBLIC_RAM_START    (MBED_RAM_START + MBED_RAM_SIZE - STACK_SIZE - MBED_PUBLIC_RAM_SIZE)
+#endif
 
 /* Force symbol to be entered in the output file as an undefined symbol. Doing
 * this may, for example, trigger linking of additional modules from standard
@@ -95,16 +100,16 @@ EXTERN(Reset_Handler)
 */
 MEMORY
 {
-    /* The ram and flash regions control RAM and flash memory allocation for the CM4 core.
+    /* The ram and flash regions control RAM and flash memory allocation for the CM0+ core.
      * You can change the memory allocation by editing the 'ram' and 'flash' regions.
      * Note that 2 KB of RAM (at the end of the SRAM) are reserved for system use.
      * Using this memory region for other purposes will lead to unexpected behavior.
-     * Your changes must be aligned with the corresponding memory regions for CM0+ core in 'xx_cm0plus.ld',
-     * where 'xx' is the device group; for example, 'cy8c6xx7_cm0plus.ld'.
+     * Your changes must be aligned with the corresponding memory regions for the CM4 core in 'xx_cm4_dual.ld',
+     * where 'xx' is the device group; for example, 'cy8c6xx7_cm4_dual.ld'.
      */
     ram               (rwx)   : ORIGIN = MBED_RAM_START, LENGTH = MBED_RAM_SIZE
-    cm0p_image        (rx)    : ORIGIN = MBED_ROM_START, LENGTH = FLASH_CM0P_SIZE
-    flash             (rx)    : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
+    public_ram        (rw)    : ORIGIN = MBED_PUBLIC_RAM_START, LENGTH = MBED_PUBLIC_RAM_SIZE
+    flash             (rx)    : ORIGIN = MBED_APP_START, LENGTH = (MBED_APP_SIZE - 0x8000)
 
     /* This is a 32K flash region used for EEPROM emulation. This region can also be used as the general purpose flash.
      * You can assign sections to this memory region for only one of the cores.
@@ -162,17 +167,13 @@ GROUP(libgcc.a libc.a libm.a libnosys.a)
 
 SECTIONS
 {
-     /* Cortex-M0+ application flash image area */
-    .cy_m0p_image ORIGIN(cm0p_image) :
+    .cy_app_header :
     {
-        . = ALIGN(4);
-        __cy_m0p_code_start = . ;
-        KEEP(*(.cy_m0p_image))
-        __cy_m0p_code_end = . ;
-    } > cm0p_image
+        KEEP(*(.cy_app_header))
+    } > flash
 
-    /* Cortex-M4 application flash area */
-    .text ORIGIN(flash) :
+    /* Cortex-M0+ application flash area */
+    .text :
     {
         . = ALIGN(4);
         __Vectors = . ;
@@ -225,7 +226,7 @@ SECTIONS
 
     /* To copy multiple ROM to RAM sections,
      * uncomment .copy.table section and,
-     * define __STARTUP_COPY_MULTIPLE in startup_psoc6_03_cm4.S */
+     * define __STARTUP_COPY_MULTIPLE in startup_psoc6_03_cm0plus.S */
     .copy.table :
     {
         . = ALIGN(4);
@@ -247,7 +248,7 @@ SECTIONS
 
     /* To clear multiple BSS sections,
      * uncomment .zero.table section and,
-     * define __STARTUP_CLEAR_BSS_MULTIPLE in startup_psoc6_03_cm4.S */
+     * define __STARTUP_CLEAR_BSS_MULTIPLE in startup_psoc6_03_cm0plus.S */
     .zero.table :
     {
         . = ALIGN(4);
@@ -349,6 +350,22 @@ SECTIONS
     } > ram
 
 
+    /* .stack_dummy section doesn't contains any symbols. It is only
+     * used for linker to calculate size of stack sections, and assign
+     * values to stack symbols later */
+    .stack_dummy (NOLOAD):
+    {
+        KEEP(*(.stack*))
+    } > ram
+
+
+    /* Public RAM */
+    .cy_sharedmem (NOLOAD):
+    {
+        . = ALIGN(4);
+        KEEP(*(.cy_sharedmem))
+    } > public_ram
+
     /* Set stack top to end of RAM, and stack limit move down by
      * size of stack_dummy section */
     __StackTop = ORIGIN(ram) + LENGTH(ram);
@@ -357,14 +374,6 @@ SECTIONS
 
     /* Check if data + heap + stack exceeds RAM limit */
     ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
-
-
-    /* Used for the digital signature of the secure application and the Bootloader SDK application.
-    * The size of the section depends on the required data size. */
-    .cy_app_signature ORIGIN(flash) + LENGTH(flash) - 256 :
-    {
-        KEEP(*(.cy_app_signature))
-    } > flash
 
 
     /* Emulated EEPROM Flash area */

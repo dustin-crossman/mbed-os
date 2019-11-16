@@ -4,7 +4,9 @@
 * Description:
 * System configuration
 * This file was automatically generated and should not be modified.
-* 
+* cfg-backend-cli: 1.2.0.1478
+* Device Support Library (../../../../output/psoc6/psoc6pdl): 1.4.0.1571
+*
 ********************************************************************************
 * Copyright 2017-2019 Cypress Semiconductor Corporation
 * SPDX-License-Identifier: Apache-2.0
@@ -38,6 +40,9 @@
 #define CY_CFG_SYSCLK_CLKHF2_ENABLED 1
 #define CY_CFG_SYSCLK_CLKHF2_FREQ_MHZ 50UL
 #define CY_CFG_SYSCLK_CLKHF2_CLKPATH CY_SYSCLK_CLKHF_IN_CLKPATH0
+#define CY_CFG_SYSCLK_CLKHF3_ENABLED 1
+#define CY_CFG_SYSCLK_CLKHF3_FREQ_MHZ 48UL
+#define CY_CFG_SYSCLK_CLKHF3_CLKPATH CY_SYSCLK_CLKHF_IN_CLKPATH1
 #define CY_CFG_SYSCLK_CLKHF4_ENABLED 1
 #define CY_CFG_SYSCLK_CLKHF4_FREQ_MHZ 100UL
 #define CY_CFG_SYSCLK_CLKHF4_CLKPATH CY_SYSCLK_CLKHF_IN_CLKPATH0
@@ -120,9 +125,9 @@ static const cy_stc_fll_manual_config_t srss_0_clock_0_fll_0_fllConfig =
 #endif //defined (CY_USING_HAL)
 static const cy_stc_pll_manual_config_t srss_0_clock_0_pll_0_pllConfig = 
 {
-	.feedbackDiv = 36,
+	.feedbackDiv = 30,
 	.referenceDiv = 1,
-	.outputDiv = 2,
+	.outputDiv = 5,
 	.lfMode = false,
 	.outputMode = CY_SYSCLK_FLLPLL_OUTPUT_AUTO,
 };
@@ -161,6 +166,12 @@ __STATIC_INLINE void Cy_SysClk_ClkHf2Init()
     Cy_SysClk_ClkHfSetSource(CY_CFG_SYSCLK_CLKHF2, CY_CFG_SYSCLK_CLKHF2_CLKPATH);
     Cy_SysClk_ClkHfSetDivider(CY_CFG_SYSCLK_CLKHF2, CY_SYSCLK_CLKHF_DIVIDE_BY_2);
     Cy_SysClk_ClkHfEnable(CY_CFG_SYSCLK_CLKHF2);
+}
+__STATIC_INLINE void Cy_SysClk_ClkHf3Init()
+{
+    Cy_SysClk_ClkHfSetSource(CY_CFG_SYSCLK_CLKHF3, CY_CFG_SYSCLK_CLKHF3_CLKPATH);
+    Cy_SysClk_ClkHfSetDivider(CY_CFG_SYSCLK_CLKHF3, CY_SYSCLK_CLKHF_NO_DIVIDE);
+    Cy_SysClk_ClkHfEnable(CY_CFG_SYSCLK_CLKHF3);
 }
 __STATIC_INLINE void Cy_SysClk_ClkHf4Init()
 {
@@ -543,22 +554,22 @@ void init_cycfg_system(void)
 	SystemCoreClockUpdate();
 
 #if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&srss_0_clock_0_pathmux_0_obj);
+	cyhal_hwmgr_reserve(&srss_0_clock_0_pathmux_0_obj);
 #endif //defined (CY_USING_HAL)
 
 #if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&srss_0_clock_0_pathmux_1_obj);
+	cyhal_hwmgr_reserve(&srss_0_clock_0_pathmux_1_obj);
 #endif //defined (CY_USING_HAL)
 
 #if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&srss_0_clock_0_pathmux_2_obj);
+	cyhal_hwmgr_reserve(&srss_0_clock_0_pathmux_2_obj);
 #endif //defined (CY_USING_HAL)
 
 #if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&srss_0_clock_0_pathmux_3_obj);
+	cyhal_hwmgr_reserve(&srss_0_clock_0_pathmux_3_obj);
 #endif //defined (CY_USING_HAL)
 
 #if defined (CY_USING_HAL)
-		cyhal_hwmgr_reserve(&srss_0_clock_0_pathmux_4_obj);
+	cyhal_hwmgr_reserve(&srss_0_clock_0_pathmux_4_obj);
 #endif //defined (CY_USING_HAL)
 }
