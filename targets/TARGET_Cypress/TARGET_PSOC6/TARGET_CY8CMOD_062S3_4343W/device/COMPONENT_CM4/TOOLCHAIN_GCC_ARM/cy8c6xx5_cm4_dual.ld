@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy8c6xx5_cm4_dual.ld
-* \version 2.70
+* \version 2.60
 *
 * Linker file for the GNU C compiler.
 *
@@ -40,7 +40,7 @@ SEARCH_DIR(.)
 GROUP(-lgcc -lc -lnosys)
 ENTRY(Reset_Handler)
 
-/* The size of the Cortex-M0+ application image at the start of FLASH */
+/* Size of the Cortex-M0+ application image at the start of FLASH */
 FLASH_CM0P_SIZE = 0x2000;
 
 #if !defined(MBED_ROM_START)
@@ -79,7 +79,7 @@ FLASH_CM0P_SIZE = 0x2000;
     #define MBED_BOOT_STACK_SIZE 0x400
 #endif
 
-/* The size of the stack section at the end of CM4 SRAM */
+/* Size of the stack section at the end of CM4 SRAM */
 STACK_SIZE = MBED_BOOT_STACK_SIZE;
 
 /* Force symbol to be entered in the output file as an undefined symbol. Doing
