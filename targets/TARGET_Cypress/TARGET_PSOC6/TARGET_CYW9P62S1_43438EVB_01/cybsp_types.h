@@ -203,6 +203,15 @@ extern "C" {
 /** Pin: QUAD SPI SCK */
 #define CYBSP_QSPI_SCK              (P11_7)
 
+/** Pin: SPI MOSI */
+#define CYBSP_SPI_MOSI              (P12_0)
+/** Pin: SPI MISO */
+#define CYBSP_SPI_MISO              (P12_1)
+/** Pin: SPI CLK */
+#define CYBSP_SPI_CLK               (P12_2)
+/** Pin: SPI CS */
+#define CYBSP_SPI_CS                (P12_4)
+
 /** Host-wake GPIO drive mode */
 #define CYBSP_WIFI_HOST_WAKE_GPIO_DM (CYHAL_GPIO_DRIVE_ANALOG)
 /** Host-wake IRQ event */
@@ -262,6 +271,47 @@ extern "C" {
 #define CYBSP_D15                   (P6_0)
 
 /** \} group_bsp_pins_arduino */
+
+
+/**
+* \addtogroup group_bsp_pins_j2 J2 Header Pins
+* \{
+*/
+
+/** Cypress J2 Header pin 1 */
+#define CYBSP_J2_1                  (CYBSP_A0)
+/** Cypress J2 Header pin 2 */
+#define CYBSP_J2_2                  (P9_0)
+/** Cypress J2 Header pin 3 */
+#define CYBSP_J2_3                  (CYBSP_A1)
+/** Cypress J2 Header pin 4 */
+#define CYBSP_J2_4                  (P9_1)
+/** Cypress J2 Header pin 5 */
+#define CYBSP_J2_5                  (CYBSP_A2)
+/** Cypress J2 Header pin 6 */
+#define CYBSP_J2_6                  (P9_2)
+/** Cypress J2 Header pin 7 */
+#define CYBSP_J2_7                  (CYBSP_A3)
+/** Cypress J2 Header pin 8 */
+#define CYBSP_J2_8                  (P9_3)
+/** Cypress J2 Header pin 9 */
+#define CYBSP_J2_9                  (CYBSP_A4)
+/** Cypress J2 Header pin 10 */
+#define CYBSP_J2_10                 (P9_4)
+/** Cypress J2 Header pin 11 */
+#define CYBSP_J2_11                 (CYBSP_A5)
+/** Cypress J2 Header pin 12 */
+#define CYBSP_J2_12                 (P9_5)
+/** Cypress J2 Header pin 13 */
+#define CYBSP_J2_13                 (P10_6)
+/** Cypress J2 Header pin 14 */
+#define CYBSP_J2_14                 (P9_6)
+/** Cypress J2 Header pin 15 */
+#define CYBSP_J2_15                 (NC)
+/** Cypress J2 Header pin 16 */
+#define CYBSP_J2_16                 (NC)
+
+/** \} group_bsp_pins_j2 */
 
 /** \} group_bsp_pins */
 
