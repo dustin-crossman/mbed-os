@@ -9238,13 +9238,11 @@
     "CYW9P62S1_43438EVB_01": {
         "inherits": ["MCU_PSOC6_M4"],
         "features": ["BLE"],
+        "components_add": ["WHD", "43438", "CYW43XXX" ],
         "extra_labels_add": [
             "PSOC6_01",
             "MXCRYPTO_01",
             "CM0P_SLEEP",
-            "WHD",
-            "43438",
-            "CYW43XXX",
             "CORDIO"
         ],
         "macros_add": ["CY8C6247BZI_D54", "CYHAL_UDB_SDIO", "CYBSP_WIFI_CAPABLE"],
