@@ -55,6 +55,17 @@
         "gdbServerOther": "-p 3333&#13;&#10;--no-deprecation-warning",
         "corePortNumber": 3334
       }
+    },
+
+    "CY8CPROTO_064S3_4343W": {
+      "generic": {
+      },
+      "debug": {
+        "coreLoadImage": "false"
+      },
+      "program": {
+        "PROGRAM_NAME": ".hex"
+      }
     }
   }
 }
