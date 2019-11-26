@@ -1,6 +1,6 @@
 /***************************************************************************//**
-* \file cyb06xx7_cm4_dual.ld
-* \version 2.60
+* \file cy8c6xx5_cm4_dual.ld
+* \version 2.70
 *
 * Linker file for the GNU C compiler.
 *
@@ -41,12 +41,13 @@ GROUP(-lgcc -lc -lnosys)
 ENTRY(Reset_Handler)
 
 #if !defined(MBED_ROM_START)
-  #define MBED_ROM_START    0x10002400
+  #define MBED_ROM_START    0x10000000
 #endif
 
-/* MBED_APP_START is being  used by the bootloader build script and
-* will be calculate by the system. Without bootloader the MBED_APP_START
-* is equal to MBED_ROM_START
+/* MBED_APP_START is being used by the bootloader build script and
+* will be calculate by the system. In case if MBED_APP_START address is
+* customized by the bootloader config, the application image should not
+* include CM0p prebuilt image.
 */
 #if !defined(MBED_APP_START)
   #define MBED_APP_START MBED_ROM_START
@@ -57,8 +58,7 @@ ENTRY(Reset_Handler)
 #endif
 
 /* MBED_APP_SIZE is being  used by the bootloader build script and
-* will be calculate by the system. Without bootloader the MBED_APP_SIZE
-* is equal to MBED_ROM_SIZE
+* will be calculate by the system.
 */
 #if !defined(MBED_APP_SIZE)
   #define MBED_APP_SIZE MBED_ROM_SIZE
@@ -76,7 +76,10 @@ ENTRY(Reset_Handler)
     #define MBED_BOOT_STACK_SIZE 0x400
 #endif
 
-/* Size of the stack section at the end of CM4 SRAM */
+/* The size of the MCU boot header area at the start of FLASH */
+BOOT_HEADER_SIZE = 0x400;
+
+/* The size of the stack section at the end of CM4 SRAM */
 STACK_SIZE = MBED_BOOT_STACK_SIZE;
 
 /* Force symbol to be entered in the output file as an undefined symbol. Doing
@@ -159,7 +162,7 @@ GROUP(libgcc.a libc.a libm.a libnosys.a)
 SECTIONS
 {
     /* Cortex-M4 application flash area */
-    .text ORIGIN(flash) :
+    .text ORIGIN(flash) + BOOT_HEADER_SIZE :
     {
         . = ALIGN(4);
         __Vectors = . ;
@@ -212,7 +215,7 @@ SECTIONS
 
     /* To copy multiple ROM to RAM sections,
      * uncomment .copy.table section and,
-     * define __STARTUP_COPY_MULTIPLE in startup_psoc6_01_cm4.S */
+     * define __STARTUP_COPY_MULTIPLE in startup_psoc6_03_cm4.S */
     .copy.table :
     {
         . = ALIGN(4);
@@ -234,7 +237,7 @@ SECTIONS
 
     /* To clear multiple BSS sections,
      * uncomment .zero.table section and,
-     * define __STARTUP_CLEAR_BSS_MULTIPLE in startup_psoc6_01_cm4.S */
+     * define __STARTUP_CLEAR_BSS_MULTIPLE in startup_psoc6_03_cm4.S */
     .zero.table :
     {
         . = ALIGN(4);
@@ -422,7 +425,7 @@ SECTIONS
 /* The following symbols used by the cymcuelftool. */
 /* Flash */
 __cy_memory_0_start    = 0x10000000;
-__cy_memory_0_length   = 0x000D0000;
+__cy_memory_0_length   = 0x00080000;
 __cy_memory_0_row_size = 0x200;
 
 /* Emulated EEPROM Flash area */
