@@ -61,7 +61,7 @@
  * flushing the Tx FIFO would take: 16 * 8 * 1000 / 9600 = 13.3 ms.
  * To be on the safe side, set the wait time to 20 ms.
  */
-#define SERIAL_FLUSH_TIME_MS    20
+#define SERIAL_FLUSH_TIME_MS    200
 
 int CASE_INDEX_START;
 int CASE_INDEX_CURRENT;

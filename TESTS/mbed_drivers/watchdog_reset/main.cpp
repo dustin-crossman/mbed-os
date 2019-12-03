@@ -70,7 +70,7 @@
  * flushing the Tx FIFO would take: 16 * 8 * 1000 / 9600 = 13.3 ms.
  * To be on the safe side, set the wait time to 20 ms.
  */
-#define SERIAL_FLUSH_TIME_MS 20
+#define SERIAL_FLUSH_TIME_MS 200
 
 #define TIMEOUT_US (1000 * (TIMEOUT_MS))
 #define KICK_ADVANCE_US (1000 * (KICK_ADVANCE_MS))
@@ -112,6 +112,7 @@ bool send_reset_notification(testcase_data *tcdata, uint32_t delay_ms)
         return false;
     }
     greentea_send_kv(MSG_KEY_DEVICE_RESET, msg_value);
+    wait_ms(SERIAL_FLUSH_TIME_MS);
     return true;
 }
 
