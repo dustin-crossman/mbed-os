@@ -85,6 +85,8 @@ static void kvstore_init()
     res = bd->init();
     TEST_ASSERT_EQUAL_ERROR_CODE(0, res);
     int erase_val = bd->get_erase_value();
+    // Clear out any stale data that might be left from a previous test
+    bd->erase(0, bd->size()); 
     res = bd->deinit();
     TEST_ASSERT_EQUAL_ERROR_CODE(0, res);
 
