@@ -122,8 +122,8 @@ static void kvstore_init()
         program_size  = sec_bd->get_program_size();
         erase_size = sec_bd->get_erase_size();
         // We must be able to hold at least 10 small keys (20 program sectors) and master record + internal data
-        ul_bd_size  = align_up(program_size * 40, erase_size);
-        rbp_bd_size = align_up(program_size * 40, erase_size);
+        ul_bd_size  = align_up(program_size * 40, erase_size * 2);
+        rbp_bd_size = align_up(program_size * 40, erase_size * 2);
 
         res = sec_bd->deinit();
         TEST_ASSERT_EQUAL_ERROR_CODE(MBED_SUCCESS, res);
