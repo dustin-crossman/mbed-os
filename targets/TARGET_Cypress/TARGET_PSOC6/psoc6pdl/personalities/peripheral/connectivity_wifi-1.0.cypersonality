@@ -263,6 +263,6 @@
       <Member name="`${tcpkaOflIdx + 1}`u" value="{NULL, NULL, NULL, NULL}" include="`${pktFilterEn || arpOffload || tcpkaOffload}`" />
     </ConfigStruct>
 
-    <ConfigFunction signature="const ol_desc_t *cycfg_get_default_ol_list(void)" body="&#9;return &amp;ol_list_0[0];" public="false" include="`${pktFilterEn || arpOffload}`" />
+    <ConfigFunction signature="const ol_desc_t *cycfg_get_default_ol_list(void)" body="&#9;return &amp;ol_list_0[0];" public="false" include="`${pktFilterEn || arpOffload || tcpkaOffload}`" />
   </ConfigFirmware>
 </Personality>

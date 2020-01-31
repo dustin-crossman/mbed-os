@@ -5,7 +5,7 @@
 * Common header file to be included by the drivers.
 *
 * \note
-* Generator version: 1.5.0.1292
+* Generator version: 1.5.1.21
 *
 ********************************************************************************
 * \copyright
@@ -236,6 +236,8 @@
     #include "cy8c6245lqi_s3d02.h"
 #elif defined (CY8C6245W_S3D72)
     #include "cy8c6245w_s3d72.h"
+#elif defined (PSoC6A256K)
+    #include "psoc6a256k.h"
 #else
     #include "cy_device_common.h"
 #endif

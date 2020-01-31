@@ -1,6 +1,6 @@
 /***************************************************************************//**
 * \file cy_prot.h
-* \version 1.30.1
+* \version 1.30.2
 *
 * \brief
 * Provides an API declaration of the Protection Unit driver
@@ -389,6 +389,12 @@
 * \section group_prot_changelog Changelog
 * <table class="doxtable">
 *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
+*   <tr>
+*     <td>1.30.2</td>
+*     <td>Clarified the description of the next API functions: \ref Cy_Prot_ConfigPpuProgMasterAtt,\n
+*         \ref Cy_Prot_ConfigPpuProgSlaveAtt, \ref Cy_Prot_ConfigPpuFixedMasterAtt, \ref Cy_Prot_ConfigPpuFixedSlaveAtt.</td>
+*     <td>API enhancement based on usability feedback.</td>
+*   </tr>
 *   <tr>
 *     <td>1.30.1</td>
 *     <td>Snippet updated.</td>
